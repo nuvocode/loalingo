@@ -203,7 +203,7 @@
         "dayTrip": "Einen Tagesausflug planen"
       }
     },
-    "pickTopic": "Worüber sollt ihr, {{name}} und du, sprechen?",
+    "pickTopic": "Worüber möchtest du mit {{name}} sprechen?",
     "ownTopic": "Oder schreibe ein eigenes Thema",
     "ownTopicPlaceholder": "z. B. eine Geburtstagsfeier planen",
     "start": "Start",
@@ -315,7 +315,7 @@
     "endLesson": "Lektion beenden",
     "quitTitle": "Lektion abbrechen?",
     "quitDesc": "Dein Fortschritt in dieser Lektion geht verloren.",
-    "quit": "Abbrechen",
+    "quit": "Beenden",
     "keepGoing": "Weiterlernen"
   },
   "lesson": {

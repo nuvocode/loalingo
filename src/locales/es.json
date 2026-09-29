@@ -263,8 +263,8 @@
   },
   "settings": {
     "title": "Ajustes",
-    "on": "Sí",
-    "off": "No",
+    "on": "Activado",
+    "off": "Desactivado",
     "sound": "Efectos de sonido",
     "soundDesc": "Sonidos de acierto y error",
     "speaking": "Ejercicios orales",
