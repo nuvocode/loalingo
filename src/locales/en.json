@@ -327,7 +327,14 @@
     "start": "Start",
     "noMoreCourses": "No other courses installed yet.",
     "switched": "Switched to {{course}}",
-    "switchCourse": "Switch course"
+    "switchCourse": "Switch course",
+    "more": "Options for {{name}}",
+    "delete": "Delete",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteWarn": "All progress of {{name}}'s profile will be permanently deleted. This can't be undone.",
+    "deleteType": "Type \"{{name}}\" to confirm",
+    "deleted": "Deleted {{name}}",
+    "deleteFailed": "Could not delete the profile"
   },
   "ai": {
     "title": "AI provider",

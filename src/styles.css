@@ -347,6 +347,11 @@ svg{display:block}
 .input:focus-visible,.select:focus-visible{outline:none;border-color:var(--blue)}
 .swatch{width:36px;height:36px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 2px var(--border)}
 .swatch[aria-checked="true"]{border-color:var(--card);box-shadow:0 0 0 3px var(--blue)}
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:100%;z-index:5;min-width:140px;margin-top:4px;padding:4px;background:var(--card);border:2px solid var(--border);border-radius:var(--r);box-shadow:0 4px 0 var(--border)}
+.menu-item{display:block;width:100%;text-align:left;font:inherit;font-weight:800;padding:10px 12px;min-height:44px;border-radius:8px;color:var(--text)}
+.menu-item:hover,.menu-item:focus-visible{background:var(--surface)}
+.menu-item.danger{color:var(--red)}
 .course-chip{border:2px solid var(--border);border-radius:12px;padding:2px 8px;font-size:18px}
 /* First node is the current one: leave room for its start tag under the sticky unit header. */
 .path:has(> .node:nth-child(2) .start-tag){padding-top:24px}

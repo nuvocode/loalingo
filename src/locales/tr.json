@@ -322,7 +322,14 @@
     "start": "Başla",
     "noMoreCourses": "Henüz yüklü başka kurs yok.",
     "switched": "{{course}} kursuna geçildi",
-    "switchCourse": "Kurs değiştir"
+    "switchCourse": "Kurs değiştir",
+    "more": "{{name}} için seçenekler",
+    "delete": "Sil",
+    "deleteTitle": "{{name}} silinsin mi?",
+    "deleteWarn": "{{name}} profilinin tüm ilerlemesi kalıcı olarak silinir. Bu işlem geri alınamaz.",
+    "deleteType": "Onaylamak için \"{{name}}\" yaz",
+    "deleted": "{{name}} silindi",
+    "deleteFailed": "Profil silinemedi"
   },
   "ai": {
     "title": "Yapay zekâ sağlayıcısı",
