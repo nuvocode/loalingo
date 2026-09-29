@@ -2,6 +2,12 @@
   "_meta": {
     "name": "Türkçe"
   },
+  "boot": {
+    "newerTitle": "Bu veri daha yeni bir sürümden",
+    "newerDesc": "Verilerin loalingo'nun daha yeni bir sürümüyle kaydedilmiş. Açmak için uygulamayı güncelle. Bu sürüm verilere dokunmaz.",
+    "failedTitle": "loalingo verilerini açamadı",
+    "failedDesc": "Veritabanı açılırken bir sorun oluştu. Ayrıntılar:"
+  },
   "nav": {
     "main": "Ana gezinme",
     "bottom": "Alt gezinme",

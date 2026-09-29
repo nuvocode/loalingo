@@ -2,6 +2,12 @@
   "_meta": {
     "name": "English"
   },
+  "boot": {
+    "newerTitle": "This data is from a newer version",
+    "newerDesc": "Your data was saved by a newer version of loalingo. Update the app to open it. This version won't change it.",
+    "failedTitle": "loalingo couldn't open your data",
+    "failedDesc": "Something went wrong while opening the database. Details:"
+  },
   "nav": {
     "main": "Main navigation",
     "bottom": "Bottom navigation",

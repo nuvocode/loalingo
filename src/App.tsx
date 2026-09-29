@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "./icons";
-import { useApp, type Route } from "./store";
+import { useApp, type BootError, type Route } from "./store";
 import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
 import { reminderDue, today } from "./progress";
@@ -38,9 +38,23 @@ function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
   );
 }
 
+function BootErrorScreen({ e }: { e: BootError }) {
+  const { t } = useTranslation();
+  const future = e.kind === "future";
+  return (
+    <div className="boot-error" role="alert">
+      <div className="card">
+        <h3>{t(future ? "boot.newerTitle" : "boot.failedTitle")}</h3>
+        <p className="muted">{t(future ? "boot.newerDesc" : "boot.failedDesc")}</p>
+        {!future && <pre className="boot-detail">{e.detail}</pre>}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const { t } = useTranslation();
-  const { ready, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
+  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
   const Screen = SCREENS[route];
 
   useEffect(() => {
@@ -73,6 +87,7 @@ export default function App() {
     return () => clearInterval(h);
   }, [profile?.id, s.reminderOn, s.reminderTime, s.lastActive, s.remindedDay, s.streak]);
 
+  if (bootError) return <BootErrorScreen e={bootError} />;
   if (!ready) return null;
   return (
     <>

@@ -7,6 +7,7 @@ import * as db from "./db";
 import { activateConfig, loadAiConfig, saveAiConfig, type AiConfig } from "./ai";
 import type { Enrollment, Profile, Stats } from "./db";
 import { rollDay, today } from "./progress";
+import { FutureSchemaError } from "./migrate";
 
 export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings";
 const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings"];
@@ -33,8 +34,11 @@ async function loadCourses() {
 
 export const LAST_PROFILE = "last_profile";
 
+export type BootError = { kind: "future" | "failed"; detail: string };
+
 type Ctx = {
   ready: boolean;
+  bootError: BootError | null;
   ai: AiConfig | null; setAi: (c: AiConfig) => Promise<void>;
   courses: Course[]; courseErrors: string[];
   profile: Profile | null; enrollments: Enrollment[];
@@ -63,6 +67,7 @@ export const useApp = () => useContext(C);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
+  const [bootError, setBootError] = useState<BootError | null>(null);
   const [ai, setAiState] = useState<AiConfig | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [courseErrors, setCourseErrors] = useState<string[]>([]);
@@ -100,17 +105,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const cfg = await loadAiConfig();
-      await activateConfig(cfg);
-      setAiState(cfg);
-      const { courses, errors } = await loadCourses();
-      setCourses(courses); setCourseErrors(errors);
-      errors.forEach((e) => console.error(e));
-      // Auto sign-in to the last profile unless it is PIN-locked.
-      const last = Number(await db.getSetting(LAST_PROFILE));
-      const p = last ? await db.getProfile(last) : null;
-      if (p && !p.pin_hash) await login(p);
-      setReady(true);
+      try {
+        const cfg = await loadAiConfig();
+        await activateConfig(cfg);
+        setAiState(cfg);
+        const { courses, errors } = await loadCourses();
+        setCourses(courses); setCourseErrors(errors);
+        errors.forEach((e) => console.error(e));
+        // Auto sign-in to the last profile unless it is PIN-locked.
+        const last = Number(await db.getSetting(LAST_PROFILE));
+        const p = last ? await db.getProfile(last) : null;
+        if (p && !p.pin_hash) await login(p);
+        setReady(true);
+      } catch (e) {
+        console.error(e);
+        setBootError({ kind: e instanceof FutureSchemaError ? "future" : "failed", detail: e instanceof Error ? e.message : String(e) });
+      }
     })();
   }, [login]);
 
@@ -129,7 +139,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const firstLevel = (iso: string) => levelsOf(courses.find((c) => c.iso === iso)!)[0];
 
   const value: Ctx = {
-    ready, ai,
+    ready, bootError, ai,
     setAi: async (c) => { await saveAiConfig(c); await activateConfig(c); setAiState(c); },
     courses, courseErrors, profile, enrollments, enrollment, course, done, legendary,
     login,
