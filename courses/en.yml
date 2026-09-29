@@ -1261,6 +1261,7 @@ levels:
           - id: comparing-conditionals
             title: Real or Imaginary?
             description: Choose the right conditional for the situation.
+            vocabulary: [likely, unlikely, "real situation", "imaginary situation", unless]
             activities:
               - { type: learn }
               - { type: sentence_complete, count: 3 }
@@ -1401,6 +1402,7 @@ levels:
           - id: describing-someone-you-know
             title: Describing Someone You Know
             description: Describe a person you know using relative clauses.
+            vocabulary: [personality, generous, reliable, "get along with", "look up to"]
             activities:
               - { type: sentence_complete, count: 2 }
               - { type: error_correct, count: 2 }
@@ -1459,6 +1461,7 @@ levels:
           - id: talking-about-your-career
             title: Talking About Your Career
             description: Discuss your career goals and a recent challenge with a colleague.
+            vocabulary: [ambition, promotion, challenge, "career path", "work experience"]
             activities:
               - { type: word_bank, count: 2 }
               - { type: error_correct, count: 2 }
@@ -1503,6 +1506,7 @@ levels:
           - id: giving-lifestyle-advice
             title: Giving Lifestyle Advice
             description: Give someone advice about changing their lifestyle.
+            vocabulary: [lifestyle, "cut down on", "take up", routine, habit]
             activities:
               - { type: sentence_complete, count: 2 }
               - { type: error_correct, count: 2 }
@@ -1547,6 +1551,7 @@ levels:
           - id: pros-and-cons-of-technology
             title: Pros & Cons of Technology
             description: Discuss the advantages and disadvantages of modern technology.
+            vocabulary: [advantage, disadvantage, "on the one hand", "on the other hand", convenient]
             activities:
               - { type: word_bank, count: 2 }
               - { type: translate, count: 2 }
@@ -1796,6 +1801,7 @@ levels:
           - id: talking-about-the-future
             title: Talking About Your Future
             description: Discuss your own long-term plans and predictions with a partner.
+            vocabulary: ["long-term", prediction, "be about to", "be bound to", "in the near future"]
             activities:
               - { type: word_bank, count: 2 }
               - { type: error_correct, count: 2 }
@@ -1899,6 +1905,7 @@ levels:
           - id: retelling-a-conversation
             title: Retelling a Conversation
             description: Retell a longer conversation using a variety of reporting verbs.
+            vocabulary: [admit, suggest, insist, warn, promise, "point out"]
             activities:
               - { type: word_bank, count: 2 }
               - { type: error_correct, count: 2 }
@@ -1949,6 +1956,7 @@ levels:
           - id: discussing-a-project-at-work
             title: Discussing a Project
             description: Discuss the progress of a work project using phrasal verbs and collocations.
+            vocabulary: ["carry out", "run into", "meet a deadline", "on schedule", "behind schedule"]
             activities:
               - { type: word_select, count: 2 }
               - { type: sentence_complete, count: 2 }
@@ -2001,6 +2009,7 @@ levels:
           - id: having-a-debate
             title: Having a Debate
             description: Take part in a structured debate on an everyday issue.
+            vocabulary: ["I take the view that", "I'd argue that", "to some extent", "I see your point", counterargument]
             activities:
               - { type: sentence_complete, count: 2 }
               - { type: translate, count: 2 }
@@ -2051,6 +2060,7 @@ levels:
           - id: discussing-a-global-issue
             title: Discussing a Global Issue
             description: Share your views on an environmental or social issue with someone else.
+            vocabulary: [sustainable, inequality, "raise awareness", "take action", "long-term impact"]
             activities:
               - { type: word_bank, count: 2 }
               - { type: translate, count: 2 }
@@ -2112,6 +2122,7 @@ levels:
           - id: discussing-a-cultural-event
             title: Discussing a Cultural Event
             description: Talk about a film, exhibition or performance you have seen.
+            vocabulary: [review, plot, "stand out", "highly recommend", "worth seeing"]
             activities:
               - { type: word_bank, count: 2 }
               - { type: translate, count: 2 }
@@ -2122,6 +2133,1128 @@ levels:
 
     checkpoint:
       title: B2 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }
+
+  C1:
+    title: Advanced
+    description: >
+      Understand a wide range of demanding, longer texts and recognise implicit meaning. Express
+      ideas fluently and spontaneously, and use language flexibly for social, academic and
+      professional purposes.
+
+    units:
+      - id: inversion-and-emphasis
+        title: Inversion & Emphasis
+        description: Put weight on what matters with inverted word order and cleft sentences.
+        icon: 🔁
+        steps:
+          - id: negative-adverbial-inversion
+            title: Negative Adverbials
+            description: Invert subject and auxiliary after negative and restrictive adverbials.
+            vocabulary: [never, seldom, rarely, hardly, scarcely, "not only", "under no circumstances"]
+            grammar:
+              - pattern: "Never have I seen such a beautiful sunset."
+              - pattern: "Rarely does the board reject a proposal outright."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct, count: 2 }
+          - id: only-and-no-sooner-inversion
+            title: Only, No Sooner, Not Until
+            description: Use inversion after "only", "no sooner", "hardly" and "not until".
+            vocabulary: ["only when", "only after", "no sooner ... than", "hardly ... when", "not until"]
+            grammar:
+              - pattern: "No sooner had we sat down than the power went out."
+              - pattern: "Only after the results came in did we realise the scale of the problem."
+              - pattern: "Not until she left did I understand how much she had done."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: conditional-inversion
+            title: Inverted Conditionals
+            description: Drop "if" and invert in formal conditional sentences.
+            vocabulary: [provided, "should you", "were it not for", "had it not been for", assuming]
+            grammar:
+              - pattern: "Had I known about the delay, I would have rebooked the flight."
+              - pattern: "Should you require further assistance, please contact us."
+              - pattern: "Were it not for your support, the project would have collapsed."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: cleft-sentences
+            title: Cleft Sentences
+            description: Focus attention with it-clefts and wh-clefts.
+            vocabulary: ["what matters is", "the reason why", "the thing that", "it was ... who", "all I want"]
+            grammar:
+              - pattern: "It was the lack of funding that ended the project."
+              - pattern: "What I find most striking is the speed of the change."
+              - pattern: "All he did was complain."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: error_correct }
+          - id: emphasising-a-point
+            title: Emphasising a Point
+            description: Stress a view with fronting and emphatic structures in a lively conversation.
+            vocabulary: ["so much so that", "such was", "little did I know", "by no means", "above all"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: emphasising_a_view
+                goal: Tell a friend about a surprising event, using inversion and cleft sentences for emphasis.
+
+      - id: hypotheticals-and-subjunctive
+        title: Hypotheticals & the Subjunctive
+        description: Handle complex conditions, wishes and formal suggestions with precision.
+        icon: 🧪
+        steps:
+          - id: advanced-mixed-conditionals
+            title: Complex Conditionals
+            description: Combine conditions across time and use "but for" and "otherwise".
+            vocabulary: ["but for", otherwise, "if it weren't for", "supposing", "in that case"]
+            grammar:
+              - pattern: "But for her advice, I would still be working in a job I hated."
+              - pattern: "If he hadn't been so stubborn, we would be partners by now."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: if-it-were-to-and-happen-to
+            title: Were To, Happen To, Should
+            description: Talk about remote or tentative possibilities.
+            vocabulary: ["if ... were to", "happen to", "should ... happen", "in the unlikely event", contingency]
+            grammar:
+              - pattern: "If the company were to relocate, would you go with it?"
+              - pattern: "If you happen to see Mark, could you pass on the message?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank }
+          - id: the-subjunctive
+            title: The Subjunctive
+            description: Use the present subjunctive after verbs and adjectives of demand and importance.
+            vocabulary: [insist, demand, recommend, "it is essential", imperative, "lest"]
+            grammar:
+              - pattern: "The committee recommended that he be given a second chance."
+              - pattern: "It is essential that every employee complete the training."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: multiple_choice }
+          - id: wishes-and-preferences
+            title: Wishes & Preferences
+            description: Express regret, irritation and preference with "wish", "would rather" and "it's time".
+            vocabulary: ["it's high time", "would rather", "as if", "as though", "would sooner"]
+            grammar:
+              - pattern: "It's high time we changed the way we work."
+              - pattern: "I'd rather you didn't mention it to anyone."
+              - pattern: "He talks as though he owned the place."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+
+      - id: advanced-structures
+        title: Advanced Grammar Structures
+        description: Command the passives, participle clauses and noun phrases of formal English.
+        icon: 🏛️
+        steps:
+          - id: complex-passives
+            title: Complex Passives
+            description: Use passive infinitives, perfect passives and get-passives.
+            vocabulary: ["is said to have been", "is expected to be", "get caught", "having been told", allegedly]
+            grammar:
+              - pattern: "The painting is thought to have been stolen in the 1970s."
+              - pattern: "He objected to being treated like a child."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: participle-clauses
+            title: Participle Clauses
+            description: Condense information with -ing, -ed and perfect participle clauses.
+            vocabulary: ["having finished", "given that", "seen from", "judging by", "generally speaking"]
+            grammar:
+              - pattern: "Having reviewed the data, the team changed its approach."
+              - pattern: "Built in 1890, the station is now a museum."
+              - pattern: "Judging by the reviews, the film is well worth seeing."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: translate }
+          - id: nominalisation
+            title: Nominalisation
+            description: Turn verbs and adjectives into nouns for a formal, compact style.
+            vocabulary: [implementation, decline, "the emergence of", reliance, "a growing awareness"]
+            grammar:
+              - pattern: "The rapid decline of local newspapers has changed how people follow politics."
+              - pattern: "Their reliance on a single supplier proved costly."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: ellipsis-and-substitution
+            title: Ellipsis & Substitution
+            description: Avoid repetition with "do so", "the former", "the latter" and reduced clauses.
+            vocabulary: ["do so", "the former", "the latter", "the same", "as is the case"]
+            grammar:
+              - pattern: "Employees may leave early, but few choose to do so."
+              - pattern: "Both plans are risky; the former is cheaper, the latter faster."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+
+      - id: hedging-and-discourse
+        title: Hedging & Discourse
+        description: Sound careful, tactful and well organised when you speak and write.
+        icon: 🧭
+        steps:
+          - id: softening-claims-with-hedges
+            title: Hedging Language
+            description: Soften claims with hedges, so you sound cautious rather than blunt.
+            vocabulary: ["tend to", "it would appear", "to a certain extent", "by and large", arguably, "seem to suggest"]
+            grammar:
+              - pattern: "The findings would seem to suggest that the effect is relatively small."
+              - pattern: "It could be argued that the policy has largely failed."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: discourse-markers
+            title: Discourse Markers
+            description: Signal contrast, addition, concession and consequence in extended talk.
+            vocabulary: [nonetheless, "that said", furthermore, consequently, "be that as it may", "having said that"]
+            grammar:
+              - pattern: "The results were promising; that said, the sample was small."
+              - pattern: "Be that as it may, we still need to cut costs."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: word_bank, count: 2 }
+          - id: concession-structures
+            title: Concession
+            description: Grant a point while keeping your own, with "however", "much as" and "albeit".
+            vocabulary: [albeit, "much as", "granted", "for all", "notwithstanding", "admittedly"]
+            grammar:
+              - pattern: "Much as I admire her, I can't support the proposal."
+              - pattern: "It was a useful, albeit expensive, solution."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: tactful-disagreement
+            title: Disagreeing Tactfully
+            description: Disagree, correct and criticise without causing offence.
+            vocabulary: ["I take your point", "with respect", "I'm not entirely convinced", "up to a point", "I see it differently"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: steering-a-discussion
+            title: Steering a Discussion
+            description: Take the floor, redirect a conversation and summarise the main points.
+            vocabulary: ["if I could just", "to return to", "to sum up", "coming back to", "building on that"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: leading_a_meeting_discussion
+                goal: Chair a short discussion, disagree tactfully with a colleague and steer the group back to the agenda.
+
+      - id: professional-life
+        title: Professional Life
+        description: Communicate with authority in meetings, negotiations and reports.
+        icon: 💼
+        steps:
+          - id: negotiating-terms
+            title: Negotiating Terms
+            description: Make offers, set conditions and reach compromise.
+            vocabulary: ["meet you halfway", "a deal-breaker", leverage, concession, "on the table", "bottom line"]
+            grammar:
+              - pattern: "We'd be prepared to lower the price, provided you commit to a longer contract."
+              - pattern: "Were you to increase the order, we could offer a discount."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: match }
+              - { type: word_bank, count: 2 }
+          - id: managing-and-leading
+            title: Managing & Leading
+            description: Delegate, motivate and give constructive feedback.
+            vocabulary: [delegate, "hold accountable", "buy-in", "constructive criticism", "empower", "stretch target"]
+            grammar:
+              - pattern: "I'd suggest you take ownership of the client relationship going forward."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: reports-and-proposals
+            title: Reports & Proposals
+            description: Describe trends, recommend action and write in a professional register.
+            vocabulary: ["a marked increase", plummet, "levelled off", "project", "in light of", "it is recommended that"]
+            grammar:
+              - pattern: "Sales plummeted in the third quarter before levelling off."
+              - pattern: "In light of these findings, it is recommended that the scheme be extended."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: workplace-change-and-conflict
+            title: Change & Conflict at Work
+            description: Talk through restructuring, disagreements and resolving tension.
+            vocabulary: [restructuring, redundancy, "clear the air", "office politics", "meet in the middle", "on the same page"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: listen_type }
+              - { type: speak }
+          - id: senior-role-interview
+            title: The Senior Interview
+            description: Present your experience with confidence in an interview for a senior role.
+            vocabulary: ["track record", "transferable skills", "spearhead", "core competence", "a steep learning curve"]
+            activities:
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: senior_job_interview
+                goal: Answer an interviewer's questions about your track record, your leadership style and a difficult decision you made.
+
+      - id: media-and-information
+        title: Media & Information
+        description: Analyse how news is made and how messages persuade.
+        icon: 📰
+        steps:
+          - id: news-and-headlines
+            title: News & Headlines
+            description: Read between the lines of headlines and reports.
+            vocabulary: [headline, "front page", scoop, coverage, "go viral", "breaking news", tabloid]
+            grammar:
+              - pattern: "The minister is reported to have resigned."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+          - id: bias-and-spin
+            title: Bias & Spin
+            description: Talk about how language shapes opinion.
+            vocabulary: [bias, spin, "loaded language", propaganda, "sensationalise", "take at face value", impartial]
+            grammar:
+              - pattern: "The story was framed in such a way as to blame the council."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+              - { type: translate, count: 2 }
+          - id: social-media-and-privacy
+            title: Social Media & Privacy
+            description: Discuss online behaviour, data and digital footprints.
+            vocabulary: ["digital footprint", "echo chamber", misinformation, "clickbait", "data breach", "opt out", surveillance]
+            grammar:
+              - pattern: "Were platforms held liable, they might moderate content more carefully."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+          - id: assessing-sources
+            title: Assessing Sources
+            description: Weigh up the reliability of claims, statistics and sources.
+            vocabulary: [credible, "peer-reviewed", "cherry-pick", anecdotal, "a sweeping generalisation", "take with a pinch of salt"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: fact_checking_a_claim
+                goal: Challenge a friend's claim about an online story, questioning the source and the statistics.
+
+      - id: science-technology-ethics
+        title: Science, Technology & Ethics
+        description: Explain innovation and debate where it should stop.
+        icon: 🔬
+        steps:
+          - id: research-and-methods
+            title: Research & Methods
+            description: Describe how studies are designed and what findings show.
+            vocabulary: [hypothesis, "control group", "sample size", correlation, causation, "statistically significant"]
+            grammar:
+              - pattern: "The study found no evidence that the two variables were causally linked."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select, count: 2 }
+          - id: artificial-intelligence-and-automation
+            title: AI & Automation
+            description: Discuss what intelligent machines mean for work and society.
+            vocabulary: [automation, algorithm, "machine learning", "job displacement", "human oversight", accountable]
+            grammar:
+              - pattern: "Were more tasks to be automated, entire professions might disappear."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: ethical-dilemmas
+            title: Ethical Dilemmas
+            description: Argue about right and wrong in medicine, technology and business.
+            vocabulary: [dilemma, "moral obligation", consent, "the greater good", "cross a line", "ethically questionable"]
+            grammar:
+              - pattern: "Scientists ought not to be allowed to act without independent scrutiny."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: debating-innovation
+            title: Debating Innovation
+            description: Weigh the benefits and risks of a new technology in a debate.
+            vocabulary: ["a double-edged sword", safeguards, regulation, "unintended consequences", "pave the way"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: technology_ethics_debate
+                goal: Argue for or against a controversial new technology, respond to objections and propose safeguards.
+
+      - id: society-and-environment
+        title: Society & Environment
+        description: Talk about inequality, policy and the planet in depth.
+        icon: 🌱
+        steps:
+          - id: social-inequality
+            title: Social Inequality
+            description: Discuss wealth, opportunity and social mobility.
+            vocabulary: ["the wealth gap", "social mobility", deprivation, "underprivileged", "level playing field", "marginalised"]
+            grammar:
+              - pattern: "Not only has inequality widened, but it has also become more entrenched."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: climate-and-sustainability
+            title: Climate & Sustainability
+            description: Talk about climate policy, carbon and the transition to renewable energy.
+            vocabulary: ["carbon footprint", "net zero", "renewable", "fossil fuels", "tipping point", "offset emissions"]
+            grammar:
+              - pattern: "Had governments acted earlier, the worst effects might have been avoided."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select, count: 2 }
+              - { type: word_bank }
+          - id: politics-and-governance
+            title: Politics & Governance
+            description: Discuss how societies are governed and how policy is made.
+            vocabulary: [legislation, "grassroots", electorate, "public consultation", "cast a vote", "hold to account"]
+            grammar:
+              - pattern: "It is the electorate who ultimately decide, not the pundits."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: community-action
+            title: Community Action
+            description: Persuade others to take part in a local or global cause.
+            vocabulary: [campaign, "raise funds", volunteer, "make a difference", "lobby", "spread the word"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: rallying_support
+                goal: Persuade a neighbour to join a local campaign, explaining the problem, the plan and why their help matters.
+
+      - id: idioms-and-collocations
+        title: Idioms & Collocations
+        description: Sound natural with fixed phrases and word partnerships.
+        icon: 💬
+        steps:
+          - id: strong-collocations
+            title: Strong Collocations
+            description: Pair verbs, nouns and adjectives the way native speakers do.
+            vocabulary: ["draw a conclusion", "raise concerns", "wield influence", "harbour doubts", "bitterly disappointed", "deeply rooted"]
+            grammar:
+              - pattern: "The report raises serious concerns about safety standards."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: word_select }
+          - id: idioms-of-work-and-money
+            title: Idioms of Work & Money
+            description: Use idioms about effort, risk, cost and success.
+            vocabulary: ["pull your weight", "cut corners", "a drop in the ocean", "break the bank", "go the extra mile", "on a shoestring"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate, count: 2 }
+          - id: idioms-of-people-and-feelings
+            title: Idioms of People & Feelings
+            description: Describe character, mood and relationships with idioms.
+            vocabulary: ["down to earth", "on cloud nine", "at the end of my tether", "get cold feet", "wear your heart on your sleeve"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct }
+          - id: phrasal-verbs-advanced
+            title: Advanced Phrasal Verbs
+            description: Master less common, sometimes idiomatic phrasal verbs.
+            vocabulary: ["come across as", "pan out", "chip in", "brush up on", "iron out", "back out of", "fall through"]
+            grammar:
+              - pattern: "Let's iron out the remaining details before the launch."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank }
+          - id: telling-a-story-with-idioms
+            title: A Story With Idioms
+            description: Tell an anecdote and colour it with idioms and collocations.
+            vocabulary: ["out of the blue", "by the skin of my teeth", "a blessing in disguise", "the last straw", "in the nick of time"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: telling_an_anecdote_with_idioms
+                goal: Tell a friend about a day when everything went wrong, using at least four idioms naturally.
+
+      - id: argument-and-academic-writing
+        title: Argument & Academic Writing
+        description: Build a case in formal writing and speech.
+        icon: ✍️
+        steps:
+          - id: structuring-an-essay
+            title: Structuring an Essay
+            description: Write introductions, thesis statements and topic sentences.
+            vocabulary: ["thesis statement", "this essay will argue", "topic sentence", "by way of illustration", "in conclusion"]
+            grammar:
+              - pattern: "This essay will argue that public transport deserves greater investment."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: translate }
+          - id: evidence-and-citation
+            title: Evidence & Citation
+            description: Refer to sources and data accurately and fairly.
+            vocabulary: ["according to", "as cited in", "corroborate", "in line with", "contradict", "draw on"]
+            grammar:
+              - pattern: "These findings corroborate earlier research by Chen (2019)."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: counterarguments
+            title: Counterarguments
+            description: Acknowledge opposing views and rebut them.
+            vocabulary: ["critics contend", "a common objection", "refute", "on closer inspection", "this overlooks"]
+            grammar:
+              - pattern: "Critics contend that the tax is unfair; however, this overlooks its long-term benefits."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: presenting-a-case-aloud
+            title: Presenting a Case
+            description: Deliver a structured, persuasive mini-presentation and answer questions.
+            vocabulary: ["I'd like to begin by", "turning to", "the key takeaway", "in a nutshell", "I'd be happy to expand"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: giving_a_short_presentation
+                goal: Present an argument on a topic of your choice and respond to a sceptical question from the audience.
+
+    checkpoint:
+      title: C1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }
+
+  C2:
+    title: Proficiency
+    description: >
+      Understand virtually everything heard or read, summarise information from different sources
+      and express yourself spontaneously, very fluently and precisely, differentiating finer shades
+      of meaning even in the most complex situations.
+
+    units:
+      - id: register-and-nuance
+        title: Register & Nuance
+        description: Choose exactly the right word and tone for every audience.
+        icon: 🎚️
+        steps:
+          - id: formal-and-informal-registers
+            title: Formal & Informal Registers
+            description: Shift between casual, neutral and highly formal English without a slip.
+            vocabulary: [commence, "get going", ascertain, "find out", "prior to", "before long", "kindly"]
+            grammar:
+              - pattern: "I would be grateful if you could confirm receipt of this letter."
+              - pattern: "Let me know if you can make it."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: connotation-and-shades-of-meaning
+            title: Connotation & Shades of Meaning
+            description: Tell apart near-synonyms that carry different attitudes.
+            vocabulary: [slim, skinny, thrifty, stingy, "determined", "pig-headed", "inquisitive", "nosy"]
+            grammar:
+              - pattern: "She's not stubborn, she's resolute; there's a difference."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 3 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: euphemism-and-understatement
+            title: Euphemism & Understatement
+            description: Say difficult things gently, or say less than you mean.
+            vocabulary: ["pass away", "let go", "economical with the truth", "not entirely", "a touch", "somewhat"]
+            grammar:
+              - pattern: "The results were not entirely what we had hoped for."
+              - pattern: "He's a touch over-enthusiastic, shall we say."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: regional-and-social-varieties
+            title: Regional & Social Varieties
+            description: Recognise British, American and other varieties, slang and dialect.
+            vocabulary: [dialect, accent, slang, vernacular, "colloquialism", "lorry", "truck", "cheers"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: listen_select, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+          - id: adjusting-your-tone
+            title: Adjusting Your Tone
+            description: Rephrase a message for a boss, a friend and a stranger.
+            vocabulary: ["I was wondering whether", "would you mind", "cut to the chase", "with the greatest respect", "no offence"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: rephrasing_for_different_audiences
+                goal: Deliver the same awkward news first to a close friend and then to a senior client, adjusting register and tact.
+
+      - id: subtle-modality
+        title: Modality & Stance
+        description: Convey certainty, doubt, attitude and obligation with fine control.
+        icon: 🎯
+        steps:
+          - id: modal-nuances
+            title: Modal Nuances
+            description: Use "may well", "might as well", "needn't have" and "was to have" with precision.
+            vocabulary: ["may well", "might as well", "needn't have", "was to have", "ought to have", "dare"]
+            grammar:
+              - pattern: "You may well be right, but I'd like to check first."
+              - pattern: "We needn't have hurried; the train was late."
+              - pattern: "The talks were to have ended on Friday, but they dragged on."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: multiple_choice }
+          - id: stance-adverbials
+            title: Stance Adverbials
+            description: Signal your attitude to what you say with sentence adverbs.
+            vocabulary: [admittedly, ostensibly, "to all intents and purposes", "as it happens", "frankly", "understandably"]
+            grammar:
+              - pattern: "Ostensibly a charity, the organisation was in fact a lobbying group."
+              - pattern: "Understandably, the staff were reluctant to speak."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: translate }
+          - id: certainty-and-doubt
+            title: Certainty & Doubt
+            description: Grade your confidence from near-certain to sceptical.
+            vocabulary: [undoubtedly, "in all likelihood", "it stands to reason", "I have my doubts", "far from certain", "beyond question"]
+            grammar:
+              - pattern: "In all likelihood, the vote will be postponed."
+              - pattern: "It stands to reason that prices will rise if supply falls."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: attitude-in-conversation
+            title: Attitude in Conversation
+            description: Express reservations, reluctant agreement and gentle scepticism in a live exchange.
+            vocabulary: ["I'm inclined to think", "I daresay", "for what it's worth", "if anything", "I wouldn't go so far as to say"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: expressing_reservations
+                goal: Respond to a friend's ambitious plan with measured doubt, partial agreement and constructive advice.
+
+      - id: idiom-and-figurative-language
+        title: Idiom & Figurative Language
+        description: Understand and use metaphor, idiom and proverb the way native speakers do.
+        icon: 🎭
+        steps:
+          - id: metaphor-and-simile
+            title: Metaphor & Simile
+            description: Read and craft vivid comparisons.
+            vocabulary: [metaphor, simile, "a tidal wave of", "a web of lies", "as sharp as a razor", "the tip of the iceberg"]
+            grammar:
+              - pattern: "Her argument was a house of cards, ready to collapse at the first challenge."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 3 }
+              - { type: translate }
+          - id: opaque-idioms
+            title: Opaque Idioms
+            description: Decode idioms whose meaning cannot be guessed from the words.
+            vocabulary: ["bite the bullet", "let the cat out of the bag", "throw in the towel", "a red herring", "the elephant in the room", "beat around the bush"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 3 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct }
+          - id: proverbs-and-sayings
+            title: Proverbs & Sayings
+            description: Recognise proverbs and adapt them to the situation.
+            vocabulary: ["the proof of the pudding", "too many cooks", "a stitch in time", "every cloud has a silver lining", "barking up the wrong tree"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank }
+          - id: idioms-in-formal-and-spoken-contexts
+            title: Idioms in Context
+            description: Judge when an idiom enriches your speech and when it grates.
+            vocabulary: ["a tall order", "on the back burner", "hit the ground running", "a sea change", "the writing on the wall"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+              - { type: speak }
+          - id: narrating-with-figurative-language
+            title: Figurative Storytelling
+            description: Tell a story rich in imagery and idiom.
+            vocabulary: ["dark horse", "a storm in a teacup", "on thin ice", "burn the midnight oil", "at a crossroads"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: colourful_storytelling
+                goal: Tell a friend about a turning point in your life, using vivid imagery and idiom without overdoing it.
+
+      - id: rhetoric-and-persuasion
+        title: Rhetoric & Persuasion
+        description: Move an audience with the devices of great speakers.
+        icon: 🎤
+        steps:
+          - id: rhetorical-devices
+            title: Rhetorical Devices
+            description: Recognise and use triads, parallelism, antithesis and rhetorical questions.
+            vocabulary: [antithesis, parallelism, "rhetorical question", anaphora, "tricolon", hyperbole]
+            grammar:
+              - pattern: "We came, we saw, we conquered."
+              - pattern: "Ask not what your country can do for you; ask what you can do for your country."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete }
+          - id: persuasive-structures
+            title: Persuasive Structures
+            description: Build appeals using emphasis, contrast and repetition.
+            vocabulary: ["let us not forget", "the question is not whether but", "imagine a world", "nothing less than", "at stake"]
+            grammar:
+              - pattern: "The question is not whether we can afford to act, but whether we can afford not to."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: emotive-and-loaded-language
+            title: Emotive Language
+            description: Spot how word choice manipulates feeling and how to use it responsibly.
+            vocabulary: [emotive, "loaded", "scaremongering", "rallying cry", "appeal to emotion", "dog whistle"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: speechwriting
+            title: Writing a Speech
+            description: Open strongly, build to a climax and close memorably.
+            vocabulary: ["a call to arms", "to close", "hook", "crescendo", "let me leave you with"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+              - { type: speak }
+          - id: delivering-a-speech
+            title: Delivering a Speech
+            description: Deliver a short persuasive speech and respond to an interruption.
+            vocabulary: ["ladies and gentlemen", "I put it to you", "allow me to", "bear with me", "in the words of"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: delivering_a_persuasive_speech
+                goal: Deliver a short speech using at least three rhetorical devices, then deal with a hostile interruption gracefully.
+
+      - id: humour-irony-wordplay
+        title: Humour, Irony & Wordplay
+        description: Get the joke and make your own.
+        icon: 😏
+        steps:
+          - id: irony-and-sarcasm
+            title: Irony & Sarcasm
+            description: Tell verbal irony, sarcasm and dry understatement from sincerity.
+            vocabulary: [irony, sarcasm, "dry wit", deadpan, "tongue in cheek", "poking fun at"]
+            grammar:
+              - pattern: "Oh, brilliant. Another meeting that could have been an email."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_select, count: 2 }
+              - { type: sentence_complete }
+          - id: puns-and-wordplay
+            title: Puns & Wordplay
+            description: Understand double meanings, puns and playful language.
+            vocabulary: [pun, "double entendre", "play on words", innuendo, "a running joke", witty]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: translate }
+          - id: british-humour
+            title: British Humour
+            description: Grasp self-deprecation, banter and understatement in British comedy.
+            vocabulary: [banter, "self-deprecating", "taking the mickey", "not bad", "a bit rich", "quite the character"]
+            grammar:
+              - pattern: "That's a bit rich coming from someone who's never been on time."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: error_correct }
+          - id: telling-a-funny-story
+            title: Telling a Funny Story
+            description: Time a punchline, build comic tension and land the joke.
+            vocabulary: [punchline, "comic timing", anecdote, "wry", "cringeworthy", "the funny thing is"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: sharing_a_funny_story
+                goal: Tell a friend a funny, slightly embarrassing story with good timing, then respond to their teasing in kind.
+
+      - id: academic-and-formal-writing
+        title: Academic & Formal Writing
+        description: Write with the precision, distance and structure of scholarly prose.
+        icon: 🎓
+        steps:
+          - id: academic-register
+            title: Academic Register
+            description: Use impersonal constructions, precise verbs and careful qualification.
+            vocabulary: [posit, "it can be inferred", "is contingent on", "underpin", "ostensible", "a plethora of"]
+            grammar:
+              - pattern: "It can be inferred from the data that consumer confidence remained fragile."
+              - pattern: "The outcome is contingent on a number of interrelated factors."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: error_correct }
+          - id: cohesion-in-long-texts
+            title: Cohesion in Long Texts
+            description: Link paragraphs with reference, lexical chains and signposting.
+            vocabulary: ["the aforementioned", "the latter", "in this respect", "to that end", "by extension", "hence", "thereby"]
+            grammar:
+              - pattern: "The policy reduced costs, thereby freeing resources for research."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: translate }
+          - id: summarising-and-paraphrasing
+            title: Summarising & Paraphrasing
+            description: Condense long arguments and restate ideas in your own words.
+            vocabulary: [paraphrase, synthesise, "in essence", "boil down to", "the gist", "distil"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: critical-evaluation
+            title: Critical Evaluation
+            description: Judge the strength of an argument and its methodology.
+            vocabulary: ["methodological flaw", "tenuous", "robust", "compelling", "lacks rigour", "a fair assessment", "unsubstantiated"]
+            grammar:
+              - pattern: "While the conclusions are compelling, the methodology is not beyond criticism."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: formal-correspondence
+            title: Formal Correspondence
+            description: Write and respond to formal letters, complaints and proposals with authority.
+            vocabulary: ["I am writing with regard to", "I would appreciate", "pursuant to", "we regret to inform you", "yours faithfully"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: formal_complaint_meeting
+                goal: Present a formal complaint to a company's representative, cite the facts and negotiate a satisfactory resolution.
+
+      - id: literature-and-style
+        title: Literature & Style
+        description: Read literary English closely and write with style.
+        icon: 📚
+        steps:
+          - id: literary-vocabulary
+            title: Literary Vocabulary
+            description: Understand words used in fiction, poetry and essays.
+            vocabulary: [ephemeral, ubiquitous, "melancholy", "foreboding", "luminous", "languid", "sombre"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+          - id: narrative-voice-and-tone
+            title: Narrative Voice & Tone
+            description: Distinguish narrator, viewpoint and tone in a text.
+            vocabulary: ["unreliable narrator", "omniscient", "free indirect speech", tone, "stream of consciousness", "vantage point"]
+            grammar:
+              - pattern: "He paused. Surely she must have known? The whole town certainly did."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select, count: 2 }
+              - { type: error_correct }
+          - id: stylistic-variation
+            title: Stylistic Variation
+            description: Vary sentence length, syntax and rhythm for effect.
+            vocabulary: [cadence, terse, "periodic sentence", "run-on", "sentence fragment", "for effect"]
+            grammar:
+              - pattern: "Silence. Then, slowly, without a word, the door began to open."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: discussing-a-book
+            title: Discussing a Book
+            description: Analyse themes, characters and style in a work of literature.
+            vocabulary: [theme, motif, "character arc", "subtext", "allegory", "the prose is", "leaves the reader"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: book_club_discussion
+                goal: Discuss a novel you know with a fellow reader, analysing its themes and style and defending your interpretation.
+
+      - id: ideas-and-philosophy
+        title: Ideas & Philosophy
+        description: Discuss abstract concepts and reason about them with clarity.
+        icon: 🧠
+        steps:
+          - id: abstract-concepts
+            title: Abstract Concepts
+            description: Talk about freedom, justice, identity and meaning.
+            vocabulary: [autonomy, justice, "free will", "the common good", meaning, "moral relativism", pragmatism]
+            grammar:
+              - pattern: "What we call freedom is, to a large extent, a matter of perspective."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: logic-and-fallacies
+            title: Logic & Fallacies
+            description: Name flawed reasoning and reason soundly.
+            vocabulary: ["straw man", "slippery slope", "false dichotomy", "begging the question", "non sequitur", "ad hominem"]
+            grammar:
+              - pattern: "That doesn't follow; it's a classic non sequitur."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct }
+          - id: thought-experiments-and-abstraction
+            title: Thought Experiments
+            description: Pose and follow hypothetical scenarios.
+            vocabulary: ["suppose for a moment", "hypothetically", "by the same token", "it follows that", "taken to its logical conclusion"]
+            grammar:
+              - pattern: "Were we to accept that premise, it would follow that no one is responsible."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: a-philosophical-discussion
+            title: A Philosophical Discussion
+            description: Explore a big question and test each other's reasoning.
+            vocabulary: ["play devil's advocate", "it depends on what you mean by", "at the heart of", "a false premise", "push back"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: philosophical_debate
+                goal: Explore an abstract question with a friend, define your terms, challenge each other's assumptions and reach a considered view.
+
+      - id: culture-language-identity
+        title: Culture, Language & Identity
+        description: Reflect on how language, tradition and belonging shape who we are.
+        icon: 🌐
+        steps:
+          - id: language-change-and-globalisation
+            title: Language Change
+            description: Discuss how English evolves, spreads and borrows.
+            vocabulary: ["lingua franca", "loanword", "linguistic drift", "code-switching", neologism, "language death"]
+            grammar:
+              - pattern: "Rather than corrupting a language, borrowing has always been how it grows."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+          - id: identity-and-belonging
+            title: Identity & Belonging
+            description: Talk about heritage, migration and cultural identity with sensitivity.
+            vocabulary: [heritage, diaspora, assimilation, "sense of belonging", "cultural identity", "rootless"]
+            grammar:
+              - pattern: "For many, identity is less a fixed fact than an ongoing negotiation."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: cross-cultural-communication
+            title: Cross-Cultural Communication
+            description: Navigate differences in politeness, directness and etiquette.
+            vocabulary: ["high-context", "lost in translation", faux pas, etiquette, "read between the lines", "cultural sensitivity"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: traditions-and-modernity
+            title: Traditions & Modernity
+            description: Discuss what to preserve and what to change.
+            vocabulary: [custom, "time-honoured", "steeped in tradition", "die out", "revive", "modernisation"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: tradition_versus_change
+                goal: Discuss with a friend from another culture which traditions are worth preserving, and how customs differ between your countries.
+
+      - id: mastery-and-mediation
+        title: Mastery & Mediation
+        description: Use English as a fluent, flexible professional and mediator.
+        icon: 🏆
+        steps:
+          - id: interpreting-and-reformulating
+            title: Interpreting & Reformulating
+            description: Relay complex ideas clearly for people who need a simpler or different version.
+            vocabulary: ["in other words", "to put it simply", "what she is getting at", "to clarify", "put another way"]
+            grammar:
+              - pattern: "What the report is really saying is that the plan is unworkable."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 3 }
+              - { type: translate, count: 2 }
+              - { type: word_bank }
+          - id: handling-difficult-conversations
+            title: Difficult Conversations
+            description: Deliver bad news, defuse conflict and rebuild trust.
+            vocabulary: ["de-escalate", "tread carefully", "diplomatic", "clear the air", "hold your ground", "reach an understanding"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: thinking-on-your-feet
+            title: Thinking on Your Feet
+            description: Answer unexpected questions, buy time and recover from a slip.
+            vocabulary: ["that's a fair question", "let me think", "if I may", "to be perfectly honest", "correct myself", "off the top of my head"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - { type: speak }
+          - id: chairing-and-moderating
+            title: Chairing & Moderating
+            description: Lead a panel, manage speakers and sum up a complex debate.
+            vocabulary: [moderate, "the floor is yours", "with that in mind", "we're running short of time", "to wrap up"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: moderating_a_panel
+                goal: Moderate a panel discussion, draw out quiet speakers, manage a heated exchange and summarise the key positions.
+
+    checkpoint:
+      title: C2 Checkpoint
       required_score: 80
       activities:
         - { type: word_select, count: 3 }
