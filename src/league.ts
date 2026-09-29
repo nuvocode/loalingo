@@ -3,7 +3,7 @@
 export type Rival = { n: string; c: string; rate: number }; // rate = XP per day
 export type LeagueState = { week: string; tier: number; rivals: Rival[]; last?: "up" | "down" | "stay" };
 
-export const TIERS = 10; // Bronze … Diamond (names: i18n league.tier0..9)
+export const TIERS = 10; // Seed … Forest (names: i18n league.tier0..9)
 export const PROMOTE = 3, DEMOTE = 3;
 const NAMES = ["Aylin", "Mert", "Zeynep", "Kaan", "Elif", "Deniz", "Baran", "Selin", "Umut", "Lena", "Jonas", "Sofia", "Mateo", "Yuki", "Aarav",
   "Chloe", "Liam", "Nora", "Omar", "Ines", "Marco", "Hana", "Leo", "Maya", "Ivan", "Sara", "Theo", "Amir", "Lucia", "Emil"];

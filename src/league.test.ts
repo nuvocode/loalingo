@@ -27,6 +27,6 @@ test("new week settles the league: top 3 up, bottom 3 down, idle stays out of pr
   assert.ok(rankOf(l, 0, new Date(2026, 9, 5).getTime()) > 7);
   const down = rollLeague(l, 0, "2026-10-05");
   assert.equal(down.league.tier, 2); assert.equal(down.league.last, "down");
-  assert.equal(rollLeague(newLeague("2026-09-28", 0), 0, "2026-10-05").league.tier, 0, "no tier below Bronze");
+  assert.equal(rollLeague(newLeague("2026-09-28", 0), 0, "2026-10-05").league.tier, 0, "no tier below Seed");
   assert.equal(rollLeague(null, 0, "2026-10-05").league.week, "2026-10-05");
 });

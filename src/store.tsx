@@ -45,7 +45,7 @@ type Ctx = {
   switchCourse: (iso: string) => Promise<void>;
   completeStep: (stepId: string, xp: number) => Promise<void>;
   gainXp: (xp: number) => Promise<void>;
-  /** Legendary lesson passed: the (done) step turns gold. */
+  /** Mastery lesson passed: the (done) step turns gold. */
   markLegendary: (stepId: string) => Promise<void>;
   /** Checkpoint / level test passed: every node of `level` done, enrollment moves to the next level. */
   completeLevel: (level: Cefr, xp: number) => Promise<void>;

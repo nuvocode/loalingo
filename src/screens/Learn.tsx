@@ -53,7 +53,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
   const { t } = useTranslation();
   const { s, setS, completeStep, openSheet, closeSheet, legendary, ai, toast } = useApp();
   const start = useStartLesson();
-  // Legendary costs a shop ticket, else LEGEND_PRICE gems (charged only when the lesson can actually start).
+  // Mastery costs a shop ticket, else LEGEND_PRICE gems (charged only when the lesson can actually start).
   const startLegend = (id: string) => {
     closeSheet();
     if (!ai) return start(`legend:${id}`); // shows the "set up AI" sheet
@@ -61,7 +61,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
     setS((s) => s.legendTickets ? { ...s, legendTickets: s.legendTickets - 1 } : { ...s, gems: s.gems - LEGEND_PRICE });
     start(`legend:${id}`);
   };
-  // Done steps: review, or the Legendary version (gold once passed).
+  // Done steps: review, or the Mastery version (gold once passed).
   const doneStep = (n: PathNode) => openSheet(<>
     <h3>{n.title}</h3><p>{t(legendary.has(n.id) ? "learn.legendDone" : "learn.legendDesc", { score: LEGEND_PASS })}</p>
     <button className="btn btn-gold btn-block" onClick={() => startLegend(n.id)}>

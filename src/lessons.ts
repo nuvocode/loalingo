@@ -23,7 +23,7 @@ export function stepContext(course: Course, stepId: string, native: string): Les
     return {
       ...c, level: CEFR[Math.min(CEFR.indexOf(c.level) + 1, CEFR.length - 1)], // ponytail: C2 stays C2
       step: { ...c.step, id: stepId, activities: acts.length ? acts : c.step.activities,
-        description: `${c.step.description ?? ""} Legendary challenge: harder sentences and less obvious distractors than a normal lesson.`.trim() },
+        description: `${c.step.description ?? ""} Mastery challenge: harder sentences and less obvious distractors than a normal lesson.`.trim() },
     };
   }
   const exam = examLevel(stepId);
