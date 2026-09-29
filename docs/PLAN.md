@@ -146,8 +146,8 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Match Madness (90 sn) ve Zamanlı Meydan Okuma (120 sn, önbellekteki derslerden). Kalp harcamaz.
 - Mağaza: 2× XP (süreli), efsanevi bilet; efsanevi ders 100 elmas ya da bilet.
 - Arkadaşlar: bu cihazdaki diğer profiller. Bildirimler: gerçek durumdan (seri, lig, sandık…).
-- Günlük hatırlatıcı: sistem bildirimi; yalnızca uygulama açıkken (dakikada bir kontrol).
-- A2 kursu: 10 ünite, 43 adım + checkpoint.
+- Günlük hatırlatıcı: sistem bildirimi, dakikada bir kontrol. Açıkken pencereyi kapatmak uygulamayı gizler (Dock'tan geri gelir, ⌘Q kapatır) ve uygulama oturum açılışında gizli başlar (`tauri-plugin-autostart`, LaunchAgent). Kapatınca ikisi de geri alınır. PIN'li profil otomatik girilmediği için onun hatırlatıcısı giriş yapılana kadar çalışmaz.
+- A2 ve B1 kursları: her biri 10 ünite, 43 adım + checkpoint.
 - ✔ Whisper Rust testi (`cargo test -- --ignored whisper`) geçiyor. Dev uygulamada mikrofonla elle test bekliyor.
 
 ## 5. Kararlar

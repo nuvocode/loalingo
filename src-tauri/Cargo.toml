@@ -26,6 +26,7 @@ tauri-plugin-http = "~2.7"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 tauri-plugin-notification = "~2.5"
 whisper-rs = { version = "0.16", features = ["metal"] }
+tauri-plugin-autostart = "~2.6"
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

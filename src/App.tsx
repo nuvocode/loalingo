@@ -5,7 +5,7 @@ import { useApp, type Route } from "./store";
 import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
 import { reminderDue, today } from "./progress";
-import { notify } from "./notify";
+import { keepInBackground, notify } from "./notify";
 import { Chat, Story } from "./Talk";
 import type { CharacterId } from "./lessons";
 import { Learn } from "./screens/Learn";
@@ -52,6 +52,9 @@ export default function App() {
     sfxState.on = s.soundOn;
     document.documentElement.dataset.motion = s.reduceMotion ? "reduce" : "full";
   }, [s.soundOn, s.reduceMotion]);
+
+  // ponytail: a PIN-locked profile never auto-signs in, so its reminder only fires once someone signs in
+  useEffect(() => { keepInBackground(!!profile && s.reminderOn); }, [profile?.id, s.reminderOn]);
 
   // Daily reminder (Settings): checked every minute while the app runs, even in the background.
   useEffect(() => {

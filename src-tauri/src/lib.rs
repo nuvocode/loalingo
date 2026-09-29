@@ -112,19 +112,61 @@ mod tests {
     }
 }
 
+/// Daily reminder (Settings): the check runs in the webview, so the app must stay alive to fire it.
+/// While on, closing the window only hides it and the app starts hidden at login.
+static KEEP_ALIVE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+const HIDDEN_ARG: &str = "--hidden";
+
+#[tauri::command]
+fn set_background(app: tauri::AppHandle, on: bool) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    KEEP_ALIVE.store(on, std::sync::atomic::Ordering::Relaxed);
+    let launch = app.autolaunch();
+    // Skip no-op writes: enable() rewrites the LaunchAgent plist every time.
+    if launch.is_enabled().unwrap_or(false) != on {
+        if on { launch.enable() } else { launch.disable() }.map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+fn show_main(app: &tauri::AppHandle) {
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_notification::init())
-        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, transcribe])
+        .plugin(tauri_plugin_autostart::Builder::new().args([HIDDEN_ARG]).build())
+        .setup(|app| {
+            // The window starts invisible (tauri.conf.json); a login launch keeps it that way.
+            if !std::env::args().any(|a| a == HIDDEN_ARG) {
+                show_main(app.handle());
+            }
+            Ok(())
+        })
+        .on_window_event(|w, e| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = e {
+                if KEEP_ALIVE.load(std::sync::atomic::Ordering::Relaxed) {
+                    api.prevent_close();
+                    let _ = w.hide();
+                }
+            }
+        })
+        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, transcribe, set_background])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|_, event| {
-            if let tauri::RunEvent::Exit = event {
-                release_stt();
-            }
+        .run(|app, event| match event {
+            // Dock icon click brings a hidden window back.
+            #[cfg(target_os = "macos")]
+            tauri::RunEvent::Reopen { has_visible_windows: false, .. } => show_main(app),
+            tauri::RunEvent::Exit => release_stt(),
+            _ => {}
         });
 }
 

@@ -201,7 +201,7 @@
     "speaking": "Konuşma egzersizleri",
     "speakingDesc": "Mikrofonlu alıştırmalar",
     "reminder": "Günlük hatırlatma",
-    "reminderDesc": "Her akşam 20:00'de bildirim",
+    "reminderDesc": "Açıkken loalingo arka planda kalır ve oturum açılışında başlar",
     "reduceMotion": "Hareket azaltma",
     "reduceMotionDesc": "Animasyonları en aza indir",
     "appearance": "Görünüm",

@@ -204,7 +204,7 @@
     "speaking": "Speaking exercises",
     "speakingDesc": "Exercises that use the microphone",
     "reminder": "Daily reminder",
-    "reminderDesc": "Notification every evening at 20:00",
+    "reminderDesc": "While on, loalingo stays in the background and starts at login",
     "reduceMotion": "Reduce motion",
     "reduceMotionDesc": "Keep animations to a minimum",
     "appearance": "Appearance",
