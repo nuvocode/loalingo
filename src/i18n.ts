@@ -18,9 +18,15 @@ function stored() {
   try { return localStorage.getItem(LANG_KEY); } catch { return null; }
 }
 
+// First launch: follow the system language when we ship it, else English.
+function systemLang() {
+  const l = (typeof navigator === "undefined" ? "" : navigator.language).slice(0, 2).toLowerCase();
+  return l in resources ? l : "en";
+}
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: stored() ?? "en",
+  lng: stored() ?? systemLang(),
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });

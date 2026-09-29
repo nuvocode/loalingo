@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../icons";
 import { useApp } from "../store";
+import { languages } from "../i18n";
 import * as db from "../db";
 import type { Profile } from "../db";
 import type { Course } from "../course";
@@ -69,6 +70,13 @@ export function ProfileForm({ initial, onDone }: { initial?: Profile; onDone?: (
           ))}
         </div>
       </div>
+      {!initial && (
+        <label className="od-field"><b>{t("settings.language")}</b>
+          <select className="select" value={i18n.resolvedLanguage} onChange={(e) => i18n.changeLanguage(e.target.value)}>
+            {languages.map((l) => <option key={l.code} value={l.code}>{l.name}</option>)}
+          </select>
+        </label>
+      )}
       <label className="od-field"><b>{t("profiles.native")}</b><span className="muted small">{t("profiles.nativeDesc")}</span>
         <select className="select" value={native} onChange={(e) => setNative(e.target.value)}>
           {NATIVE.map((l) => <option key={l} value={l}>{langName(l)}</option>)}
