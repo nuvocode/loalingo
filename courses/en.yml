@@ -1,0 +1,497 @@
+# English course. Hierarchy: levels (CEFR) > units > steps > activities.
+# Activities name only a type (+ optional count and hints like scenario/goal); the AI writes the content
+# from the step's title, description, vocabulary, grammar and the level. Types: see src/course.ts.
+name: English
+native_name: English
+iso: en
+flag: 🇬🇧
+
+levels:
+  A1:
+    title: Beginner
+    description: >
+      Understand and use familiar everyday expressions and very basic phrases.
+
+    units:
+      - id: greetings
+        title: Greetings & Introductions
+        description: Meet people and introduce yourself.
+        icon: 👋
+        steps:
+          - id: basic-greetings
+            title: Basic Greetings
+            description: Common ways to greet people.
+            vocabulary: [hello, hi, goodbye, morning, afternoon, evening, night]
+            grammar:
+              - pattern: "Good morning!"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: introduce-yourself
+            title: Introduce Yourself
+            description: Tell someone your name and ask theirs.
+            vocabulary: [name, my, your, meet, nice]
+            grammar:
+              - pattern: "My name is {name}."
+              - pattern: "What is your name?"
+              - pattern: "Nice to meet you."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_someone
+                goal: Greet the person, introduce yourself and ask their name.
+          - id: how-are-you
+            title: How Are You?
+            description: Ask and answer how someone is.
+            vocabulary: [fine, good, great, tired, thanks, "and you"]
+            grammar:
+              - pattern: "How are you?"
+              - pattern: "I'm fine, thank you."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: friend_on_the_street
+          - id: polite-words
+            title: Please & Thank You
+            description: Be polite in everyday situations.
+            vocabulary: [please, "thank you", sorry, "excuse me", welcome]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+
+      - id: numbers-colors
+        title: Numbers & Colors
+        description: Count, say your age and name colors.
+        icon: 🔢
+        steps:
+          - id: numbers-1-10
+            title: Numbers 1–10
+            vocabulary: [one, two, three, four, five, six, seven, eight, nine, ten]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: listen_type }
+          - id: numbers-11-100
+            title: Numbers 11–100
+            vocabulary: [eleven, twelve, thirteen, twenty, thirty, fifty, hundred]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: match }
+          - id: how-old
+            title: How Old Are You?
+            vocabulary: [old, age, year, years]
+            grammar:
+              - pattern: "I am {number} years old."
+              - pattern: "How old are you?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: colors
+            title: Basic Colors
+            vocabulary: [red, blue, green, yellow, black, white, orange, brown]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank }
+              - { type: listen_select }
+
+      - id: people-family
+        title: Family & People
+        description: Talk about your family and describe people.
+        icon: 👨‍👩‍👧
+        steps:
+          - id: family-members
+            title: Family Members
+            vocabulary: [mother, father, sister, brother, son, daughter, parents, family]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: possessives
+            title: My, Your, His, Her
+            vocabulary: [my, your, his, her, our, their]
+            grammar:
+              - pattern: "This is my brother."
+              - pattern: "Her name is {name}."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: describing-people
+            title: Describing People
+            vocabulary: [tall, short, young, old, happy, friendly, hair, eyes]
+            grammar:
+              - pattern: "She is tall."
+              - pattern: "He has brown eyes."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: pets
+            title: Pets & Animals
+            vocabulary: [dog, cat, bird, fish, horse, have]
+            grammar:
+              - pattern: "I have a dog."
+              - pattern: "Do you have a pet?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+
+      - id: food-drink
+        title: Food & Drink
+        description: Order at a café and talk about what you like.
+        icon: 🍎
+        steps:
+          - id: food-basics
+            title: Food Basics
+            vocabulary: [bread, apple, egg, cheese, rice, chicken, soup, salad]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: drinks
+            title: Drinks
+            vocabulary: [water, coffee, tea, milk, juice, glass, cup]
+            grammar:
+              - pattern: "A cup of tea, please."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: likes-dislikes
+            title: I Like, I Don't Like
+            vocabulary: [like, love, hate, favourite, delicious]
+            grammar:
+              - pattern: "I like coffee."
+              - pattern: "I don't like milk."
+              - pattern: "Do you like tea?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate, count: 2 }
+          - id: at-the-cafe
+            title: At the Café
+            vocabulary: [menu, order, bill, price, "how much", want]
+            grammar:
+              - pattern: "I would like a coffee."
+              - pattern: "How much is it?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: ordering_at_a_cafe
+                goal: Order a drink and a snack, then ask for the bill.
+
+      - id: daily-routine
+        title: Daily Routine
+        description: Time, days and what you do every day.
+        icon: ⏰
+        steps:
+          - id: telling-time
+            title: Telling the Time
+            vocabulary: [o'clock, half, quarter, past, to, time]
+            grammar:
+              - pattern: "What time is it?"
+              - pattern: "It's half past seven."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: listen_type, count: 2 }
+          - id: days-of-week
+            title: Days of the Week
+            vocabulary: [monday, tuesday, wednesday, thursday, friday, saturday, sunday, weekend, today, tomorrow]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: morning-routine
+            title: My Morning
+            vocabulary: ["wake up", "get up", shower, breakfast, "go to work", "go to school"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: image_select }
+              - { type: translate }
+          - id: present-simple
+            title: Every Day (Present Simple)
+            vocabulary: [always, usually, sometimes, never, every]
+            grammar:
+              - pattern: "I work every day."
+              - pattern: "She works on Mondays."
+              - pattern: "He doesn't drink coffee."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: home
+        title: At Home
+        description: Rooms, furniture and where things are.
+        icon: 🏠
+        steps:
+          - id: rooms
+            title: Rooms
+            vocabulary: [house, flat, kitchen, bedroom, bathroom, "living room", garden]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: furniture
+            title: Furniture
+            vocabulary: [table, chair, bed, sofa, door, window, lamp]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: image_select }
+              - { type: listen_type }
+          - id: there-is-there-are
+            title: There Is / There Are
+            vocabulary: [there, some, any, many]
+            grammar:
+              - pattern: "There is a sofa in the living room."
+              - pattern: "There are two chairs."
+              - pattern: "Is there a garden?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: prepositions-of-place
+            title: In, On, Under
+            vocabulary: ["in", "on", under, "next to", behind, "in front of"]
+            grammar:
+              - pattern: "The cat is under the table."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+
+      - id: around-town
+        title: Around Town
+        description: Places, directions, transport and shopping.
+        icon: 🏙️
+        steps:
+          - id: places-in-town
+            title: Places in Town
+            vocabulary: [bank, supermarket, station, hospital, park, school, museum, pharmacy]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: directions
+            title: Asking for Directions
+            vocabulary: [left, right, straight, near, far, corner, street]
+            grammar:
+              - pattern: "Where is the station?"
+              - pattern: "Turn left at the corner."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: lost_tourist
+                goal: Ask a local how to get to the museum.
+          - id: transport
+            title: Getting Around
+            vocabulary: [bus, train, taxi, bike, car, ticket, walk]
+            grammar:
+              - pattern: "I go to work by bus."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: shopping
+            title: Shopping
+            vocabulary: [buy, shop, cheap, expensive, size, money, pay]
+            grammar:
+              - pattern: "Can I pay by card?"
+              - pattern: "This is too expensive."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: clothes_shop
+                goal: Ask for a different size and pay.
+
+      - id: free-time
+        title: Free Time
+        description: Hobbies, sports and what you can do.
+        icon: ⚽
+        steps:
+          - id: hobbies
+            title: Hobbies
+            vocabulary: [read, music, movie, cook, dance, paint, travel]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: sports
+            title: Sports
+            vocabulary: [football, tennis, swim, run, play, team, game]
+            grammar:
+              - pattern: "I play football on Saturdays."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: can-ability
+            title: I Can, I Can't
+            vocabulary: [can, "can't", well, a little]
+            grammar:
+              - pattern: "I can swim."
+              - pattern: "She can't drive."
+              - pattern: "Can you cook?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: weekend-plans
+            title: Weekend Plans
+            vocabulary: [free, busy, together, invite, "let's"]
+            grammar:
+              - pattern: "Let's go to the cinema."
+              - pattern: "Are you free on Sunday?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: making_plans
+                goal: Invite a friend to do something on the weekend and agree on a time.
+
+      - id: weather-clothes
+        title: Weather & Clothes
+        description: Seasons, the weather and what people are wearing.
+        icon: ☀️
+        steps:
+          - id: weather
+            title: The Weather
+            vocabulary: [sunny, rainy, cloudy, windy, cold, hot, warm, snow]
+            grammar:
+              - pattern: "It's sunny today."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: listen_select }
+          - id: seasons-months
+            title: Seasons & Months
+            vocabulary: [spring, summer, autumn, winter, january, june, december, month]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: clothes
+            title: Clothes
+            vocabulary: [shirt, trousers, dress, shoes, jacket, hat, wear]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: translate }
+          - id: present-continuous
+            title: Right Now (Present Continuous)
+            vocabulary: [now, "at the moment", wearing, doing]
+            grammar:
+              - pattern: "I am wearing a jacket."
+              - pattern: "It is raining."
+              - pattern: "What are you doing?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: yesterday
+        title: Yesterday
+        description: Talk about the past.
+        icon: 📅
+        steps:
+          - id: was-were
+            title: Was & Were
+            vocabulary: [was, were, yesterday, "last night", ago]
+            grammar:
+              - pattern: "I was at home yesterday."
+              - pattern: "Were you tired?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: past-regular
+            title: Past Simple (Regular)
+            vocabulary: [worked, played, watched, visited, cooked]
+            grammar:
+              - pattern: "I watched a film last night."
+              - pattern: "She didn't work on Friday."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: past-irregular
+            title: Past Simple (Irregular)
+            vocabulary: [went, had, saw, ate, bought, made]
+            grammar:
+              - pattern: "We went to the park."
+              - pattern: "Did you see the game?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+          - id: last-weekend
+            title: My Last Weekend
+            vocabulary: [weekend, fun, boring, first, then, after]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: monday_morning_chat
+                goal: Tell a colleague what you did last weekend and ask about theirs.
+
+    checkpoint:
+      title: A1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }
