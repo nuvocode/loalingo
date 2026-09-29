@@ -8,6 +8,7 @@ import { NEW_STATS, type Stats } from "./progress";
 import { runMigrations, type SqlDb } from "./migrate";
 import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
+import { deleteProfileSql } from "./profileDelete";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
@@ -97,6 +98,14 @@ export async function updateProfile(id: number, patch: ProfilePatch) {
     `UPDATE profiles SET ${keys.map((k, i) => `${k} = $${i + 1}`).join(", ")} WHERE id = $${keys.length + 1}`,
     [...Object.values(cols), id],
   );
+}
+
+/** Removes the profile and all its progress in one transaction; forgets it as the auto-sign-in profile. */
+export async function deleteProfile(id: number) {
+  const d = await db();
+  try { await d.execute(deleteProfileSql(id)); }
+  catch (e) { await d.execute("ROLLBACK").catch(() => {}); throw e; }
+  if (Number(await getSetting("last_profile")) === id) await setSetting("last_profile", null);
 }
 
 // ---- Enrollments (profile × course) ----
