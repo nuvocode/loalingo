@@ -112,7 +112,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Ders bitince adım tamamlanır ve XP kursa yazılır.
 - Test: `pnpm test` (loader + path). Tarayıcı önizlemesinde SQLite yerine sql.js çalışır (sadece dev).
 
-**Faz 2 — AI sağlayıcıları + ders üretimi** 🟡 (kod bitti; bulut sağlayıcı testi bekliyor)
+**Faz 2 — AI sağlayıcıları + ders üretimi** ✅
 - `src/ai.ts`: Ollama, LM Studio (OpenAI uyumlu), OpenAI, Anthropic, Gemini — AI SDK v7. Ayar cihaz geneli (`device_settings.ai`), API anahtarı OS anahtarlığında (Rust `keyring`, `secret_get/secret_set`). İstekler Tauri HTTP eklentisiyle gider (CORS yok).
 - Ayarlar > Yapay zekâ sağlayıcısı: sağlayıcı seçimi, sunucu adresi, anahtar, model (bağlantı testi modelleri listeler).
 - C6: AI yoksa yeni profil Ayarlar'a düşer, Öğren'de kurulum bandı, ders düğümleri kurulum sheet'i açar.
@@ -120,7 +120,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - `src/lessons.ts`: önbellek (`content_cache`, kayıt × adım) → tek çağrıda tüm ders → olmazsa etkinlik başına çağrı (C2, C3). Ders bitince sonraki adım arka planda üretilir; ders üst barındaki ↻ yeniden üretir.
 - Cevap kontrolü (C4): normalize edilmiş eşleşme → olmazsa AI anlam kontrolü + kısa geri bildirim. Yanlışta "Açıkla" (C5).
 - Şema prompt'a da eklenir ve ```json çitli cevaplar kurtarılır (Ollama bulut modelleri `response_format`'ı yok sayıyor). Yerel sağlayıcılarda `reasoning: "low"` (glm-5.3-flash: 185 sn → 7 sn).
-- ✔ Ollama (glm-5.3-flash:cloud) ile 2 ders üretildi ve oynandı. ☐ Bulut sağlayıcıyla aynı test.
+- ✔ Ollama (glm-5.3-flash:cloud) ile 2 ders üretildi ve oynandı. ✔ Anthropic (claude-haiku-4-5): ders şeması + cevap kontrolü, Node betiğiyle (uygulama içi anahtarlık yolu kullanıcıda).
 
 **Faz 3 — İlerleme + tekrar döngüsü** ✅
 - `src/progress.ts` (saf, testli): XP, seri + en iyi seri, seri dondurma, günlük hedef (50 XP), 3 günlük görev (XP / 3 ders / 1 alıştırma), hepsi bitince günde 1 sandık. Gün değişimi girişte (`rollDay`).
