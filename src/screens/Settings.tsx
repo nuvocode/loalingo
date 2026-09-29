@@ -254,7 +254,7 @@ export function Settings() {
       <h2 className="section-title">{t("settings.account")}</h2>
       <div className="od-stack" style={gap("12px")}>
         <button className="btn btn-ghost btn-block" onClick={() => openSheet(<><h3 style={{ marginBottom: 14 }}>{t("settings.editProfile")}</h3><ProfileForm initial={profile!} onDone={closeSheet} /></>)}>{t("settings.editProfile")}</button>
-        <button className="btn btn-danger btn-block" onClick={logout}>{t("settings.logout")}</button>
+        <button className="btn btn-ghost btn-block" onClick={logout}>{t("settings.logout")}</button>
       </div>
     </>
   );
