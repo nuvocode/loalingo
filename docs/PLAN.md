@@ -149,7 +149,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Günlük hatırlatıcı: sistem bildirimi, dakikada bir kontrol. Açıkken pencereyi kapatmak uygulamayı gizler (Dock'tan geri gelir, ⌘Q kapatır) ve uygulama oturum açılışında gizli başlar (`tauri-plugin-autostart`, LaunchAgent). Kapatınca ikisi de geri alınır. PIN'li profil otomatik girilmediği için onun hatırlatıcısı giriş yapılana kadar çalışmaz.
 - A2, B1 ve B2 kursları: her biri 10 ünite, 43 adım + checkpoint.
 - İlk açılış (C6): sağlayıcı yoksa kurulum sheet'i girişte bir kez kendiliğinden açılır. Bu Mac'te Ollama / LM Studio aranır; model varsa seçili gelir. Ollama çalışıyor ama modeli yoksa önerilen model (`RECOMMENDED_OLLAMA`, qwen3:8b) uygulamadan ilerlemeyle indirilir (`/api/pull`). Hiçbiri yoksa "Ollama'yı indir" (opener) + "Tekrar kontrol et".
-- Uygulama içi güncelleme: `tauri-plugin-updater`, `https://github.com/nuvocode/loalingo/releases/latest/download/latest.json`. Açılışta sessiz kontrol, Ayarlar → Güncellemeler → Denetle. ✔ Yerel sunucuyla 0.1.0 → 0.1.1 uçtan uca test edildi (indir, kur, yeniden başlat).
+- Uygulama içi güncelleme: `tauri-plugin-updater`, `https://github.com/nuvocode/loalingo/releases/latest/download/latest.json`. Açılışta sessiz kontrol, Ayarlar → Güncellemeler → Denetle. ✔ 0.1.0 → 0.1.1 uçtan uca test edildi: önce yerel sunucuyla, sonra GitHub Releases üzerinden (`/Applications`’a kurulu 0.1.0 uygulama içinden güncellendi).
 - ✔ Whisper Rust testi (`cargo test -- --ignored whisper`) geçiyor. Dev uygulamada mikrofonla elle test bekliyor.
 
 ## 5. Kararlar
@@ -158,7 +158,7 @@ Tüm açık kararlar: [DECISIONS.md](DECISIONS.md)
 
 ## 6. Paketleme (macOS)
 
-- `pnpm tauri build` → `src-tauri/target/release/bundle/macos/loalingo.app` (~10 MB) ve `bundle/dmg/loalingo_<sürüm>_aarch64.dmg` (~5 MB).
+- `pnpm tauri build` → `src-tauri/target/release/bundle/macos/loalingo.app` (~69 MB) ve `bundle/dmg/loalingo_<sürüm>_aarch64.dmg` (~64 MB). Boyutun çoğu paketlenen whisper modeli (~57 MB).
 - İmza: ad-hoc (`bundle.macOS.signingIdentity: "-"`). Bu Mac'te ve "Yine de aç" ile başka Mac'lerde çalışır. Dağıtım için Developer ID Application sertifikası + notarization gerekir (şu an yalnızca Apple Development sertifikası var).
 - `[profile.release.build-override] strip = false`: macOS 27 bağlayıcısıyla strip edilen proc-macro dylib'leri (sqlx-macros) yüklenemiyor. Uygulama binary'si yine strip edilir.
 - Sürüm yayınlama: `tauri.conf.json` ve `Cargo.toml` sürümünü artır → `pnpm release` → `dist-release/` içindekileri (`.dmg`, `loalingo.app.tar.gz`, `latest.json`) `nuvocode/loalingo` reposunda `v<sürüm>` etiketli GitHub release'e yükle. Repo public olmalı (updater giriş yapmadan indirir).
