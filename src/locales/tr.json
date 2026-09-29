@@ -389,7 +389,7 @@
   "stt": {
     "idle": "Konuşmak için dokun",
     "rec": "Dinleniyor… bitince tekrar dokun",
-    "busy": "Bu Mac'te yazıya dökülüyor…",
+    "busy": "Yazıya dökülüyor…",
     "record": "Kaydet",
     "stop": "Kaydı durdur",
     "noMic": "Mikrofon izni yok. Sistem Ayarları → Gizlilik → Mikrofon'dan izin ver.",

@@ -17,10 +17,8 @@ export function loadKokoro(onProgress: (p: number) => void = () => {}) {
       const all = Object.values(files);
       onProgress(all.reduce((n, f) => n + f[0], 0) / all.reduce((n, f) => n + f[1], 0));
     };
-    const load = (device: "webgpu" | "wasm") =>
-      KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", { dtype: "q8", device, progress_callback });
-    if (!("gpu" in navigator)) return load("wasm");
-    try { return await load("webgpu"); } catch (e) { console.error(e); return load("wasm"); }
+    // ponytail: wasm only; kokoro-js wants fp32 (~320 MB) on webgpu, q8 keeps the download at ~90 MB
+    return KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", { dtype: "q8", device: "wasm", progress_callback });
   })().catch((e) => { model = undefined; throw e; }));
 }
 

@@ -394,7 +394,7 @@
   "stt": {
     "idle": "Tap to speak",
     "rec": "Listening… tap again when you're done",
-    "busy": "Transcribing on this Mac…",
+    "busy": "Transcribing…",
     "record": "Record",
     "stop": "Stop recording",
     "noMic": "No microphone access. Allow it in System Settings → Privacy → Microphone.",
