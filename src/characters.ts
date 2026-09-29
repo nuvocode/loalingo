@@ -68,6 +68,7 @@ export const CHARACTERS = {
 export type CharacterId = keyof typeof CHARACTERS;
 
 const FREE = "free";
+export const FREE_GOAL = "have a natural conversation about: ";
 
 /** `chat:<id>:<topicId>` or `chat:<id>:free:<text>`; `call:` for voice. */
 export function talkId(voice: boolean, who: CharacterId, topic: string | { free: string }) {
@@ -80,7 +81,7 @@ export function parseTalkId(id: string): { voice: boolean; who: CharacterId; top
   const voice = kind === "call", c = who as CharacterId;
   if (rest[0] === FREE) {
     const text = rest.slice(1).join(":").trim();
-    return text ? { voice, who: c, topic: { goal: `have a natural conversation about: ${text}` } } : null;
+    return text ? { voice, who: c, topic: { goal: FREE_GOAL + text } } : null;
   }
   const topic = CHARACTERS[c].topics.find((x) => x.id === rest.join(":"));
   return topic ? { voice, who: c, topic } : null;

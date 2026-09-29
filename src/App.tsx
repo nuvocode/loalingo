@@ -9,7 +9,7 @@ import { keepInBackground, notify } from "./notify";
 import { takeOver, resetDataDir } from "./datadir";
 import { findUpdate, UpdateSheet } from "./Update";
 import { Chat, Story } from "./Talk";
-import type { CharacterId } from "./lessons";
+import { parseTalkId } from "./characters";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
 import { ProfileGate } from "./screens/Profiles";
@@ -72,8 +72,11 @@ function BootErrorScreen({ e }: { e: BootError }) {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
+  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS } = useApp();
   const Screen = SCREENS[route];
+  const talk = lessonId && /^(chat|call):/.test(lessonId) ? parseTalkId(lessonId) : undefined;
+  const badTalk = talk === null;
+  useEffect(() => { if (badTalk) endLesson(); }, [badTalk]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && sheet) closeSheet(); };
@@ -133,7 +136,7 @@ export default function App() {
       </nav>
 
       {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
-        : /^(chat|call):/.test(lessonId) ? <Chat who={lessonId.slice(5) as CharacterId} voice={lessonId.startsWith("call:")} /> : <Lesson id={lessonId} />)}
+        : /^(chat|call):/.test(lessonId) ? (talk && <Chat key={lessonId} who={talk.who} topic={talk.topic} voice={talk.voice} />) : <Lesson id={lessonId} />)}
       </>}
 
       <div className={`sheet-scrim ${sheet ? "open" : ""}`} onClick={(e) => e.target === e.currentTarget && closeSheet()}>

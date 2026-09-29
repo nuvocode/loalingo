@@ -21,3 +21,8 @@ test("no pre-garden wording in user-visible text", () => {
   assert.deepEqual(bad(en, /\b(hearts?|streaks?|chests?|freeze)\b/i), []);
   assert.deepEqual(bad(tr, /kalp|\bseri|sandık|dondur/i), []);
 });
+
+// Lily is a Duolingo character; the hotel receptionist is Mia.
+test("no Duolingo character names in user-visible text", () => {
+  for (const rows of [en, tr]) assert.deepEqual(rows.filter(([, v]) => /\bLily\b/i.test(v)).map(([k]) => k), []);
+});

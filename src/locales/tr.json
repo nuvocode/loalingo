@@ -162,10 +162,6 @@
   "roleplay": {
     "title": "Rol Yapma",
     "subtitle": "Gerçek hayat senaryolarında yapay zekâ karakterleriyle yazış. Mesajlarını düzeltirler.",
-    "lilyRole": "Otel resepsiyonisti",
-    "lilyGoal": "Giriş yap ve oda iste",
-    "kaiRole": "Restoran şefi",
-    "kaiGoal": "Menüden öneri iste",
     "topics": {
       "mia": {
         "checkIn": "Check-in yap",
@@ -205,6 +201,10 @@
         "dayTrip": "Günübirlik gezi planla"
       }
     },
+    "pickTopic": "{{name}} ile ne hakkında konuşacaksın?",
+    "ownTopic": "Ya da kendi konunu yaz",
+    "ownTopicPlaceholder": "ör. doğum günü partisi planlamak",
+    "start": "Başla",
     "chat": "Sohbet",
     "call": "Ara",
     "message": "Mesajın",

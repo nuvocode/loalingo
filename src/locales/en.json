@@ -164,10 +164,6 @@
   "roleplay": {
     "title": "Roleplay",
     "subtitle": "Chat with AI characters in real-life scenarios. They correct your messages as you go.",
-    "lilyRole": "Hotel receptionist",
-    "lilyGoal": "Check in and ask for a room",
-    "kaiRole": "Restaurant chef",
-    "kaiGoal": "Ask for a recommendation",
     "topics": {
       "mia": {
         "checkIn": "Check in",
@@ -207,6 +203,10 @@
         "dayTrip": "Plan a day trip"
       }
     },
+    "pickTopic": "What should you and {{name}} talk about?",
+    "ownTopic": "Or write your own topic",
+    "ownTopicPlaceholder": "e.g. planning a birthday party",
+    "start": "Start",
     "chat": "Chat",
     "call": "Call",
     "message": "Your message",

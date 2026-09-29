@@ -6,7 +6,8 @@ import { useApp } from "./store";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
-import { CHARACTERS, chatTurn, loadStory, type CharacterId, type ChatMsg, type Story as StoryData } from "./lessons";
+import { CHARACTERS, FREE_GOAL, type CharacterId } from "./characters";
+import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -188,11 +189,12 @@ export function Story({ unitId }: { unitId: string }) {
 
 // ---- Roleplay: free text chat with a character; the model corrects each message. `voice` = video-call mode: speak instead of type ----
 
-export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean }) {
+export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: { id?: string; goal: string }; voice?: boolean }) {
   const { t } = useTranslation();
   const { course, enrollment, profile, s, setS, gainXp } = useApp();
   const ch = CHARACTERS[who];
   const lang = course?.iso ?? "en";
+  const say = (text: string) => speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice });
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState("");
@@ -209,10 +211,10 @@ export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean
     if (!course || !enrollment || !profile) return;
     setBusy(true); setErr("");
     try {
-      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang }, who, history);
+      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang }, who, topic, history);
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
-      speak(r.reply, lang);
+      say(r.reply);
       if (r.goal_reached && history.length) setGoal(true);
     } catch (e) { setErr((e as Error).message); setMsgs(history); }
     finally { setBusy(false); }
@@ -244,11 +246,11 @@ export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean
     body = <>
       <div className="od-row" style={{ ...gap("12px"), marginBottom: 16 }}>
         <span className="avatar" style={{ width: 48, height: 48, fontSize: 20, background: ch.color }}>{ch.name[0]}</span>
-        <span className="od-field od-fill"><b>{ch.name}</b><span className="muted small">{t(`roleplay.${who}Role`)} — {t(`roleplay.${who}Goal`)}</span></span>
+        <span className="od-field od-fill"><b>{ch.name}</b><span className="muted small">{topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length)}</span></span>
       </div>
       <div className="chat">
         {msgs.map((m, i) => m.from === "ai" ? (
-          <button key={i} className="bubble" lang={lang} onClick={() => { speak(m.text, lang); setOpen((s) => new Set(s).add(i)); }}>
+          <button key={i} className="bubble" lang={lang} onClick={() => { say(m.text); setOpen((s) => new Set(s).add(i)); }}>
             <span>{m.text}</span>{open.has(i) && <small>{m.translation}</small>}
           </button>
         ) : (

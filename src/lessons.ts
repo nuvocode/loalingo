@@ -3,6 +3,7 @@ import { z } from "zod";
 import { generate, generatePlain } from "./ai";
 import { getCached, listMistakes, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
+import { CHARACTERS, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -170,24 +171,18 @@ export async function loadStory(enrollmentId: number, c: Base, unit: Unit, fresh
   return story;
 }
 
-// Roleplay characters from the design; the scenario is described in English for the model, the UI text comes from i18n.
-export const CHARACTERS = {
-  lily: { name: "Lily", color: "#b07cf0", role: "a hotel receptionist", goal: "check in and ask for a room" },
-  kai: { name: "Kai", color: "#4c6ef5", role: "a restaurant chef", goal: "ask the chef for a recommendation and order" },
-} as const;
-export type CharacterId = keyof typeof CHARACTERS;
 export type ChatMsg = { from: "ai" | "me"; text: string; translation?: string; correction?: string };
 
 const turnSchema = z.object({ correction: z.string(), reply: z.string(), translation: z.string(), goal_reached: z.boolean() });
 
 /** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
-export function chatTurn(c: Base, who: CharacterId, history: ChatMsg[]) {
+export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
   const ch = CHARACTERS[who], native = langEn(c.native);
   const system = [
-    `You are ${ch.name}, ${ch.role}, in a roleplay inside a language-learning app. The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}. The learner's goal: ${ch.goal}.`,
-    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal. \`translation\`: the reply in ${native}.`,
+    `You are ${ch.name} in a roleplay inside a language-learning app. ${ch.persona} The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}. The learner's goal: ${topic.goal}.`,
+    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal, in your own manner. \`translation\`: the reply in ${native}.`,
     `\`correction\`: if the learner's last message has a mistake, the corrected sentence and a very short explanation in ${native}; otherwise "". Ignore capitalization and punctuation.`,
-    "`goal_reached`: true once the learner has achieved the goal; then wrap up the scene politely in `reply`.",
+    "`goal_reached`: true once the learner has achieved the goal; then wrap up the scene politely in `reply`. If the goal is an open conversation, keep it false unless the learner clearly wraps up.",
     "Respond only with JSON matching the schema.",
   ].join("\n");
   const last = history[history.length - 1];

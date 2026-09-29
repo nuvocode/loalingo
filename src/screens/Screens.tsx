@@ -8,7 +8,8 @@ import { msLeft, rivalXp, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, today } from "../progress";
-import { CHARACTERS, LEGEND_PRICE, type CharacterId } from "../lessons";
+import { LEGEND_PRICE } from "../lessons";
+import { CHARACTERS, talkId, type CharacterId } from "../characters";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -261,10 +262,32 @@ export function Stories() {
   );
 }
 
+function TopicSheet({ who, voice }: { who: CharacterId; voice: boolean }) {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  const start = useStartLesson();
+  const [own, setOwn] = useState("");
+  const go = (topic: string | { free: string }) => { closeSheet(); start(talkId(voice, who, topic)); };
+  return (
+    <div className="od-stack" style={{ "--od-gap": "14px", textAlign: "left" } as React.CSSProperties}>
+      <h3 style={{ textAlign: "center" }}>{t("roleplay.pickTopic", { name: CHARACTERS[who].name })}</h3>
+      {CHARACTERS[who].topics.map((x) => (
+        <button key={x.id} className="btn btn-ghost btn-block" onClick={() => go(x.id)}>{t(`roleplay.topics.${who}.${x.id}`)}</button>
+      ))}
+      <label className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+        <b>{t("roleplay.ownTopic")}</b>
+        <input className="input" value={own} maxLength={120} placeholder={t("roleplay.ownTopicPlaceholder")}
+          onChange={(e) => setOwn(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && own.trim()) go({ free: own.trim() }); }} />
+      </label>
+      <button className="btn btn-blue btn-block" disabled={!own.trim()} onClick={() => go({ free: own.trim() })}>{t("roleplay.start")}</button>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
 export function Roleplay() {
   const { t } = useTranslation();
-  const { toast } = useApp();
-  const start = useStartLesson();
+  const { toast, openSheet } = useApp();
   const speakBlock = useSpeakBlock();
   return (
     <>
@@ -276,10 +299,10 @@ export function Roleplay() {
           return (
             <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
               <span className="avatar" style={{ width: 56, height: 56, fontSize: 22, background: color }}>{name[0]}</span>
-              <span className="od-field od-fill"><b>{name}</b><span className="muted small">{t(`roleplay.${k}Role`)} — {t(`roleplay.${k}Goal`)}</span></span>
+              <span className="od-field od-fill"><b>{name}</b></span>
               <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
-                <button className="btn btn-ghost" onClick={() => start(`chat:${k}`)}>{t("roleplay.chat")}</button>
-                <button className="btn btn-blue" onClick={() => speakBlock ? toast(t(speakBlock)) : start(`call:${k}`)}><Icon name="video" /> {t("roleplay.call")}</button>
+                <button className="btn btn-ghost" onClick={() => openSheet(<TopicSheet who={k} voice={false} />)}>{t("roleplay.chat")}</button>
+                <button className="btn btn-blue" onClick={() => speakBlock ? toast(t(speakBlock)) : openSheet(<TopicSheet who={k} voice />)}><Icon name="video" /> {t("roleplay.call")}</button>
               </span>
             </div>
           );
