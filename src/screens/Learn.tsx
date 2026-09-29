@@ -4,7 +4,7 @@ import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
 import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
-import { say } from "../Lesson";
+import { speak } from "../tts";
 import { AiSheet } from "./Settings";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
@@ -139,7 +139,7 @@ function GuideSheet({ unitId, level }: { unitId: string; level: Cefr }) {
     <h4>{t("learn.guideWords")}</h4>
     <div className="guide-words">
       {words.map((w) => (
-        <button key={w.word} className="card guide-word" onClick={() => say(w.word, lang)}>
+        <button key={w.word} className="card guide-word" onClick={() => speak(w.word, lang)}>
           <b lang={lang}><Icon name="headphones" /> {w.word}</b>{w.translation && <span className="muted">{w.translation}</span>}
           {w.example && <small lang={lang}>{w.example}</small>}{w.example_translation && <small className="muted">{w.example_translation}</small>}
         </button>
@@ -150,7 +150,7 @@ function GuideSheet({ unitId, level }: { unitId: string; level: Cefr }) {
       <div key={g.pattern} className="card" style={{ marginBottom: 10 }}>
         <b lang={lang}>{g.pattern}</b>
         {g.explanation && <p className="small" style={{ margin: "4px 0" }}>{g.explanation}</p>}
-        {g.example && <button className="prompt-word" lang={lang} onClick={() => say(g.example, lang)}><Icon name="headphones" /> {g.example}</button>}
+        {g.example && <button className="prompt-word" lang={lang} onClick={() => speak(g.example, lang)}><Icon name="headphones" /> {g.example}</button>}
       </div>
     ))}
     <button className="btn btn-primary btn-block" style={{ marginTop: 12 }} onClick={closeSheet}>{t("lesson.gotIt")}</button>

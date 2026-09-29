@@ -7,6 +7,7 @@ import * as db from "./db";
 import { SPEECH_PASS, listenItems, madnessItems, matchesAnswer, normalize, speakItems, speechScore, type Item } from "./activities";
 import { MicButton } from "./Mic";
 import { sttReady } from "./stt";
+import { speak } from "./tts";
 import { LEGEND_PASS, appeal, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 import { acceptAppeal } from "./appeal";
@@ -29,14 +30,6 @@ export function useStartLesson() {
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
   };
-}
-
-// D1: system TTS for listening exercises.
-export function say(text: string, lang: string) {
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
 }
 
 /** Short synthesized cues (Web Audio, no sound files); App keeps `sfxState.on` in sync with the setting. */
@@ -125,7 +118,7 @@ export function Lesson({ id }: { id: string }) {
   const it = list[i] as PItem | undefined;
 
   // Auto-play listening items once.
-  useEffect(() => { if (it && (it.kind === "choice" || it.kind === "input") && it.listen) say(it.listen, lang); }, [it, lang]);
+  useEffect(() => { if (it && (it.kind === "choice" || it.kind === "input") && it.listen) speak(it.listen, lang); }, [it, lang]);
 
   const quit = () => { closeSheet(); endLesson(); };
   const askQuit = () => {
@@ -262,7 +255,7 @@ export function Lesson({ id }: { id: string }) {
   const canCheck = !!it && !checking && (it.kind === "choice" ? sel !== null : it.kind === "bank" ? bankSel.length > 0 : it.kind === "input" ? text.trim().length > 0 : false);
   const progress = result ? 100 : list.length ? (i / list.length) * 100 : 0;
   const last = i + 1 >= list.length;
-  const listenBtn = (txt: string) => <button className="prompt-word" onClick={() => say(txt, lang)}><Icon name="headphones" /> {t("lesson.listen")}</button>;
+  const listenBtn = (txt: string) => <button className="prompt-word" onClick={() => speak(txt, lang)}><Icon name="headphones" /> {t("lesson.listen")}</button>;
 
   let body: React.ReactNode;
   if (load.state === "loading") body = (

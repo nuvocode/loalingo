@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
-import { say, sfx } from "./Lesson";
+import { sfx } from "./Lesson";
+import { speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { CHARACTERS, chatTurn, loadStory, type CharacterId, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
@@ -82,7 +83,7 @@ function Done({ title, r }: { title: string; r: Result }) {
 function useQuit(active: boolean) {
   const { t } = useTranslation();
   const { openSheet, closeSheet, endLesson } = useApp();
-  const quit = () => { closeSheet(); endLesson(); speechSynthesis.cancel(); };
+  const quit = () => { closeSheet(); endLesson(); stopSpeaking(); };
   const askQuit = () => active ? openSheet(<>
     <h3>{t("sheet.quitTitle")}</h3><p>{t("sheet.quitDesc")}</p>
     <button className="btn btn-danger btn-block" onClick={quit}>{t("sheet.quit")}</button>
@@ -128,7 +129,7 @@ export function Story({ unitId }: { unitId: string }) {
   const lastLine = cur?.line ?? 0;
 
   useEffect(() => {
-    if (story && cur && cur.q === undefined) say(story.lines[cur.line].text, lang);
+    if (story && cur && cur.q === undefined) speak(story.lines[cur.line].text, lang);
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [p, story]);
 
@@ -154,7 +155,7 @@ export function Story({ unitId }: { unitId: string }) {
       <h2 className="ex-title" lang={lang}>{story.title}</h2>
       <div className="chat">
         {story.lines.slice(0, lastLine + 1).map((l, li) => (
-          <button key={li} className="bubble story-line" lang={lang} onClick={() => { say(l.text, lang); setShown((s) => new Set(s).add(li)); }}>
+          <button key={li} className="bubble story-line" lang={lang} onClick={() => { speak(l.text, lang); setShown((s) => new Set(s).add(li)); }}>
             <b className="small" style={{ color: "var(--blue)" }}>{l.speaker}</b>
             <span>{l.text}</span>
             {shown.has(li) && <small>{l.translation}</small>}
@@ -211,7 +212,7 @@ export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean
       const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang }, who, history);
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
-      say(r.reply, lang);
+      speak(r.reply, lang);
       if (r.goal_reached && history.length) setGoal(true);
     } catch (e) { setErr((e as Error).message); setMsgs(history); }
     finally { setBusy(false); }
@@ -247,7 +248,7 @@ export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean
       </div>
       <div className="chat">
         {msgs.map((m, i) => m.from === "ai" ? (
-          <button key={i} className="bubble" lang={lang} onClick={() => { say(m.text, lang); setOpen((s) => new Set(s).add(i)); }}>
+          <button key={i} className="bubble" lang={lang} onClick={() => { speak(m.text, lang); setOpen((s) => new Set(s).add(i)); }}>
             <span>{m.text}</span>{open.has(i) && <small>{m.translation}</small>}
           </button>
         ) : (

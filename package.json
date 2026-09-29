@@ -29,6 +29,7 @@
     "@tauri-apps/plugin-updater": "~2.13.0",
     "ai": "^7.0.122",
     "i18next": "^26.4.2",
+    "kokoro-js": "^1.2.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-i18next": "^17.0.15",
