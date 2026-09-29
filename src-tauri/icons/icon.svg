@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- loalingo app icon: a friendly tutor in a speech bubble, answered by a second language bubble.
+       macOS grid: 824px body on a 1024 canvas. Regenerate PNG/ICNS/ICO with `pnpm tauri icon src-tauri/icons/icon.svg`. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fdc1f"/>
+      <stop offset="1" stop-color="#46a302"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#49c3fb"/>
+      <stop offset="1" stop-color="#1899d6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1f4d00" flood-opacity=".35"/>
+    </filter>
+  </defs>
+
+  <!-- body -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)"/>
+
+  <!-- answer bubble (blue, top right) -->
+  <g filter="url(#shadow)">
+    <path d="M598 214h170a74 74 0 0 1 74 74v84a74 74 0 0 1-74 74h-22l14 52-66-52h-96a74 74 0 0 1-74-74v-84a74 74 0 0 1 74-74z" fill="url(#blue)"/>
+  </g>
+  <circle cx="627" cy="330" r="19" fill="#fff"/>
+  <circle cx="683" cy="330" r="19" fill="#fff"/>
+  <circle cx="739" cy="330" r="19" fill="#fff"/>
+
+  <!-- tutor bubble (white) -->
+  <g filter="url(#shadow)">
+    <path d="M298 360h300a118 118 0 0 1 118 118v168a118 118 0 0 1-118 118h-186l-118 86 26-92a118 118 0 0 1-140-116v-164a118 118 0 0 1 118-118z" fill="#fff"/>
+  </g>
+
+  <!-- face -->
+  <ellipse cx="378" cy="532" rx="36" ry="46" fill="#3c3c3c"/>
+  <ellipse cx="530" cy="532" rx="36" ry="46" fill="#3c3c3c"/>
+  <circle cx="390" cy="516" r="12" fill="#fff"/>
+  <circle cx="542" cy="516" r="12" fill="#fff"/>
+  <path d="M398 626q56 50 112 0" fill="none" stroke="#3c3c3c" stroke-width="26" stroke-linecap="round"/>
+  <ellipse cx="318" cy="610" rx="30" ry="18" fill="#ff8fa3" opacity=".55"/>
+  <ellipse cx="590" cy="610" rx="30" ry="18" fill="#ff8fa3" opacity=".55"/>
+</svg>
