@@ -130,9 +130,11 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Checkpoint düğümü ve "Seviyeyi atla" aynı sınav akışı (B8): tüm seviyenin kelime/gramerinden AI sınavı, `required_score` geçilirse seviyenin tüm düğümleri tamamlanır ve kayıt ilerler (geri gitmez). Son seviyede "Kursu bitirdin" kartı.
 - Atlandı: `match_madness`, `timed_challenge`, `legendary` — tasarımda ekranı yok (Match Madness Lig ekranında, o da "Yakında"). Faz 4'e.
 
-**Faz 4 — Sonraki aşama (şimdilik "Yakında")**
-- Hikâyeler, Rol Yapma (AI sohbet), Konuşma/STT, Video Call.
-- Lig, Arkadaşlar, Mağaza (sosyal/ekonomi — local-first'te anlamı ayrıca konuşulmalı), Bildirimler (OS bildirimi ile hatırlatma olabilir).
+**Faz 4 — Hikâyeler + Rol Yapma** ✅
+- Hikâyeler: aktif seviyenin her ünitesine bir hikâye. AI, ünitenin kelime/gramerinden kısa bir diyalog + 2–3 anlama sorusu yazar (`content_cache`, anahtar `story:<ünite>`, ↻ ile yeniden üretilir). Satırlar tek tek açılır, sesli okunur; dokununca çeviri. Ünite başlayınca açılır (ilk ünite hep açık). Okunan hikâye `story:<ünite>` olarak tamamlanır → Profil'deki "Kitap kurdu" başarımı.
+- Rol Yapma: tasarımdaki iki karakter (Lily — otel, Kai — restoran). Serbest yazışma; AI karakterde kalır, seviyeye uygun cevap verir, öğrencinin son mesajını düzeltir (ana dilde kısa açıklama), hedefe ulaşınca bitirir. En fazla 10 mesaj. Sohbet kaydedilmez.
+- İkisi de kalp harcamaz; XP + seri + "alıştırma" görevi sayılır.
+- "Yakında" kalanlar: Konuşma/STT ve Görüntülü arama (D2), Lig, Arkadaşlar, Mağaza, Bildirimler (E1), `match_madness`, `timed_challenge`, `legendary`.
 
 ## 5. Kararlar
 

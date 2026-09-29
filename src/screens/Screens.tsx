@@ -6,6 +6,7 @@ import { useStartLesson } from "../Lesson";
 import { FRIENDS, LEAGUE, NOTIFS } from "../mock";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS } from "../activities";
+import { CHARACTERS, type CharacterId } from "../lessons";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -158,7 +159,7 @@ export function Shop() {
 
 export function Profile() {
   const { t, i18n } = useTranslation();
-  const { s, xp, profile } = useApp();
+  const { s, xp, profile, done } = useApp();
   const since = new Date(profile!.created_at.replace(" ", "T") + "Z").toLocaleDateString(i18n.language, { month: "long", year: "numeric" });
   const stat = (v: React.ReactNode, k: string, c: string) => (
     <div className="card od-stat" style={{ "--od-gap": "2px", textAlign: "center", padding: 14 } as React.CSSProperties}>
@@ -167,7 +168,7 @@ export function Profile() {
     </div>
   );
   const ach: [IconName, string, number, number, string][] = [
-    ["flame", "achFire", s.bestStreak, 7, "var(--orange)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", 0, 1, "var(--blue)"], // stories: Faz 4
+    ["flame", "achFire", s.bestStreak, 7, "var(--orange)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", [...done].filter((d) => d.startsWith("story:")).length, 1, "var(--blue)"],
   ];
   return (
     <>
@@ -202,21 +203,26 @@ export function Profile() {
 
 export function Stories() {
   const { t } = useTranslation();
-  const { toast } = useApp();
-  const items: [string, number, boolean][] = [["s1", 3, true], ["s2", 4, false], ["s3", 5, false]];
+  const { toast, course, enrollment, done } = useApp();
+  const start = useStartLesson();
+  const units = (enrollment && course?.levels[enrollment.level]?.units) || [];
   return (
     <>
-      <SoonBanner />
-      <h1 className="section-title" style={{ marginTop: 24 }}>{t("stories.title")}</h1>
+      <h1 className="section-title">{t("stories.title")}</h1>
       <p className="muted" style={{ marginBottom: 18 }}>{t("stories.subtitle")}</p>
       <div className="od-stack" style={{ "--od-gap": "12px" } as React.CSSProperties}>
-        {items.map(([k, min, open]) => (
-          <button className="card row-item" key={k} onClick={() => toast(t(open ? "stories.openToast" : "stories.lockedToast"))}>
-            <span style={iconBox(open ? "var(--sky)" : "var(--surface)", open ? "var(--blue)" : "var(--text-faint)")}><Icon name={open ? "story" : "lock"} /></span>
-            <span className="od-field od-fill"><b>{t(`stories.${k}`)}</b><span className="muted small">{t(`stories.${k}Desc`)} · {t("stories.minutes", { count: min })}</span></span>
-            {open && <span className="btn btn-ghost" style={{ pointerEvents: "none" }}>{t("stories.read")}</span>}
-          </button>
-        ))}
+        {units.map((u, ui) => {
+          // A unit's story opens once the unit is started (the first one is always open).
+          const open = ui === 0 || u.steps.some((st) => done.has(st.id));
+          const read = done.has(`story:${u.id}`);
+          return (
+            <button className="card row-item" key={u.id} onClick={() => open ? start(`story:${u.id}`) : toast(t("stories.lockedToast", { unit: ui }))}>
+              <span style={iconBox(open ? "var(--sky)" : "var(--surface)", open ? "var(--blue)" : "var(--text-faint)")}><Icon name={read ? "check" : open ? "story" : "lock"} /></span>
+              <span className="od-field od-fill"><b>{u.title}</b><span className="muted small">{t("learn.kicker", { level: enrollment!.level, unit: ui + 1 })}{u.description ? ` · ${u.description}` : ""}</span></span>
+              {open && <span className="btn btn-ghost" style={{ pointerEvents: "none" }}>{t(read ? "stories.again" : "stories.read")}</span>}
+            </button>
+          );
+        })}
       </div>
     </>
   );
@@ -225,23 +231,25 @@ export function Stories() {
 export function Roleplay() {
   const { t } = useTranslation();
   const { toast } = useApp();
-  const chars: [string, string, string][] = [["Lily", "lily", "#ce82ff"], ["Kai", "kai", "#1cb0f6"]];
+  const start = useStartLesson();
   return (
     <>
-      <SoonBanner />
-      <h1 className="section-title" style={{ marginTop: 24 }}>{t("roleplay.title")}</h1>
+      <h1 className="section-title">{t("roleplay.title")}</h1>
       <p className="muted" style={{ marginBottom: 18 }}>{t("roleplay.subtitle")}</p>
       <div className="od-grid" style={{ "--od-cols": 1, "--od-gap": "14px" } as React.CSSProperties}>
-        {chars.map(([name, k, c]) => (
-          <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
-            <span className="avatar" style={{ width: 56, height: 56, fontSize: 22, background: c }}>{name[0]}</span>
-            <span className="od-field od-fill"><b>{name}</b><span className="muted small">{t(`roleplay.${k}Role`)} — {t(`roleplay.${k}Goal`)}</span></span>
-            <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
-              <button className="btn btn-ghost" onClick={() => toast(t("roleplay.chatToast", { name }))}>{t("roleplay.chat")}</button>
-              <button className="btn btn-blue" onClick={() => toast(t("roleplay.callToast"))}><Icon name="video" /> {t("roleplay.call")}</button>
-            </span>
-          </div>
-        ))}
+        {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
+          const { name, color } = CHARACTERS[k];
+          return (
+            <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
+              <span className="avatar" style={{ width: 56, height: 56, fontSize: 22, background: color }}>{name[0]}</span>
+              <span className="od-field od-fill"><b>{name}</b><span className="muted small">{t(`roleplay.${k}Role`)} — {t(`roleplay.${k}Goal`)}</span></span>
+              <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
+                <button className="btn btn-ghost" onClick={() => start(`chat:${k}`)}>{t("roleplay.chat")}</button>
+                <button className="btn btn-blue" onClick={() => toast(t("roleplay.callToast"))}><Icon name="video" /> {t("roleplay.call")}</button>
+              </span>
+            </div>
+          );
+        })}
       </div>
     </>
   );

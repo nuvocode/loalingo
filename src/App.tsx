@@ -4,6 +4,8 @@ import { Icon, type IconName } from "./icons";
 import { useApp, type Route } from "./store";
 import { Rail } from "./Rail";
 import { Lesson } from "./Lesson";
+import { Chat, Story } from "./Talk";
+import type { CharacterId } from "./lessons";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
 import { ProfileGate } from "./screens/Profiles";
@@ -70,7 +72,8 @@ export default function App() {
         {NAV.map((n) => <NavBtn key={n.id} {...n} />)}
       </nav>
 
-      {lessonId && <Lesson id={lessonId} />}
+      {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
+        : lessonId.startsWith("chat:") ? <Chat who={lessonId.slice(5) as CharacterId} /> : <Lesson id={lessonId} />)}
       </>}
 
       <div className={`sheet-scrim ${sheet ? "open" : ""}`} onClick={(e) => e.target === e.currentTarget && closeSheet()}>

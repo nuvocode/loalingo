@@ -19,7 +19,7 @@ export function useStartLesson() {
       <button className="btn btn-primary btn-block" onClick={() => { closeSheet(); go("settings"); }}>{t("ai.setUp")}</button>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
-    if (!s.heartsOn || s.hearts > 0) return startLesson(id);
+    if (!s.heartsOn || s.hearts > 0 || /^(story|chat):/.test(id)) return startLesson(id); // stories and chats cost no hearts
     openSheet(<>
       <h3>{t("sheet.noHearts")}</h3><p>{t("sheet.noHeartsDesc")}</p>
       <button className="btn btn-danger btn-block" onClick={() => buy("refill", 350)}>{t("sheet.refillFor", { count: 350 })}</button>
@@ -29,7 +29,7 @@ export function useStartLesson() {
 }
 
 // D1: system TTS for listening exercises.
-function say(text: string, lang: string) {
+export function say(text: string, lang: string) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang;
   speechSynthesis.cancel();

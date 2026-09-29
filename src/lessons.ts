@@ -2,8 +2,8 @@
 import { z } from "zod";
 import { generate, generatePlain } from "./ai";
 import { getCached, putCached } from "./db";
-import { REGISTRY, lessonPrompt, lessonSchema, plannedActivities, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
-import { levelsOf, type Course, type Cefr } from "./course";
+import { REGISTRY, langEn, lessonPrompt, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
+import { levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
@@ -97,4 +97,68 @@ export async function judge(c: LessonContext, question: string, expected: string
 export function explain(c: LessonContext, question: string, correct: string, given: string) {
   return generatePlain(systemPrompt(c).replace("Respond only with JSON matching the schema.", ""),
     `Exercise: ${question}\nCorrect answer: ${correct}\nLearner answered: ${given || "(skipped)"}\nExplain in at most 3 short sentences why the correct answer is right${given ? " and what was wrong with the learner's answer" : ""}. Plain text, no markdown.`);
+}
+
+// ---- Stories (one per unit) and roleplay chat (Faz 4) ----
+
+type Base = Pick<LessonContext, "course" | "level" | "native">;
+type Unit = CourseLevel["units"][number];
+
+const storySchema = z.object({
+  title: z.string(),
+  lines: z.array(z.object({ speaker: z.string(), text: z.string(), translation: z.string() })).min(6).max(14),
+  questions: z.array(z.object({ after_line: z.int(), prompt: z.string(), options: z.array(z.string()).min(3).max(4), answer: z.int() })).min(1).max(3),
+});
+export type Story = z.infer<typeof storySchema>;
+
+/** Cached per (enrollment, unit) like lessons; `fresh` regenerates. */
+export async function loadStory(enrollmentId: number, c: Base, unit: Unit, fresh = false): Promise<Story> {
+  const key = `story:${unit.id}`;
+  const cached = fresh ? null : await getCached<Story>(enrollmentId, key);
+  if (cached) return cached;
+  const steps = unit.steps;
+  const g = await generate(storySchema, systemPrompt(c), [
+    `Write a short story told as a dialogue between 2–3 named characters, on the theme of the unit "${unit.title}"${unit.description ? ` (${unit.description})` : ""}.`,
+    `Use vocabulary from: ${[...new Set(steps.flatMap((s) => s.vocabulary))].join(", ")}`,
+    `Grammar: ${[...new Set(steps.flatMap((s) => s.grammar.map((x) => x.pattern)))].join(" | ")}`,
+    "`title` and every line's `text` are in the target language; `translation` is the line in the learner's language. 8–12 lines with a small plot.",
+    "`questions`: 2–3 comprehension questions (prompt in the learner's language, options in the target language), exactly one correct, `answer` is its 0-based index. " +
+      "`after_line` is the 0-based index of the line after which it is asked; the question must be answerable from the lines up to there.",
+  ].join("\n"));
+  const last = g.lines.length - 1;
+  const story: Story = {
+    ...g,
+    questions: g.questions.filter((q) => q.options[q.answer] !== undefined)
+      .map((q) => ({ ...q, after_line: Math.min(Math.max(q.after_line, 0), last), ...shuffleAnswer(q.options, q.answer) })),
+  };
+  await putCached(enrollmentId, key, story);
+  return story;
+}
+
+// Roleplay characters from the design; the scenario is described in English for the model, the UI text comes from i18n.
+export const CHARACTERS = {
+  lily: { name: "Lily", color: "#ce82ff", role: "a hotel receptionist", goal: "check in and ask for a room" },
+  kai: { name: "Kai", color: "#1cb0f6", role: "a restaurant chef", goal: "ask the chef for a recommendation and order" },
+} as const;
+export type CharacterId = keyof typeof CHARACTERS;
+export type ChatMsg = { from: "ai" | "me"; text: string; translation?: string; correction?: string };
+
+const turnSchema = z.object({ correction: z.string(), reply: z.string(), translation: z.string(), goal_reached: z.boolean() });
+
+/** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
+export function chatTurn(c: Base, who: CharacterId, history: ChatMsg[]) {
+  const ch = CHARACTERS[who], native = langEn(c.native);
+  const system = [
+    `You are ${ch.name}, ${ch.role}, in a roleplay inside a language-learning app. The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}. The learner's goal: ${ch.goal}.`,
+    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal. \`translation\`: the reply in ${native}.`,
+    `\`correction\`: if the learner's last message has a mistake, the corrected sentence and a very short explanation in ${native}; otherwise "". Ignore capitalization and punctuation.`,
+    "`goal_reached`: true once the learner has achieved the goal; then wrap up the scene politely in `reply`.",
+    "Respond only with JSON matching the schema.",
+  ].join("\n");
+  const last = history[history.length - 1];
+  const prompt = last
+    ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
+      `Check only this last learner message for \`correction\` (earlier ones were already corrected): "${last.text}"\nThen write ${ch.name}'s next turn.`
+    : "Open the scene with a short greeting that invites the learner to start.";
+  return generate(turnSchema, system, prompt);
 }

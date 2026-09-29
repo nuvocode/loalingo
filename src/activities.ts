@@ -92,7 +92,7 @@ export function toItems(acts: LessonActivity[], out: Record<string, unknown[]>):
 // ---- Prompts ----
 
 export type LessonContext = { course: Course; level: Cefr; levelDef: CourseLevel; unitTitle: string; step: CourseLevel["units"][number]["steps"][number]; native: string };
-const langEn = (iso: string) => new Intl.DisplayNames(["en"], { type: "language" }).of(iso) ?? iso;
+export const langEn = (iso: string) => new Intl.DisplayNames(["en"], { type: "language" }).of(iso) ?? iso;
 
 export function systemPrompt(c: Pick<LessonContext, "course" | "level" | "native">) {
   return [
@@ -145,7 +145,7 @@ export function shuffle<T>(a: T[]): T[] {
   return r;
 }
 // Models tend to put the answer first; shuffle so position carries no hint.
-function shuffleAnswer(opts: string[], answer: number) {
+export function shuffleAnswer(opts: string[], answer: number) {
   const options = shuffle(opts);
   return { options, answer: options.indexOf(opts[answer]) };
 }
