@@ -24,3 +24,16 @@ test("lesson plan skips v1-unsupported types, applies default count, validates a
   // Out-of-range index slips past the schema when options < 4: toItems drops it instead of crashing.
   assert.equal(toItems(acts, { a0: [{ prompt: "x", options: ["a", "b", "c"], answer_index: 3 }], a1: [] }).length, 0);
 });
+
+test("listening practice picks the weakest words with 4 distinct options", async () => {
+  const { listenItems } = await import("./activities.ts");
+  const words = ["a", "b", "c", "d", "e"].map((w, i) => ({ word: w, translation: w.toUpperCase(), strength: i }));
+  assert.deepEqual(listenItems(words.slice(0, 3), "?"), []);
+  const items = listenItems(words, "?", 2);
+  assert.deepEqual(items.map((i) => i.kind === "choice" && i.listen).sort(), ["a", "b"]);
+  for (const it of items) {
+    assert.ok(it.kind === "choice");
+    assert.equal(new Set(it.options).size, 4);
+    assert.equal(it.options[it.answer], it.listen);
+  }
+});

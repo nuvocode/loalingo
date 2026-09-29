@@ -1,16 +1,17 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
+import { DAILY_XP_GOAL } from "./progress";
 import { useLeague } from "./screens/Screens";
 import { CourseFlag, CourseSheet } from "./screens/Profiles";
 
-const QUEST_KEY = { q1: "rail.qXp", q2: "rail.qLessons", q3: "rail.qStory" } as const;
+const QUEST_KEY = { q1: "rail.qXp", q2: "rail.qLessons", q3: "rail.qPractice" } as const;
 
 export function Rail() {
   const { t } = useTranslation();
   const { s, setS, go, openSheet, closeSheet, course } = useApp();
   const league = useLeague();
-  const pct = Math.min((s.todayXp / 50) * 100, 100);
+  const pct = Math.min((s.todayXp / DAILY_XP_GOAL) * 100, 100);
 
   const openChest = () => {
     setS((s) => ({ ...s, chests: s.chests - 1, gems: s.gems + 50 }));
@@ -26,7 +27,7 @@ export function Rail() {
         {course && <button className="stat-chip course-chip" onClick={() => openSheet(<CourseSheet />)} aria-label={t("profiles.switchCourse")}><CourseFlag c={course} /></button>}
         <span className="stat-chip" style={{ color: "var(--orange)" }}><Icon name="flame" />{s.streak}</span>
         <span className="stat-chip" style={{ color: "var(--blue)" }}><Icon name="gem" />{s.gems}</span>
-        <span className="stat-chip" style={{ color: "var(--red)" }}><Icon name="heart" />{s.hearts}</span>
+        {s.heartsOn && <span className="stat-chip" style={{ color: "var(--red)" }}><Icon name="heart" />{s.hearts}</span>}
       </div></div>
 
       <div className="rail-card">

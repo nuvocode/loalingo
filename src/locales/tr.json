@@ -28,8 +28,6 @@
     "guidebook": "Rehber",
     "guidebookToast": "Rehber yakında — önce mevcut dersi bitir",
     "chest": "Ünite sandığı",
-    "checkpointSoon": "Kontrol noktası testi yakında",
-    "levelTestSoon": "Seviye testleri yakında",
     "levels": "Seviyeler",
     "levelDone": "Tamamlandı — istediğin zaman tekrar et",
     "levelCurrent": "Şu anki seviyen",
@@ -41,7 +39,10 @@
     "checkpointNext": "{{level}} seviyesini açmak için kontrol noktasını geç",
     "skipLevel": "{{level}} seviyesini atla — seviye testi",
     "courseErrors": "Bazı kurs dosyaları yüklenemedi",
-    "noCourse": "Kullanılabilir kurs yok. Yukarıdaki kurs dosyası hatalarını düzelt."
+    "noCourse": "Kullanılabilir kurs yok. Yukarıdaki kurs dosyası hatalarını düzelt.",
+    "finishFirst": "Önce {{level}} seviyesini bitir ya da seviye testini geç",
+    "courseDone": "{{level}} tamamlandı!",
+    "courseDoneDesc": "Bu kursta henüz sonraki seviye yok. Dersleri tekrar edebilir ya da pratik yapabilirsin."
   },
   "practice": {
     "title": "Pratik Merkezi",
@@ -52,10 +53,14 @@
     "speak": "Konuşma pratiği",
     "speakDesc": "Telaffuzunu ölç — 3 cümle",
     "listen": "Dinleme pratiği",
-    "listenDesc": "Duyduğunu seç — 4 soru",
+    "listenDesc": "Duyduğunu seç — {{count}} soru",
     "start": "Başla",
     "myWords": "Kelimelerim",
-    "wordAria": "{{word}}, {{meaning}}, güç {{strength}}/5"
+    "wordAria": "{{word}}, {{meaning}}, güç {{strength}}/5",
+    "listenPrompt": "Hangi kelimeyi duydun?",
+    "noMistakes": "Düzeltilecek hata yok — harika!",
+    "needWords": "Önce derslerde en az {{count}} kelime öğren",
+    "noWords": "Derslerde öğrendiğin kelimeler burada görünür."
   },
   "league": {
     "title": "{{name}} Ligi",
@@ -172,16 +177,18 @@
     "change": "Değiştir",
     "account": "Hesap",
     "editProfile": "Profili düzenle",
-    "logout": "Çıkış yap"
+    "logout": "Çıkış yap",
+    "hearts": "Kalpler",
+    "heartsDesc": "Her hatada bir kalp gider; her gün yenilenir"
   },
   "rail": {
     "label": "İlerleme",
     "dailyQuests": "Günlük Görevler",
     "qXp": "{{count}} XP kazan",
     "qLessons": "{{count}} ders tamamla",
-    "qStory": "{{count}} hikâye oku",
     "chestTitle": "Açılmamış sandığın var",
-    "chestTap": "Dokunarak aç"
+    "chestTap": "Dokunarak aç",
+    "qPractice": "{{count}} pratik oturumu bitir"
   },
   "sheet": {
     "chestOpened": "Sandık açıldı!",
@@ -222,7 +229,10 @@
     "matchPairs": "Eşleri bul",
     "explain": "Açıkla",
     "gotIt": "Anladım",
-    "checking": "Kontrol ediliyor…"
+    "checking": "Kontrol ediliyor…",
+    "examPassed": "{{level}} tamamlandı!",
+    "examFailed": "Henüz olmadı",
+    "examNeed": "Geçmek için %{{score}} gerekiyor. Tekrar edip yeniden dene."
   },
   "mock": {
     "leagueName": "Safir"

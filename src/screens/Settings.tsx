@@ -8,10 +8,11 @@ import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
-function ToggleRow({ k, initial }: { k: string; initial: boolean }) {
+function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onChange?: (on: boolean) => void }) {
   const { t } = useTranslation();
-  // ponytail: visual toggles only, as in the design; wired to real settings when each feature lands.
-  const [on, setOn] = useState(initial);
+  // ponytail: rows without onChange are visual only, as in the design; wired when each feature lands.
+  const [on, setOnState] = useState(initial);
+  const setOn = (v: boolean) => { setOnState(v); onChange?.(v); };
   return (
     <div className="card od-row" style={gap("12px")}>
       <span className="od-field od-fill"><b>{t(`settings.${k}`)}</b><span className="muted small">{t(`settings.${k}Desc`)}</span></span>
@@ -97,7 +98,7 @@ function AiSheet() {
 
 export function Settings() {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout, ai } = useApp();
+  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout, ai, s, setS } = useApp();
   const langName = useLangName();
   const themes: ThemePref[] = ["system", "light", "dark"];
   const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
@@ -111,6 +112,7 @@ export function Settings() {
               : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
           <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
         </div>
+        <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
         <ToggleRow k="sound" initial />
         <ToggleRow k="speaking" initial />
         <ToggleRow k="reminder" initial />

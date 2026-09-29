@@ -122,9 +122,24 @@ export const normalize = (t: string) =>
 export const matchesAnswer = (given: string, item: { answer: string; accepted: string[] }) =>
   [item.answer, ...item.accepted].some((a) => normalize(a) === normalize(given));
 
+// ---- Practice built locally from the learner's own words (no AI call) ----
+
+export type PracticeWord = { word: string; translation: string; strength: number };
+export const LISTEN_MIN_WORDS = 4;
+
+/** Weakest words first: hear the word, pick it among 3 other known words. */
+export function listenItems(words: PracticeWord[], prompt: string, n = 6): Item[] {
+  if (words.length < LISTEN_MIN_WORDS) return [];
+  const weakest = shuffle(words).sort((a, b) => a.strength - b.strength).slice(0, n);
+  return weakest.map((w) => {
+    const options = shuffle([w.word, ...shuffle(words.filter((o) => o.word !== w.word)).slice(0, 3).map((o) => o.word)]);
+    return { kind: "choice", prompt, context: "", big: false, listen: w.word, options, answer: options.indexOf(w.word) };
+  });
+}
+
 // ---- helpers ----
 
-function shuffle<T>(a: T[]): T[] {
+export function shuffle<T>(a: T[]): T[] {
   const r = [...a];
   for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
   return r;

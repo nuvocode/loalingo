@@ -5,8 +5,27 @@ import { getCached, putCached } from "./db";
 import { REGISTRY, lessonPrompt, lessonSchema, plannedActivities, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { levelsOf, type Course, type Cefr } from "./course";
 
-/** Finds a step and its surroundings in the course tree. */
+/** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
+export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
+
+/** Finds a step and its surroundings in the course tree; exams get a synthetic step covering the whole level. */
 export function stepContext(course: Course, stepId: string, native: string): LessonContext | null {
+  const exam = examLevel(stepId);
+  if (exam) {
+    const levelDef = course.levels[exam];
+    if (!levelDef?.checkpoint) return null;
+    const steps = levelDef.units.flatMap((u) => u.steps);
+    return {
+      course, level: exam, levelDef, unitTitle: levelDef.title, native,
+      step: {
+        id: stepId, title: levelDef.checkpoint.title,
+        description: `Level test covering all of ${exam}: mix topics from every unit, do not focus on one.`,
+        vocabulary: [...new Set(steps.flatMap((s) => s.vocabulary))],
+        grammar: [...new Map(steps.flatMap((s) => s.grammar).map((g) => [g.pattern, g])).values()],
+        activities: levelDef.checkpoint.activities,
+      },
+    };
+  }
   for (const level of levelsOf(course)) {
     const levelDef = course.levels[level]!;
     for (const u of levelDef.units) {

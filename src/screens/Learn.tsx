@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
-import { buildPath, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
+import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
 
@@ -76,7 +76,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
             n.state === "locked" ? undefined
             : n.kind === "step" ? () => start(n.id)
             : n.kind === "chest" ? (n.state === "current" ? () => openChest(n.id) : undefined)
-            : () => toast(t("learn.checkpointSoon")); // ponytail: checkpoint + level test land in Faz 3
+            : () => start(n.id); // checkpoint: retake allowed once done
           return (
             <div className={`node ${cls}`} style={{ transform: `translateX(${off}px)` }} key={n.id}>
               <button className="node-btn" onClick={onClick} aria-label={name} aria-disabled={!onClick || undefined}>
@@ -102,7 +102,7 @@ function LevelSheet() {
     <div className="od-stack" style={{ "--od-gap": "10px", marginTop: 12 } as React.CSSProperties}>
       {levels.map((l, i) => (
         <button key={l} className="card row-item" onClick={() => {
-          if (i > cur) return toast(t("learn.levelTestSoon"));
+          if (i > cur) return toast(t("learn.finishFirst", { level: enrollment!.level }));
           setViewLevel(l); closeSheet();
         }}>
           <span className="od-field od-fill"><b>{l} · {course!.levels[l]!.title}</b>
@@ -116,16 +116,24 @@ function LevelSheet() {
 
 function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number; total: number }) {
   const { t } = useTranslation();
-  const { course, toast } = useApp();
+  const { course, done } = useApp();
+  const start = useStartLesson();
   const levels = levelsOf(course!);
   const next = levels[levels.indexOf(level) + 1];
+  const hasExam = !!course!.levels[level]!.checkpoint;
+  if (!next && (done.has(checkpointId(level)) || (!hasExam && remaining === 0))) return (
+    <div className="card" style={{ margin: "8px 0 24px", textAlign: "center" }}>
+      <h3 style={{ fontWeight: 900, fontSize: 18 }}>{t("learn.courseDone", { level })}</h3>
+      <p className="muted small">{t("learn.courseDoneDesc")}</p>
+    </div>
+  );
   const title = remaining === 0 ? t("learn.checkpointNext", { level: next ?? level })
     : next ? t("learn.lessonsLeft", { count: remaining, level: next }) : t("learn.lessonsLeftFinish", { count: remaining, level });
   return (
     <div className="card" style={{ margin: "8px 0 24px", textAlign: "center" }}>
       <h3 style={{ fontWeight: 900, fontSize: 18 }}>{title}</h3>
       <div className="progress-track" style={{ margin: "12px 0 14px" }}><div className="progress-fill green" style={{ width: `${((total - remaining) / total) * 100}%` }} /></div>
-      <button className="btn btn-ghost btn-block" onClick={() => toast(t("learn.levelTestSoon"))}>{t("learn.skipLevel", { level })}</button>
+      {hasExam && remaining > 0 && <button className="btn btn-ghost btn-block" onClick={() => start(`${level}:test`)}>{t("learn.skipLevel", { level })}</button>}
     </div>
   );
 }

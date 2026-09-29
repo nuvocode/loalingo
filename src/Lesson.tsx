@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { useBuy } from "./screens/Screens";
-import { EXERCISES } from "./mock";
-import { matchesAnswer, normalize, type Item } from "./activities";
-import { explain, judge, loadLesson, prefetchNext, stepContext } from "./lessons";
+import * as db from "./db";
+import { listenItems, matchesAnswer, normalize, type Item } from "./activities";
+import { examLevel, explain, judge, loadLesson, prefetchNext, stepContext } from "./lessons";
+import { recordSession, today } from "./progress";
 
 /** Opens a lesson, or the out-of-hearts sheet (design behaviour). Steps need an AI provider (DECISIONS C6). */
 export function useStartLesson() {
@@ -18,7 +19,7 @@ export function useStartLesson() {
       <button className="btn btn-primary btn-block" onClick={() => { closeSheet(); go("settings"); }}>{t("ai.setUp")}</button>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
-    if (s.hearts > 0) return startLesson(id);
+    if (!s.heartsOn || s.hearts > 0) return startLesson(id);
     openSheet(<>
       <h3>{t("sheet.noHearts")}</h3><p>{t("sheet.noHeartsDesc")}</p>
       <button className="btn btn-danger btn-block" onClick={() => buy("refill", 350)}>{t("sheet.refillFor", { count: 350 })}</button>
@@ -35,31 +36,36 @@ function say(text: string, lang: string) {
   speechSynthesis.speak(u);
 }
 
-// ponytail: practice modes still use the design's sample questions until Faz 3 builds them from mistakes/words.
-const practiceItems = (id: string): Item[] => (EXERCISES[id] ?? []).map((e) => e.type === "choice"
-  ? { kind: "choice", prompt: e.q, context: "", big: false, listen: e.listen ?? "", options: e.opts, answer: e.a }
-  : { kind: "bank", prompt: e.q, answer: e.answer, bank: e.bank });
+/** Items of the practice modes, built from the learner's own data (Faz 3). `mistakeId` links a replayed mistake. */
+type PItem = Item & { mistakeId?: number };
+async function practiceItems(id: string, enrollmentId: number, listenPrompt: string): Promise<PItem[]> {
+  if (id === "practice-mistakes") return (await db.listMistakes<Item>(enrollmentId, 10)).map((m) => ({ ...m.item, mistakeId: m.id }));
+  if (id === "practice-listen") return listenItems(await db.listWords(enrollmentId), listenPrompt);
+  return [];
+}
 
 const questionOf = (it: Item) => it.kind === "learn" ? it.phrase : it.kind === "match" ? "match" : [it.prompt, "context" in it ? it.context : "", "listen" in it ? it.listen : ""].filter(Boolean).join(" — ");
 
 type Fb = { ok: boolean; correct: string; given: string; note?: string } | null;
-type Load = { state: "loading" } | { state: "error"; msg: string } | { state: "ready"; items: Item[] };
+type Load = { state: "loading" } | { state: "error"; msg: string } | { state: "ready"; items: PItem[] };
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export function Lesson({ id }: { id: string }) {
   const { t } = useTranslation();
-  const { s, setS, completeStep, openSheet, closeSheet, endLesson, sheet, course, enrollment, profile, ai, go } = useApp();
+  const { s, setS, completeStep, gainXp, completeLevel, openSheet, closeSheet, endLesson, sheet, course, enrollment, profile, ai, go } = useApp();
   const native = profile?.native_lang;
   // Keyed on stable values: `profile` changes on every stats update and must not restart the lesson.
   const ctx = useMemo(() => course && native && !id.startsWith("practice-") ? stepContext(course, id, native) : null, [course, native, id]);
   const lang = course?.iso ?? "en";
-  const [load, setLoad] = useState<Load>(() => ctx ? { state: "loading" } : { state: "ready", items: practiceItems(id) });
+  const practice = id.startsWith("practice-");
+  const exam = examLevel(id);
+  const [load, setLoad] = useState<Load>({ state: "loading" });
   const [gen, setGen] = useState(0); // bump = regenerate (C3)
   const [i, setI] = useState(0);
   const [fb, setFb] = useState<Fb>(null);
   const [checking, setChecking] = useState(false);
   const [score, setScore] = useState({ correct: 0, xp: 0 });
-  const [result, setResult] = useState<{ xp: number; acc: number; gems: number } | null>(null);
+  const [result, setResult] = useState<{ xp: number; acc: number; gems: number; passed?: boolean; required?: number } | null>(null);
   const [sel, setSel] = useState<number | null>(null);
   const [bankSel, setBankSel] = useState<number[]>([]);
   const [text, setText] = useState("");
@@ -68,10 +74,10 @@ export function Lesson({ id }: { id: string }) {
   function reset() { setSel(null); setBankSel([]); setText(""); setFb(null); setMatched({ done: [], left: null, wrong: [], misses: 0 }); }
 
   useEffect(() => {
-    if (!ctx || !enrollment) return;
+    if (!enrollment || (!ctx && !practice)) return;
     let live = true;
     setLoad({ state: "loading" }); setI(0); reset(); setScore({ correct: 0, xp: 0 });
-    loadLesson(enrollment.id, ctx, gen > 0)
+    (ctx ? loadLesson(enrollment.id, ctx, gen > 0) : practiceItems(id, enrollment.id, t("practice.listenPrompt")))
       .then((items) => live && setLoad({ state: "ready", items }))
       .catch((e) => live && setLoad({ state: "error", msg: (e as Error).message }));
     return () => { live = false; };
@@ -80,7 +86,7 @@ export function Lesson({ id }: { id: string }) {
   useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
 
   const list = load.state === "ready" ? load.items : [];
-  const it = list[i] as Item | undefined;
+  const it = list[i] as PItem | undefined;
 
   // Auto-play listening items once.
   useEffect(() => { if (it && (it.kind === "choice" || it.kind === "input") && it.listen) say(it.listen, lang); }, [it, lang]);
@@ -103,16 +109,21 @@ export function Lesson({ id }: { id: string }) {
 
   const finish = () => {
     const total = list.filter((x) => x.kind !== "learn").length || 1; // learn cards are not scored
-    const acc = Math.round((score.correct / total) * 100), gems = score.correct * 2;
-    setS((s) => ({
-      ...s, todayXp: s.todayXp + score.xp, gems: s.gems + gems,
-      quests: s.quests.map((q) => q.id === "q1" ? { ...q, cur: Math.min(q.cur + score.xp, 999) } : q.id === "q2" ? { ...q, cur: q.cur + 1 } : q),
-    }));
-    if (ctx && enrollment) {
-      completeStep(id, score.xp);
-      prefetchNext(enrollment.id, ctx.course, ctx.level, id, ctx.native);
+    const acc = Math.round((score.correct / total) * 100), gems = score.correct * 2, xp = score.xp;
+    setS((s) => recordSession(s, { xp, gems, kind: practice ? "practice" : "lesson" }, today()));
+    const required = ctx?.levelDef.checkpoint?.required_score;
+    const passed = exam ? acc >= required! : undefined;
+    if (enrollment) {
+      if (exam) (passed ? completeLevel(exam, xp) : gainXp(xp));
+      else if (ctx) {
+        completeStep(id, xp);
+        prefetchNext(enrollment.id, ctx.course, ctx.level, id, ctx.native);
+      } else gainXp(xp);
+      // "My words": phrases taught or matched in this lesson (strength grows each time they come back).
+      db.addWords(enrollment.id, list.flatMap((x): [string, string][] =>
+        x.kind === "learn" ? [[x.phrase, x.translation]] : x.kind === "match" ? x.pairs : []));
     }
-    setResult({ xp: score.xp, acc, gems });
+    setResult({ xp, acc, gems, passed, required });
   };
 
   const next = () => {
@@ -121,8 +132,14 @@ export function Lesson({ id }: { id: string }) {
   };
 
   const grade = (ok: boolean, correct: string, given: string, note?: string) => {
+    if (it && enrollment) {
+      const { mistakeId, ...item } = it;
+      if (id === "practice-listen" && it.kind === "choice") db.nudgeWord(enrollment.id, it.listen, ok ? 1 : -1);
+      else if (ok && mistakeId) db.deleteMistake(mistakeId);
+      else if (!ok && !mistakeId) db.addMistake(enrollment.id, item);
+    }
     if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
-    else {
+    else if (s.heartsOn) {
       const hearts = Math.max(0, s.hearts - 1);
       setS((s) => ({ ...s, hearts }));
       if (hearts <= 0) openSheet(<HeartsOut onEnd={quit} />);
@@ -189,8 +206,13 @@ export function Lesson({ id }: { id: string }) {
   );
   else if (result) body = (
     <div className="result-wrap">
-      <div className="result-badge" style={{ color: "var(--on-accent)" }}><Icon name="trophy" /></div>
-      <h2 style={{ fontSize: 26, fontWeight: 900 }}>{t("lesson.done")}</h2>
+      <div className="result-badge" style={{ color: "var(--on-accent)", ...(result.passed === false && { background: "var(--red)", boxShadow: "0 6px 0 var(--red-dark)" }) }}>
+        <Icon name={result.passed === false ? "refresh" : "trophy"} />
+      </div>
+      <h2 style={{ fontSize: 26, fontWeight: 900 }}>
+        {result.passed === undefined ? t("lesson.done") : result.passed ? t("lesson.examPassed", { level: exam }) : t("lesson.examFailed")}
+      </h2>
+      {result.passed === false && <p className="muted">{t("lesson.examNeed", { score: result.required })}</p>}
       <div className="result-stats">
         <span className="result-stat gold"><span className="rs-k">{t("lesson.totalXp")}</span><span className="rs-v">+{result.xp}</span></span>
         <span className="result-stat green"><span className="rs-k">{t("lesson.accuracy")}</span><span className="rs-v">{t("lesson.accuracyValue", { value: result.acc })}</span></span>
@@ -276,7 +298,7 @@ export function Lesson({ id }: { id: string }) {
         {ctx && !result && (
           <button className="icon-btn" onClick={() => setGen((g) => g + 1)} disabled={load.state === "loading"} aria-label={t("ai.regenerate")} title={t("ai.regenerate")}><Icon name="refresh" /></button>
         )}
-        <div className="hearts-box"><Icon name="heart" />{s.hearts}</div>
+        {s.heartsOn && <div className="hearts-box"><Icon name="heart" />{s.hearts}</div>}
       </div>
 
       <div className="lesson-body"><div className="lesson-inner">{body}</div></div>

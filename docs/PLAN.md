@@ -108,7 +108,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Tema ve arayüz dili profile yazılır (giriş ekranı için son seçim localStorage'da kalır).
 - Kurs değiştirme sheet'i: ray bayrak çipi + Ayarlar > Kurs; "Yeni dil ekle".
 - YAML şeması (zod, `src/course.ts`), `courses/en.yml` (A1: 10 ünite, 40 adım + checkpoint). Kullanıcı kursları: `~/Library/Application Support/com.nuvocode.loalingo/courses/*.yml` (aynı iso gömülüyü ezer). Bozuk dosya Öğren ekranında dosya + yol + nedenle gösterilir.
-- Öğren ekranı: sadece aktif seviye, seviye seçici çipi + sheet, ünite sonu sandığı (+20 elmas), checkpoint düğümü ve seviye kartı ("X ders kaldı"). Checkpoint ve seviye testi butonları Faz 3'e kadar "Yakında".
+- Öğren ekranı: sadece aktif seviye, seviye seçici çipi + sheet, ünite sonu sandığı (+20 elmas), checkpoint düğümü ve seviye kartı ("X ders kaldı"). Checkpoint ve seviye testi Faz 3'te açıldı.
 - Ders bitince adım tamamlanır ve XP kursa yazılır.
 - Test: `pnpm test` (loader + path). Tarayıcı önizlemesinde SQLite yerine sql.js çalışır (sadece dev).
 
@@ -122,10 +122,13 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Şema prompt'a da eklenir ve ```json çitli cevaplar kurtarılır (Ollama bulut modelleri `response_format`'ı yok sayıyor). Yerel sağlayıcılarda `reasoning: "low"` (glm-5.3-flash: 185 sn → 7 sn).
 - ✔ Ollama (glm-5.3-flash:cloud) ile 2 ders üretildi ve oynandı. ☐ Bulut sağlayıcıyla aynı test.
 
-**Faz 3 — İlerleme + tekrar döngüsü**
-- XP, seri, günlük hedef, kalpler (lokal).
-- Hata kaydı → `mistakes`; öğrenilen kelimeler → `words`; `listen`, `match_madness`, `timed_challenge`, `legendary` modları.
-- Checkpoint (seviye sonu, `required_score`) + seviye ayırıcı kartı ("A2'ye X ders kaldı") + "Seviyeyi atla" testi (DECISIONS B8).
+**Faz 3 — İlerleme + tekrar döngüsü** ✅
+- `src/progress.ts` (saf, testli): XP, seri + en iyi seri, seri dondurma, günlük hedef (50 XP), 3 günlük görev (XP / 3 ders / 1 alıştırma), hepsi bitince günde 1 sandık. Gün değişimi girişte (`rollDay`).
+- Kalpler Ayarlar'dan açılıp kapanır (E2); kapalıyken rozet ve ceza yok. Kalpler günde bir dolar (sayaç yok).
+- Yanlış cevap → `mistakes`, doğru tekrar edilince silinir. Öğrenilen kelimeler (learn + match) → `words` (güç 0–5).
+- Alıştırma: Hatalarım (son 10 hata) ve Dinleme (en zayıf kelimeler, en az 4 kelime). "Kelimelerim" gerçek listeyi gösterir.
+- Checkpoint düğümü ve "Seviyeyi atla" aynı sınav akışı (B8): tüm seviyenin kelime/gramerinden AI sınavı, `required_score` geçilirse seviyenin tüm düğümleri tamamlanır ve kayıt ilerler (geri gitmez). Son seviyede "Kursu bitirdin" kartı.
+- Atlandı: `match_madness`, `timed_challenge`, `legendary` — tasarımda ekranı yok (Match Madness Lig ekranında, o da "Yakında"). Faz 4'e.
 
 **Faz 4 — Sonraki aşama (şimdilik "Yakında")**
 - Hikâyeler, Rol Yapma (AI sohbet), Konuşma/STT, Video Call.

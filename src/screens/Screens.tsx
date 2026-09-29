@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
-import { FRIENDS, LEAGUE, MISTAKES, NOTIFS, WORDS } from "../mock";
+import { FRIENDS, LEAGUE, NOTIFS } from "../mock";
+import * as db from "../db";
+import { LISTEN_MIN_WORDS } from "../activities";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -42,8 +45,15 @@ export function useBuy() {
 
 export function Practice() {
   const { t } = useTranslation();
-  const { toast } = useApp();
+  const { toast, enrollment, lessonId } = useApp();
   const start = useStartLesson();
+  const [data, setData] = useState<{ mistakes: number; words: db.Word[] }>({ mistakes: 0, words: [] });
+  // Reloads when a practice session closes (lessonId → null).
+  useEffect(() => {
+    if (!enrollment || lessonId) return;
+    Promise.all([db.listMistakes(enrollment.id), db.listWords(enrollment.id)]).then(([m, words]) => setData({ mistakes: m.length, words }));
+  }, [enrollment?.id, lessonId]);
+  const { mistakes, words } = data;
   const card = (onClick: () => void, icon: IconName, bg: string, fg: string, title: string, desc: string) => (
     <button className="card row-item" onClick={onClick}>
       <span style={iconBox(bg, fg)}><Icon name={icon} /></span>
@@ -56,19 +66,22 @@ export function Practice() {
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("practice.title")}</h1>
       <p className="muted" style={{ marginBottom: 20 }}>{t("practice.subtitle")}</p>
       <div className="od-grid" style={{ "--od-cols": 1, "--od-gap": "14px" } as React.CSSProperties}>
-        {card(() => start("practice-mistakes"), "refresh", "var(--red-tint)", "var(--red)", t("practice.mistakes"), t("practice.mistakesCount", { count: MISTAKES.length }))}
+        {card(() => mistakes ? start("practice-mistakes") : toast(t("practice.noMistakes")), "refresh", "var(--red-tint)", "var(--red)", t("practice.mistakes"),
+          mistakes ? t("practice.mistakesCount", { count: mistakes }) : t("practice.noMistakes"))}
         {/* Speaking needs STT, which WKWebView lacks (DECISIONS D2). */}
         {card(() => toast(t("common.soonToast")), "mic", "var(--sky)", "var(--blue)", t("practice.speak"), t("practice.speakDesc"))}
-        {card(() => start("practice-listen"), "headphones", "var(--purple-tint)", "var(--purple-dark)", t("practice.listen"), t("practice.listenDesc"))}
+        {card(() => words.length >= LISTEN_MIN_WORDS ? start("practice-listen") : toast(t("practice.needWords", { count: LISTEN_MIN_WORDS })),
+          "headphones", "var(--purple-tint)", "var(--purple-dark)", t("practice.listen"), words.length >= LISTEN_MIN_WORDS ? t("practice.listenDesc", { count: Math.min(6, words.length) }) : t("practice.needWords", { count: LISTEN_MIN_WORDS }))}
       </div>
-      <h2 className="section-title">{t("practice.myWords")} <span className="muted small" style={{ fontWeight: 700 }}>({WORDS.length})</span></h2>
+      <h2 className="section-title">{t("practice.myWords")} <span className="muted small" style={{ fontWeight: 700 }}>({words.length})</span></h2>
+      {!words.length && <p className="muted small">{t("practice.noWords")}</p>}
       <div className="od-cluster" style={{ "--od-gap": "10px" } as React.CSSProperties}>
-        {WORDS.map((w) => {
-          const col = w.s >= 4 ? "var(--green)" : w.s >= 2 ? "var(--gold)" : "var(--red)";
+        {words.map((w) => {
+          const col = w.strength >= 4 ? "var(--green)" : w.strength >= 2 ? "var(--gold)" : "var(--red)";
           return (
-            <button className="word-chip" key={w.w} onClick={() => toast(`'${w.w}' = ${w.t}`)} aria-label={t("practice.wordAria", { word: w.w, meaning: w.t, strength: w.s })}>
-              <span>{w.w}</span>
-              <span className="strength" aria-hidden="true"><i style={{ width: `${(w.s / 5) * 100}%`, background: col }} /></span>
+            <button className="word-chip" key={w.word} onClick={() => toast(`'${w.word}' = ${w.translation}`)} aria-label={t("practice.wordAria", { word: w.word, meaning: w.translation, strength: w.strength })}>
+              <span>{w.word}</span>
+              <span className="strength" aria-hidden="true"><i style={{ width: `${(w.strength / 5) * 100}%`, background: col }} /></span>
             </button>
           );
         })}
@@ -154,7 +167,7 @@ export function Profile() {
     </div>
   );
   const ach: [IconName, string, number, number, string][] = [
-    ["flame", "achFire", 12, 7, "var(--orange)"], ["bolt", "achFast", 30, 50, "var(--gold-dark)"], ["book", "achBook", 0, 1, "var(--blue)"],
+    ["flame", "achFire", s.bestStreak, 7, "var(--orange)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", 0, 1, "var(--blue)"], // stories: Faz 4
   ];
   return (
     <>

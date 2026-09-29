@@ -28,8 +28,6 @@
     "guidebook": "Guidebook",
     "guidebookToast": "Guidebook coming soon — finish the current lesson first",
     "chest": "Unit chest",
-    "checkpointSoon": "The checkpoint test is coming soon",
-    "levelTestSoon": "Level tests are coming soon",
     "levels": "Levels",
     "levelDone": "Completed — review anytime",
     "levelCurrent": "Your current level",
@@ -41,7 +39,10 @@
     "checkpointNext": "Pass the checkpoint to unlock {{level}}",
     "skipLevel": "Skip {{level}} — take the level test",
     "courseErrors": "Some course files could not be loaded",
-    "noCourse": "No course is available. Fix the course file errors above."
+    "noCourse": "No course is available. Fix the course file errors above.",
+    "finishFirst": "Finish {{level}} or pass its level test first",
+    "courseDone": "You finished {{level}}!",
+    "courseDoneDesc": "This course has no further levels yet. Review any lesson or keep practising."
   },
   "practice": {
     "title": "Practice Hub",
@@ -52,10 +53,15 @@
     "speak": "Speaking practice",
     "speakDesc": "Check your pronunciation — 3 sentences",
     "listen": "Listening practice",
-    "listenDesc": "Pick what you hear — 4 questions",
     "start": "Start",
     "myWords": "My words",
-    "wordAria": "{{word}}, {{meaning}}, strength {{strength}}/5"
+    "wordAria": "{{word}}, {{meaning}}, strength {{strength}}/5",
+    "listenDesc_one": "Pick what you hear — {{count}} question",
+    "listenDesc_other": "Pick what you hear — {{count}} questions",
+    "listenPrompt": "Which word did you hear?",
+    "noMistakes": "No mistakes to fix — nice!",
+    "needWords": "Learn at least {{count}} words in lessons first",
+    "noWords": "Words you learn in lessons appear here."
   },
   "league": {
     "title": "{{name}} League",
@@ -174,7 +180,9 @@
     "change": "Change",
     "account": "Account",
     "editProfile": "Edit profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "hearts": "Hearts",
+    "heartsDesc": "Lose a heart for each mistake; they refill every day"
   },
   "rail": {
     "label": "Progress",
@@ -182,10 +190,10 @@
     "qXp": "Earn {{count}} XP",
     "qLessons_one": "Complete {{count}} lesson",
     "qLessons_other": "Complete {{count}} lessons",
-    "qStory_one": "Read {{count}} story",
-    "qStory_other": "Read {{count}} stories",
     "chestTitle": "You have an unopened chest",
-    "chestTap": "Tap to open"
+    "chestTap": "Tap to open",
+    "qPractice_one": "Finish {{count}} practice session",
+    "qPractice_other": "Finish {{count}} practice sessions"
   },
   "sheet": {
     "chestOpened": "Chest opened!",
@@ -226,7 +234,10 @@
     "matchPairs": "Match the pairs",
     "explain": "Explain",
     "gotIt": "Got it",
-    "checking": "Checking…"
+    "checking": "Checking…",
+    "examPassed": "{{level}} complete!",
+    "examFailed": "Not quite yet",
+    "examNeed": "You need {{score}}% to pass. Review and try again."
   },
   "mock": {
     "leagueName": "Sapphire"

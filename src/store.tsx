@@ -2,10 +2,11 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { invoke } from "@tauri-apps/api/core";
 import i18n from "./i18n";
 import { useTheme, type ThemePref } from "./theme";
-import { parseCourse, levelsOf, type Cefr, type Course } from "./course";
+import { parseCourse, levelsOf, chestId, checkpointId, type Cefr, type Course } from "./course";
 import * as db from "./db";
 import { activateConfig, loadAiConfig, saveAiConfig, type AiConfig } from "./ai";
 import type { Enrollment, Profile, Stats } from "./db";
+import { rollDay, today } from "./progress";
 
 export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings";
 const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings"];
@@ -43,6 +44,9 @@ type Ctx = {
   updateProfile: (patch: Parameters<typeof db.updateProfile>[1]) => Promise<void>;
   switchCourse: (iso: string) => Promise<void>;
   completeStep: (stepId: string, xp: number) => Promise<void>;
+  gainXp: (xp: number) => Promise<void>;
+  /** Checkpoint / level test passed: every node of `level` done, enrollment moves to the next level. */
+  completeLevel: (level: Cefr, xp: number) => Promise<void>;
   viewLevel: Cefr | null; setViewLevel: (l: Cefr | null) => void;
   s: Stats; setS: (f: (s: Stats) => Stats) => void; xp: number;
   route: Route; go: (r: Route) => void;
@@ -81,6 +85,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Loads everything that belongs to a profile (E6) and applies its UI prefs.
   const login = useCallback(async (p: Profile) => {
     const fresh = (await db.getProfile(p.id))!;
+    const stats = rollDay(fresh.stats, today());
+    if (stats !== fresh.stats) { fresh.stats = stats; await db.updateProfile(p.id, { stats }); }
     setEnrollments(await db.listEnrollments(p.id));
     setViewLevel(null);
     setProfile(fresh);
@@ -152,6 +158,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (xp) await db.addXp(enrollment.id, xp);
       setDone((d) => new Set(d).add(stepId));
       setEnrollments((es) => es.map((e) => e.id === enrollment.id ? { ...e, xp: e.xp + xp } : e));
+    },
+    gainXp: async (xp) => {
+      if (!enrollment || !xp) return;
+      await db.addXp(enrollment.id, xp);
+      setEnrollments((es) => es.map((e) => e.id === enrollment.id ? { ...e, xp: e.xp + xp } : e));
+    },
+    completeLevel: async (level, xp) => {
+      if (!enrollment || !course) return;
+      const levels = levelsOf(course), def = course.levels[level]!;
+      const ids = [...def.units.flatMap((u) => [...u.steps.map((st) => st.id), chestId(u.id)]), checkpointId(level)];
+      // Only move forward: passing an earlier level's test again must not pull the enrollment back.
+      const next = levels[levels.indexOf(level) + 1] ?? null;
+      const moveTo = next && levels.indexOf(next) > levels.indexOf(enrollment.level) ? next : null;
+      await db.completeLevel(enrollment.id, ids, moveTo);
+      if (xp) await db.addXp(enrollment.id, xp);
+      setDone((d) => new Set([...d, ...ids]));
+      setEnrollments((es) => es.map((e) => e.id === enrollment.id ? { ...e, xp: e.xp + xp, level: moveTo ?? e.level } : e));
+      setViewLevel(null);
     },
     viewLevel, setViewLevel,
     s: profile?.stats ?? db.NEW_STATS,

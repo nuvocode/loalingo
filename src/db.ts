@@ -3,6 +3,8 @@
 // persisted to localStorage. Never used in the shipped app.
 import type { Cefr } from "./course";
 import type { ThemePref } from "./theme";
+import { NEW_STATS, type Stats } from "./progress";
+export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
 type Db = { select<T = Row>(sql: string, args?: unknown[]): Promise<T[]>; execute(sql: string, args?: unknown[]): Promise<{ lastInsertId?: number }> };
@@ -22,8 +24,13 @@ CREATE TABLE IF NOT EXISTS step_progress(
   state TEXT NOT NULL, legendary INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(enrollment_id, step_id));
 CREATE TABLE IF NOT EXISTS content_cache(
   enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, step_id TEXT NOT NULL,
-  content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, step_id))`;
-// mistakes / words tables arrive with the features that write them (Faz 3).
+  content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, step_id));
+CREATE TABLE IF NOT EXISTS mistakes(
+  id INTEGER PRIMARY KEY, enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE,
+  item TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(enrollment_id, item));
+CREATE TABLE IF NOT EXISTS words(
+  enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, word TEXT NOT NULL, translation TEXT NOT NULL,
+  strength INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, word))`;
 
 async function tauriDb(): Promise<Db> {
   const { default: Database } = await import("@tauri-apps/plugin-sql");
@@ -66,20 +73,6 @@ function db() {
 }
 
 // ---- Types ----
-
-export type Stats = {
-  hearts: number; maxHearts: number; streak: number; gems: number; todayXp: number;
-  streakFreeze: number; chests: number;
-  quests: { id: "q1" | "q2" | "q3"; icon: "bolt" | "book" | "story"; cur: number; goal: number }[];
-};
-export const NEW_STATS: Stats = {
-  hearts: 5, maxHearts: 5, streak: 0, gems: 0, todayXp: 0, streakFreeze: 0, chests: 0,
-  quests: [
-    { id: "q1", icon: "bolt", cur: 0, goal: 50 },
-    { id: "q2", icon: "book", cur: 0, goal: 3 },
-    { id: "q3", icon: "story", cur: 0, goal: 1 },
-  ],
-};
 
 export type Profile = {
   id: number; name: string; color: string; pin_hash: string | null; ui_lang: string; theme: ThemePref;
@@ -169,6 +162,40 @@ export async function getCached<T>(enrollmentId: number, stepId: string): Promis
 }
 export async function putCached(enrollmentId: number, stepId: string, content: unknown) {
   await (await db()).execute("INSERT INTO content_cache(enrollment_id, step_id, content) VALUES ($1, $2, $3) ON CONFLICT DO UPDATE SET content = $3, created_at = CURRENT_TIMESTAMP", [enrollmentId, stepId, JSON.stringify(content)]);
+}
+
+/** Levels passed via checkpoint or level test: marks every node of the level done and moves the enrollment on. */
+export async function completeLevel(enrollmentId: number, ids: string[], next: Cefr | null) {
+  for (const id of ids) await markDone(enrollmentId, id);
+  if (next) await (await db()).execute("UPDATE enrollments SET level = $1 WHERE id = $2", [next, enrollmentId]);
+}
+
+// ---- Mistakes and words (per enrollment, DECISIONS E6) ----
+
+export async function addMistake(enrollmentId: number, item: unknown) {
+  await (await db()).execute("INSERT INTO mistakes(enrollment_id, item) VALUES ($1, $2) ON CONFLICT DO NOTHING", [enrollmentId, JSON.stringify(item)]);
+}
+export async function listMistakes<T>(enrollmentId: number, limit = 1000) {
+  const r = await (await db()).select<{ id: number; item: string }>("SELECT id, item FROM mistakes WHERE enrollment_id = $1 ORDER BY id DESC LIMIT $2", [enrollmentId, limit]);
+  return r.map((x) => ({ id: x.id, item: JSON.parse(x.item) as T }));
+}
+export async function deleteMistake(id: number) {
+  await (await db()).execute("DELETE FROM mistakes WHERE id = $1", [id]);
+}
+
+export type Word = { word: string; translation: string; strength: number };
+/** Seen again → stronger (max 5). */
+export async function addWords(enrollmentId: number, pairs: [string, string][]) {
+  const d = await db();
+  for (const [w, t] of pairs) await d.execute(
+    "INSERT INTO words(enrollment_id, word, translation) VALUES ($1, $2, $3) ON CONFLICT DO UPDATE SET strength = MIN(5, strength + 1), translation = $3, updated_at = CURRENT_TIMESTAMP",
+    [enrollmentId, w, t]);
+}
+export async function nudgeWord(enrollmentId: number, word: string, delta: number) {
+  await (await db()).execute("UPDATE words SET strength = MAX(0, MIN(5, strength + $1)), updated_at = CURRENT_TIMESTAMP WHERE enrollment_id = $2 AND word = $3", [delta, enrollmentId, word]);
+}
+export async function listWords(enrollmentId: number) {
+  return (await db()).select<Word>("SELECT word, translation, strength FROM words WHERE enrollment_id = $1 ORDER BY updated_at DESC, word", [enrollmentId]);
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----
