@@ -1,4 +1,4 @@
-// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql, `loalingo.db` in the data folder (spec B, src/datadir.ts).
+// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql, `sprigo.db` in the data folder (spec B, src/datadir.ts).
 // Schema changes live in src/migrations.ts and run on open (spec A).
 // ponytail: in a plain browser (the Vite preview used during development) the same SQL runs on sql.js,
 // persisted to localStorage. Never used in the shipped app.
@@ -18,7 +18,7 @@ type Db = SqlDb;
 async function browserDb(): Promise<Db> {
   const [{ default: init }, { default: wasm }] = await Promise.all([import("sql.js"), import("sql.js/dist/sql-wasm.wasm?url")]);
   const SQL = await init({ locateFile: () => wasm });
-  const KEY = "loalingo.devdb";
+  const KEY = "sprigo.devdb";
   const saved = localStorage.getItem(KEY);
   const db = new SQL.Database(saved ? Uint8Array.from(atob(saved), (c) => c.charCodeAt(0)) : undefined);
   return wrapSqlJs(db, () => localStorage.setItem(KEY, btoa(String.fromCharCode(...db.export()))));
@@ -28,7 +28,7 @@ let dbP: Promise<Db> | null = null;
 export const isTauri = "__TAURI_INTERNALS__" in window;
 function db() {
   return (dbP ??= (async () => {
-    const d = await (isTauri ? openTauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("loalingo needs the Tauri shell")));
+    const d = await (isTauri ? openTauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("Sprigo needs the Tauri shell")));
     await runMigrations(d, MIGRATIONS, isTauri ? (v) => snapshot(d, `pre-v${v}-${Date.now()}.db`).then(() => {}) : undefined);
     if (isTauri) await dailyBackup(d).catch((e) => console.error("daily backup", e));
     return d;

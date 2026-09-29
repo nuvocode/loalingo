@@ -31,7 +31,7 @@ export const saveAiConfig = (c: AiConfig) => setSetting("ai", JSON.stringify(c))
 
 // ---- API keys ----
 // ponytail: the dev browser preview has no keychain, so it keeps keys in localStorage. Never used in the app.
-const DEV_KEY = (p: ProviderId) => `loalingo.devkey.${p}`;
+const DEV_KEY = (p: ProviderId) => `sprigo.devkey.${p}`;
 export async function getKey(p: ProviderId): Promise<string | null> {
   if (!PROVIDERS[p].needsKey) return null;
   return isTauri ? invoke<string | null>("secret_get", { key: `api-key.${p}` }) : localStorage.getItem(DEV_KEY(p));

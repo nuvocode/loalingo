@@ -26,7 +26,7 @@ test("backup pruning keeps the newest seven daily files and ignores others", () 
 });
 
 test("sqlite url escapes characters sqlx would decode", () => {
-  assert.equal(sqliteUrl("/Users/a/My Drive/loalingo.db"), "sqlite:/Users/a/My Drive/loalingo.db");
-  assert.equal(sqliteUrl("/x/100%?#/loalingo.db"), "sqlite:/x/100%25%3F%23/loalingo.db");
+  assert.equal(sqliteUrl("/Users/a/My Drive/sprigo.db"), "sqlite:/Users/a/My Drive/sprigo.db");
+  assert.equal(sqliteUrl("/x/100%?#/sprigo.db"), "sqlite:/x/100%25%3F%23/sprigo.db");
   assert.equal(sqlString("/a/O'Neil/x.db"), "'/a/O''Neil/x.db'");
 });

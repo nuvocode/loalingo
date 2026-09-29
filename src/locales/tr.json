@@ -4,13 +4,13 @@
   },
   "boot": {
     "newerTitle": "Bu veri daha yeni bir sürümden",
-    "newerDesc": "Verilerin loalingo'nun daha yeni bir sürümüyle kaydedilmiş. Açmak için uygulamayı güncelle. Bu sürüm verilere dokunmaz.",
-    "failedTitle": "loalingo verilerini açamadı",
+    "newerDesc": "Verilerin Sprigo'nun daha yeni bir sürümüyle kaydedilmiş. Açmak için uygulamayı güncelle. Bu sürüm verilere dokunmaz.",
+    "failedTitle": "Sprigo verilerini açamadı",
     "failedDesc": "Veritabanı açılırken bir sorun oluştu. Ayrıntılar:",
     "unreachableTitle": "Veri klasörüne ulaşılamıyor",
     "unreachableDesc": "Diski tak ya da klasörün erişilebilir olduğundan emin ol, sonra tekrar dene.",
     "lockedTitle": "Verilerin {{device}} üzerinde açık",
-    "lockedDesc": "Orada loalingo'yu kapat, sonra tekrar dene. Devralırsan o cihazın henüz kaydetmediği değişiklikler kaybolabilir.",
+    "lockedDesc": "Orada Sprigo'yu kapat, sonra tekrar dene. Devralırsan o cihazın henüz kaydetmediği değişiklikler kaybolabilir.",
     "retry": "Tekrar dene",
     "takeOver": "Devral",
     "useDefault": "Varsayılan klasörü kullan"
@@ -253,7 +253,7 @@
     "speaking": "Konuşma egzersizleri",
     "speakingDesc": "Mikrofonlu alıştırmalar",
     "reminder": "Günlük hatırlatma",
-    "reminderDesc": "Açıkken loalingo arka planda kalır ve oturum açılışında başlar",
+    "reminderDesc": "Açıkken Sprigo arka planda kalır ve oturum açılışında başlar",
     "reduceMotion": "Hareket azaltma",
     "reduceMotionDesc": "Animasyonları en aza indir",
     "appearance": "Görünüm",
@@ -281,7 +281,7 @@
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
     "reminderTime": "Hatırlatma saati",
-    "reminderTimeDesc": "loalingo açıkken çalışır, arka planda bile.",
+    "reminderTimeDesc": "Sprigo açıkken çalışır, arka planda bile.",
     "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver.",
     "reminderTitle": "Ders zamanı",
     "reminderBody": "Bugün beş dakika, alışkanlığı başlatır.",
@@ -438,11 +438,11 @@
   },
   "update": {
     "section": "Güncellemeler",
-    "version": "loalingo {{version}}",
+    "version": "Sprigo {{version}}",
     "desc": "Yeni sürümler GitHub'dan iner ve yeniden başlatınca kurulur",
     "check": "Denetle",
     "none": "En güncel sürümdesin",
-    "title": "loalingo {{version}} hazır",
+    "title": "Sprigo {{version}} hazır",
     "install": "Güncelle ve yeniden başlat",
     "later": "Sonra",
     "downloading": "İndiriliyor… %{{pct}}"
@@ -472,7 +472,7 @@
     "export": "Dışa aktar",
     "import": "İçe aktar",
     "reveal": "Finder'da göster",
-    "existsTitle": "Bu klasörde zaten loalingo verisi var",
+    "existsTitle": "Bu klasörde zaten Sprigo verisi var",
     "useThere": "Oradaki veriyi kullan",
     "copyThere": "Bu cihazdaki veriyi oraya kopyala",
     "copyNote": "Kopyalarsan oradaki mevcut veri yedekler klasörüne taşınır.",
@@ -481,8 +481,8 @@
     "importConfirm": "Değiştir ve yeniden başlat",
     "exported": "Veriler dışa aktarıldı",
     "lockedThere": "O klasör {{device}} üzerinde açık",
-    "notDb": "Bu dosya bir loalingo veritabanı değil",
+    "notDb": "Bu dosya bir Sprigo veritabanı değil",
     "failed": "Olmadı: {{error}}",
-    "fileType": "loalingo verisi"
+    "fileType": "Sprigo verisi"
   }
 }

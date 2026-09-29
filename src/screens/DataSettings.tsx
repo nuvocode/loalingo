@@ -50,7 +50,7 @@ function DataSheet({ loc }: { loc: Location }) {
   const switchTo = async (dir: string, copy: boolean) => {
     if (copy) await withSnapshot((src) => invoke("install_db", { src, dir }));
     await invoke("set_data_dir", { dir: dir === loc.defaultDir ? null : dir });
-    await restart(); // ponytail: the old folder keeps its loalingo.db (spec: nothing is deleted)
+    await restart(); // ponytail: the old folder keeps its sprigo.db (spec: nothing is deleted)
   };
   const moveTo = async (dir: string | null) => {
     if (!dir || dir === loc.dataDir) return;
@@ -62,7 +62,7 @@ function DataSheet({ loc }: { loc: Location }) {
   const pickFolder = async () => moveTo(await (await dialog()).open({ directory: true, defaultPath: loc.dataDir }));
 
   const exportDb = async () => {
-    const to = await (await dialog()).save({ defaultPath: `loalingo-${today()}.db`, filters });
+    const to = await (await dialog()).save({ defaultPath: `sprigo-${today()}.db`, filters });
     if (!to) return;
     await withSnapshot((from) => invoke("copy_file", { from, to }));
     toast(t("data.exported"));

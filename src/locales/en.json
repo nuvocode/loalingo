@@ -4,13 +4,13 @@
   },
   "boot": {
     "newerTitle": "This data is from a newer version",
-    "newerDesc": "Your data was saved by a newer version of loalingo. Update the app to open it. This version won't change it.",
-    "failedTitle": "loalingo couldn't open your data",
+    "newerDesc": "Your data was saved by a newer version of Sprigo. Update the app to open it. This version won't change it.",
+    "failedTitle": "Sprigo couldn't open your data",
     "failedDesc": "Something went wrong while opening the database. Details:",
     "unreachableTitle": "Can't reach the data folder",
     "unreachableDesc": "Plug in the drive or make sure the folder is available, then try again.",
     "lockedTitle": "Your data is open on {{device}}",
-    "lockedDesc": "Close loalingo there, then try again. If you take over, changes that device hasn't saved yet may be lost.",
+    "lockedDesc": "Close Sprigo there, then try again. If you take over, changes that device hasn't saved yet may be lost.",
     "retry": "Try again",
     "takeOver": "Take over",
     "useDefault": "Use the default folder"
@@ -256,7 +256,7 @@
     "speaking": "Speaking exercises",
     "speakingDesc": "Exercises that use the microphone",
     "reminder": "Daily reminder",
-    "reminderDesc": "While on, loalingo stays in the background and starts at login",
+    "reminderDesc": "While on, Sprigo stays in the background and starts at login",
     "reduceMotion": "Reduce motion",
     "reduceMotionDesc": "Keep animations to a minimum",
     "appearance": "Appearance",
@@ -284,7 +284,7 @@
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
     "reminderTime": "Reminder time",
-    "reminderTimeDesc": "Works while loalingo is open, even in the background.",
+    "reminderTimeDesc": "Works while Sprigo is open, even in the background.",
     "reminderBlocked": "Notifications are blocked. Allow them in System Settings.",
     "reminderTitle": "Time for a lesson",
     "reminderBody": "Five minutes today builds the habit.",
@@ -443,11 +443,11 @@
   },
   "update": {
     "section": "Updates",
-    "version": "loalingo {{version}}",
+    "version": "Sprigo {{version}}",
     "desc": "New versions download from GitHub and install after a restart",
     "check": "Check",
     "none": "You're on the latest version",
-    "title": "loalingo {{version}} is available",
+    "title": "Sprigo {{version}} is available",
     "install": "Update and restart",
     "later": "Later",
     "downloading": "Downloading… {{pct}}%"
@@ -477,7 +477,7 @@
     "export": "Export",
     "import": "Import",
     "reveal": "Show in Finder",
-    "existsTitle": "This folder already has loalingo data",
+    "existsTitle": "This folder already has Sprigo data",
     "useThere": "Use the data there",
     "copyThere": "Copy this device's data there",
     "copyNote": "If you copy, the data already there moves to its backups folder.",
@@ -486,8 +486,8 @@
     "importConfirm": "Replace and restart",
     "exported": "Data exported",
     "lockedThere": "That folder is open on {{device}}",
-    "notDb": "That file isn't a loalingo database",
+    "notDb": "That file isn't a Sprigo database",
     "failed": "That didn't work: {{error}}",
-    "fileType": "loalingo data"
+    "fileType": "Sprigo data"
   }
 }

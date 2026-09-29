@@ -9,7 +9,7 @@ export type SttProvider = "whisper" | "deepgram";
 export const sttProvider = async (): Promise<SttProvider> => ((await getSetting("stt")) === "deepgram" ? "deepgram" : "whisper");
 
 // ponytail: the dev browser preview has no keychain, so it keeps the key in localStorage. Never used in the app.
-const DEV_KEY = "loalingo.devkey.deepgram";
+const DEV_KEY = "sprigo.devkey.deepgram";
 export const getDeepgramKey = () => (isTauri ? invoke<string | null>("secret_get", { key: "stt-key.deepgram" }) : Promise.resolve(localStorage.getItem(DEV_KEY)));
 export async function setDeepgramKey(value: string | null) {
   if (isTauri) return invoke("secret_set", { key: "stt-key.deepgram", value });

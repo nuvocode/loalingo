@@ -63,7 +63,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_type == 'tag' && 'v__VERSION__' || '' }}
-          releaseName: loalingo __VERSION__
+          releaseName: Sprigo __VERSION__
           releaseBody: "Downloads for macOS, Windows and Linux. The macOS app is not notarized yet: see the README for the one-time `xattr` command."
           releaseDraft: true
           args: ${{ matrix.args }}

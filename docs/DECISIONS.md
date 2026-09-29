@@ -1,4 +1,4 @@
-# loalingo — Kararlar
+# Sprigo — Kararlar
 
 Her madde: seçenekler, öneri, karar. Tüm kararlar verildi (2026-09-29).
 Plan: [PLAN.md](PLAN.md)
@@ -50,8 +50,8 @@ Plan: [PLAN.md](PLAN.md)
 
 **B3. Kurs dosyalarının konumu**
 - Uygulamaya gömülü · kullanıcı klasörü · ikisi birden
-- Öneri: İkisi (gömülü + `Application Support/loalingo/courses`)
-- Karar: İkisi (gömülü + `Application Support/loalingo/courses`)
+- Öneri: İkisi (gömülü + `Application Support/Sprigo/courses`)
+- Karar: İkisi (gömülü + `Application Support/Sprigo/courses`)
 
 **B4. v1'de hazır gelecek kurs(lar)**
 - Sadece İngilizce A1 · İngilizce A1–A2 · birden fazla dil

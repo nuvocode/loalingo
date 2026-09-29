@@ -22,7 +22,7 @@ export const dataLocation = async () => (loc ??= await invoke<Location>("data_lo
 
 // ponytail: "/" joins, the app ships for macOS (Windows accepts it too)
 export const inDir = (dir: string, ...names: string[]) => [dir.replace(/[/\\]+$/, ""), ...names].join("/");
-export const dbFile = (dir: string) => inDir(dir, "loalingo.db");
+export const dbFile = (dir: string) => inDir(dir, "sprigo.db");
 
 type TauriDb = SqlDb & { close(db?: string): Promise<boolean> };
 let opened: TauriDb | null = null;

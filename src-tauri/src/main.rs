@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    loalingo_lib::run()
+    sprigo_lib::run()
 }

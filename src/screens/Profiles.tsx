@@ -169,7 +169,7 @@ export function ProfileGate() {
   const create = creating || profiles.length === 0;
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "48px 16px" }}>
-      <div className="logo" style={{ textAlign: "center", marginBottom: 12 }}>loalingo</div>
+      <div className="logo" style={{ textAlign: "center", marginBottom: 12 }}>sprigo</div>
       <h1 className="section-title" style={{ textAlign: "center", marginTop: 0 }}>{t(create ? (profiles.length ? "profiles.newTitle" : "profiles.welcome") : "profiles.who")}</h1>
       {create ? (
         <div className="card"><ProfileForm onDone={profiles.length ? () => setCreating(false) : undefined} /></div>

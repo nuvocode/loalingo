@@ -4,6 +4,6 @@
 <dict>
   <!-- Merged into the bundle's Info.plist by Tauri. Speech stays on this Mac (bundled Whisper). -->
   <key>NSMicrophoneUsageDescription</key>
-  <string>loalingo listens while you practise speaking. Your voice is transcribed on this Mac and never uploaded.</string>
+  <string>Sprigo listens while you practise speaking. Your voice is transcribed on this Mac and never uploaded.</string>
 </dict>
 </plist>

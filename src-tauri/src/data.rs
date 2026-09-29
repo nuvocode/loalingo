@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::Manager;
 
-const DB: &str = "loalingo.db";
-const LOCK: &str = "loalingo.lock";
+const DB: &str = "sprigo.db";
+const LOCK: &str = "sprigo.lock";
 const POINTER: &str = "location.json";
 
 fn now_ms() -> u64 {
@@ -54,7 +54,7 @@ fn config_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
 }
 
 /// `location.json` in the app config dir points at the data folder; without it the config dir itself is used
-/// (where loalingo.db always lived), so existing installs see no change.
+/// (where sprigo.db always lived), so existing installs see no change.
 #[tauri::command]
 pub fn data_location(app: tauri::AppHandle) -> Result<Location, String> {
     let default = config_dir(&app)?;
@@ -180,7 +180,7 @@ pub fn is_sqlite(path: String) -> bool {
     std::fs::File::open(path).and_then(|mut f| f.read_exact(&mut head)).is_ok() && &head == b"SQLite format 3\0"
 }
 
-/// Puts `src` in place as `<dir>/loalingo.db`. Whatever was there (with its -wal/-shm) moves to
+/// Puts `src` in place as `<dir>/sprigo.db`. Whatever was there (with its -wal/-shm) moves to
 /// `<dir>/backups/replaced-<ms>.db*` first; nothing is deleted. The database must be closed.
 #[tauri::command]
 pub fn install_db(src: String, dir: String) -> Result<(), String> {
@@ -207,7 +207,7 @@ mod tests {
     use super::*;
 
     fn temp(name: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("loalingo-data-test-{name}-{}", now_ms()));
+        let d = std::env::temp_dir().join(format!("sprigo-data-test-{name}-{}", now_ms()));
         std::fs::create_dir_all(&d).unwrap();
         d
     }
@@ -255,7 +255,7 @@ mod tests {
         std::fs::write(dir.join(LOCK), r#"{"device":"other-mac","at":1}"#).unwrap();
         lock_remove(s(&dir));
         assert_eq!(lock_read(s(&dir)).unwrap().device, "other-mac");
-        assert!(backups_remove(s(&dir), "../loalingo.lock".into()).is_err());
+        assert!(backups_remove(s(&dir), "../sprigo.lock".into()).is_err());
         std::fs::remove_dir_all(dir).unwrap();
     }
 }

@@ -64,3 +64,8 @@ for (const lang of others) {
 
   test(`${lang}: has _meta.name`, () => assert.ok(String(load(lang)._meta?.name ?? "").trim()));
 }
+
+// The app was renamed to Sprigo (spec J).
+test("no old app name in user-visible text", () => {
+  for (const rows of [en, ...others.map((l) => flat(load(l)))]) assert.deepEqual(rows.filter(([, v]) => /loalingo/i.test(v)).map(([k]) => k), []);
+});

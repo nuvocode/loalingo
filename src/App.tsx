@@ -115,7 +115,7 @@ export default function App() {
       {!profile ? <ProfileGate /> : <>
       <div className="app">
         <aside className="sidebar" aria-label={t("nav.main")}>
-          <div className="logo">loalingo</div>
+          <div className="logo">sprigo</div>
           <nav>
             {NAV.map((n) => <NavBtn key={n.id} {...n} />)}
             <div style={{ margin: "14px 12px 6px", fontSize: 11, fontWeight: 900, letterSpacing: "1.2px", color: "var(--text-faint)", textTransform: "uppercase" }}>

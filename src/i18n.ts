@@ -13,7 +13,7 @@ for (const [path, mod] of Object.entries(files)) {
 }
 languages.sort((a, b) => a.name.localeCompare(b.name));
 
-const LANG_KEY = "loalingo.uiLang";
+const LANG_KEY = "sprigo.uiLang";
 function stored() {
   try { return localStorage.getItem(LANG_KEY); } catch { return null; }
 }

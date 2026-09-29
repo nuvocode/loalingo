@@ -4,13 +4,13 @@
   },
   "boot": {
     "newerTitle": "Ces données viennent d'une version plus récente",
-    "newerDesc": "Tes données ont été enregistrées par une version plus récente de loalingo. Mets l'app à jour pour les ouvrir. Cette version ne les modifiera pas.",
-    "failedTitle": "loalingo n'a pas pu ouvrir tes données",
+    "newerDesc": "Tes données ont été enregistrées par une version plus récente de Sprigo. Mets l'app à jour pour les ouvrir. Cette version ne les modifiera pas.",
+    "failedTitle": "Sprigo n'a pas pu ouvrir tes données",
     "failedDesc": "Un problème est survenu à l'ouverture de la base de données. Détails :",
     "unreachableTitle": "Dossier de données inaccessible",
     "unreachableDesc": "Branche le disque ou vérifie que le dossier est disponible, puis réessaie.",
     "lockedTitle": "Tes données sont ouvertes sur {{device}}",
-    "lockedDesc": "Ferme loalingo là-bas, puis réessaie. Si tu reprends la main, les modifications pas encore enregistrées sur cet appareil risquent d'être perdues.",
+    "lockedDesc": "Ferme Sprigo là-bas, puis réessaie. Si tu reprends la main, les modifications pas encore enregistrées sur cet appareil risquent d'être perdues.",
     "retry": "Réessayer",
     "takeOver": "Reprendre",
     "useDefault": "Utiliser le dossier par défaut"
@@ -270,7 +270,7 @@
     "speaking": "Exercices oraux",
     "speakingDesc": "Exercices qui utilisent le micro",
     "reminder": "Rappel quotidien",
-    "reminderDesc": "Quand il est activé, loalingo reste en arrière-plan et se lance à l'ouverture de session",
+    "reminderDesc": "Quand il est activé, Sprigo reste en arrière-plan et se lance à l'ouverture de session",
     "reduceMotion": "Réduire les animations",
     "reduceMotionDesc": "Limiter les animations au minimum",
     "appearance": "Apparence",
@@ -298,7 +298,7 @@
     "hearts": "Gouttes",
     "heartsDesc": "Tu perds une goutte à chaque erreur ; elles se rechargent chaque jour",
     "reminderTime": "Heure du rappel",
-    "reminderTimeDesc": "Fonctionne tant que loalingo est ouvert, même en arrière-plan.",
+    "reminderTimeDesc": "Fonctionne tant que Sprigo est ouvert, même en arrière-plan.",
     "reminderBlocked": "Les notifications sont bloquées. Autorise-les dans les Réglages Système.",
     "reminderTitle": "C'est l'heure d'une leçon",
     "reminderBody": "Cinq minutes aujourd'hui, et l'habitude s'installe.",
@@ -460,11 +460,11 @@
   },
   "update": {
     "section": "Mises à jour",
-    "version": "loalingo {{version}}",
+    "version": "Sprigo {{version}}",
     "desc": "Les nouvelles versions se téléchargent depuis GitHub et s'installent après un redémarrage",
     "check": "Vérifier",
     "none": "Tu as la dernière version",
-    "title": "loalingo {{version}} est disponible",
+    "title": "Sprigo {{version}} est disponible",
     "install": "Mettre à jour et redémarrer",
     "later": "Plus tard",
     "downloading": "Téléchargement… {{pct}} %"
@@ -494,7 +494,7 @@
     "export": "Exporter",
     "import": "Importer",
     "reveal": "Afficher dans le Finder",
-    "existsTitle": "Ce dossier contient déjà des données loalingo",
+    "existsTitle": "Ce dossier contient déjà des données Sprigo",
     "useThere": "Utiliser les données qui s'y trouvent",
     "copyThere": "Y copier les données de cet appareil",
     "copyNote": "Si tu copies, les données déjà présentes sont déplacées dans son dossier de sauvegardes.",
@@ -503,8 +503,8 @@
     "importConfirm": "Remplacer et redémarrer",
     "exported": "Données exportées",
     "lockedThere": "Ce dossier est ouvert sur {{device}}",
-    "notDb": "Ce fichier n'est pas une base de données loalingo",
+    "notDb": "Ce fichier n'est pas une base de données Sprigo",
     "failed": "Ça n'a pas marché : {{error}}",
-    "fileType": "données loalingo"
+    "fileType": "données Sprigo"
   }
 }
