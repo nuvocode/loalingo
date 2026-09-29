@@ -201,3 +201,61 @@ pub fn install_db(src: String, dir: String) -> Result<(), String> {
     }
     std::fs::rename(&part, dir.join(DB)).map_err(err)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn temp(name: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("loalingo-data-test-{name}-{}", now_ms()));
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+    fn s(p: &Path) -> String {
+        p.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn install_db_moves_the_old_file_aside() {
+        let dir = temp("install");
+        let src = dir.join("new.db");
+        std::fs::write(&src, b"SQLite format 3\0new").unwrap();
+        std::fs::write(dir.join(DB), b"SQLite format 3\0old").unwrap();
+        std::fs::write(dir.join(format!("{DB}-wal")), b"wal").unwrap();
+        install_db(s(&src), s(&dir)).unwrap();
+        assert_eq!(std::fs::read(dir.join(DB)).unwrap(), b"SQLite format 3\0new");
+        assert!(!dir.join(format!("{DB}-wal")).exists());
+        let mut kept = backups_list(s(&dir)).unwrap();
+        kept.sort();
+        assert_eq!(kept.len(), 2);
+        assert!(kept[0].starts_with("replaced-") && kept[0].ends_with(".db"));
+        assert!(kept[1].ends_with(".db-wal"));
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn install_db_rejects_non_sqlite_and_keeps_the_old_file() {
+        let dir = temp("reject");
+        let src = dir.join("notes.txt");
+        std::fs::write(&src, b"hello").unwrap();
+        std::fs::write(dir.join(DB), b"SQLite format 3\0old").unwrap();
+        assert!(install_db(s(&src), s(&dir)).is_err());
+        assert_eq!(std::fs::read(dir.join(DB)).unwrap(), b"SQLite format 3\0old");
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn lock_round_trip_and_foreign_lock_survives_remove() {
+        let dir = temp("lock");
+        assert!(lock_read(s(&dir)).is_none());
+        lock_write(s(&dir)).unwrap();
+        assert_eq!(lock_read(s(&dir)).unwrap().device, device_name());
+        lock_remove(s(&dir));
+        assert!(lock_read(s(&dir)).is_none());
+        std::fs::write(dir.join(LOCK), r#"{"device":"other-mac","at":1}"#).unwrap();
+        lock_remove(s(&dir));
+        assert_eq!(lock_read(s(&dir)).unwrap().device, "other-mac");
+        assert!(backups_remove(s(&dir), "../loalingo.lock".into()).is_err());
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+}
