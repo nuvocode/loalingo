@@ -162,7 +162,7 @@ svg{display:block}
 .node.done.legendary .node-btn{background:var(--gold)}
 .node.current .node-btn{background:var(--green);outline-color:var(--green-bright);animation:pulse 2s infinite}
 .node.locked .node-btn{background:var(--border);color:var(--text-faint);cursor:not-allowed;box-shadow:0 5px 0 var(--locked-shadow)}
-.node.chest .node-btn{background:var(--purple)}
+.node.chest .node-btn{background:var(--gold)}
 .start-tag{
   position:absolute;top:-30px;background:var(--card);border:2px solid var(--border);border-radius:10px;
   padding:3px 10px;font-size:12px;font-weight:900;color:var(--green);letter-spacing:1px;text-transform:uppercase;
@@ -236,7 +236,7 @@ svg{display:block}
 .lesson-progress i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .35s ease}
 .icon-btn{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--text-faint)}
 .icon-btn:hover{background:var(--surface)}
-.hearts-box{display:flex;align-items:center;gap:4px;font-weight:900;color:var(--red);font-size:16px}
+.hearts-box{display:flex;align-items:center;gap:4px;font-weight:900;color:var(--blue);font-size:16px}
 .lesson-body{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:20px}
 .lesson-inner{width:100%;max-width:600px;display:flex;flex-direction:column}
 .ex-title{font-size:24px;font-weight:900;margin-bottom:8px}
@@ -288,7 +288,7 @@ svg{display:block}
 .result-stat.green{border-color:var(--green);color:var(--green-dark)}
 .result-stat.blue{border-color:var(--blue);color:var(--blue-dark)}
 /* chest */
-.chest-box{width:140px;height:140px;border-radius:24px;background:var(--purple);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 var(--purple-dark);cursor:pointer;transition:transform .2s ease}
+.chest-box{width:140px;height:140px;border-radius:24px;background:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 var(--gold-dark);cursor:pointer;transition:transform .2s ease}
 .chest-box:hover{transform:scale(1.05)}
 
 /* toast */

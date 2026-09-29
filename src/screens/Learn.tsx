@@ -45,7 +45,7 @@ function PathLines() {
 
 const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
   step: { done: "check", current: "star", locked: "lock" },
-  chest: { done: "check", current: "chest", locked: "chest" },
+  chest: { done: "check", current: "basket", locked: "basket" },
   checkpoint: { done: "trophy", current: "trophy", locked: "trophy" },
 };
 
