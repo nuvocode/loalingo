@@ -172,7 +172,9 @@ export function Lesson({ id }: { id: string }) {
   }, [running]);
   useEffect(() => { if (running && left <= 0) finishRef.current(); }, [running, left]);
 
+  // Out of drops: shown on Continue, not on the wrong answer, so the feedback (and its appeal, F) stays reachable.
   const next = () => {
+    if (s.heartsOn && !limit && s.hearts <= 0) return openSheet(<HeartsOut onEnd={quit} />);
     if (i + 1 >= list.length) return finish();
     setI(i + 1); reset();
   };
@@ -188,9 +190,7 @@ export function Lesson({ id }: { id: string }) {
     if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
     else if (s.heartsOn && !limit) {
       lost = true;
-      const hearts = Math.max(0, s.hearts - 1);
-      setS((s) => ({ ...s, hearts }));
-      if (hearts <= 0) openSheet(<HeartsOut onEnd={quit} />);
+      setS((s) => ({ ...s, hearts: Math.max(0, s.hearts - 1) }));
     }
     sfx(ok ? "ok" : "bad");
     setFb({ ok, correct, given, note, judged: judged && !ok, lost });
