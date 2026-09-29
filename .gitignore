@@ -27,3 +27,4 @@ dist-ssr
 src-tauri/resources/*.bin
 src-tauri/resources/*.part
 dist-release
+.serena
