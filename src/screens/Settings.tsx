@@ -182,13 +182,17 @@ export function Settings() {
   return (
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("settings.title")}</h1>
-      <div className="od-stack" style={{ ...gap("12px"), marginTop: 14 }}>
-        <div className="card od-row" style={gap("12px")}>
-          <span className="od-field od-fill"><b>{t("ai.title")}</b>
-            {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
-              : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
-          <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
-        </div>
+
+      <h2 className="section-title">{t("settings.course")}</h2>
+      <div className="card od-row">
+        <span style={{ fontSize: 28 }}>{course && <CourseFlag c={course} />}</span>
+        <span className="od-field od-fill"><b>{course ? langName(course.iso) : "—"}</b>
+          <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
+        <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
+      </div>
+
+      <h2 className="section-title">{t("settings.general")}</h2>
+      <div className="od-stack" style={gap("12px")}>
         <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
         <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
         <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
@@ -226,22 +230,32 @@ export function Settings() {
         </div>
       </div>
 
-      <h2 className="section-title">{t("settings.course")}</h2>
-      <div className="card od-row">
-        <span style={{ fontSize: 28 }}>{course && <CourseFlag c={course} />}</span>
-        <span className="od-field od-fill"><b>{course ? langName(course.iso) : "—"}</b>
-          <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
-        <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
+      <h2 className="section-title">{t("settings.aiVoice")}</h2>
+      <div className="od-stack" style={gap("12px")}>
+        <div className="card od-row" style={gap("12px")}>
+          <span className="od-field od-fill"><b>{t("ai.title")}</b>
+            {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
+              : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
+          <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
+        </div>
+        {/* ponytail: TTS/STT rows only show the current engine until D adds the provider modals. */}
+        <div className="card od-row" style={gap("12px")}>
+          <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t("settings.ttsSystem")}</span></span>
+        </div>
+        <div className="card od-row" style={gap("12px")}>
+          <span className="od-field od-fill"><b>{t("settings.stt")}</b><span className="muted small">{t("settings.sttWhisper")}</span></span>
+        </div>
       </div>
 
       <DataSection />
+
       <h2 className="section-title">{t("update.section")}</h2>
       <VersionRow />
 
       <h2 className="section-title">{t("settings.account")}</h2>
       <div className="od-stack" style={gap("12px")}>
         <button className="btn btn-ghost btn-block" onClick={() => openSheet(<><h3 style={{ marginBottom: 14 }}>{t("settings.editProfile")}</h3><ProfileForm initial={profile!} onDone={closeSheet} /></>)}>{t("settings.editProfile")}</button>
-        <button className="btn btn-danger btn-block" onClick={logout}>{t("settings.logout")}</button>
+        <button className="btn btn-ghost btn-block" onClick={logout}>{t("settings.logout")}</button>
       </div>
     </>
   );

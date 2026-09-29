@@ -15,6 +15,42 @@ test("bundled courses/en.yml is valid and builds a sequential A1 path", () => {
   assert.equal(units.at(-1)!.nodes.at(-1)!.kind, "checkpoint");
 });
 
+// Grows with the course: A1-B2, then C1, then C2.
+const EXPECTED_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+test("en.yml has every expected CEFR level in order, each with 10 units and a checkpoint", () => {
+  const c = parseCourse(en, "en.yml");
+  assert.deepEqual(Object.keys(c.levels), EXPECTED_LEVELS);
+  for (const lv of EXPECTED_LEVELS) {
+    const level = c.levels[lv as keyof typeof c.levels]!;
+    assert.equal(level.units.length, 10, `${lv} units`);
+    assert.ok(level.checkpoint, `${lv} checkpoint`);
+    assert.ok(level.checkpoint.activities.length >= 4, `${lv} checkpoint activities`);
+    for (const u of level.units) assert.ok(u.steps.length >= 4 && u.steps.length <= 5, `${lv}/${u.id} has ${u.steps.length} steps`);
+  }
+});
+
+test("en.yml step ids are unique and every step carries vocabulary or grammar", () => {
+  const c = parseCourse(en, "en.yml");
+  const ids = Object.values(c.levels).flatMap((l) => l!.units.flatMap((u) => u.steps.map((s) => s.id)));
+  assert.equal(new Set(ids).size, ids.length);
+  for (const [lv, level] of Object.entries(c.levels))
+    for (const u of level!.units) for (const s of u.steps) {
+      assert.ok(s.vocabulary.length + s.grammar.length > 0, `${lv}/${s.id}: no vocabulary and no grammar`);
+      assert.ok(s.vocabulary.every((w) => w.trim()), `${lv}/${s.id}: blank vocabulary entry`);
+      assert.ok(s.grammar.every((g) => g.pattern.trim()), `${lv}/${s.id}: blank grammar pattern`);
+    }
+});
+
+test("en.yml per-level step counts stay in the range of B2", () => {
+  const c = parseCourse(en, "en.yml");
+  const b2 = c.levels.B2!.units.flatMap((u) => u.steps).length;
+  for (const [lv, level] of Object.entries(c.levels)) {
+    const n = level!.units.flatMap((u) => u.steps).length;
+    assert.ok(n >= b2 - 3 && n <= b2 + 3, `${lv} has ${n} steps (B2 has ${b2})`);
+  }
+});
+
 test("broken YAML fails with file, path and reason", () => {
   const bad = (text: string, re: RegExp) => assert.throws(() => parseCourse(text, "x.yml"), re);
   bad("name: A\nname: B\n", /x\.yml: Map keys must be unique at line 2/);

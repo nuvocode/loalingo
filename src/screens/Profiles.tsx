@@ -97,7 +97,8 @@ export function ProfileForm({ initial, onDone }: { initial?: Profile; onDone?: (
   );
 }
 
-function PinSheet({ p }: { p: Profile }) {
+/** `onOk` replaces the sign-in, for reusing the check before a destructive action. */
+function PinSheet({ p, onOk }: { p: Profile; onOk?: () => void }) {
   const { t } = useTranslation();
   const { login, closeSheet } = useApp();
   const [pin, setPin] = useState("");
@@ -106,7 +107,7 @@ function PinSheet({ p }: { p: Profile }) {
     v = v.replace(/\D/g, "").slice(0, 4);
     setPin(v); setWrong(false);
     if (v.length < 4) return;
-    if (await db.checkPin(p, v)) { closeSheet(); await login(p); }
+    if (await db.checkPin(p, v)) { if (onOk) onOk(); else { closeSheet(); await login(p); } }
     else { setWrong(true); setPin(""); }
   };
   return <>
@@ -118,14 +119,45 @@ function PinSheet({ p }: { p: Profile }) {
   </>;
 }
 
+function DeleteSheet({ p, onDeleted }: { p: Profile; onDeleted: () => void }) {
+  const { t } = useTranslation();
+  const { closeSheet, toast } = useApp();
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
+  const remove = async () => {
+    setBusy(true);
+    try { await db.deleteProfile(p.id); closeSheet(); onDeleted(); toast(t("profiles.deleted", { name: p.name })); }
+    catch (e) { console.error(e); toast(t("profiles.deleteFailed")); }
+    finally { setBusy(false); }
+  };
+  return <>
+    <div className="od-row" style={gap("12px")}><Avatar p={p} /><h3>{t("profiles.deleteTitle", { name: p.name })}</h3></div>
+    <p style={{ margin: "14px 0" }}>{t("profiles.deleteWarn", { name: p.name })}</p>
+    <label className="od-field"><b>{t("profiles.deleteType", { name: p.name })}</b>
+      <input className="input" value={typed} autoFocus autoComplete="off" spellCheck={false} onChange={(e) => setTyped(e.target.value)} />
+    </label>
+    <div className="od-stack" style={{ ...gap("10px"), marginTop: 16 }}>
+      <button className="btn btn-danger btn-block" disabled={busy || typed !== p.name} onClick={remove}>{t("profiles.delete")}</button>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  </>;
+}
+
 /** Shown when nobody is signed in: pick a profile or create one. */
 export function ProfileGate() {
   const { t } = useTranslation();
   const { login, openSheet } = useApp();
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
   const [creating, setCreating] = useState(false);
-  useEffect(() => { db.listProfiles().then(setProfiles); }, []);
+  const [menu, setMenu] = useState<number | null>(null);
+  const refresh = () => db.listProfiles().then(setProfiles);
+  useEffect(() => { refresh(); }, []);
   if (!profiles) return null;
+  const askDelete = (p: Profile) => {
+    setMenu(null);
+    const dialog = <DeleteSheet p={p} onDeleted={refresh} />;
+    openSheet(p.pin_hash ? <PinSheet p={p} onOk={() => openSheet(dialog)} /> : dialog);
+  };
   const create = creating || profiles.length === 0;
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "48px 16px" }}>
@@ -136,11 +168,18 @@ export function ProfileGate() {
       ) : (
         <div className="od-stack" style={gap("12px")}>
           {profiles.map((p) => (
-            <button key={p.id} className="card row-item" onClick={() => p.pin_hash ? openSheet(<PinSheet p={p} />) : login(p)}>
-              <Avatar p={p} />
-              <span className="od-field od-fill"><b>{p.name}</b></span>
-              {p.pin_hash && <span className="muted" aria-label={t("profiles.locked")} style={{ width: 22, height: 22, display: "inline-flex" }}><Icon name="lock" size={22} /></span>}
-            </button>
+            <div key={p.id} className="card od-row" style={{ ...gap("4px"), padding: 4 }}>
+              <button className="row-item od-fill" onClick={() => p.pin_hash ? openSheet(<PinSheet p={p} />) : login(p)}>
+                <Avatar p={p} />
+                <span className="od-field od-fill"><b>{p.name}</b></span>
+                {p.pin_hash && <span className="muted" aria-label={t("profiles.locked")} style={{ width: 22, height: 22, display: "inline-flex" }}><Icon name="lock" size={22} /></span>}
+              </button>
+              <div className="menu-wrap" onBlur={(e) => e.currentTarget.contains(e.relatedTarget) || setMenu(null)}>
+                <button className="btn btn-ghost" aria-label={t("profiles.more", { name: p.name })} aria-haspopup="menu" aria-expanded={menu === p.id}
+                  onClick={() => setMenu(menu === p.id ? null : p.id)}>⋯</button>
+                {menu === p.id && <div className="menu" role="menu"><button role="menuitem" className="menu-item danger" autoFocus onClick={() => askDelete(p)}>{t("profiles.delete")}</button></div>}
+              </div>
+            </div>
           ))}
           <button className="btn btn-ghost btn-block" onClick={() => setCreating(true)}>+ {t("profiles.add")}</button>
         </div>

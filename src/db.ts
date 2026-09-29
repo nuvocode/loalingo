@@ -9,6 +9,7 @@ import { runMigrations, type SqlDb } from "./migrate";
 import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
+import { deleteProfileSql } from "./profileDelete";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
@@ -94,6 +95,14 @@ export async function updateProfile(id: number, patch: ProfilePatch) {
   );
 }
 
+/** Removes the profile and all its progress in one transaction; forgets it as the auto-sign-in profile. */
+export async function deleteProfile(id: number) {
+  const d = await db();
+  try { await d.execute(deleteProfileSql(id)); }
+  catch (e) { await d.execute("ROLLBACK").catch(() => {}); throw e; }
+  if (Number(await getSetting("last_profile")) === id) await setSetting("last_profile", null);
+}
+
 // ---- Enrollments (profile × course) ----
 
 export async function listEnrollments(profileId: number) {
@@ -161,6 +170,10 @@ export async function listMistakes<T>(enrollmentId: number, limit = 1000) {
 }
 export async function deleteMistake(id: number) {
   await (await db()).execute("DELETE FROM mistakes WHERE id = $1", [id]);
+}
+/** Removes the row `addMistake` wrote for this item (F: accepted appeal). */
+export async function deleteMistakeByItem(enrollmentId: number, item: unknown) {
+  await (await db()).execute("DELETE FROM mistakes WHERE enrollment_id = $1 AND item = $2", [enrollmentId, JSON.stringify(item)]);
 }
 
 export type Word = { word: string; translation: string; strength: number };
