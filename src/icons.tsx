@@ -7,7 +7,7 @@ const I = {
   shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-1.2 12a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>',
   flame:'<svg viewBox="0 0 24 24" fill="#f4862a" stroke="none"><path d="M12 2.5c.8 3.2-1.6 4.7-3 6.3C7.6 10.4 7 12 7 14a5 5 0 0 0 10 0c0-1.2-.3-2.2-.9-3.2-.7 1-1.6 1.7-2.6 2 .5-2.8-.6-7.4-1.5-10.3Z"/></svg>',
-  gem:'<svg viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9l4-6Z"/><path d="M2 9h20M12 21 8 9l4-6 4 6-4 12"/></svg>',
+  gem:'<svg viewBox="0 0 24 24" fill="none" stroke="#d4930b" stroke-width="2"><circle cx="12" cy="12" r="9" fill="#f5b014"/><circle cx="12" cy="12" r="5.5"/></svg>',
   heart:'<svg viewBox="0 0 24 24" fill="#f0565c" stroke="none"><path d="M12 21C7 16.6 2.5 13 2.5 8.9 2.5 6 4.7 4 7.3 4c1.8 0 3.5 1 4.7 2.7C13.2 5 14.9 4 16.7 4c2.6 0 4.8 2 4.8 4.9 0 4.1-4.5 7.7-9.5 12.1Z"/></svg>',
   star:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m12 2.6 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9L12 2.6Z"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>',

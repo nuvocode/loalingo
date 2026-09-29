@@ -26,7 +26,7 @@ export function Rail() {
       <div className="rail-card"><div className="stat-strip" style={{ justifyContent: "space-between" }}>
         {course && <button className="stat-chip course-chip" onClick={() => openSheet(<CourseSheet />)} aria-label={t("profiles.switchCourse")}><CourseFlag c={course} /></button>}
         <span className="stat-chip" style={{ color: "var(--orange)" }}><Icon name="flame" />{s.streak}</span>
-        <span className="stat-chip" style={{ color: "var(--blue)" }}><Icon name="gem" />{s.gems}</span>
+        <span className="stat-chip" style={{ color: "var(--gold-dark)" }}><Icon name="gem" />{s.gems}</span>
         {s.heartsOn && <span className="stat-chip" style={{ color: "var(--red)" }}><Icon name="heart" />{s.hearts}</span>}
       </div></div>
 
