@@ -219,7 +219,14 @@
     "accuracyValue": "{{value}}%",
     "gems": "Gems",
     "end": "Done",
-    "listen": "Listen"
+    "listen": "Listen",
+    "newPhrase": "New phrase",
+    "yourAnswer": "Your answer",
+    "typeHere": "Type your answer",
+    "matchPairs": "Match the pairs",
+    "explain": "Explain",
+    "gotIt": "Got it",
+    "checking": "Checking…"
   },
   "mock": {
     "leagueName": "Sapphire"
@@ -253,5 +260,29 @@
     "noMoreCourses": "No other courses installed yet.",
     "switched": "Switched to {{course}}",
     "switchCourse": "Switch course"
+  },
+  "ai": {
+    "title": "AI provider",
+    "provider": "Provider",
+    "baseURL": "Server address",
+    "apiKey": "API key",
+    "apiKeyDesc": "Stored in your system keychain, never in the app database",
+    "model": "Model",
+    "modelDesc": "Test the connection to list the available models",
+    "test": "Test connection",
+    "save": "Save",
+    "connected": "Connected — {{count}} models found",
+    "connectFailed": "Could not connect",
+    "saved": "AI provider saved",
+    "needed": "Set up an AI provider",
+    "neededDesc": "Lessons are written by an AI model. Connect Ollama, LM Studio or a cloud provider to start.",
+    "setUp": "Set up",
+    "preparing": "Preparing your lesson…",
+    "failed": "Lesson could not be generated",
+    "retry": "Try again",
+    "openSettings": "AI settings",
+    "empty": "This lesson has no exercises.",
+    "regenerate": "Generate new exercises",
+    "thinking": "Thinking…"
   }
 }

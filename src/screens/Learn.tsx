@@ -132,7 +132,13 @@ function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number
 
 export function Learn() {
   const { t } = useTranslation();
-  const { course, enrollment, done, viewLevel, openSheet, courseErrors } = useApp();
+  const { course, enrollment, done, viewLevel, openSheet, courseErrors, ai, go } = useApp();
+  const setup = !ai && (
+    <div className="soon-banner" role="status" style={{ borderColor: "var(--blue)" }}>
+      <span className="od-field od-fill"><b>{t("ai.needed")}</b><span className="small">{t("ai.neededDesc")}</span></span>
+      <button className="btn btn-blue" onClick={() => go("settings")}>{t("ai.setUp")}</button>
+    </div>
+  );
   const errors = courseErrors.length > 0 && (
     <div className="soon-banner" role="alert" style={{ borderColor: "var(--red)", alignItems: "flex-start" }}>
       <span className="od-field" style={{ minWidth: 0 }}><b>{t("learn.courseErrors")}</b>
@@ -145,7 +151,7 @@ export function Learn() {
   const total = course.levels[level]!.units.reduce((a, u) => a + u.steps.length, 0);
   return (
     <>
-      {errors}
+      {setup}{errors}
       <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => openSheet(<LevelSheet />)} aria-haspopup="dialog">
         {level} · {course.levels[level]!.title} ▾
       </button>

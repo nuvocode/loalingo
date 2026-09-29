@@ -109,14 +109,18 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Kurs değiştirme sheet'i: ray bayrak çipi + Ayarlar > Kurs; "Yeni dil ekle".
 - YAML şeması (zod, `src/course.ts`), `courses/en.yml` (A1: 10 ünite, 40 adım + checkpoint). Kullanıcı kursları: `~/Library/Application Support/com.nuvocode.loalingo/courses/*.yml` (aynı iso gömülüyü ezer). Bozuk dosya Öğren ekranında dosya + yol + nedenle gösterilir.
 - Öğren ekranı: sadece aktif seviye, seviye seçici çipi + sheet, ünite sonu sandığı (+20 elmas), checkpoint düğümü ve seviye kartı ("X ders kaldı"). Checkpoint ve seviye testi butonları Faz 3'e kadar "Yakında".
-- Ders içeriği hâlâ örnek sorular (Faz 2'de AI); ders bitince adım tamamlanır ve XP kursa yazılır.
+- Ders bitince adım tamamlanır ve XP kursa yazılır.
 - Test: `pnpm test` (loader + path). Tarayıcı önizlemesinde SQLite yerine sql.js çalışır (sadece dev).
 
-**Faz 2 — AI sağlayıcıları + ders üretimi**
-- Sağlayıcı ayar ekranı + keychain + bağlantı testi.
-- Activity registry ve v1 bileşenleri (tablodaki ✅'ler); ders overlay'i akışı (kalp, ilerleme, doğru/yanlış footer, sonuç ekranı).
-- Loading / hata / boş durumları (model yok, bağlantı yok).
-- ✔ Kabul: Ollama ve bir bulut sağlayıcıyla aynı ders üretiliyor ve oynanıyor.
+**Faz 2 — AI sağlayıcıları + ders üretimi** 🟡 (kod bitti; bulut sağlayıcı testi bekliyor)
+- `src/ai.ts`: Ollama, LM Studio (OpenAI uyumlu), OpenAI, Anthropic, Gemini — AI SDK v7. Ayar cihaz geneli (`device_settings.ai`), API anahtarı OS anahtarlığında (Rust `keyring`, `secret_get/secret_set`). İstekler Tauri HTTP eklentisiyle gider (CORS yok).
+- Ayarlar > Yapay zekâ sağlayıcısı: sağlayıcı seçimi, sunucu adresi, anahtar, model (bağlantı testi modelleri listeler).
+- C6: AI yoksa yeni profil Ayarlar'a düşer, Öğren'de kurulum bandı, ders düğümleri kurulum sheet'i açar.
+- `src/activities.ts` registry: her YAML tipi → zod şeması + AI yönergesi + 5 görüntüleyiciden biri (learn / choice / bank / input / match). speak, story, roleplay, video_call v1'de atlanır.
+- `src/lessons.ts`: önbellek (`content_cache`, kayıt × adım) → tek çağrıda tüm ders → olmazsa etkinlik başına çağrı (C2, C3). Ders bitince sonraki adım arka planda üretilir; ders üst barındaki ↻ yeniden üretir.
+- Cevap kontrolü (C4): normalize edilmiş eşleşme → olmazsa AI anlam kontrolü + kısa geri bildirim. Yanlışta "Açıkla" (C5).
+- Şema prompt'a da eklenir ve ```json çitli cevaplar kurtarılır (Ollama bulut modelleri `response_format`'ı yok sayıyor). Yerel sağlayıcılarda `reasoning: "low"` (glm-5.3-flash: 185 sn → 7 sn).
+- ✔ Ollama (glm-5.3-flash:cloud) ile 2 ders üretildi ve oynandı. ☐ Bulut sağlayıcıyla aynı test.
 
 **Faz 3 — İlerleme + tekrar döngüsü**
 - XP, seri, günlük hedef, kalpler (lokal).

@@ -335,3 +335,5 @@ svg{display:block}
 .course-chip{border:2px solid var(--border);border-radius:12px;padding:2px 8px;font-size:18px}
 /* First node is the current one: leave room for its start tag under the sticky unit header. */
 .path:has(> .node:nth-child(2) .start-tag){padding-top:48px}
+.gen-pulse{animation:bob 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.gen-pulse{animation:none}}

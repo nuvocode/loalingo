@@ -215,7 +215,14 @@
     "accuracyValue": "%{{value}}",
     "gems": "Elmas",
     "end": "Son",
-    "listen": "Dinle"
+    "listen": "Dinle",
+    "newPhrase": "Yeni ifade",
+    "yourAnswer": "Cevabın",
+    "typeHere": "Cevabını yaz",
+    "matchPairs": "Eşleri bul",
+    "explain": "Açıkla",
+    "gotIt": "Anladım",
+    "checking": "Kontrol ediliyor…"
   },
   "mock": {
     "leagueName": "Safir"
@@ -249,5 +256,29 @@
     "noMoreCourses": "Henüz yüklü başka kurs yok.",
     "switched": "{{course}} kursuna geçildi",
     "switchCourse": "Kurs değiştir"
+  },
+  "ai": {
+    "title": "Yapay zekâ sağlayıcısı",
+    "provider": "Sağlayıcı",
+    "baseURL": "Sunucu adresi",
+    "apiKey": "API anahtarı",
+    "apiKeyDesc": "Uygulama veritabanında değil, sistem anahtarlığında saklanır",
+    "model": "Model",
+    "modelDesc": "Mevcut modelleri listelemek için bağlantıyı test et",
+    "test": "Bağlantıyı test et",
+    "save": "Kaydet",
+    "connected": "Bağlandı — {{count}} model bulundu",
+    "connectFailed": "Bağlanılamadı",
+    "saved": "Yapay zekâ sağlayıcısı kaydedildi",
+    "needed": "Bir yapay zekâ sağlayıcısı kur",
+    "neededDesc": "Dersleri bir yapay zekâ modeli yazar. Başlamak için Ollama, LM Studio veya bir bulut sağlayıcısı bağla.",
+    "setUp": "Kur",
+    "preparing": "Dersin hazırlanıyor…",
+    "failed": "Ders oluşturulamadı",
+    "retry": "Tekrar dene",
+    "openSettings": "Yapay zekâ ayarları",
+    "empty": "Bu derste alıştırma yok.",
+    "regenerate": "Yeni alıştırmalar üret",
+    "thinking": "Düşünüyor…"
   }
 }

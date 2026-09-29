@@ -4,6 +4,7 @@ import i18n from "./i18n";
 import { useTheme, type ThemePref } from "./theme";
 import { parseCourse, levelsOf, type Cefr, type Course } from "./course";
 import * as db from "./db";
+import { activateConfig, loadAiConfig, saveAiConfig, type AiConfig } from "./ai";
 import type { Enrollment, Profile, Stats } from "./db";
 
 export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings";
@@ -33,6 +34,7 @@ export const LAST_PROFILE = "last_profile";
 
 type Ctx = {
   ready: boolean;
+  ai: AiConfig | null; setAi: (c: AiConfig) => Promise<void>;
   courses: Course[]; courseErrors: string[];
   profile: Profile | null; enrollments: Enrollment[];
   enrollment: Enrollment | null; course: Course | null; done: Set<string>;
@@ -55,6 +57,7 @@ export const useApp = () => useContext(C);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
+  const [ai, setAiState] = useState<AiConfig | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [courseErrors, setCourseErrors] = useState<string[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -88,6 +91,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
+      const cfg = await loadAiConfig();
+      await activateConfig(cfg);
+      setAiState(cfg);
       const { courses, errors } = await loadCourses();
       setCourses(courses); setCourseErrors(errors);
       errors.forEach((e) => console.error(e));
@@ -114,7 +120,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const firstLevel = (iso: string) => levelsOf(courses.find((c) => c.iso === iso)!)[0];
 
   const value: Ctx = {
-    ready, courses, courseErrors, profile, enrollments, enrollment, course, done,
+    ready, ai,
+    setAi: async (c) => { await saveAiConfig(c); await activateConfig(c); setAiState(c); },
+    courses, courseErrors, profile, enrollments, enrollment, course, done,
     login,
     logout: async () => {
       await db.setSetting(LAST_PROFILE, null);
@@ -124,7 +132,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     createProfile: async (p, iso) => {
       const id = await db.createProfile(p, iso, firstLevel(iso));
       await login((await db.getProfile(id))!);
-      location.hash = "learn";
+      location.hash = ai ? "learn" : "settings";
     },
     updateProfile: async (patch) => {
       if (!profile) return;

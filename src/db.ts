@@ -19,8 +19,11 @@ CREATE TABLE IF NOT EXISTS enrollments(
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(profile_id, course_iso));
 CREATE TABLE IF NOT EXISTS step_progress(
   enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, step_id TEXT NOT NULL,
-  state TEXT NOT NULL, legendary INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(enrollment_id, step_id))`;
-// mistakes / words / content_cache tables arrive with the features that write them (Faz 2–3).
+  state TEXT NOT NULL, legendary INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(enrollment_id, step_id));
+CREATE TABLE IF NOT EXISTS content_cache(
+  enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, step_id TEXT NOT NULL,
+  content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, step_id))`;
+// mistakes / words tables arrive with the features that write them (Faz 3).
 
 async function tauriDb(): Promise<Db> {
   const { default: Database } = await import("@tauri-apps/plugin-sql");
@@ -156,6 +159,16 @@ export async function doneSteps(enrollmentId: number) {
 }
 export async function markDone(enrollmentId: number, stepId: string) {
   await (await db()).execute("INSERT INTO step_progress(enrollment_id, step_id, state) VALUES ($1, $2, 'done') ON CONFLICT DO UPDATE SET state = 'done'", [enrollmentId, stepId]);
+}
+
+// ---- Generated lesson cache (DECISIONS C3; per enrollment because it will be personalised by mistakes) ----
+
+export async function getCached<T>(enrollmentId: number, stepId: string): Promise<T | null> {
+  const r = await (await db()).select<{ content: string }>("SELECT content FROM content_cache WHERE enrollment_id = $1 AND step_id = $2", [enrollmentId, stepId]);
+  return r[0] ? JSON.parse(r[0].content) : null;
+}
+export async function putCached(enrollmentId: number, stepId: string, content: unknown) {
+  await (await db()).execute("INSERT INTO content_cache(enrollment_id, step_id, content) VALUES ($1, $2, $3) ON CONFLICT DO UPDATE SET content = $3, created_at = CURRENT_TIMESTAMP", [enrollmentId, stepId, JSON.stringify(content)]);
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----
