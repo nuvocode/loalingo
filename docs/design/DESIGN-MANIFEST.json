@@ -4,7 +4,6 @@
   "entryFile": "index.html",
   "sourceFiles": {
     "all": [
-      "duolingo-DESIGN.md",
       "index.html"
     ],
     "html": [
@@ -12,9 +11,7 @@
     ],
     "css": [],
     "scriptsAndComponents": [],
-    "assets": [
-      "duolingo-DESIGN.md"
-    ]
+    "assets": []
   },
   "screens": [
     {

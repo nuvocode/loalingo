@@ -72,7 +72,7 @@ For responsive web exports, treat these as a modern breakpoint system for one ad
 - None detected
 
 ## Assets and supporting files
-- `duolingo-DESIGN.md`
+- None detected
 
 ## Coding checklist for AI tools
 1. Inspect `index.html` and `DESIGN-MANIFEST.json` first and identify reusable components before coding.
