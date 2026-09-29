@@ -283,6 +283,7 @@
     "openSettings": "AI settings",
     "empty": "This lesson has no exercises.",
     "regenerate": "Generate new exercises",
-    "thinking": "Thinking…"
+    "thinking": "Thinking…",
+    "notSet": "Not set up — lessons are locked"
   }
 }

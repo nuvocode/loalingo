@@ -23,9 +23,9 @@ function ToggleRow({ k, initial }: { k: string; initial: boolean }) {
 }
 
 /** DECISIONS C1/C6: device-wide provider, key in the OS keychain. */
-function AiSettings() {
+function AiSheet() {
   const { t } = useTranslation();
-  const { ai, setAi, toast } = useApp();
+  const { ai, setAi, toast, closeSheet } = useApp();
   const [provider, setProvider] = useState<ProviderId>(ai?.provider ?? "ollama");
   const [baseURL, setBaseURL] = useState(ai?.baseURL ?? PROVIDERS[provider].baseURL);
   const [model, setModel] = useState(ai?.model ?? "");
@@ -60,13 +60,14 @@ function AiSettings() {
       if (needsKey) await setKey(provider, key.trim() || null);
       await setAi(cfg);
       toast(t("ai.saved"));
+      closeSheet();
     } catch (e) { setStatus({ ok: false, msg: (e as Error).message }); }
     finally { setBusy(false); }
   };
 
   return (
-    <div className="card od-stack" style={gap("14px")}>
-      {!ai && <p className="small" role="status" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.neededDesc")}</p>}
+    <div className="od-stack" style={{ ...gap("14px"), textAlign: "left" }}>
+      <h3 style={{ textAlign: "center" }}>{t("ai.title")}</h3>
       <div className="seg" role="radiogroup" aria-label={t("ai.provider")}>
         {(Object.keys(PROVIDERS) as ProviderId[]).map((p) => (
           <button key={p} role="radio" aria-checked={provider === p} className={`btn ${provider === p ? "btn-blue" : "btn-ghost"}`} onClick={() => pick(p)}>{PROVIDERS[p].label}</button>
@@ -87,15 +88,16 @@ function AiSettings() {
       {status && <p className="small" role="status" style={{ color: status.ok ? "var(--green)" : "var(--red)", overflowWrap: "anywhere" }}>{status.msg}</p>}
       <div className="od-row" style={gap("10px")}>
         <button className="btn btn-ghost" disabled={busy || (needsKey && !key.trim())} onClick={test}>{t("ai.test")}</button>
-        <button className="btn btn-primary" disabled={busy || !cfg.model || (needsKey && !key.trim())} onClick={save}>{t("ai.save")}</button>
+        <button className="btn btn-primary od-fill" disabled={busy || !cfg.model || (needsKey && !key.trim())} onClick={save}>{t("ai.save")}</button>
       </div>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </div>
   );
 }
 
 export function Settings() {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout } = useApp();
+  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout, ai } = useApp();
   const langName = useLangName();
   const themes: ThemePref[] = ["system", "light", "dark"];
   const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
@@ -103,14 +105,17 @@ export function Settings() {
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("settings.title")}</h1>
       <div className="od-stack" style={{ ...gap("12px"), marginTop: 14 }}>
+        <div className="card od-row" style={gap("12px")}>
+          <span className="od-field od-fill"><b>{t("ai.title")}</b>
+            {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
+              : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
+          <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
+        </div>
         <ToggleRow k="sound" initial />
         <ToggleRow k="speaking" initial />
         <ToggleRow k="reminder" initial />
         <ToggleRow k="reduceMotion" initial={false} />
       </div>
-
-      <h2 className="section-title" id="ai">{t("ai.title")}</h2>
-      <AiSettings />
 
       <h2 className="section-title">{t("settings.appearance")}</h2>
       <div className="od-stack" style={gap("12px")}>

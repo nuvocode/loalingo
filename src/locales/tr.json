@@ -279,6 +279,7 @@
     "openSettings": "Yapay zekâ ayarları",
     "empty": "Bu derste alıştırma yok.",
     "regenerate": "Yeni alıştırmalar üret",
-    "thinking": "Düşünüyor…"
+    "thinking": "Düşünüyor…",
+    "notSet": "Kurulmadı — dersler kilitli"
   }
 }
