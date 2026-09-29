@@ -282,6 +282,7 @@
     "explain": "Explain",
     "gotIt": "Got it",
     "checking": "Checking…",
+    "checkFailed": "Couldn't check your answer. Try again.",
     "examPassed": "{{level}} complete!",
     "examFailed": "Not quite yet",
     "examNeed": "You need {{score}}% to pass. Review and try again.",

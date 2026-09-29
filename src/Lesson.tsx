@@ -78,7 +78,7 @@ const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export function Lesson({ id }: { id: string }) {
   const { t } = useTranslation();
-  const { s, setS, completeStep, gainXp, completeLevel, markLegendary, openSheet, closeSheet, endLesson, sheet, course, enrollment, profile, ai, go } = useApp();
+  const { s, setS, completeStep, gainXp, completeLevel, markLegendary, openSheet, closeSheet, endLesson, sheet, toast, course, enrollment, profile, ai, go } = useApp();
   const native = profile?.native_lang;
   // Keyed on stable values: `profile` changes on every stats update and must not restart the lesson.
   const ctx = useMemo(() => course && native && !id.startsWith("practice-") ? stepContext(course, id, native) : null, [course, native, id]);
@@ -210,8 +210,9 @@ export function Lesson({ id }: { id: string }) {
       if (matchesAnswer(text, it)) return grade(true, it.answer, text);
       if (!ctx) return grade(false, it.answer, text);
       setChecking(true); // C4: string match failed, let the AI judge meaning
+      // A failed AI call is not a wrong answer: no heart lost, the learner just checks again.
       try { const r = await judge(ctx, questionOf(it), it.answer, text); grade(r.correct, it.answer, text, r.feedback); }
-      catch { grade(false, it.answer, text); }
+      catch (e) { console.warn("judge", e); toast(t("lesson.checkFailed")); }
       finally { setChecking(false); }
     }
   };

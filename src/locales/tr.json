@@ -277,6 +277,7 @@
     "explain": "Açıkla",
     "gotIt": "Anladım",
     "checking": "Kontrol ediliyor…",
+    "checkFailed": "Cevabın kontrol edilemedi. Tekrar dene.",
     "examPassed": "{{level}} tamamlandı!",
     "examFailed": "Henüz olmadı",
     "examNeed": "Geçmek için %{{score}} gerekiyor. Tekrar edip yeniden dene.",

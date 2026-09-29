@@ -103,14 +103,17 @@ export function prefetchNext(enrollmentId: number, course: Course, level: Cefr, 
 // ---- Answer judging (C4) and explanations (C5) ----
 
 export async function judge(c: LessonContext, question: string, expected: string, given: string) {
-  return generate(
-    z.object({ correct: z.boolean(), feedback: z.string() }),
+  // ponytail: one retry covers the occasional malformed JSON; the caller reports a second failure
+  const run = () => generate(
+    z.object({ feedback: z.string(), correct: z.boolean() }), // feedback first: the model reasons before it decides
     systemPrompt(c),
     `Exercise: ${question}\nExpected answer: ${expected}\nLearner's answer: ${given}\n` +
       "Mark it correct if it conveys the same meaning and is grammatical — other wording, word order, synonyms or contractions are fine; " +
-      "the expected answer is only one example. Ignore capitalization and punctuation; accept a single-letter typo but mention it. " +
+      "the expected answer is only one example. British and American usage are both correct. " +
+      "Capitalization and punctuation (including a missing final period) never make an answer wrong; accept a single-letter typo but mention it. " +
       "`feedback`: one short sentence.",
   );
+  return run().catch(run);
 }
 
 export function explain(c: LessonContext, question: string, correct: string, given: string) {
