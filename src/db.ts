@@ -150,6 +150,13 @@ export async function doneSteps(enrollmentId: number) {
   const r = await (await db()).select<{ step_id: string }>("SELECT step_id FROM step_progress WHERE enrollment_id = $1 AND state = 'done'", [enrollmentId]);
   return new Set(r.map((x) => x.step_id));
 }
+export async function legendarySteps(enrollmentId: number) {
+  const r = await (await db()).select<{ step_id: string }>("SELECT step_id FROM step_progress WHERE enrollment_id = $1 AND legendary = 1", [enrollmentId]);
+  return new Set(r.map((x) => x.step_id));
+}
+export async function markLegendary(enrollmentId: number, stepId: string) {
+  await (await db()).execute("UPDATE step_progress SET legendary = 1 WHERE enrollment_id = $1 AND step_id = $2", [enrollmentId, stepId]);
+}
 export async function markDone(enrollmentId: number, stepId: string) {
   await (await db()).execute("INSERT INTO step_progress(enrollment_id, step_id, state) VALUES ($1, $2, 'done') ON CONFLICT DO UPDATE SET state = 'done'", [enrollmentId, stepId]);
 }

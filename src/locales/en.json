@@ -42,7 +42,11 @@
     "noCourse": "No course is available. Fix the course file errors above.",
     "finishFirst": "Finish {{level}} or pass its level test first",
     "courseDone": "You finished {{level}}!",
-    "courseDoneDesc": "This course has no further levels yet. Review any lesson or keep practising."
+    "courseDoneDesc": "This course has no further levels yet. Review any lesson or keep practising.",
+    "legendary": "Legendary",
+    "review": "Review",
+    "legendDesc": "Take the Legendary version: no teaching cards, one level harder. Score {{score}}% to turn this lesson gold.",
+    "legendDone": "This lesson is Legendary. Play the challenge again or review it."
   },
   "practice": {
     "title": "Practice Hub",
@@ -239,7 +243,8 @@
     "checking": "Checking…",
     "examPassed": "{{level}} complete!",
     "examFailed": "Not quite yet",
-    "examNeed": "You need {{score}}% to pass. Review and try again."
+    "examNeed": "You need {{score}}% to pass. Review and try again.",
+    "legendPassed": "Legendary!"
   },
   "mock": {
     "leagueName": "Sapphire"

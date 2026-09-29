@@ -38,13 +38,15 @@ type Ctx = {
   ai: AiConfig | null; setAi: (c: AiConfig) => Promise<void>;
   courses: Course[]; courseErrors: string[];
   profile: Profile | null; enrollments: Enrollment[];
-  enrollment: Enrollment | null; course: Course | null; done: Set<string>;
+  enrollment: Enrollment | null; course: Course | null; done: Set<string>; legendary: Set<string>;
   login: (p: Profile) => Promise<void>; logout: () => Promise<void>;
   createProfile: (p: db.NewProfile, courseIso: string) => Promise<void>;
   updateProfile: (patch: Parameters<typeof db.updateProfile>[1]) => Promise<void>;
   switchCourse: (iso: string) => Promise<void>;
   completeStep: (stepId: string, xp: number) => Promise<void>;
   gainXp: (xp: number) => Promise<void>;
+  /** Legendary lesson passed: the (done) step turns gold. */
+  markLegendary: (stepId: string) => Promise<void>;
   /** Checkpoint / level test passed: every node of `level` done, enrollment moves to the next level. */
   completeLevel: (level: Cefr, xp: number) => Promise<void>;
   viewLevel: Cefr | null; setViewLevel: (l: Cefr | null) => void;
@@ -67,6 +69,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [done, setDone] = useState<Set<string>>(new Set());
+  const [legendary, setLegendary] = useState<Set<string>>(new Set());
   const [viewLevel, setViewLevel] = useState<Cefr | null>(null);
   const [route, setRoute] = useState(readRoute);
   const [toastMsg, setToastMsg] = useState("");
@@ -80,7 +83,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const usable = enrollments.filter((e) => courses.some((c) => c.iso === e.course_iso));
   const enrollment = usable.find((e) => e.id === profile?.active_enrollment_id) ?? usable[0] ?? null;
   const course = courses.find((c) => c.iso === enrollment?.course_iso) ?? null;
-  useEffect(() => { if (enrollment) db.doneSteps(enrollment.id).then(setDone); }, [enrollment?.id]);
+  useEffect(() => { if (enrollment) { db.doneSteps(enrollment.id).then(setDone); db.legendarySteps(enrollment.id).then(setLegendary); } }, [enrollment?.id]);
 
   // Loads everything that belongs to a profile (E6) and applies its UI prefs.
   const login = useCallback(async (p: Profile) => {
@@ -128,7 +131,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: Ctx = {
     ready, ai,
     setAi: async (c) => { await saveAiConfig(c); await activateConfig(c); setAiState(c); },
-    courses, courseErrors, profile, enrollments, enrollment, course, done,
+    courses, courseErrors, profile, enrollments, enrollment, course, done, legendary,
     login,
     logout: async () => {
       await db.setSetting(LAST_PROFILE, null);
@@ -163,6 +166,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!enrollment || !xp) return;
       await db.addXp(enrollment.id, xp);
       setEnrollments((es) => es.map((e) => e.id === enrollment.id ? { ...e, xp: e.xp + xp } : e));
+    },
+    markLegendary: async (stepId) => {
+      if (!enrollment) return;
+      await db.markLegendary(enrollment.id, stepId);
+      setLegendary((l) => new Set(l).add(stepId));
     },
     completeLevel: async (level, xp) => {
       if (!enrollment || !course) return;

@@ -119,6 +119,8 @@ svg{display:block}
 .btn-primary:active{box-shadow:0 2px 0 var(--green-dark)}
 .btn-blue{background:var(--blue);color:#fff;box-shadow:0 4px 0 var(--blue-dark)}
 .btn-blue:active{box-shadow:0 2px 0 var(--blue-dark)}
+.btn-gold{background:var(--gold);color:var(--on-accent);box-shadow:0 4px 0 var(--gold-dark)}
+.btn-gold:active{box-shadow:0 2px 0 var(--gold-dark)}
 .btn-ghost{background:var(--card);color:var(--blue);border:2px solid var(--border);box-shadow:0 2px 0 var(--border)}
 .btn-ghost:hover{background:var(--surface)}
 .btn-danger{background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red-dark)}

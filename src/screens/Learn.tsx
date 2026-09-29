@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
+import { LEGEND_PASS } from "../lessons";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -48,8 +49,14 @@ const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
 
 function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
   const { t } = useTranslation();
-  const { toast, setS, completeStep, openSheet, closeSheet } = useApp();
+  const { toast, setS, completeStep, openSheet, closeSheet, legendary } = useApp();
   const start = useStartLesson();
+  // Done steps: review, or the Legendary version (gold once passed).
+  const doneStep = (n: PathNode) => openSheet(<>
+    <h3>{n.title}</h3><p>{t(legendary.has(n.id) ? "learn.legendDone" : "learn.legendDesc", { score: LEGEND_PASS })}</p>
+    <button className="btn btn-gold btn-block" onClick={() => { closeSheet(); start(`legend:${n.id}`); }}><Icon name="star" /> {t("learn.legendary")}</button>
+    <button className="btn btn-ghost btn-block" onClick={() => { closeSheet(); start(n.id); }}>{t("learn.review")}</button>
+  </>);
   const openChest = async (id: string) => {
     await completeStep(id, 0);
     setS((s) => ({ ...s, gems: s.gems + CHEST_GEMS }));
@@ -70,17 +77,18 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
         <PathLines />
         {u.nodes.map((n, ni) => {
           const off = PATH_OFF[((u.index - 1) * 3 + ni) % PATH_OFF.length];
-          const cls = n.kind === "step" ? n.state : `${n.kind === "chest" ? "chest" : "legendary"} ${n.state}`;
+          const gold = n.kind === "step" && legendary.has(n.id);
+          const cls = n.kind === "step" ? `${n.state}${gold ? " legendary" : ""}` : `${n.kind === "chest" ? "chest" : "legendary"} ${n.state}`;
           const name = n.kind === "chest" ? t("learn.chest") : n.title;
           const onClick =
             n.state === "locked" ? undefined
-            : n.kind === "step" ? () => start(n.id)
+            : n.kind === "step" ? () => n.state === "done" ? doneStep(n) : start(n.id)
             : n.kind === "chest" ? (n.state === "current" ? () => openChest(n.id) : undefined)
             : () => start(n.id); // checkpoint: retake allowed once done
           return (
             <div className={`node ${cls}`} style={{ transform: `translateX(${off}px)` }} key={n.id}>
               <button className="node-btn" onClick={onClick} aria-label={name} aria-disabled={!onClick || undefined}>
-                <Icon name={ICON[n.kind][n.state]} />
+                <Icon name={gold ? "star" : ICON[n.kind][n.state]} />
               </button>
               {n.state === "current" && n.kind === "step" && <span className="start-tag">{t("learn.start")}</span>}
               <span className="node-label">{name}</span>

@@ -5,7 +5,7 @@ import { useApp } from "./store";
 import { useBuy } from "./screens/Screens";
 import * as db from "./db";
 import { listenItems, matchesAnswer, normalize, type Item } from "./activities";
-import { examLevel, explain, judge, loadLesson, prefetchNext, stepContext } from "./lessons";
+import { LEGEND_PASS, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
 import { recordSession, today } from "./progress";
 
 /** Opens a lesson, or the out-of-hearts sheet (design behaviour). Steps need an AI provider (DECISIONS C6). */
@@ -52,13 +52,14 @@ const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export function Lesson({ id }: { id: string }) {
   const { t } = useTranslation();
-  const { s, setS, completeStep, gainXp, completeLevel, openSheet, closeSheet, endLesson, sheet, course, enrollment, profile, ai, go } = useApp();
+  const { s, setS, completeStep, gainXp, completeLevel, markLegendary, openSheet, closeSheet, endLesson, sheet, course, enrollment, profile, ai, go } = useApp();
   const native = profile?.native_lang;
   // Keyed on stable values: `profile` changes on every stats update and must not restart the lesson.
   const ctx = useMemo(() => course && native && !id.startsWith("practice-") ? stepContext(course, id, native) : null, [course, native, id]);
   const lang = course?.iso ?? "en";
   const practice = id.startsWith("practice-");
   const exam = examLevel(id);
+  const legend = legendStep(id);
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [gen, setGen] = useState(0); // bump = regenerate (C3)
   const [i, setI] = useState(0);
@@ -111,10 +112,11 @@ export function Lesson({ id }: { id: string }) {
     const total = list.filter((x) => x.kind !== "learn").length || 1; // learn cards are not scored
     const acc = Math.round((score.correct / total) * 100), gems = score.correct * 2, xp = score.xp;
     setS((s) => recordSession(s, { xp, gems, kind: practice ? "practice" : "lesson" }, today()));
-    const required = ctx?.levelDef.checkpoint?.required_score;
-    const passed = exam ? acc >= required! : undefined;
+    const required = legend ? LEGEND_PASS : ctx?.levelDef.checkpoint?.required_score;
+    const passed = exam || legend ? acc >= required! : undefined;
     if (enrollment) {
       if (exam) (passed ? completeLevel(exam, xp) : gainXp(xp));
+      else if (legend) { gainXp(xp); if (passed) markLegendary(legend); }
       else if (ctx) {
         completeStep(id, xp);
         prefetchNext(enrollment.id, ctx.course, ctx.level, id, ctx.native);
@@ -210,7 +212,7 @@ export function Lesson({ id }: { id: string }) {
         <Icon name={result.passed === false ? "refresh" : "trophy"} />
       </div>
       <h2 style={{ fontSize: 26, fontWeight: 900 }}>
-        {result.passed === undefined ? t("lesson.done") : result.passed ? t("lesson.examPassed", { level: exam }) : t("lesson.examFailed")}
+        {result.passed === undefined ? t("lesson.done") : result.passed ? (legend ? t("lesson.legendPassed") : t("lesson.examPassed", { level: exam })) : t("lesson.examFailed")}
       </h2>
       {result.passed === false && <p className="muted">{t("lesson.examNeed", { score: result.required })}</p>}
       <div className="result-stats">

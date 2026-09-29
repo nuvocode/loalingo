@@ -3,13 +3,28 @@ import { z } from "zod";
 import { generate, generatePlain } from "./ai";
 import { getCached, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
-import { levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
+import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
 
+/** `legend:<step>`: a finished step replayed without teaching cards, written one CEFR level harder (PLAN §3.3). */
+export const legendStep = (id: string) => id.startsWith("legend:") ? id.slice(7) : undefined;
+export const LEGEND_PASS = 80; // % needed to turn the step gold
+
 /** Finds a step and its surroundings in the course tree; exams get a synthetic step covering the whole level. */
 export function stepContext(course: Course, stepId: string, native: string): LessonContext | null {
+  const legend = legendStep(stepId);
+  if (legend) {
+    const c = stepContext(course, legend, native);
+    if (!c) return null;
+    const acts = c.step.activities.filter((a) => a.type !== "learn");
+    return {
+      ...c, level: CEFR[Math.min(CEFR.indexOf(c.level) + 1, CEFR.length - 1)], // ponytail: C2 stays C2
+      step: { ...c.step, id: stepId, activities: acts.length ? acts : c.step.activities,
+        description: `${c.step.description ?? ""} Legendary challenge: harder sentences and less obvious distractors than a normal lesson.`.trim() },
+    };
+  }
   const exam = examLevel(stepId);
   if (exam) {
     const levelDef = course.levels[exam];

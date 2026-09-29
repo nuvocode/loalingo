@@ -42,7 +42,11 @@
     "noCourse": "Kullanılabilir kurs yok. Yukarıdaki kurs dosyası hatalarını düzelt.",
     "finishFirst": "Önce {{level}} seviyesini bitir ya da seviye testini geç",
     "courseDone": "{{level}} tamamlandı!",
-    "courseDoneDesc": "Bu kursta henüz sonraki seviye yok. Dersleri tekrar edebilir ya da pratik yapabilirsin."
+    "courseDoneDesc": "Bu kursta henüz sonraki seviye yok. Dersleri tekrar edebilir ya da pratik yapabilirsin.",
+    "legendary": "Efsanevi",
+    "review": "Tekrar et",
+    "legendDesc": "Efsanevi sürümü dene: öğretici kart yok, bir seviye daha zor. Dersi altına çevirmek için %{{score}} al.",
+    "legendDone": "Bu ders Efsanevi. Meydan okumayı yeniden oyna ya da tekrar et."
   },
   "practice": {
     "title": "Pratik Merkezi",
@@ -234,7 +238,8 @@
     "checking": "Kontrol ediliyor…",
     "examPassed": "{{level}} tamamlandı!",
     "examFailed": "Henüz olmadı",
-    "examNeed": "Geçmek için %{{score}} gerekiyor. Tekrar edip yeniden dene."
+    "examNeed": "Geçmek için %{{score}} gerekiyor. Tekrar edip yeniden dene.",
+    "legendPassed": "Efsanevi!"
   },
   "mock": {
     "leagueName": "Safir"

@@ -134,7 +134,8 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Hikâyeler: aktif seviyenin her ünitesine bir hikâye. AI, ünitenin kelime/gramerinden kısa bir diyalog + 2–3 anlama sorusu yazar (`content_cache`, anahtar `story:<ünite>`, ↻ ile yeniden üretilir). Satırlar tek tek açılır, sesli okunur; dokununca çeviri. Ünite başlayınca açılır (ilk ünite hep açık). Okunan hikâye `story:<ünite>` olarak tamamlanır → Profil'deki "Kitap kurdu" başarımı.
 - Rol Yapma: tasarımdaki iki karakter (Lily — otel, Kai — restoran). Serbest yazışma; AI karakterde kalır, seviyeye uygun cevap verir, öğrencinin son mesajını düzeltir (ana dilde kısa açıklama), hedefe ulaşınca bitirir. En fazla 10 mesaj. Sohbet kaydedilmez.
 - İkisi de kalp harcamaz; XP + seri + "alıştırma" görevi sayılır.
-- "Yakında" kalanlar: Konuşma/STT ve Görüntülü arama (D2), Lig, Arkadaşlar, Mağaza, Bildirimler (E1), `match_madness`, `timed_challenge`, `legendary`.
+- Efsanevi (`legendary`): tamamlanmış adıma dokununca "Efsanevi / Tekrar et" sheet'i. Efsanevi ders = aynı adım, öğretici kart yok, bir üst CEFR zorluğunda (`legend:<adım>`, ayrı önbellek). %80 ile geçilirse düğüm altın yıldız olur (`step_progress.legendary`). Ücretsiz — elmas bedeli Mağaza ile birlikte.
+- "Yakında" kalanlar: Konuşma/STT ve Görüntülü arama (D2), Lig, Arkadaşlar, Mağaza, Bildirimler (E1), `match_madness`, `timed_challenge`.
 
 ## 5. Kararlar
 
