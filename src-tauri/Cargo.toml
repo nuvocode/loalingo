@@ -25,11 +25,16 @@ tauri-plugin-sql = { version = "2.5.0", features = ["sqlite"] }
 tauri-plugin-http = "~2.7"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 tauri-plugin-notification = "~2.5"
-whisper-rs = { version = "0.16", features = ["metal"] }
 tauri-plugin-autostart = "~2.6"
 tauri-plugin-opener = "~2.6"
 tauri-plugin-updater = "~2.13"
 tauri-plugin-process = "~2.4"
+
+# GPU speech recognition only where Metal exists; CPU elsewhere.
+[target.'cfg(target_os = "macos")'.dependencies]
+whisper-rs = { version = "0.16", features = ["metal"] }
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+whisper-rs = "0.16"
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

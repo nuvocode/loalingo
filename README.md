@@ -55,10 +55,10 @@ Courses are plain YAML files in [`courses/`](courses/en.yml). For the architectu
 
 ### Releasing
 
-Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, then run:
+Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, commit, then push a tag:
 
 ```bash
-pnpm release
+git tag v0.1.2 && git push origin v0.1.2
 ```
 
-This builds a signed update bundle and writes `latest.json` into `dist-release/`. Upload those files to a GitHub release tagged `v<version>`. You need the updater signing key at `~/.tauri/loalingo.key`.
+[GitHub Actions](.github/workflows/release.yml) builds macOS (Apple silicon and Intel), Windows and Linux, and uploads them with a merged `latest.json` to a draft release. Publish the draft when all jobs are green; the in-app updater only sees published releases. The workflow needs the updater signing key in the `TAURI_SIGNING_PRIVATE_KEY` repository secret. `pnpm release` still builds a macOS-only release locally.
