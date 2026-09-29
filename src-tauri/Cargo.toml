@@ -1,6 +1,6 @@
 [package]
 name = "sprigo"
-version = "0.1.2"
+version = "1.0.0"
 description = "Local-first AI language learning"
 authors = ["nuvocode"]
 edition = "2021"

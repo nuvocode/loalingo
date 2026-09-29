@@ -4482,7 +4482,7 @@ dependencies = [
 
 [[package]]
 name = "sprigo"
-version = "0.1.2"
+version = "1.0.0"
 dependencies = [
  "keyring",
  "serde",
