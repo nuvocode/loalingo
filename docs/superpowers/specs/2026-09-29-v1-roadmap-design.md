@@ -107,7 +107,8 @@ Genel kurallar:
 - `persona`: prompt'a giren 2–3 cümle (meslek, konuşma tarzı, huy; ör. "sabırsız ama yardımsever", "esprili, uzun cümleler kurar")
 - `topics`: 4–6 konu; her biri i18n anahtarı olan başlık + prompt'a giden İngilizce hedef
 
-Meslekler: otel resepsiyonisti (Lily), şef (Kai), doktor, ev sahibi, iş görüşmecisi, tur rehberi. Mevcut `lily` ve `kai` kimlikleri korunur.
+Karakterler: otel resepsiyonisti **Mia** (K), şef **Kai** (E), doktor **Nora** (K), ev sahibi **Tom** (E), iş görüşmecisi **Emma** (K), tur rehberi **Leo** (E). `lily` kimliği `mia` olur (Lily bir Duolingo karakteri; rengi de mor olmaktan çıkar), `kai` korunur.
+İsim kuralı: kısa, Türkçe konuşan biri için de kolay okunur; Duolingo karakter adlarıyla (Bea, Eddy, Falstaff, Junior, Lily, Lin, Lucy, Oscar, Vikram, Zari) çakışmaz.
 
 **Akış:** Sohbet/Ara → konu seçme modal'ı (konu listesi + "Kendi konunu yaz" metin alanı) → sohbet. `chatTurn` sistem prompt'una `persona` ve seçilen konu/hedef eklenir. Serbest konuda hedef "have a natural conversation about: <metin>" olur.
 
