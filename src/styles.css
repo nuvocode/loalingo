@@ -125,6 +125,8 @@ svg{display:block}
 .btn-ghost:hover{background:var(--surface)}
 .btn-danger{background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red-dark)}
 .btn[disabled]{background:var(--border);color:var(--text-faint);box-shadow:none;cursor:not-allowed;transform:none}
+/* coin on a coloured button: white face so it stays visible on gold */
+.btn-gold{--coin:#fff;--coin-edge:rgba(0,0,0,.18)}
 .btn-block{width:100%}
 
 /* ===== Learn path ===== */
