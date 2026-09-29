@@ -116,7 +116,15 @@ function GuideSheet({ unitId, level }: { unitId: string; level: Cefr }) {
   const grammar = guide?.grammar ?? unitGrammar(unit).map((pattern) => ({ pattern, explanation: "", example: "" }));
   return <div className="guide">
     <h3>{t("learn.guidebook")} · {unit.title}</h3>
-    {!guide && <p className="small" role="status">{!ai ? t("learn.guideNoAi") : err ? `${t("ai.failed")}: ${err}` : t("ai.thinking")}</p>}
+    {!guide && (
+      <div className={`guide-status ${err ? "bad" : ""}`} role={err ? "alert" : "status"}>
+        <span className={`guide-status-ico ${ai && !err ? "gen-pulse" : ""}`}><Icon name={err ? "x" : "spark"} /></span>
+        <span>
+          <b>{!ai ? t("ai.needed") : err ? t("ai.failed") : t("learn.guideLoading")}</b>
+          <small>{!ai ? t("learn.guideNoAi") : err || t("learn.guideLoadingDesc")}</small>
+        </span>
+      </div>
+    )}
     <h4>{t("learn.guideWords")}</h4>
     <div className="guide-words">
       {words.map((w) => (

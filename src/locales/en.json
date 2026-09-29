@@ -48,7 +48,9 @@
     "legendDone": "This lesson is Legendary. Play the challenge again or review it.",
     "guideWords": "Vocabulary",
     "guideGrammar": "Grammar",
-    "guideNoAi": "Set up an AI provider in Settings to get translations, examples and explanations."
+    "guideNoAi": "Set up an AI provider in Settings to get translations, examples and explanations.",
+    "guideLoading": "Writing your guidebook…",
+    "guideLoadingDesc": "The AI is adding translations, examples and grammar notes. This takes a few seconds, only the first time."
   },
   "practice": {
     "title": "Practice Hub",

@@ -48,7 +48,9 @@
     "legendDone": "Bu ders Efsanevi. Meydan okumayı yeniden oyna ya da tekrar et.",
     "guideWords": "Kelimeler",
     "guideGrammar": "Gramer",
-    "guideNoAi": "Çeviri, örnek ve açıklamalar için Ayarlar'dan bir yapay zekâ sağlayıcısı kur."
+    "guideNoAi": "Çeviri, örnek ve açıklamalar için Ayarlar'dan bir yapay zekâ sağlayıcısı kur.",
+    "guideLoading": "Rehberin hazırlanıyor…",
+    "guideLoadingDesc": "Yapay zekâ çevirileri, örnek cümleleri ve gramer notlarını ekliyor. Sadece ilk seferde birkaç saniye sürer."
   },
   "practice": {
     "title": "Pratik Merkezi",
