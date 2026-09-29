@@ -375,7 +375,7 @@ export function Lesson({ id }: { id: string }) {
           <button className="icon-btn" onClick={() => setGen((g) => g + 1)} disabled={load.state === "loading"} aria-label={t("ai.regenerate")} title={t("ai.regenerate")}><Icon name="refresh" /></button>
         )}
         {limit ? <div className={`timer-box ${left <= 10 ? "low" : ""}`} role="timer" aria-label={t("practice.timeLeft", { count: left })}><Icon name="clock" />{Math.floor(left / 60)}:{String(Math.max(left, 0) % 60).padStart(2, "0")}</div>
-          : s.heartsOn && <div className="hearts-box"><Icon name="heart" />{s.hearts}</div>}
+          : s.heartsOn && <div className="hearts-box"><Icon name="drop" />{s.hearts}</div>}
       </div>
 
       <div className="lesson-body"><div className="lesson-inner">{body}</div></div>

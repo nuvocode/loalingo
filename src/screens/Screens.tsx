@@ -180,8 +180,8 @@ export function Shop() {
         <b style={{ fontSize: 18 }}>{s.gems}</b><span className="muted">{t("shop.gemsHave")}</span>
         {boostMin > 0 && <span className="price-tag owned" style={{ marginLeft: "auto" }}>{t("shop.doubleXpActive", { count: boostMin })}</span>}
       </div>
-      {item("freeze", "shield", "var(--green-tint)", "var(--green-dark)", 200, s.streakFreeze)}
-      {item("refill", "heart", "var(--red-tint)", "var(--red-dark)", 350)}
+      {item("freeze", "greenhouse", "var(--green-tint)", "var(--green-dark)", 200, s.streakFreeze)}
+      {item("refill", "drop", "var(--sky)", "var(--blue-dark)", 350)}
       {item("doubleXp", "clock", "var(--sky)", "var(--blue-dark)", 120)}
       {item("legendary", "spark", "var(--purple-tint)", "var(--purple-dark)", LEGEND_PRICE)}
       {s.legendTickets > 0 && <p className="muted small">{t("learn.legendTicket", { count: s.legendTickets })}</p>}
@@ -201,7 +201,7 @@ export function Profile() {
     </div>
   );
   const ach: [IconName, string, number, number, string][] = [
-    ["flame", "achFire", s.bestStreak, 7, "var(--orange)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", [...done].filter((d) => d.startsWith("story:")).length, 1, "var(--blue)"],
+    ["roots", "achFire", s.bestStreak, 7, "var(--green)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", [...done].filter((d) => d.startsWith("story:")).length, 1, "var(--blue)"],
   ];
   return (
     <>
@@ -210,7 +210,7 @@ export function Profile() {
         <span className="od-field od-fill"><b style={{ fontSize: 22 }}>{profile!.name}</b><span className="muted small">{t("profile.since", { date: since })}</span></span>
       </div>
       <div className="od-grid" style={{ "--od-cols": 2, "--od-gap": "12px", marginTop: 18 } as React.CSSProperties}>
-        {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--orange)")}
+        {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--green)")}
         {stat(xp, t("profile.totalXp"), "var(--gold-dark)")}
         {stat(league.name, t("profile.currentLeague"), "var(--blue)")}
         {stat(t("profile.top3"), t("profile.bestLeague"), "var(--green-dark)")}
@@ -313,7 +313,7 @@ export function Friends() {
           <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={f.id}>
             <span className="avatar" style={{ background: f.color }}>{f.name[0]}</span>
             <span className="od-field od-fill"><b>{f.name}</b><span className="muted small">{t("friends.weekXp", { count: f.weekXp })}</span></span>
-            <span className="od-row" style={{ "--od-gap": "4px", color: "var(--orange)", fontWeight: 900 } as React.CSSProperties} aria-label={t("friends.streak", { count: f.stats.streak })}><Icon name="flame" />{f.stats.streak}</span>
+            <span className="od-row" style={{ "--od-gap": "4px", color: "var(--green)", fontWeight: 900 } as React.CSSProperties} aria-label={t("friends.streak", { count: f.stats.streak })}><Icon name="roots" />{f.stats.streak}</span>
           </div>
         ))}
       </div>
@@ -331,13 +331,13 @@ export function Notifications() {
   const rank = rows.findIndex((r) => r.me) + 1;
   const items: { icon: IconName; title: string; desc: string }[] = [
     s.lastActive === today()
-      ? { icon: "flame", title: t("notifications.streakSafe"), desc: t("notifications.streakSafeDesc", { count: s.streak }) }
-      : { icon: "flame", title: t(s.streak ? "notifications.streakRisk" : "notifications.streakStart"), desc: t(s.streak ? "notifications.streakRiskDesc" : "notifications.streakStartDesc", { count: s.streak }) },
+      ? { icon: "roots", title: t("notifications.streakSafe"), desc: t("notifications.streakSafeDesc", { count: s.streak }) }
+      : { icon: "roots", title: t(s.streak ? "notifications.streakRisk" : "notifications.streakStart"), desc: t(s.streak ? "notifications.streakRiskDesc" : "notifications.streakStartDesc", { count: s.streak }) },
     { icon: "trophy", title: t("notifications.league", { rank, name }), desc: t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
   ];
   if (last && last !== "stay") items.push({ icon: "trophy", title: t(last === "up" ? "league.promoted" : "league.demoted", { name }), desc: "" });
   if (ahead) items.push({ icon: "users", title: t("notifications.passed", { name: ahead.name }), desc: t("notifications.passedDesc", { name: ahead.name }) });
-  if (s.chests) items.push({ icon: "chest", title: t("notifications.chest"), desc: t("notifications.chestDesc") });
+  if (s.chests) items.push({ icon: "basket", title: t("notifications.chest"), desc: t("notifications.chestDesc") });
   return (
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("notifications.title")}</h1>
