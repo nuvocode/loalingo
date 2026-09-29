@@ -16,7 +16,7 @@ test("bundled courses/en.yml is valid and builds a sequential A1 path", () => {
 });
 
 // Grows with the course: A1-B2, then C1, then C2.
-const EXPECTED_LEVELS = ["A1", "A2", "B1", "B2", "C1"];
+const EXPECTED_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 test("en.yml has every expected CEFR level in order, each with 10 units and a checkpoint", () => {
   const c = parseCourse(en, "en.yml");
