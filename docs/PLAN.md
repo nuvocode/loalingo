@@ -7,7 +7,7 @@ Local-first, AI destekli masaüstü dil öğrenme uygulaması. Tasarım kaynağ�
 - Tek dosyalık prototip: vanilla JS, hash router, `Nunito`, CSS token'ları `:root` üzerinde.
 - Ekranlar: Öğren, Pratik, Lig, Mağaza, Profil, Hikâyeler, Rol Yapma, Arkadaşlar, Bildirimler, Ayarlar + ders overlay'i, bottom sheet, toast, sağ ray (seri/XP/günlük görev).
 - Egzersiz bileşenleri hazır: `choice` (dinle varyantı dahil), `bank` (kelime bankası), `speak`.
-- **Dark mode yarım var**: `html[data-theme="dark"]` token'ları tanımlı ama açma düğmesi yok ve inline sabit renkler (`#fff3d6`, `#e9f9d8`, `#ffe3e3`, `#fff`, `color:#fff` vb.) temaya uymuyor. İş = bu sabitleri token'a çevirmek + Ayarlar'a tema seçimi (Sistem / Açık / Koyu).
+- Dark mode: ✅ token'lar + Ayarlar → Tema (Sistem / Açık / Koyu), profil başına saklanır.
 
 ## 2. Teknoloji önerisi
 

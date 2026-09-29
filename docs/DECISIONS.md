@@ -126,7 +126,7 @@ Plan: [PLAN.md](PLAN.md)
 **D2. Ses → metin (konuşma)**
 - v1'de "Yakında" · lokal Whisper (whisper.cpp) · sağlayıcı STT
 - Öneri: v1'de Yakında
-- Karar: v1'de Yakında
+- Karar: v1'de Yakında → **güncellendi (Faz 5): lokal whisper.cpp, model uygulamaya gömülü** (ayrı servis kurulmaz; `whisper-rs` + Metal, `ggml-base-q5_1`).
 
 ## E. Kapsam & ekranlar
 

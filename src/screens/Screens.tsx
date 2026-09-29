@@ -70,8 +70,8 @@ export function Practice() {
         {card(() => mistakes ? start("practice-mistakes") : toast(t("practice.noMistakes")), "refresh", "var(--red-tint)", "var(--red)", t("practice.mistakes"),
           mistakes ? t("practice.mistakesCount", { count: mistakes }) : t("practice.noMistakes"))}
         {/* Speaking: bundled Whisper (DECISIONS D2). */}
-        {card(() => speakBlock ? toast(t(speakBlock)) : words.length ? start("practice-speak") : toast(t("practice.noWords")),
-          "mic", "var(--sky)", "var(--blue)", t("practice.speak"), speakBlock ? t(speakBlock) : t("practice.speakDesc"))}
+        {card(() => speakBlock ? toast(t(speakBlock)) : words.length ? start("practice-speak") : toast(t("practice.needWords", { count: 1 })),
+          "mic", "var(--sky)", "var(--blue)", t("practice.speak"), speakBlock ? t(speakBlock) : words.length ? t("practice.speakDesc") : t("practice.needWords", { count: 1 }))}
         {card(() => words.length >= LISTEN_MIN_WORDS ? start("practice-listen") : toast(t("practice.needWords", { count: LISTEN_MIN_WORDS })),
           "headphones", "var(--purple-tint)", "var(--purple-dark)", t("practice.listen"), words.length >= LISTEN_MIN_WORDS ? t("practice.listenDesc", { count: Math.min(6, words.length) }) : t("practice.needWords", { count: LISTEN_MIN_WORDS }))}
         {card(() => words.length >= MADNESS_MIN_WORDS ? start("practice-madness") : toast(t("practice.needWords", { count: MADNESS_MIN_WORDS })),
