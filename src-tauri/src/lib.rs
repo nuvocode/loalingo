@@ -1,5 +1,7 @@
 use tauri::Manager;
 
+mod data;
+
 /// User-installed courses (DECISIONS B3): `<app data>/courses/*.yml`, returned as (file name, text).
 /// The folder is created on first call so users can find where to drop files.
 #[tauri::command]
@@ -143,6 +145,7 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_autostart::Builder::new().args([HIDDEN_ARG]).build())
@@ -161,14 +164,19 @@ pub fn run() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, transcribe, set_background])
+        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, transcribe, set_background,
+            data::data_location, data::set_data_dir, data::dir_ok, data::file_exists, data::lock_read, data::lock_write,
+            data::lock_remove, data::backups_list, data::backups_remove, data::copy_file, data::is_sqlite, data::install_db])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| match event {
             // Dock icon click brings a hidden window back.
             #[cfg(target_os = "macos")]
             tauri::RunEvent::Reopen { has_visible_windows: false, .. } => show_main(app),
-            tauri::RunEvent::Exit => release_stt(),
+            tauri::RunEvent::Exit => {
+                release_stt();
+                data::release_lock();
+            }
             _ => {}
         });
 }
