@@ -7,8 +7,9 @@ import * as db from "./db";
 import { SPEECH_PASS, listenItems, madnessItems, matchesAnswer, normalize, speakItems, speechScore, type Item } from "./activities";
 import { MicButton } from "./Mic";
 import { sttReady } from "./stt";
-import { LEGEND_PASS, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
+import { LEGEND_PASS, appeal, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
+import { acceptAppeal } from "./appeal";
 
 /** Opens a lesson, or the out-of-hearts sheet (design behaviour). Steps need an AI provider (DECISIONS C6). */
 export function useStartLesson() {
@@ -72,7 +73,8 @@ export const TIME_LIMIT: Record<string, number> = { "practice-madness": 90, "pra
 
 const questionOf = (it: Item) => it.kind === "learn" || it.kind === "speak" ? it.phrase : it.kind === "match" ? "match" : [it.prompt, "context" in it ? it.context : "", "listen" in it ? it.listen : ""].filter(Boolean).join(" — ");
 
-type Fb = { ok: boolean; correct: string; given: string; note?: string } | null;
+// judged: the AI called it wrong (appealable, F); lost: a heart went for it; appealed: the one appeal is spent; verdict: the AI's reason for rejecting it
+type Fb = { ok: boolean; correct: string; given: string; note?: string; judged?: boolean; lost?: boolean; appealed?: boolean; verdict?: string } | null;
 type Load = { state: "loading" } | { state: "error"; msg: string } | { state: "ready"; items: PItem[] };
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -182,21 +184,37 @@ export function Lesson({ id }: { id: string }) {
     setI(i + 1); reset();
   };
 
-  const grade = (ok: boolean, correct: string, given: string, note?: string) => {
+  const grade = (ok: boolean, correct: string, given: string, note?: string, judged = false) => {
     if (it && enrollment) {
       const { mistakeId, ...item } = it;
       if (id === "practice-listen" && it.kind === "choice") db.nudgeWord(enrollment.id, it.listen, ok ? 1 : -1);
       else if (ok && mistakeId) db.deleteMistake(mistakeId);
       else if (!ok && !mistakeId) db.addMistake(enrollment.id, item);
     }
+    let lost = false;
     if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
     else if (s.heartsOn && !limit) {
+      lost = true;
       const hearts = Math.max(0, s.hearts - 1);
       setS((s) => ({ ...s, hearts }));
       if (hearts <= 0) openSheet(<HeartsOut onEnd={quit} />);
     }
     sfx(ok ? "ok" : "bad");
-    setFb({ ok, correct, given, note });
+    setFb({ ok, correct, given, note, judged: judged && !ok, lost });
+  };
+
+  // F: the learner disputes an AI verdict. Accepted = counts as correct; rejected = the AI's reason is shown. Throws on AI failure (sheet shows it, appeal stays open).
+  const submitAppeal = async (reason: string) => {
+    if (!it || !ctx || !fb) return;
+    const r = await appeal(ctx, questionOf(it), fb.correct, fb.given, reason);
+    closeSheet();
+    if (!r.accepted) return setFb((f) => f && { ...f, appealed: true, verdict: r.reason });
+    const { mistakeId, ...item } = it;
+    if (enrollment) db.deleteMistakeByItem(enrollment.id, item);
+    setScore((sc) => acceptAppeal(sc, 0, 0, false).score);
+    if (fb.lost) setS((s) => ({ ...s, hearts: acceptAppeal({ correct: 0, xp: 0 }, s.hearts, s.maxHearts, true).hearts }));
+    sfx("ok");
+    setFb((f) => f && { ...f, ok: true, note: r.reason, judged: false, appealed: true, verdict: undefined });
   };
 
   const check = async () => {
@@ -211,7 +229,7 @@ export function Lesson({ id }: { id: string }) {
       if (!ctx) return grade(false, it.answer, text);
       setChecking(true); // C4: string match failed, let the AI judge meaning
       // A failed AI call is not a wrong answer: no heart lost, the learner just checks again.
-      try { const r = await judge(ctx, questionOf(it), it.answer, text); grade(r.correct, it.answer, text, r.feedback); }
+      try { const r = await judge(ctx, questionOf(it), it.answer, text); grade(r.correct, it.answer, text, r.feedback, true); }
       catch (e) { console.warn("judge", e); toast(t("lesson.checkFailed")); }
       finally { setChecking(false); }
     }
@@ -394,9 +412,11 @@ export function Lesson({ id }: { id: string }) {
                     <span>{t("lesson.correct")}{fb.note && <small>{fb.note}</small>}</span></span>
                 ) : (
                   <span className="fb bad"><span className="fb-ico" style={{ color: "var(--red)" }}><Icon name="x" /></span>
-                    <span>{t("lesson.wrong")}{fb.note && <small>{fb.note}</small>}<small>{t("lesson.answer", { answer: fb.correct })}</small></span></span>
+                    <span>{t("lesson.wrong")}{fb.note && <small>{fb.note}</small>}<small>{t("lesson.answer", { answer: fb.correct })}</small>
+                      {fb.verdict && <small role="status">{t("lesson.appealRejected", { reason: fb.verdict })}</small>}</span></span>
                 )}
                 <span className="od-row" style={gap("10px")}>
+                  {fb.judged && !fb.appealed && ctx && <button className="btn btn-ghost" onClick={() => openSheet(<AppealSheet onSend={submitAppeal} />)}>🚩 {t("lesson.appeal")}</button>}
                   {!fb.ok && ctx && <button className="btn btn-ghost" onClick={() => openSheet(<ExplainSheet run={() => explain(ctx, questionOf(it), fb.correct, fb.given)} />)}>{t("lesson.explain")}</button>}
                   <button className={`btn ${fb.ok ? "btn-primary" : "btn-danger"}`} onClick={next}>{t(last ? "lesson.finish" : "lesson.continue")}</button>
                 </span>
@@ -424,6 +444,28 @@ function ExplainSheet({ run }: { run: () => Promise<string> }) {
     <h3>{t("lesson.explain")}</h3>
     <p role="status" style={{ margin: "12px 0 18px", whiteSpace: "pre-wrap" }}>{txt ?? t("ai.thinking")}</p>
     <button className="btn btn-primary btn-block" onClick={closeSheet}>{t("lesson.gotIt")}</button>
+  </>;
+}
+
+// F: why the learner thinks the answer is right; an AI failure stays in the sheet so they can resend.
+function AppealSheet({ onSend }: { onSend: (reason: string) => Promise<void> }) {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const send = async () => {
+    setBusy(true); setErr("");
+    try { await onSend(reason.trim()); }
+    catch (e) { console.warn("appeal", e); setErr(t("lesson.appealFailed")); setBusy(false); }
+  };
+  return <>
+    <h3>{t("lesson.appealTitle")}</h3>
+    <textarea className="input" rows={3} value={reason} autoFocus disabled={busy} aria-label={t("lesson.appealTitle")}
+      style={{ width: "100%", resize: "none", margin: "12px 0" }} onChange={(e) => setReason(e.target.value)} />
+    {err && <p className="small" role="alert" style={{ color: "var(--red)", fontWeight: 800, marginBottom: 12 }}>{err}</p>}
+    <button className="btn btn-primary btn-block" disabled={busy || !reason.trim()} onClick={send}>{t(busy ? "lesson.checking" : "lesson.appealSend")}</button>
+    <button className="btn btn-ghost btn-block" disabled={busy} onClick={closeSheet}>{t("sheet.cancel")}</button>
   </>;
 }
 

@@ -167,6 +167,10 @@ export async function listMistakes<T>(enrollmentId: number, limit = 1000) {
 export async function deleteMistake(id: number) {
   await (await db()).execute("DELETE FROM mistakes WHERE id = $1", [id]);
 }
+/** Removes the row `addMistake` wrote for this item (F: accepted appeal). */
+export async function deleteMistakeByItem(enrollmentId: number, item: unknown) {
+  await (await db()).execute("DELETE FROM mistakes WHERE enrollment_id = $1 AND item = $2", [enrollmentId, JSON.stringify(item)]);
+}
 
 export type Word = { word: string; translation: string; strength: number };
 /** Seen again → stronger (max 5). */

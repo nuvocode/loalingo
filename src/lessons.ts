@@ -116,6 +116,19 @@ export async function judge(c: LessonContext, question: string, expected: string
   return run().catch(run);
 }
 
+/** F: the learner disputes a `judge()` verdict; a second look that is fair but not a pushover. */
+export async function appeal(c: LessonContext, question: string, expected: string, given: string, reason: string) {
+  const run = () => generate(
+    z.object({ reason: z.string(), accepted: z.boolean() }), // reason first, like judge: the model reasons before it decides
+    systemPrompt(c),
+    `Exercise: ${question}\nExpected answer: ${expected}\nLearner's answer: ${given}\nThe answer was marked wrong. The learner appeals: ${reason}\n` +
+      "Be fair but not a pushover: accept only if the learner's answer is genuinely correct or acceptable for this exercise " +
+      "(same meaning, grammatical, natural); reject if it is wrong, off-topic, or the argument is merely persuasive. " +
+      `\`reason\`: one sentence in ${langEn(c.native)} explaining the decision.`,
+  );
+  return run().catch(run);
+}
+
 export function explain(c: LessonContext, question: string, correct: string, given: string) {
   return generatePlain(systemPrompt(c).replace("Respond only with JSON matching the schema.", ""),
     `Exercise: ${question}\nCorrect answer: ${correct}\nLearner answered: ${given || "(skipped)"}\nExplain in at most 3 short sentences why the correct answer is right${given ? " and what was wrong with the learner's answer" : ""}. Plain text, no markdown.`);
