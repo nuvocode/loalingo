@@ -166,6 +166,45 @@
     "lilyGoal": "Giriş yap ve oda iste",
     "kaiRole": "Restoran şefi",
     "kaiGoal": "Menüden öneri iste",
+    "topics": {
+      "mia": {
+        "checkIn": "Check-in yap",
+        "roomProblem": "Odada bir sorun var",
+        "recommendations": "Çevre önerileri",
+        "lateCheckout": "Geç check-out",
+        "lostItem": "Kayıp eşya"
+      },
+      "kai": {
+        "order": "Öneri iste, sipariş ver",
+        "allergies": "Gıda alerjileri",
+        "cooking": "Birlikte yemek yap",
+        "market": "Pazardan alışveriş"
+      },
+      "nora": {
+        "symptoms": "Şikâyetlerini anlat",
+        "pharmacy": "Eczane ve ilaç dozu",
+        "followUp": "Kontrol randevusu al",
+        "habits": "Sağlıklı alışkanlıklar"
+      },
+      "tom": {
+        "viewing": "Daireyi gez",
+        "rent": "Kirayı pazarlık et",
+        "repair": "Tamir talebi",
+        "rules": "Ev kuralları"
+      },
+      "emma": {
+        "introduce": "Kendini tanıt",
+        "strengths": "Güçlü ve zayıf yönlerin",
+        "experience": "Geçmiş deneyimlerin",
+        "salary": "Maaş ve sorularınız"
+      },
+      "leo": {
+        "tour": "Şehir turu soruları",
+        "directions": "Yol tarifi sor",
+        "tickets": "Müze bileti",
+        "dayTrip": "Günübirlik gezi planla"
+      }
+    },
     "chat": "Sohbet",
     "call": "Ara",
     "message": "Mesajın",

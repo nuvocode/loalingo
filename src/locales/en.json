@@ -168,6 +168,45 @@
     "lilyGoal": "Check in and ask for a room",
     "kaiRole": "Restaurant chef",
     "kaiGoal": "Ask for a recommendation",
+    "topics": {
+      "mia": {
+        "checkIn": "Check in",
+        "roomProblem": "A problem with the room",
+        "recommendations": "Local recommendations",
+        "lateCheckout": "Late checkout",
+        "lostItem": "A lost item"
+      },
+      "kai": {
+        "order": "Recommendation and order",
+        "allergies": "Food allergies",
+        "cooking": "Cook a dish together",
+        "market": "Shopping at the market"
+      },
+      "nora": {
+        "symptoms": "Describe your symptoms",
+        "pharmacy": "Pharmacy and dosage",
+        "followUp": "Book a follow-up",
+        "habits": "Healthy habits"
+      },
+      "tom": {
+        "viewing": "Viewing a flat",
+        "rent": "Negotiating the rent",
+        "repair": "Report a repair",
+        "rules": "House rules"
+      },
+      "emma": {
+        "introduce": "Introduce yourself",
+        "strengths": "Strengths and weaknesses",
+        "experience": "Past experience",
+        "salary": "Salary and your questions"
+      },
+      "leo": {
+        "tour": "City tour questions",
+        "directions": "Asking for directions",
+        "tickets": "Museum tickets",
+        "dayTrip": "Plan a day trip"
+      }
+    },
     "chat": "Chat",
     "call": "Call",
     "message": "Your message",
