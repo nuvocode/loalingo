@@ -141,3 +141,12 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 ## 5. Kararlar
 
 Tüm açık kararlar: [DECISIONS.md](DECISIONS.md)
+
+## 6. Paketleme (macOS)
+
+- `pnpm tauri build` → `src-tauri/target/release/bundle/macos/loalingo.app` (~10 MB) ve `bundle/dmg/loalingo_<sürüm>_aarch64.dmg` (~5 MB).
+- İmza: ad-hoc (`bundle.macOS.signingIdentity: "-"`). Bu Mac'te ve "Yine de aç" ile başka Mac'lerde çalışır. Dağıtım için Developer ID Application sertifikası + notarization gerekir (şu an yalnızca Apple Development sertifikası var).
+- `[profile.release.build-override] strip = false`: macOS 27 bağlayıcısıyla strip edilen proc-macro dylib'leri (sqlx-macros) yüklenemiyor. Uygulama binary'si yine strip edilir.
+- `tauri-plugin-http` Rust tarafında `~2.7` (npm paketi 2.7.0; sürümler uyuşmazsa `tauri build` durur).
+- ✔ Release uygulamasında test edildi: gerçek SQLite (mevcut veriler), Ollama bağlantısı ve ders üretimi (Tauri HTTP), bulut isteği (OpenAI 401 → CORS yok), API anahtarı macOS anahtarlığına yazılıp okunuyor ve veritabanında yok, kullanıcı kurs klasörü (`~/Library/Application Support/com.nuvocode.loalingo/courses`).
+
