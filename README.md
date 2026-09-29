@@ -62,3 +62,7 @@ git tag v0.1.2 && git push origin v0.1.2
 ```
 
 [GitHub Actions](.github/workflows/release.yml) builds macOS (Apple silicon and Intel), Windows and Linux, and uploads them with a merged `latest.json` to a draft release. Publish the draft when all jobs are green; the in-app updater only sees published releases. The workflow needs the updater signing key in the `TAURI_SIGNING_PRIVATE_KEY` repository secret. `pnpm release` still builds a macOS-only release locally.
+
+## License
+
+[MIT](LICENSE)
