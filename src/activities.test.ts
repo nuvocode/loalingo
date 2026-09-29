@@ -37,3 +37,13 @@ test("listening practice picks the weakest words with 4 distinct options", async
     assert.equal(it.options[it.answer], it.listen);
   }
 });
+
+test("recent mistakes reach the lesson prompt as one line each", async () => {
+  const { mistakeLine, lessonPrompt } = await import("./activities.ts");
+  assert.equal(mistakeLine({ kind: "choice", prompt: "Hi?", context: "", big: false, listen: "", options: ["a", "b"], answer: 1 }), "Hi? → b");
+  assert.equal(mistakeLine({ kind: "bank", prompt: "p", answer: ["I", "am"], bank: [] }), "p → I am");
+  assert.equal(mistakeLine({ kind: "match", pairs: [] }), null);
+  const c = { unitTitle: "U", step: { title: "S", vocabulary: [], grammar: [] } } as any;
+  assert.ok(lessonPrompt(c, [], ["Hi? → b"]).includes("- Hi? → b"));
+  assert.ok(!lessonPrompt(c, []).includes("got these wrong"));
+});

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "./icons";
 import { useApp, type Route } from "./store";
 import { Rail } from "./Rail";
-import { Lesson } from "./Lesson";
+import { Lesson, sfxState } from "./Lesson";
 import { Chat, Story } from "./Talk";
 import type { CharacterId } from "./lessons";
 import { Learn } from "./screens/Learn";
@@ -37,7 +37,7 @@ function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, profile, route, sheet, closeSheet, toastMsg, toastOn, lessonId } = useApp();
+  const { ready, profile, route, sheet, closeSheet, toastMsg, toastOn, lessonId, s } = useApp();
   const Screen = SCREENS[route];
 
   useEffect(() => {
@@ -45,6 +45,11 @@ export default function App() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [sheet, closeSheet]);
+
+  useEffect(() => {
+    sfxState.on = s.soundOn;
+    document.documentElement.dataset.motion = s.reduceMotion ? "reduce" : "full";
+  }, [s.soundOn, s.reduceMotion]);
 
   if (!ready) return null;
   return (

@@ -1,8 +1,8 @@
 // Lesson generation (DECISIONS C2, C3): cache → one call for the whole step → per-activity fallback.
 import { z } from "zod";
 import { generate, generatePlain } from "./ai";
-import { getCached, putCached } from "./db";
-import { REGISTRY, langEn, lessonPrompt, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
+import { getCached, listMistakes, putCached } from "./db";
+import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -51,12 +51,14 @@ export function stepContext(course: Course, stepId: string, native: string): Les
   return null;
 }
 
-async function generateItems(c: LessonContext): Promise<Item[]> {
+export const MISTAKES_IN_PROMPT = 8; // ponytail: most recent only, rank by frequency if prompts need sharper focus
+
+async function generateItems(c: LessonContext, mistakes: string[]): Promise<Item[]> {
   const acts = plannedActivities(c.step.activities);
   if (!acts.length) throw new Error("This step has no activities that can be generated yet.");
   const system = systemPrompt(c);
   try {
-    const items = toItems(acts, await generate(lessonSchema(acts), system, lessonPrompt(c, acts)) as Record<string, unknown[]>);
+    const items = toItems(acts, await generate(lessonSchema(acts), system, lessonPrompt(c, acts, mistakes)) as Record<string, unknown[]>);
     if (items.length) return items;
   } catch (e) { console.warn("Whole-lesson generation failed, falling back to per-activity calls", e); }
   // Fallback for small local models that struggle with the full schema.
@@ -64,7 +66,7 @@ async function generateItems(c: LessonContext): Promise<Item[]> {
   let lastError: unknown;
   for (const a of acts) {
     try {
-      const out = await generate(z.object({ items: z.array(REGISTRY[a.type]!.schema).min(1).max(a.count) }), system, lessonPrompt(c, [{ ...a, key: "items" }]));
+      const out = await generate(z.object({ items: z.array(REGISTRY[a.type]!.schema).min(1).max(a.count) }), system, lessonPrompt(c, [{ ...a, key: "items" }], mistakes));
       items.push(...toItems([{ ...a, key: "items" }], out as Record<string, unknown[]>));
     } catch (e) { lastError = e; }
   }
@@ -80,7 +82,8 @@ export function loadLesson(enrollmentId: number, c: LessonContext, fresh = false
   const p = (async () => {
     const cached = fresh ? null : await getCached<Item[]>(enrollmentId, c.step.id);
     if (cached) return cached;
-    const items = await generateItems(c);
+    const mistakes = (await listMistakes<Item>(enrollmentId, MISTAKES_IN_PROMPT)).map((m) => mistakeLine(m.item)).filter((x): x is string => !!x);
+    const items = await generateItems(c, mistakes);
     await putCached(enrollmentId, c.step.id, items);
     return items;
   })().finally(() => inflight.delete(k));

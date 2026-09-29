@@ -113,10 +113,10 @@ export function Settings() {
           <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
         </div>
         <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
-        <ToggleRow k="sound" initial />
+        <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
         <ToggleRow k="speaking" initial />
         <ToggleRow k="reminder" initial />
-        <ToggleRow k="reduceMotion" initial={false} />
+        <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
       </div>
 
       <h2 className="section-title">{t("settings.appearance")}</h2>

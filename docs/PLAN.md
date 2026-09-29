@@ -76,19 +76,19 @@ Bir kısmı **soru tipi**, bir kısmı soru tiplerinden oluşan **pratik modu**.
 | `error_correct` | Hata düzeltme | ✅ | `choice`/input |
 | `dialogue` | Karakter diyaloğu | ✅ | `choice` + balonlar |
 | `speak` | Konuşma | 🔜 | `speak` (tasarım var) |
-| `story` | Hikâyeler | 🔜 faz 2 | — |
-| `roleplay` | Roleplay (AI sohbet) | 🔜 faz 2 | — |
+| `story` | Hikâyeler | ✅ faz 4 | — |
+| `roleplay` | Roleplay (AI sohbet) | ✅ faz 4 (yazılı; sesli arama 🔜) | — |
 | `video_call` | Video Call | 🔜 | — |
 
 **Pratik modları** (Pratik ekranı; yeni tip değil, yukarıdakilerin kombinasyonu):
-`listen` (dinleme tipleri) · `speak` 🔜 · `words` (öğrenilmiş kelimeler) · `mistakes` (hata tablosundan) · `match_madness` (`match` + süre) · `timed_challenge` (karışık + süre) · `legendary` (tamamlanmış ünite, bir üst CEFR zorluğunda).
+`listen` (dinleme tipleri) · `speak` 🔜 · `words` (öğrenilmiş kelimeler) · `mistakes` (hata tablosundan) · `match_madness` 🔜 (`match` + süre) · `timed_challenge` 🔜 (karışık + süre) · `legendary` ✅ (yolda tamamlanmış adıma dokununca; bir üst CEFR zorluğunda).
 
 Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hatırla=`match` → Üret=`word_bank/translate` → Dinle=`listen_*` → Konuş=`speak` → Hata yap → `mistakes` tekrarı.
 
 ### 3.3 AI katmanı
 
 - Her tip için tek zod şeması; `generateObject` ile çağrı. Geçersiz çıktı → 1 retry → "üretilemedi, tekrar dene" hata durumu.
-- Prompt = sistem (öğretmen rolü, CEFR seviyesi, ana dil, hedef dil) + step bağlamı + tip şeması + önceki hatalar (varsa).
+- Prompt = sistem (öğretmen rolü, CEFR seviyesi, ana dil, hedef dil) + step bağlamı + tip şeması + önceki hatalar (varsa; kursun son 8 hatası, "uygunsa 1–2 alıştırmada tekrar kullan").
 - Bir ders tek çağrıda tüm activity listesi için üretilir (daha hızlı, tutarlı); küçük lokal modeller zorlanırsa tip başına çağrıya düşer.
 - Cache: `(course, step, activityIndex, seed)` anahtarıyla SQLite. Dersi tekrar açınca anında; "Yeniden üret" ile yenilenir. Sonraki dersi arka planda önceden üret.
 - Sağlayıcılar: Ollama (`localhost:11434`), LM Studio (`localhost:1234/v1`), OpenAI, Anthropic, Gemini. Ayarlar'da: sağlayıcı seç, baseURL/anahtar, model listesi, "Bağlantıyı test et".
@@ -135,6 +135,8 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Rol Yapma: tasarımdaki iki karakter (Lily — otel, Kai — restoran). Serbest yazışma; AI karakterde kalır, seviyeye uygun cevap verir, öğrencinin son mesajını düzeltir (ana dilde kısa açıklama), hedefe ulaşınca bitirir. En fazla 10 mesaj. Sohbet kaydedilmez.
 - İkisi de kalp harcamaz; XP + seri + "alıştırma" görevi sayılır.
 - Efsanevi (`legendary`): tamamlanmış adıma dokununca "Efsanevi / Tekrar et" sheet'i. Efsanevi ders = aynı adım, öğretici kart yok, bir üst CEFR zorluğunda (`legend:<adım>`, ayrı önbellek). %80 ile geçilirse düğüm altın yıldız olur (`step_progress.legendary`). Ücretsiz — elmas bedeli Mağaza ile birlikte.
+- Kişiselleştirme: yeni üretilen her ders promptuna kursun son 8 hatası girer (§3.3). Önbellekteki dersler değişmez; "Yeniden üret" hataları da alır.
+- Ayarlar: ses efektleri (Web Audio, dosyasız doğru/yanlış/bitti sesleri) ve hareketi azalt çalışıyor, profil başına saklanır. Konuşma egzersizleri ve günlük hatırlatıcı hâlâ görsel.
 - Rehber (B8): ünite başlığındaki buton; ünitenin kelime + gramer listesi. AI çeviri, örnek cümle ve açıklama yazar (`guide:<ünite>` önbelleği); AI yoksa ya da beklenirken YAML listeleri görünür. Kelimeye/örneğe dokununca sesli okunur.
 - "Yakında" kalanlar: Konuşma/STT ve Görüntülü arama (D2), Lig, Arkadaşlar, Mağaza, Bildirimler (E1), `match_madness`, `timed_challenge`.
 

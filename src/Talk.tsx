@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
-import { say } from "./Lesson";
+import { say, sfx } from "./Lesson";
 import { CHARACTERS, chatTurn, loadStory, type CharacterId, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today } from "./progress";
 
@@ -136,9 +136,10 @@ export function Story({ unitId }: { unitId: string }) {
     const xp = 10 + correct * 10, gems = correct * 2;
     setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
     completeStep(`story:${unitId}`, xp);
+    sfx("done");
     setResult({ xp, gems });
   };
-  const check = () => { setChecked(true); if (sel === q!.answer) setCorrect((c) => c + 1); };
+  const check = () => { setChecked(true); sfx(sel === q!.answer ? "ok" : "bad"); if (sel === q!.answer) setCorrect((c) => c + 1); };
 
   const title = story?.title ?? unit?.title ?? "";
   let body: React.ReactNode, footer: React.ReactNode;
@@ -228,6 +229,7 @@ export function Chat({ who }: { who: CharacterId }) {
     const xp = mine * 5 + clean * 5 + (goal ? 20 : 0), gems = goal ? 10 : 0;
     setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
     gainXp(xp);
+    sfx("done");
     setResult({ xp, gems });
   };
   const over = goal || mine >= CHAT_TURNS;

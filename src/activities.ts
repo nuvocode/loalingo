@@ -103,7 +103,15 @@ export function systemPrompt(c: Pick<LessonContext, "course" | "level" | "native
   ].join("\n");
 }
 
-export function lessonPrompt(c: LessonContext, acts: LessonActivity[]) {
+/** One line per past mistake for the prompt (PLAN §3.3); learn/match items carry no single answer. */
+export function mistakeLine(it: Item): string | null {
+  if (it.kind === "choice") return `${it.prompt} → ${it.options[it.answer]}`;
+  if (it.kind === "input") return `${it.prompt} → ${it.answer}`;
+  if (it.kind === "bank") return `${it.prompt} → ${it.answer.join(" ")}`;
+  return null;
+}
+
+export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes: string[] = []) {
   const st = c.step;
   return [
     `Unit: ${c.unitTitle}`, `Step: ${st.title}${st.description ? ` — ${st.description}` : ""}`,
@@ -111,6 +119,8 @@ export function lessonPrompt(c: LessonContext, acts: LessonActivity[]) {
     st.grammar.length ? `Grammar patterns: ${st.grammar.map((g) => g.pattern).join(" | ")}` : "",
     "", "Write these exercise groups (field name → exactly N items):",
     ...acts.map((a) => `- ${a.key}: ${a.count} × ${a.type}. ${REGISTRY[a.type]!.guide}${Object.keys(a.hints).length ? ` Hints: ${JSON.stringify(a.hints)}` : ""}`),
+    mistakes.length ? `\nThe learner recently got these wrong (exercise → correct answer):\n${mistakes.map((m) => `- ${m}`).join("\n")}\n` +
+      "Where it fits this step's topic, reuse 1–2 of these words or patterns in new exercises. Do not copy them, and stay on the step's topic." : "",
   ].filter((l) => l !== "").join("\n");
 }
 

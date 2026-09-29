@@ -315,6 +315,8 @@ svg{display:block}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
+/* Settings → Reduce motion (same rule, opt-in per profile) */
+:root[data-motion="reduce"] *,:root[data-motion="reduce"] *::before,:root[data-motion="reduce"] *::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
 
 /* ===== additions (not in design export) ===== */
 /* Design bug: icons outside nav/node/stat had no size and rendered 0×0 (guidebook, quests, chest, result, cards). */
@@ -336,7 +338,9 @@ svg{display:block}
 .swatch[aria-checked="true"]{border-color:var(--card);box-shadow:0 0 0 3px var(--blue)}
 .course-chip{border:2px solid var(--border);border-radius:12px;padding:2px 8px;font-size:18px}
 /* First node is the current one: leave room for its start tag under the sticky unit header. */
-.path:has(> .node:nth-child(2) .start-tag){padding-top:48px}
+.path:has(> .node:nth-child(2) .start-tag){padding-top:24px}
+/* The tag sits 30px above its node and covered the previous node's label: make room for it. */
+.path > .node:has(.start-tag){margin-top:24px}
 .gen-pulse{animation:bob 1.2s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.gen-pulse{animation:none}}
 

@@ -2,7 +2,7 @@
 
 export type Quest = { id: "q1" | "q2" | "q3"; icon: "bolt" | "book" | "dumbbell"; cur: number; goal: number };
 export type Stats = {
-  hearts: number; maxHearts: number; heartsOn: boolean;
+  hearts: number; maxHearts: number; heartsOn: boolean; soundOn: boolean; reduceMotion: boolean;
   streak: number; bestStreak: number; streakFreeze: number;
   gems: number; todayXp: number; bestDayXp: number; chests: number;
   day: string; lastActive: string | null; // local dates, YYYY-MM-DD
@@ -16,7 +16,7 @@ const QUESTS: Quest[] = [
   { id: "q3", icon: "dumbbell", cur: 0, goal: 1 },
 ];
 export const NEW_STATS: Stats = {
-  hearts: 5, maxHearts: 5, heartsOn: true, streak: 0, bestStreak: 0, streakFreeze: 0,
+  hearts: 5, maxHearts: 5, heartsOn: true, soundOn: true, reduceMotion: false, streak: 0, bestStreak: 0, streakFreeze: 0,
   gems: 0, todayXp: 0, bestDayXp: 0, chests: 0, day: "", lastActive: null, quests: QUESTS,
 };
 

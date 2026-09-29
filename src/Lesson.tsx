@@ -36,6 +36,24 @@ export function say(text: string, lang: string) {
   speechSynthesis.speak(u);
 }
 
+/** Short synthesized cues (Web Audio, no sound files); App keeps `sfxState.on` in sync with the setting. */
+export const sfxState = { on: true };
+let actx: AudioContext | undefined;
+export function sfx(kind: "ok" | "bad" | "done") {
+  if (!sfxState.on) return;
+  actx ??= new AudioContext();
+  const notes = { ok: [660, 880], bad: [220, 175], done: [523, 659, 784] }[kind];
+  notes.forEach((f, i) => {
+    const o = actx!.createOscillator(), g = actx!.createGain(), at = actx!.currentTime + i * 0.1;
+    o.type = kind === "bad" ? "triangle" : "sine";
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0.12, at);
+    g.gain.exponentialRampToValueAtTime(0.001, at + 0.18);
+    o.connect(g).connect(actx!.destination);
+    o.start(at); o.stop(at + 0.2);
+  });
+}
+
 /** Items of the practice modes, built from the learner's own data (Faz 3). `mistakeId` links a replayed mistake. */
 type PItem = Item & { mistakeId?: number };
 async function practiceItems(id: string, enrollmentId: number, listenPrompt: string): Promise<PItem[]> {
@@ -125,6 +143,7 @@ export function Lesson({ id }: { id: string }) {
       db.addWords(enrollment.id, list.flatMap((x): [string, string][] =>
         x.kind === "learn" ? [[x.phrase, x.translation]] : x.kind === "match" ? x.pairs : []));
     }
+    sfx(passed === false ? "bad" : "done");
     setResult({ xp, acc, gems, passed, required });
   };
 
@@ -146,6 +165,7 @@ export function Lesson({ id }: { id: string }) {
       setS((s) => ({ ...s, hearts }));
       if (hearts <= 0) openSheet(<HeartsOut onEnd={quit} />);
     }
+    sfx(ok ? "ok" : "bad");
     setFb({ ok, correct, given, note });
   };
 
@@ -179,6 +199,7 @@ export function Lesson({ id }: { id: string }) {
     if (done.length === it.pairs.length * 2) {
       const ok = matched.misses <= 1; // ponytail: one slip allowed, no heart loss inside match
       if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
+      sfx(ok ? "ok" : "bad");
       setFb({ ok, correct: it.pairs.map((p) => `${p[0]} = ${p[1]}`).join(", "), given: "" });
     }
   };
