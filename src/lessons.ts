@@ -180,7 +180,7 @@ export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, his
   const ch = CHARACTERS[who], native = langEn(c.native);
   const system = [
     `You are ${ch.name} in a roleplay inside a language-learning app. ${ch.persona} The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}. The learner's goal: ${topic.goal}.`,
-    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal, in your own manner. \`translation\`: the reply in ${native}.`,
+    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal, in your own manner. Always ${c.course.name}, even when the learner or the goal is written in another language. \`translation\`: the reply in ${native}.`,
     `\`correction\`: if the learner's last message has a mistake, the corrected sentence and a very short explanation in ${native}; otherwise "". Ignore capitalization and punctuation.`,
     "`goal_reached`: true once the learner has achieved the goal; then wrap up the scene politely in `reply`. If the goal is an open conversation, keep it false unless the learner clearly wraps up.",
     "Respond only with JSON matching the schema.",
@@ -189,7 +189,7 @@ export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, his
   const prompt = last
     ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
       `Check only this last learner message for \`correction\` (earlier ones were already corrected): "${last.text}"\nThen write ${ch.name}'s next turn.`
-    : "Open the scene with a short greeting that invites the learner to start.";
+    : "Open the scene: a short greeting that leads straight into the goal and invites the learner to start.";
   return generate(turnSchema, system, prompt);
 }
 
