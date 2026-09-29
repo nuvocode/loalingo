@@ -6,7 +6,14 @@
     "newerTitle": "Bu veri daha yeni bir sürümden",
     "newerDesc": "Verilerin loalingo'nun daha yeni bir sürümüyle kaydedilmiş. Açmak için uygulamayı güncelle. Bu sürüm verilere dokunmaz.",
     "failedTitle": "loalingo verilerini açamadı",
-    "failedDesc": "Veritabanı açılırken bir sorun oluştu. Ayrıntılar:"
+    "failedDesc": "Veritabanı açılırken bir sorun oluştu. Ayrıntılar:",
+    "unreachableTitle": "Veri klasörüne ulaşılamıyor",
+    "unreachableDesc": "Diski tak ya da klasörün erişilebilir olduğundan emin ol, sonra tekrar dene.",
+    "lockedTitle": "Verilerin {{device}} üzerinde açık",
+    "lockedDesc": "Orada loalingo'yu kapat, sonra tekrar dene. Devralırsan o cihazın henüz kaydetmediği değişiklikler kaybolabilir.",
+    "retry": "Tekrar dene",
+    "takeOver": "Devral",
+    "useDefault": "Varsayılan klasörü kullan"
   },
   "nav": {
     "main": "Ana gezinme",
@@ -380,5 +387,31 @@
     "install": "Güncelle ve yeniden başlat",
     "later": "Sonra",
     "downloading": "İndiriliyor… %{{pct}}"
+  },
+  "data": {
+    "section": "Veri",
+    "folder": "Veri klasörü",
+    "default": "Varsayılan klasör",
+    "desktopOnly": "Yalnızca masaüstü uygulamasında",
+    "title": "Verilerin",
+    "hint": "Birden çok Mac'te kullanmak için harici bir diskte ya da eşitlenen bir klasörde (iCloud Drive, Google Drive) tut. Aynı anda yalnızca bir cihaz açabilir.",
+    "note": "Cihaz değiştirmeden önce uygulamayı kapat.",
+    "move": "Klasörü değiştir",
+    "useDefault": "Varsayılan klasörü kullan",
+    "export": "Dışa aktar",
+    "import": "İçe aktar",
+    "reveal": "Finder'da göster",
+    "existsTitle": "Bu klasörde zaten loalingo verisi var",
+    "useThere": "Oradaki veriyi kullan",
+    "copyThere": "Bu cihazdaki veriyi oraya kopyala",
+    "copyNote": "Kopyalarsan oradaki mevcut veri yedekler klasörüne taşınır.",
+    "importTitle": "Verilerin bu dosyayla değiştirilsin mi?",
+    "importDesc": "Mevcut verilerin yedekler klasöründe saklanır. Uygulama yeniden başlar.",
+    "importConfirm": "Değiştir ve yeniden başlat",
+    "exported": "Veriler dışa aktarıldı",
+    "lockedThere": "O klasör {{device}} üzerinde açık",
+    "notDb": "Bu dosya bir loalingo veritabanı değil",
+    "failed": "Olmadı: {{error}}",
+    "fileType": "loalingo verisi"
   }
 }

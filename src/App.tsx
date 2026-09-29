@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "./icons";
 import { useApp, type BootError, type Route } from "./store";
@@ -6,6 +6,7 @@ import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
 import { reminderDue, today } from "./progress";
 import { keepInBackground, notify } from "./notify";
+import { takeOver, resetDataDir } from "./datadir";
 import { findUpdate, UpdateSheet } from "./Update";
 import { Chat, Story } from "./Talk";
 import type { CharacterId } from "./lessons";
@@ -40,6 +41,23 @@ function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
 
 function BootErrorScreen({ e }: { e: BootError }) {
   const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+  const act = (f: () => Promise<void> | void) => async () => { setBusy(true); try { await f(); } catch (x) { console.error(x); setBusy(false); } };
+  // Data folder / lock (spec B): retrying is a reload, the boot sequence checks everything again.
+  const retry = <button className="btn btn-primary btn-block" disabled={busy} onClick={() => location.reload()}>{t("boot.retry")}</button>;
+  if (e.kind === "unreachable" || e.kind === "locked") return (
+    <div className="boot-error" role="alert">
+      <div className="card od-stack" style={{ "--od-gap": "10px" } as React.CSSProperties}>
+        <h3>{t(e.kind === "locked" ? "boot.lockedTitle" : "boot.unreachableTitle", { device: e.detail })}</h3>
+        <p className="muted">{t(e.kind === "locked" ? "boot.lockedDesc" : "boot.unreachableDesc")}</p>
+        {e.kind === "unreachable" && <pre className="boot-detail">{e.detail}</pre>}
+        {retry}
+        {e.kind === "locked"
+          ? <button className="btn btn-ghost btn-block" disabled={busy} onClick={act(takeOver)}>{t("boot.takeOver")}</button>
+          : <button className="btn btn-ghost btn-block" disabled={busy} onClick={act(resetDataDir)}>{t("boot.useDefault")}</button>}
+      </div>
+    </div>
+  );
   const future = e.kind === "future";
   return (
     <div className="boot-error" role="alert">

@@ -1,4 +1,4 @@
-// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql (`loalingo.db` in the app config dir).
+// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql, `loalingo.db` in the data folder (spec B, src/datadir.ts).
 // Schema changes live in src/migrations.ts and run on open (spec A).
 // ponytail: in a plain browser (the Vite preview used during development) the same SQL runs on sql.js,
 // persisted to localStorage. Never used in the shipped app.
@@ -8,22 +8,11 @@ import { NEW_STATS, type Stats } from "./progress";
 import { runMigrations, type SqlDb } from "./migrate";
 import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
+import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
 type Db = SqlDb;
-
-async function tauriDb(): Promise<Db> {
-  const { default: Database } = await import("@tauri-apps/plugin-sql");
-  return Database.load("sqlite:loalingo.db");
-}
-
-/** Consistent copy of the live database next to it before a migration (VACUUM INTO works under WAL, no Rust needed). */
-async function tauriBackup(d: Db, target: number) {
-  const { appConfigDir, join } = await import("@tauri-apps/api/path");
-  const file = await join(await appConfigDir(), `loalingo.pre-v${target}-${Date.now()}.db`);
-  await d.execute(`VACUUM INTO '${file.replace(/'/g, "''")}'`);
-}
 
 async function browserDb(): Promise<Db> {
   const [{ default: init }, { default: wasm }] = await Promise.all([import("sql.js"), import("sql.js/dist/sql-wasm.wasm?url")]);
@@ -38,11 +27,17 @@ let dbP: Promise<Db> | null = null;
 export const isTauri = "__TAURI_INTERNALS__" in window;
 function db() {
   return (dbP ??= (async () => {
-    const d = await (isTauri ? tauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("loalingo needs the Tauri shell")));
-    await runMigrations(d, MIGRATIONS, isTauri ? (v) => tauriBackup(d, v) : undefined);
+    const d = await (isTauri ? openTauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("loalingo needs the Tauri shell")));
+    await runMigrations(d, MIGRATIONS, isTauri ? (v) => snapshot(d, `pre-v${v}-${Date.now()}.db`).then(() => {}) : undefined);
+    if (isTauri) await dailyBackup(d).catch((e) => console.error("daily backup", e));
     return d;
   })());
 }
+
+/** Opens (and migrates) the database now; the boot sequence calls this first so folder/lock errors surface there. */
+export const openDb = () => db().then(() => {});
+/** Tauri: consistent copy of the live database into `<dataDir>/backups/<name>`, returns its path. */
+export const backupNow = async (name: string) => snapshot(await db(), name);
 
 // ---- Types ----
 

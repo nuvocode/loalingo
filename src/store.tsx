@@ -8,6 +8,7 @@ import { activateConfig, loadAiConfig, saveAiConfig, type AiConfig } from "./ai"
 import type { Enrollment, Profile, Stats } from "./db";
 import { rollDay, today } from "./progress";
 import { FutureSchemaError } from "./migrate";
+import { DataDirError, LockedError, startHeartbeat } from "./datadir";
 
 export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings";
 const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings"];
@@ -34,7 +35,12 @@ async function loadCourses() {
 
 export const LAST_PROFILE = "last_profile";
 
-export type BootError = { kind: "future" | "failed"; detail: string };
+/** `detail`: the folder for "unreachable", the other device for "locked", the error message otherwise. */
+export type BootError = { kind: "future" | "failed" | "unreachable" | "locked"; detail: string };
+const bootErrorOf = (e: unknown): BootError =>
+  e instanceof DataDirError ? { kind: "unreachable", detail: e.dir }
+  : e instanceof LockedError ? { kind: "locked", detail: e.device }
+  : { kind: e instanceof FutureSchemaError ? "future" : "failed", detail: e instanceof Error ? e.message : String(e) };
 
 type Ctx = {
   ready: boolean;
@@ -106,6 +112,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
+        await db.openDb();
+        if (db.isTauri) startHeartbeat((device) => setBootError({ kind: "locked", detail: device }));
         const cfg = await loadAiConfig();
         await activateConfig(cfg);
         setAiState(cfg);
@@ -119,7 +127,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setReady(true);
       } catch (e) {
         console.error(e);
-        setBootError({ kind: e instanceof FutureSchemaError ? "future" : "failed", detail: e instanceof Error ? e.message : String(e) });
+        setBootError(bootErrorOf(e));
       }
     })();
   }, [login]);

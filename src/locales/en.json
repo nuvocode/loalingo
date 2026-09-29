@@ -6,7 +6,14 @@
     "newerTitle": "This data is from a newer version",
     "newerDesc": "Your data was saved by a newer version of loalingo. Update the app to open it. This version won't change it.",
     "failedTitle": "loalingo couldn't open your data",
-    "failedDesc": "Something went wrong while opening the database. Details:"
+    "failedDesc": "Something went wrong while opening the database. Details:",
+    "unreachableTitle": "Can't reach the data folder",
+    "unreachableDesc": "Plug in the drive or make sure the folder is available, then try again.",
+    "lockedTitle": "Your data is open on {{device}}",
+    "lockedDesc": "Close loalingo there, then try again. If you take over, changes that device hasn't saved yet may be lost.",
+    "retry": "Try again",
+    "takeOver": "Take over",
+    "useDefault": "Use the default folder"
   },
   "nav": {
     "main": "Main navigation",
@@ -385,5 +392,31 @@
     "install": "Update and restart",
     "later": "Later",
     "downloading": "Downloading… {{pct}}%"
+  },
+  "data": {
+    "section": "Data",
+    "folder": "Data folder",
+    "default": "Default folder",
+    "desktopOnly": "Only available in the desktop app",
+    "title": "Your data",
+    "hint": "Keep it on an external drive or a synced folder (iCloud Drive, Google Drive) to use it on more than one Mac. Only one device can have it open at a time.",
+    "note": "Close the app before switching devices.",
+    "move": "Change folder",
+    "useDefault": "Use the default folder",
+    "export": "Export",
+    "import": "Import",
+    "reveal": "Show in Finder",
+    "existsTitle": "This folder already has loalingo data",
+    "useThere": "Use the data there",
+    "copyThere": "Copy this device's data there",
+    "copyNote": "If you copy, the data already there moves to its backups folder.",
+    "importTitle": "Replace your data with this file?",
+    "importDesc": "Your current data is kept in the backups folder. The app restarts.",
+    "importConfirm": "Replace and restart",
+    "exported": "Data exported",
+    "lockedThere": "That folder is open on {{device}}",
+    "notDb": "That file isn't a loalingo database",
+    "failed": "That didn't work: {{error}}",
+    "fileType": "loalingo data"
   }
 }
