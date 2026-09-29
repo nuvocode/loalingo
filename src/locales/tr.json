@@ -26,7 +26,6 @@
     "kicker": "{{level}} · Ünite {{unit}}",
     "start": "Başla",
     "guidebook": "Rehber",
-    "guidebookToast": "Rehber yakında — önce mevcut dersi bitir",
     "chest": "Ünite sandığı",
     "levels": "Seviyeler",
     "levelDone": "Tamamlandı — istediğin zaman tekrar et",
@@ -46,7 +45,10 @@
     "legendary": "Efsanevi",
     "review": "Tekrar et",
     "legendDesc": "Efsanevi sürümü dene: öğretici kart yok, bir seviye daha zor. Dersi altına çevirmek için %{{score}} al.",
-    "legendDone": "Bu ders Efsanevi. Meydan okumayı yeniden oyna ya da tekrar et."
+    "legendDone": "Bu ders Efsanevi. Meydan okumayı yeniden oyna ya da tekrar et.",
+    "guideWords": "Kelimeler",
+    "guideGrammar": "Gramer",
+    "guideNoAi": "Çeviri, örnek ve açıklamalar için Ayarlar'dan bir yapay zekâ sağlayıcısı kur."
   },
   "practice": {
     "title": "Pratik Merkezi",

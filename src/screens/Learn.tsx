@@ -1,9 +1,10 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
-import { LEGEND_PASS } from "../lessons";
+import { LEGEND_PASS, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
+import { say } from "../Lesson";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -49,7 +50,7 @@ const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
 
 function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
   const { t } = useTranslation();
-  const { toast, setS, completeStep, openSheet, closeSheet, legendary } = useApp();
+  const { setS, completeStep, openSheet, closeSheet, legendary } = useApp();
   const start = useStartLesson();
   // Done steps: review, or the Legendary version (gold once passed).
   const doneStep = (n: PathNode) => openSheet(<>
@@ -70,7 +71,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
       <div className={`unit-head ${u.theme}`}>
         <div className="uh-row">
           <div><span className="uh-kicker">{t("learn.kicker", { level, unit: u.index })}</span><h2>{u.title}</h2></div>
-          <button className="guidebook" onClick={() => toast(t("learn.guidebookToast"))}><Icon name="book" /><span>{t("learn.guidebook")}</span></button>
+          <button className="guidebook" onClick={() => openSheet(<GuideSheet unitId={u.id} level={level} />)}><Icon name="book" /><span>{t("learn.guidebook")}</span></button>
         </div>
       </div>
       <div className="path">
@@ -98,6 +99,43 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
       </div>
     </section>
   );
+}
+
+function GuideSheet({ unitId, level }: { unitId: string; level: Cefr }) {
+  const { t } = useTranslation();
+  const { course, enrollment, profile, ai, closeSheet } = useApp();
+  const unit = course!.levels[level]!.units.find((u) => u.id === unitId)!;
+  const lang = course!.iso;
+  const [guide, setGuide] = useState<Guide | null>(null);
+  const [err, setErr] = useState("");
+  useEffect(() => {
+    if (ai) loadGuide(enrollment!.id, { course: course!, level, native: profile!.native_lang }, unit).then(setGuide, (e) => setErr((e as Error).message));
+  }, [unitId]);
+  // Until the AI answers (or without AI), the plain YAML lists are shown.
+  const words = guide?.vocabulary ?? unitWords(unit).map((word) => ({ word, translation: "", example: "", example_translation: "" }));
+  const grammar = guide?.grammar ?? unitGrammar(unit).map((pattern) => ({ pattern, explanation: "", example: "" }));
+  return <div className="guide">
+    <h3>{t("learn.guidebook")} · {unit.title}</h3>
+    {!guide && <p className="small" role="status">{!ai ? t("learn.guideNoAi") : err ? `${t("ai.failed")}: ${err}` : t("ai.thinking")}</p>}
+    <h4>{t("learn.guideWords")}</h4>
+    <div className="guide-words">
+      {words.map((w) => (
+        <button key={w.word} className="card guide-word" onClick={() => say(w.word, lang)}>
+          <b lang={lang}><Icon name="headphones" /> {w.word}</b>{w.translation && <span className="muted">{w.translation}</span>}
+          {w.example && <small lang={lang}>{w.example}</small>}{w.example_translation && <small className="muted">{w.example_translation}</small>}
+        </button>
+      ))}
+    </div>
+    {grammar.length > 0 && <h4>{t("learn.guideGrammar")}</h4>}
+    {grammar.map((g) => (
+      <div key={g.pattern} className="card" style={{ marginBottom: 10 }}>
+        <b lang={lang}>{g.pattern}</b>
+        {g.explanation && <p className="small" style={{ margin: "4px 0" }}>{g.explanation}</p>}
+        {g.example && <button className="prompt-word" lang={lang} onClick={() => say(g.example, lang)}><Icon name="headphones" /> {g.example}</button>}
+      </div>
+    ))}
+    <button className="btn btn-primary btn-block" style={{ marginTop: 12 }} onClick={closeSheet}>{t("lesson.gotIt")}</button>
+  </div>;
 }
 
 function LevelSheet() {

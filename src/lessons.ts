@@ -177,3 +177,26 @@ export function chatTurn(c: Base, who: CharacterId, history: ChatMsg[]) {
     : "Open the scene with a short greeting that invites the learner to start.";
   return generate(turnSchema, system, prompt);
 }
+
+// ---- Guidebook (DECISIONS B8): the unit's vocabulary and grammar, explained once and cached ----
+
+const guideSchema = z.object({
+  vocabulary: z.array(z.object({ word: z.string(), translation: z.string(), example: z.string(), example_translation: z.string() })),
+  grammar: z.array(z.object({ pattern: z.string(), explanation: z.string(), example: z.string() })),
+});
+export type Guide = z.infer<typeof guideSchema>;
+export const unitWords = (u: Unit) => [...new Set(u.steps.flatMap((s) => s.vocabulary))];
+export const unitGrammar = (u: Unit) => [...new Set(u.steps.flatMap((s) => s.grammar.map((g) => g.pattern)))];
+
+export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Promise<Guide> {
+  const key = `guide:${unit.id}`;
+  const cached = await getCached<Guide>(enrollmentId, key);
+  if (cached) return cached;
+  const g = await generate(guideSchema, systemPrompt(c), [
+    `Write a study guide for the unit "${unit.title}".`,
+    `vocabulary: one entry per word, in this order: ${unitWords(unit).join(", ")}. \`translation\` in the learner's language; \`example\` a short ${c.level} sentence using it, with \`example_translation\`.`,
+    `grammar: one entry per pattern, in this order: ${unitGrammar(unit).join(" | ")}. \`explanation\`: 1–2 plain sentences in the learner's language; \`example\`: one target-language sentence.`,
+  ].join("\n"));
+  await putCached(enrollmentId, key, g);
+  return g;
+}

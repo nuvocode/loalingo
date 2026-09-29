@@ -26,7 +26,6 @@
     "kicker": "{{level}} · Unit {{unit}}",
     "start": "Start",
     "guidebook": "Guidebook",
-    "guidebookToast": "Guidebook coming soon — finish the current lesson first",
     "chest": "Unit chest",
     "levels": "Levels",
     "levelDone": "Completed — review anytime",
@@ -46,7 +45,10 @@
     "legendary": "Legendary",
     "review": "Review",
     "legendDesc": "Take the Legendary version: no teaching cards, one level harder. Score {{score}}% to turn this lesson gold.",
-    "legendDone": "This lesson is Legendary. Play the challenge again or review it."
+    "legendDone": "This lesson is Legendary. Play the challenge again or review it.",
+    "guideWords": "Vocabulary",
+    "guideGrammar": "Grammar",
+    "guideNoAi": "Set up an AI provider in Settings to get translations, examples and explanations."
   },
   "practice": {
     "title": "Practice Hub",

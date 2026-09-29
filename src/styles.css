@@ -352,3 +352,14 @@ button.bubble:hover{border-color:var(--blue)}
 .bubble .fix svg{width:16px;height:16px;flex:none;margin-top:2px}
 .bubble.typing{color:var(--text-muted);letter-spacing:3px}
 .story-line{max-width:100%}
+
+/* Guidebook sheet (DECISIONS B8; not in the design) */
+.sheet:has(.guide){max-width:620px;max-height:85vh;overflow-y:auto;text-align:left}
+.guide h3{text-align:center}
+.guide h4{font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 8px}
+.guide-words{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.guide-word{display:flex;flex-direction:column;gap:2px;text-align:left;font:inherit;color:var(--text);cursor:pointer;padding:12px}
+.guide-word:hover{border-color:var(--blue)}
+.guide-word b{display:flex;gap:6px;align-items:center}
+.guide-word b svg{width:16px;height:16px;color:var(--blue)}
+.guide .card .prompt-word{margin-top:4px}
