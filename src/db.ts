@@ -1,40 +1,28 @@
 // SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql (`loalingo.db` in the app config dir).
+// Schema changes live in src/migrations.ts and run on open (spec A).
 // ponytail: in a plain browser (the Vite preview used during development) the same SQL runs on sql.js,
 // persisted to localStorage. Never used in the shipped app.
 import type { Cefr } from "./course";
 import type { ThemePref } from "./theme";
 import { NEW_STATS, type Stats } from "./progress";
+import { runMigrations, type SqlDb } from "./migrate";
+import { MIGRATIONS } from "./migrations";
+import { wrapSqlJs } from "./sqljs";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
-type Db = { select<T = Row>(sql: string, args?: unknown[]): Promise<T[]>; execute(sql: string, args?: unknown[]): Promise<{ lastInsertId?: number }> };
-
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS device_settings(key TEXT PRIMARY KEY, value TEXT);
-CREATE TABLE IF NOT EXISTS profiles(
-  id INTEGER PRIMARY KEY, name TEXT NOT NULL, color TEXT NOT NULL, pin_hash TEXT,
-  ui_lang TEXT NOT NULL, theme TEXT NOT NULL DEFAULT 'system', native_lang TEXT NOT NULL,
-  active_enrollment_id INTEGER, stats TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
-CREATE TABLE IF NOT EXISTS enrollments(
-  id INTEGER PRIMARY KEY, profile_id INTEGER NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  course_iso TEXT NOT NULL, level TEXT NOT NULL, xp INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(profile_id, course_iso));
-CREATE TABLE IF NOT EXISTS step_progress(
-  enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, step_id TEXT NOT NULL,
-  state TEXT NOT NULL, legendary INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(enrollment_id, step_id));
-CREATE TABLE IF NOT EXISTS content_cache(
-  enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, step_id TEXT NOT NULL,
-  content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, step_id));
-CREATE TABLE IF NOT EXISTS mistakes(
-  id INTEGER PRIMARY KEY, enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE,
-  item TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(enrollment_id, item));
-CREATE TABLE IF NOT EXISTS words(
-  enrollment_id INTEGER NOT NULL REFERENCES enrollments(id) ON DELETE CASCADE, word TEXT NOT NULL, translation TEXT NOT NULL,
-  strength INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(enrollment_id, word))`;
+type Db = SqlDb;
 
 async function tauriDb(): Promise<Db> {
   const { default: Database } = await import("@tauri-apps/plugin-sql");
   return Database.load("sqlite:loalingo.db");
+}
+
+/** Consistent copy of the live database next to it before a migration (VACUUM INTO works under WAL, no Rust needed). */
+async function tauriBackup(d: Db, target: number) {
+  const { appConfigDir, join } = await import("@tauri-apps/api/path");
+  const file = await join(await appConfigDir(), `loalingo.pre-v${target}-${Date.now()}.db`);
+  await d.execute(`VACUUM INTO '${file.replace(/'/g, "''")}'`);
 }
 
 async function browserDb(): Promise<Db> {
@@ -43,23 +31,7 @@ async function browserDb(): Promise<Db> {
   const KEY = "loalingo.devdb";
   const saved = localStorage.getItem(KEY);
   const db = new SQL.Database(saved ? Uint8Array.from(atob(saved), (c) => c.charCodeAt(0)) : undefined);
-  // `$1` placeholders (plugin-sql style) are named parameters to SQLite, so bind them by name.
-  const bind = (args: unknown[] = []) => Object.fromEntries(args.map((v, i) => [`$${i + 1}`, v ?? null])) as any;
-  return {
-    async select(sql, args) {
-      const st = db.prepare(sql); st.bind(bind(args));
-      const rows: any[] = [];
-      while (st.step()) rows.push(st.getAsObject());
-      st.free();
-      return rows;
-    },
-    async execute(sql, args) {
-      db.run(sql, bind(args));
-      const id = db.exec("SELECT last_insert_rowid()")[0].values[0][0] as number;
-      localStorage.setItem(KEY, btoa(String.fromCharCode(...db.export())));
-      return { lastInsertId: id };
-    },
-  };
+  return wrapSqlJs(db, () => localStorage.setItem(KEY, btoa(String.fromCharCode(...db.export()))));
 }
 
 let dbP: Promise<Db> | null = null;
@@ -67,7 +39,7 @@ export const isTauri = "__TAURI_INTERNALS__" in window;
 function db() {
   return (dbP ??= (async () => {
     const d = await (isTauri ? tauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("loalingo needs the Tauri shell")));
-    for (const stmt of SCHEMA.split(";")) await d.execute(stmt);
+    await runMigrations(d, MIGRATIONS, isTauri ? (v) => tauriBackup(d, v) : undefined);
     return d;
   })());
 }
