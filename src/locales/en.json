@@ -345,7 +345,17 @@
     "empty": "This lesson has no exercises.",
     "regenerate": "Generate new exercises",
     "thinking": "Thinking…",
-    "notSet": "Not set up — lessons are locked"
+    "notSet": "Not set up — lessons are locked",
+    "scanning": "Looking for a local model on this Mac…",
+    "foundLocal": "{{name}} found on this Mac — pick a model and save.",
+    "noModels": "Ollama is running but has no models yet",
+    "pullDesc": "Download {{model}} ({{size}}). It runs on this Mac, free and offline.",
+    "pull": "Download {{model}}",
+    "pulling": "Downloading… {{pct}}%",
+    "noLocal": "No local model found",
+    "noLocalDesc": "Install the free Ollama app, open it, then check again. Or pick a cloud provider above.",
+    "getOllama": "Get Ollama",
+    "rescan": "Check again"
   },
   "stt": {
     "idle": "Tap to speak",
@@ -357,5 +367,16 @@
     "failed": "Speech recognition failed",
     "unavailable": "Speaking needs the desktop app with the speech model.",
     "off": "Speaking exercises are off in Settings."
+  },
+  "update": {
+    "section": "Updates",
+    "version": "loalingo {{version}}",
+    "desc": "New versions download from GitHub and install after a restart",
+    "check": "Check",
+    "none": "You're on the latest version",
+    "title": "loalingo {{version}} is available",
+    "install": "Update and restart",
+    "later": "Later",
+    "downloading": "Downloading… {{pct}}%"
   }
 }

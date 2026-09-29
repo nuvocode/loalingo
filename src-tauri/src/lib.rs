@@ -142,6 +142,9 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_autostart::Builder::new().args([HIDDEN_ARG]).build())
         .setup(|app| {
             // The window starts invisible (tauri.conf.json); a login launch keeps it that way.

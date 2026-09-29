@@ -10,6 +10,9 @@
     "sql:default",
     "sql:allow-execute",
     "notification:default",
+    "opener:default",
+    "updater:default",
+    "process:allow-restart",
     {
       "identifier": "http:default",
       "allow": [

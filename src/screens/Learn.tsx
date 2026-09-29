@@ -5,6 +5,7 @@ import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
 import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
 import { say } from "../Lesson";
+import { AiSheet } from "./Settings";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -202,13 +203,17 @@ function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number
   );
 }
 
+let setupOffered = false;
+
 export function Learn() {
   const { t } = useTranslation();
-  const { course, enrollment, done, viewLevel, openSheet, courseErrors, ai, go } = useApp();
+  const { course, enrollment, done, viewLevel, openSheet, courseErrors, ai } = useApp();
+  // First run (DECISIONS C6): offer setup once per launch; the banner stays until a provider is saved.
+  useEffect(() => { if (!ai && !setupOffered) { setupOffered = true; openSheet(<AiSheet />); } }, [ai]);
   const setup = !ai && (
     <div className="soon-banner" role="status" style={{ borderColor: "var(--blue)" }}>
       <span className="od-field od-fill"><b>{t("ai.needed")}</b><span className="small">{t("ai.neededDesc")}</span></span>
-      <button className="btn btn-blue" onClick={() => go("settings")}>{t("ai.setUp")}</button>
+      <button className="btn btn-blue" onClick={() => openSheet(<AiSheet />)}>{t("ai.setUp")}</button>
     </div>
   );
   const errors = courseErrors.length > 0 && (

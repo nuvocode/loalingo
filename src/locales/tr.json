@@ -340,7 +340,17 @@
     "empty": "Bu derste alıştırma yok.",
     "regenerate": "Yeni alıştırmalar üret",
     "thinking": "Düşünüyor…",
-    "notSet": "Kurulmadı — dersler kilitli"
+    "notSet": "Kurulmadı — dersler kilitli",
+    "scanning": "Bu Mac'te yerel model aranıyor…",
+    "foundLocal": "Bu Mac'te {{name}} bulundu — bir model seçip kaydet.",
+    "noModels": "Ollama çalışıyor ama henüz modeli yok",
+    "pullDesc": "{{model}} modelini indir ({{size}}). Bu Mac'te ücretsiz ve çevrimdışı çalışır.",
+    "pull": "{{model}} indir",
+    "pulling": "İndiriliyor… %{{pct}}",
+    "noLocal": "Yerel model bulunamadı",
+    "noLocalDesc": "Ücretsiz Ollama uygulamasını kur, aç ve tekrar kontrol et. Ya da yukarıdan bir bulut sağlayıcısı seç.",
+    "getOllama": "Ollama'yı indir",
+    "rescan": "Tekrar kontrol et"
   },
   "stt": {
     "idle": "Konuşmak için dokun",
@@ -352,5 +362,16 @@
     "failed": "Ses tanıma başarısız",
     "unavailable": "Konuşma, ses modeli olan masaüstü uygulamasında çalışır.",
     "off": "Konuşma egzersizleri Ayarlar'da kapalı."
+  },
+  "update": {
+    "section": "Güncellemeler",
+    "version": "loalingo {{version}}",
+    "desc": "Yeni sürümler GitHub'dan iner ve yeniden başlatınca kurulur",
+    "check": "Denetle",
+    "none": "En güncel sürümdesin",
+    "title": "loalingo {{version}} hazır",
+    "install": "Güncelle ve yeniden başlat",
+    "later": "Sonra",
+    "downloading": "İndiriliyor… %{{pct}}"
   }
 }

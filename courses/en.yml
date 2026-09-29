@@ -1563,3 +1563,569 @@ levels:
         - { type: listen_select, count: 3 }
         - { type: translate, count: 3 }
         - { type: dialogue }
+
+  B2:
+    title: Upper Intermediate
+    description: >
+      Understand complex texts, interact with fluency and spontaneity, and produce clear, detailed
+      text on a wide range of subjects, explaining a viewpoint on a topical issue.
+
+    units:
+      - id: regrets-and-hypotheticals
+        title: Regrets & Hypotheticals
+        description: Talk about the past you can't change and imagine how things could have been different.
+        icon: 🌀
+        steps:
+          - id: third-conditional
+            title: Third Conditional
+            description: Talk about imaginary past situations and their imaginary results.
+            vocabulary: ["would have", "wouldn't have", "if I had known", regret, unlikely]
+            grammar:
+              - pattern: "If I had studied harder, I would have passed the exam."
+              - pattern: "If she hadn't left early, she wouldn't have missed the train."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: mixed-conditionals
+            title: Mixed Conditionals
+            description: Combine past causes with present results and present causes with past results.
+            vocabulary: ["mixed conditional", "would be", "had been", consequence]
+            grammar:
+              - pattern: "If I hadn't taken that job, I wouldn't be living here now."
+              - pattern: "If she were more organized, she would have finished on time."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: wish-and-if-only
+            title: Wish & If Only
+            description: Express regrets and wishes about the past and present.
+            vocabulary: [wish, "if only", "I wish I had", regret, "I wish I could"]
+            grammar:
+              - pattern: "I wish I had studied medicine."
+              - pattern: "If only I had more free time."
+              - pattern: "I wish I could speak French."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: expressing-regret
+            title: Expressing Regret
+            description: Talk naturally about things you regret and could have done differently.
+            vocabulary: ["should have", "shouldn't have", "could have", "I regret", "looking back"]
+            grammar:
+              - pattern: "I should have listened to my parents."
+              - pattern: "I shouldn't have quit my job so soon."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: word_select }
+          - id: talking-about-regrets
+            title: Talking About Regrets
+            description: Share a personal regret and discuss what you would do differently.
+            vocabulary: [hindsight, "turning point", "with hindsight", "looking back"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: sharing_regrets
+                goal: Tell a friend about something you regret and what you wish you had done differently.
+
+      - id: deduction-and-speculation
+        title: Deduction & Speculation
+        description: Guess what happened or what is true using modal verbs of deduction.
+        icon: 🔍
+        steps:
+          - id: present-deduction
+            title: Must, Might, Can't
+            description: Make guesses about the present using modal verbs.
+            vocabulary: ["must be", "might be", "can't be", "could be", certain, unlikely]
+            grammar:
+              - pattern: "He must be tired after that flight."
+              - pattern: "She can't be at home, the lights are off."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: past-deduction
+            title: Must Have, Might Have, Can't Have
+            description: Make guesses about the past.
+            vocabulary: ["must have", "might have", "can't have", "could have", "may have"]
+            grammar:
+              - pattern: "They must have left already."
+              - pattern: "She can't have forgotten the meeting."
+              - pattern: "He might have missed the bus."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: speculating-about-situations
+            title: Speculating About Situations
+            description: Speculate about unclear or surprising situations.
+            vocabulary: [speculate, "it's possible that", "I bet", presumably, apparently]
+            grammar:
+              - pattern: "I bet she forgot about the appointment."
+              - pattern: "Presumably, the flight was delayed."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: word_bank }
+          - id: discussing-a-mystery
+            title: Discussing a Mystery
+            description: Use deduction to work out what happened in a mysterious situation.
+            vocabulary: [mystery, clue, disappear, suspicious]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: solving_a_mystery
+                goal: Discuss with a friend what you think happened to a missing neighbour, using modals of deduction.
+
+      - id: passive-and-causative
+        title: Passive & Causative
+        description: Use advanced passive structures and talk about services done for you.
+        icon: 🏭
+        steps:
+          - id: passive-with-modals
+            title: Passive With Modals
+            description: Use the passive voice with modal verbs.
+            vocabulary: ["must be done", "should be fixed", "can be arranged", "has to be signed"]
+            grammar:
+              - pattern: "The contract must be signed by Friday."
+              - pattern: "This problem should be solved quickly."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: passive-reporting-verbs
+            title: It Is Said That...
+            description: Report general beliefs and facts impersonally.
+            vocabulary: ["it is said that", "it is believed that", "it is thought that", widely]
+            grammar:
+              - pattern: "It is said that the company is losing money."
+              - pattern: "The bridge is believed to be over 200 years old."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: have-get-something-done
+            title: Have/Get Something Done
+            description: Talk about services someone else does for you.
+            vocabulary: ["have something done", "get something done", repair, deliver, install]
+            grammar:
+              - pattern: "I'm having my car repaired tomorrow."
+              - pattern: "We got the kitchen redecorated last month."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: arranging-a-service
+            title: Arranging a Service
+            description: Ask someone to arrange a service for you.
+            vocabulary: [arrange, quote, technician, "call someone out"]
+            activities:
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: arranging_a_repair
+                goal: Call a company to arrange for something in your home to be repaired and agree on a time.
+
+      - id: future-forms
+        title: Talking About the Future
+        description: Predict, plan and imagine what will be happening or finished by a certain time.
+        icon: 🕓
+        steps:
+          - id: future-continuous
+            title: Future Continuous
+            description: Talk about actions in progress at a point in the future.
+            vocabulary: ["will be", "at this time tomorrow", meanwhile]
+            grammar:
+              - pattern: "This time next week, I will be lying on a beach."
+              - pattern: "Don't call at 9, I'll be sleeping."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: future-perfect
+            title: Future Perfect
+            description: Talk about actions that will be finished before a future point.
+            vocabulary: ["will have finished", "by the time", deadline]
+            grammar:
+              - pattern: "By next year, I will have finished my degree."
+              - pattern: "She will have left before we arrive."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: future-forms-review
+            title: Future Forms Review
+            description: Choose the right future form for the situation.
+            vocabulary: [prediction, arrangement, intention, deadline]
+            activities:
+              - { type: learn }
+              - { type: sentence_complete, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: predicting-long-term-changes
+            title: Predicting Long-Term Changes
+            description: Make predictions about long-term trends and changes.
+            vocabulary: [trend, "in the long run", inevitable, shift]
+            grammar:
+              - pattern: "In ten years, most cars will have become electric."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: word_select }
+          - id: talking-about-the-future
+            title: Talking About Your Future
+            description: Discuss your own long-term plans and predictions with a partner.
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: future_plans_discussion
+                goal: Discuss with a friend what you think your life will be like in ten years.
+
+      - id: linking-and-argument
+        title: Linking Ideas
+        description: Connect ideas clearly when writing or arguing a point.
+        icon: 🧩
+        steps:
+          - id: contrast-linkers
+            title: However, Whereas, Although
+            description: Use linking words to show contrast.
+            vocabulary: [however, whereas, although, "even though", despite]
+            grammar:
+              - pattern: "The hotel was expensive; however, the service was excellent."
+              - pattern: "Whereas he prefers the city, she prefers the countryside."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: despite-in-spite-of
+            title: Despite & In Spite Of
+            description: Contrast ideas using a noun or -ing form.
+            vocabulary: [despite, "in spite of", nevertheless, nonetheless]
+            grammar:
+              - pattern: "Despite the rain, we went for a walk."
+              - pattern: "In spite of his age, he still runs every day."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: cause-and-result-linkers
+            title: Cause & Result
+            description: Link causes and results in writing.
+            vocabulary: [therefore, "as a result", consequently, "due to", "owing to"]
+            grammar:
+              - pattern: "Due to the strike, all flights were cancelled."
+              - pattern: "Prices rose; as a result, sales fell."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct }
+          - id: structuring-an-argument
+            title: Structuring an Argument
+            description: Organise ideas clearly in a short piece of writing or a spoken argument.
+            vocabulary: [firstly, "in addition", "to sum up", "on the whole"]
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+
+      - id: reported-speech-advanced
+        title: Advanced Reported Speech
+        description: Report what people said using a wider range of reporting verbs.
+        icon: 🗨️
+        steps:
+          - id: reporting-verbs-suggestions
+            title: Suggesting, Advising, Warning
+            description: Report suggestions, advice and warnings.
+            vocabulary: [suggest, advise, warn, recommend, insist]
+            grammar:
+              - pattern: "She suggested going to the cinema."
+              - pattern: "He warned me not to be late."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: reporting-verbs-promises
+            title: Promising, Refusing, Admitting
+            description: Report promises, refusals and admissions.
+            vocabulary: [promise, refuse, admit, deny, apologise]
+            grammar:
+              - pattern: "He promised to call me back."
+              - pattern: "She admitted making a mistake."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: reported-speech-with-modals
+            title: Reporting With Modals
+            description: Report sentences containing modal verbs.
+            vocabulary: [would, could, might, "had to"]
+            grammar:
+              - pattern: "He said he could help later."
+              - pattern: "She said she might be late."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: word_bank }
+          - id: retelling-a-conversation
+            title: Retelling a Conversation
+            description: Retell a longer conversation using a variety of reporting verbs.
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - type: dialogue
+                scenario: retelling_a_disagreement
+                goal: Tell a friend about an argument you overheard, reporting what each person said.
+
+      - id: phrasal-verbs-at-work
+        title: Phrasal Verbs at Work
+        description: Use common phrasal verbs and collocations in a professional setting.
+        icon: 💻
+        steps:
+          - id: phrasal-verbs-meetings
+            title: Phrasal Verbs for Meetings
+            description: Common phrasal verbs used in meetings and projects.
+            vocabulary: ["bring up", "carry out", "come up with", "go through", "follow up"]
+            grammar:
+              - pattern: "Let's bring up that issue at the next meeting."
+              - pattern: "We need to follow up with the client."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: phrasal-verbs-workload
+            title: Dealing With Workload
+            description: Talk about managing tasks and deadlines.
+            vocabulary: ["deal with", "put off", "catch up on", "keep up with", "fall behind"]
+            grammar:
+              - pattern: "I've fallen behind on my emails."
+              - pattern: "Stop putting off that report."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: business-collocations
+            title: Business Collocations
+            description: Common word partnerships used at work.
+            vocabulary: ["make a decision", "reach an agreement", "meet a deadline", "take responsibility"]
+            grammar:
+              - pattern: "We finally reached an agreement with the supplier."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: discussing-a-project-at-work
+            title: Discussing a Project
+            description: Discuss the progress of a work project using phrasal verbs and collocations.
+            activities:
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: project_update_meeting
+                goal: Update a colleague on a project's progress, using phrasal verbs and business collocations.
+
+      - id: debate-and-persuasion
+        title: Debate & Persuasion
+        description: Hedge, concede points and build a persuasive argument.
+        icon: ⚖️
+        steps:
+          - id: hedging-language
+            title: Hedging Your Opinion
+            description: Soften opinions so they sound less direct.
+            vocabulary: ["it could be argued that", "to some extent", arguably, "tend to"]
+            grammar:
+              - pattern: "It could be argued that remote work reduces productivity."
+              - pattern: "To some extent, I agree with you."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: conceding-a-point
+            title: Conceding a Point
+            description: Accept part of the other side's argument before disagreeing.
+            vocabulary: ["I take your point, but", admittedly, granted, "having said that"]
+            grammar:
+              - pattern: "Admittedly, the plan has some risks, but it's worth trying."
+              - pattern: "Having said that, we still need more evidence."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: persuasive-language
+            title: Persuasive Language
+            description: Use language that persuades and convinces.
+            vocabulary: [convince, persuade, surely, "there's no doubt that", compelling]
+            grammar:
+              - pattern: "Surely you can see the benefits of this plan."
+              - pattern: "There's no doubt that we need to act now."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: having-a-debate
+            title: Having a Debate
+            description: Take part in a structured debate on an everyday issue.
+            activities:
+              - { type: sentence_complete, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: friendly_debate
+                goal: Debate an everyday issue with a friend, hedging your opinion and conceding at least one point.
+
+      - id: society-and-environment
+        title: Society & the Environment
+        description: Discuss social issues and environmental challenges.
+        icon: 🌍
+        steps:
+          - id: environmental-issues
+            title: Environmental Issues
+            description: Talk about problems facing the environment.
+            vocabulary: [pollution, "climate change", emissions, sustainable, "renewable energy"]
+            grammar:
+              - pattern: "We need to reduce carbon emissions."
+              - pattern: "More cities are investing in renewable energy."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: social-issues
+            title: Social Issues
+            description: Discuss issues affecting society.
+            vocabulary: [inequality, poverty, "unemployment rate", homelessness, "raise awareness"]
+            grammar:
+              - pattern: "The government is trying to raise awareness of homelessness."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: possible-solutions
+            title: Possible Solutions
+            description: Suggest solutions to social and environmental problems.
+            vocabulary: [tackle, "address the issue", "raise funds", implement]
+            grammar:
+              - pattern: "The city plans to tackle traffic congestion by building more bike lanes."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: discussing-a-global-issue
+            title: Discussing a Global Issue
+            description: Share your views on an environmental or social issue with someone else.
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: environment_discussion
+                goal: Discuss a current environmental issue with a friend and suggest possible solutions.
+
+      - id: science-culture-and-arts
+        title: Science, Culture & the Arts
+        description: Describe trends, explain causes and effects, and talk about art, culture and discoveries.
+        icon: 🎨
+        steps:
+          - id: describing-trends
+            title: Describing Trends
+            description: Describe rises, falls and trends using appropriate vocabulary.
+            vocabulary: [rise, fall, "a sharp increase", "a steady decline", fluctuate, "remain stable"]
+            grammar:
+              - pattern: "Sales rose sharply after the new product launched."
+              - pattern: "The number of users has remained stable this year."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: match }
+              - { type: error_correct }
+          - id: cause-and-effect
+            title: Cause & Effect
+            description: Explain how one event leads to another.
+            vocabulary: ["lead to", "result in", "give rise to", "be responsible for"]
+            grammar:
+              - pattern: "Overfishing has led to a sharp decline in fish populations."
+              - pattern: "The new policy resulted in lower unemployment."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: scientific-discoveries
+            title: Scientific Discoveries
+            description: Talk about scientific breakthroughs and discoveries.
+            vocabulary: [breakthrough, discover, research, "carry out a study", innovative]
+            grammar:
+              - pattern: "Scientists have discovered a new way to store energy."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+          - id: talking-about-art-and-culture
+            title: Art & Culture
+            description: Describe works of art, films and cultural events.
+            vocabulary: [exhibition, masterpiece, "thought-provoking", "contemporary art", perform]
+            grammar:
+              - pattern: "The exhibition features some thought-provoking contemporary art."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: discussing-a-cultural-event
+            title: Discussing a Cultural Event
+            description: Talk about a film, exhibition or performance you have seen.
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: reviewing_a_cultural_event
+                goal: Tell a friend about a film or exhibition you saw recently and give your opinion of it.
+
+    checkpoint:
+      title: B2 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }

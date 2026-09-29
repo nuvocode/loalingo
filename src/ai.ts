@@ -113,3 +113,39 @@ export async function generatePlain(system: string, prompt: string) {
   const r = await generateText({ model: model(active.cfg, active.key), reasoning: reasoning(active.cfg), system, prompt, maxRetries: 1, abortSignal: AbortSignal.timeout(60_000) });
   return r.text.trim();
 }
+
+/** First-run setup suggests this when Ollama runs without models. ponytail: one fixed pick, a size-aware list if people ask */
+export const RECOMMENDED_OLLAMA = { model: "qwen3:8b", size: "5.2 GB" };
+
+/** Local servers found on this Mac with their models (null = not running). */
+export async function detectLocal(): Promise<Record<"ollama" | "lmstudio", string[] | null>> {
+  const probe = (p: "ollama" | "lmstudio") => Promise.race([
+    listModels({ provider: p, baseURL: PROVIDERS[p].baseURL, model: "" }, null),
+    new Promise<never>((_, no) => setTimeout(() => no(new Error("timeout")), 2000)),
+  ]).catch(() => null);
+  const [ollama, lmstudio] = await Promise.all([probe("ollama"), probe("lmstudio")]);
+  return { ollama, lmstudio };
+}
+
+/** Downloads a model into Ollama; onProgress gets 0..1. Throws with Ollama's error text. */
+export async function pullOllama(baseURL: string, model: string, onProgress: (f: number) => void) {
+  const r = await http(`${trim(baseURL)}/api/pull`, { method: "POST", body: JSON.stringify({ model, stream: true }) });
+  if (!r.ok || !r.body) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
+  const reader = r.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buf = "", big = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += value;
+    const lines = buf.split("\n");
+    buf = lines.pop()!;
+    for (const line of lines.filter(Boolean)) {
+      const m = JSON.parse(line);
+      if (m.error) throw new Error(m.error);
+      // Progress is per layer; follow the biggest (the weights) so tiny config layers don't reset the bar.
+      if (m.total && m.total >= big) { big = m.total; onProgress((m.completed ?? 0) / m.total); }
+      if (m.status === "success") return;
+    }
+  }
+  throw new Error("pull ended early");
+}

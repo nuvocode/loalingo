@@ -147,7 +147,9 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Mağaza: 2× XP (süreli), efsanevi bilet; efsanevi ders 100 elmas ya da bilet.
 - Arkadaşlar: bu cihazdaki diğer profiller. Bildirimler: gerçek durumdan (seri, lig, sandık…).
 - Günlük hatırlatıcı: sistem bildirimi, dakikada bir kontrol. Açıkken pencereyi kapatmak uygulamayı gizler (Dock'tan geri gelir, ⌘Q kapatır) ve uygulama oturum açılışında gizli başlar (`tauri-plugin-autostart`, LaunchAgent). Kapatınca ikisi de geri alınır. PIN'li profil otomatik girilmediği için onun hatırlatıcısı giriş yapılana kadar çalışmaz.
-- A2 ve B1 kursları: her biri 10 ünite, 43 adım + checkpoint.
+- A2, B1 ve B2 kursları: her biri 10 ünite, 43 adım + checkpoint.
+- İlk açılış (C6): sağlayıcı yoksa kurulum sheet'i girişte bir kez kendiliğinden açılır. Bu Mac'te Ollama / LM Studio aranır; model varsa seçili gelir. Ollama çalışıyor ama modeli yoksa önerilen model (`RECOMMENDED_OLLAMA`, qwen3:8b) uygulamadan ilerlemeyle indirilir (`/api/pull`). Hiçbiri yoksa "Ollama'yı indir" (opener) + "Tekrar kontrol et".
+- Uygulama içi güncelleme: `tauri-plugin-updater`, `https://github.com/nuvocode/loalingo/releases/latest/download/latest.json`. Açılışta sessiz kontrol, Ayarlar → Güncellemeler → Denetle. ✔ Yerel sunucuyla 0.1.0 → 0.1.1 uçtan uca test edildi (indir, kur, yeniden başlat).
 - ✔ Whisper Rust testi (`cargo test -- --ignored whisper`) geçiyor. Dev uygulamada mikrofonla elle test bekliyor.
 
 ## 5. Kararlar
@@ -159,6 +161,9 @@ Tüm açık kararlar: [DECISIONS.md](DECISIONS.md)
 - `pnpm tauri build` → `src-tauri/target/release/bundle/macos/loalingo.app` (~10 MB) ve `bundle/dmg/loalingo_<sürüm>_aarch64.dmg` (~5 MB).
 - İmza: ad-hoc (`bundle.macOS.signingIdentity: "-"`). Bu Mac'te ve "Yine de aç" ile başka Mac'lerde çalışır. Dağıtım için Developer ID Application sertifikası + notarization gerekir (şu an yalnızca Apple Development sertifikası var).
 - `[profile.release.build-override] strip = false`: macOS 27 bağlayıcısıyla strip edilen proc-macro dylib'leri (sqlx-macros) yüklenemiyor. Uygulama binary'si yine strip edilir.
+- Sürüm yayınlama: `tauri.conf.json` ve `Cargo.toml` sürümünü artır → `pnpm release` → `dist-release/` içindekileri (`.dmg`, `loalingo.app.tar.gz`, `latest.json`) `nuvocode/loalingo` reposunda `v<sürüm>` etiketli GitHub release'e yükle. Repo public olmalı (updater giriş yapmadan indirir).
+- İmza anahtarı: `~/.tauri/loalingo.key` (şifresiz, repoda değil; kaybolursa yayınlanmış uygulamalar yeni sürümleri kabul etmez, yedekle). `createUpdaterArtifacts: true` olduğundan her `tauri build` bu anahtarı ister: `TAURI_SIGNING_PRIVATE_KEY=~/.tauri/loalingo.key`.
+- Updater, güncellemeyi sistemin geçici klasöründen uygulamanın yanına taşır. Uygulama başka bir diskte çalışıyorsa (ör. `/Volumes/...`) "Cross-device link" hatası verir. `/Applications`'da sorun yok.
 - `tauri-plugin-http` Rust tarafında `~2.7` (npm paketi 2.7.0; sürümler uyuşmazsa `tauri build` durur).
 - ✔ Release uygulamasında test edildi: gerçek SQLite (mevcut veriler), Ollama bağlantısı ve ders üretimi (Tauri HTTP), bulut isteği (OpenAI 401 → CORS yok), API anahtarı macOS anahtarlığına yazılıp okunuyor ve veritabanında yok, kullanıcı kurs klasörü (`~/Library/Application Support/com.nuvocode.loalingo/courses`).
 

@@ -6,6 +6,7 @@ import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
 import { reminderDue, today } from "./progress";
 import { keepInBackground, notify } from "./notify";
+import { findUpdate, UpdateSheet } from "./Update";
 import { Chat, Story } from "./Talk";
 import type { CharacterId } from "./lessons";
 import { Learn } from "./screens/Learn";
@@ -39,7 +40,7 @@ function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, profile, route, sheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
+  const { ready, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
   const Screen = SCREENS[route];
 
   useEffect(() => {
@@ -52,6 +53,9 @@ export default function App() {
     sfxState.on = s.soundOn;
     document.documentElement.dataset.motion = s.reduceMotion ? "reduce" : "full";
   }, [s.soundOn, s.reduceMotion]);
+
+  // Quiet update check once per launch, after sign-in so the sheet has somewhere to show.
+  useEffect(() => { if (profile) findUpdate().then((u) => u && openSheet(<UpdateSheet update={u} />)); }, [!!profile]);
 
   // ponytail: a PIN-locked profile never auto-signs in, so its reminder only fires once someone signs in
   useEffect(() => { keepInBackground(!!profile && s.reminderOn); }, [profile?.id, s.reminderOn]);

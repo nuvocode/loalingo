@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
-import { PROVIDERS, getKey, listModels, setKey, type AiConfig, type ProviderId } from "../ai";
+import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
+import { isTauri } from "../db";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
+import { findUpdate, UpdateSheet } from "../Update";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -24,8 +26,57 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
   );
 }
 
+const OLLAMA_DOWNLOAD = "https://ollama.com/download";
+const openLink = async (url: string) => isTauri ? (await import("@tauri-apps/plugin-opener")).openUrl(url) : window.open(url, "_blank");
+
+/** First run: finds Ollama / LM Studio on this Mac, or helps install Ollama and pull a model. */
+function LocalSetup({ onPick }: { onPick: (p: ProviderId, models: string[]) => void }) {
+  const { t } = useTranslation();
+  const [found, setFound] = useState<Awaited<ReturnType<typeof detectLocal>> | null>(null);
+  const [pull, setPull] = useState<number | null>(null);
+  const [err, setErr] = useState("");
+  const scan = async () => {
+    setFound(null); setErr("");
+    const f = await detectLocal();
+    setFound(f);
+    const p = f.ollama?.length ? "ollama" : f.lmstudio?.length ? "lmstudio" : null;
+    if (p) onPick(p, f[p]!);
+  };
+  useEffect(() => { scan(); }, []);
+  const download = async () => {
+    setPull(0); setErr("");
+    try { await pullOllama(PROVIDERS.ollama.baseURL, RECOMMENDED_OLLAMA.model, setPull); await scan(); }
+    catch (e) { setErr((e as Error).message); }
+    finally { setPull(null); }
+  };
+
+  if (!found) return <p className="muted small" role="status">{t("ai.scanning")}</p>;
+  const name = found.ollama?.length ? "Ollama" : found.lmstudio?.length ? "LM Studio" : null;
+  if (name) return <p className="small" role="status" style={{ color: "var(--green)" }}>{t("ai.foundLocal", { name })}</p>;
+  return (
+    <div className="card od-stack" style={gap("10px")} role="status">
+      {found.ollama ? <>
+        <b>{t("ai.noModels")}</b>
+        <span className="muted small">{t("ai.pullDesc", RECOMMENDED_OLLAMA)}</span>
+        {pull === null
+          ? <button className="btn btn-blue" onClick={download}>{t("ai.pull", RECOMMENDED_OLLAMA)}</button>
+          : <div className="od-stack" style={gap("6px")}>
+              <div className="progress-track"><div className="progress-fill green" style={{ width: `${Math.round(pull * 100)}%` }} /></div>
+              <span className="muted small">{t("ai.pulling", { pct: Math.round(pull * 100) })}</span>
+            </div>}
+      </> : <>
+        <b>{t("ai.noLocal")}</b>
+        <span className="muted small">{t("ai.noLocalDesc")}</span>
+        <button className="btn btn-blue" onClick={() => openLink(OLLAMA_DOWNLOAD)}>{t("ai.getOllama")}</button>
+        <button className="btn btn-ghost" onClick={scan}>{t("ai.rescan")}</button>
+      </>}
+      {err && <p className="small" style={{ color: "var(--red)", overflowWrap: "anywhere" }}>{err}</p>}
+    </div>
+  );
+}
+
 /** DECISIONS C1/C6: device-wide provider, key in the OS keychain. */
-function AiSheet() {
+export function AiSheet() {
   const { t } = useTranslation();
   const { ai, setAi, toast, closeSheet } = useApp();
   const [provider, setProvider] = useState<ProviderId>(ai?.provider ?? "ollama");
@@ -70,6 +121,10 @@ function AiSheet() {
   return (
     <div className="od-stack" style={{ ...gap("14px"), textAlign: "left" }}>
       <h3 style={{ textAlign: "center" }}>{t("ai.title")}</h3>
+      {!ai && <LocalSetup onPick={(p, list) => {
+        setProvider(p); setBaseURL(PROVIDERS[p].baseURL); setModels(list);
+        setModel(list.includes(RECOMMENDED_OLLAMA.model) ? RECOMMENDED_OLLAMA.model : list[0]);
+      }} />}
       <div className="seg" role="radiogroup" aria-label={t("ai.provider")}>
         {(Object.keys(PROVIDERS) as ProviderId[]).map((p) => (
           <button key={p} role="radio" aria-checked={provider === p} className={`btn ${provider === p ? "btn-blue" : "btn-ghost"}`} onClick={() => pick(p)}>{PROVIDERS[p].label}</button>
@@ -93,6 +148,26 @@ function AiSheet() {
         <button className="btn btn-primary od-fill" disabled={busy || !cfg.model || (needsKey && !key.trim())} onClick={save}>{t("ai.save")}</button>
       </div>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
+function VersionRow() {
+  const { t } = useTranslation();
+  const { openSheet, toast } = useApp();
+  const [version, setVersion] = useState("dev");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { if (isTauri) import("@tauri-apps/api/app").then((a) => a.getVersion()).then(setVersion); }, []);
+  const check = async () => {
+    setBusy(true);
+    const u = await findUpdate();
+    setBusy(false);
+    u ? openSheet(<UpdateSheet update={u} />) : toast(t("update.none"));
+  };
+  return (
+    <div className="card od-row" style={gap("12px")}>
+      <span className="od-field od-fill"><b>{t("update.version", { version })}</b><span className="muted small">{t("update.desc")}</span></span>
+      <button className="btn btn-ghost" disabled={busy} onClick={check}>{t("update.check")}</button>
     </div>
   );
 }
@@ -157,6 +232,9 @@ export function Settings() {
           <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
         <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
       </div>
+
+      <h2 className="section-title">{t("update.section")}</h2>
+      <VersionRow />
 
       <h2 className="section-title">{t("settings.account")}</h2>
       <div className="od-stack" style={gap("12px")}>

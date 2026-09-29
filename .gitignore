@@ -26,3 +26,4 @@ dist-ssr
 # Whisper model (scripts/fetch-model.sh)
 src-tauri/resources/*.bin
 src-tauri/resources/*.part
+dist-release
