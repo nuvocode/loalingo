@@ -9,6 +9,7 @@ import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
 import { DataSection } from "./DataSettings";
+import { SttRow, TtsRow } from "./VoiceSettings";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -238,13 +239,8 @@ export function Settings() {
               : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
           <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
         </div>
-        {/* ponytail: TTS/STT rows only show the current engine until D adds the provider modals. */}
-        <div className="card od-row" style={gap("12px")}>
-          <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t("settings.ttsSystem")}</span></span>
-        </div>
-        <div className="card od-row" style={gap("12px")}>
-          <span className="od-field od-fill"><b>{t("settings.stt")}</b><span className="muted small">{t("settings.sttWhisper")}</span></span>
-        </div>
+        <TtsRow />
+        <SttRow />
       </div>
 
       <DataSection />

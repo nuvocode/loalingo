@@ -237,6 +237,8 @@
     "ttsSystem": "Sistem sesi",
     "stt": "Konuşma tanıma",
     "sttWhisper": "Whisper (yerel)",
+    "ttsKokoro": "Kokoro (yerel, doğal)",
+    "sttDeepgram": "Deepgram (bulut)",
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
     "reminderTime": "Hatırlatma saati",
@@ -405,6 +407,18 @@
     "install": "Güncelle ve yeniden başlat",
     "later": "Sonra",
     "downloading": "İndiriliyor… %{{pct}}"
+  },
+  "voice": {
+    "kokoroDesc": "Daha doğal bir ses. Bilgisayarının hızına göre cümle başına birkaç saniye sürebilir.",
+    "englishOnly": "Kokoro yalnız İngilizce seslendirir; diğer dillerde sistem sesi kullanılır.",
+    "downloading": "Ses indiriliyor… %{{pct}}",
+    "loadFailed": "Kokoro yüklenemedi: {{error}}. Sistem sesinde kalındı.",
+    "listen": "Dinle",
+    "whisperDesc": "Bu Mac'te çalışır. Sesin bilgisayardan çıkmaz.",
+    "deepgramDesc": "Bulutta çalışır. Kaydın Deepgram'a gönderilir.",
+    "deepgramKey": "Deepgram API anahtarı",
+    "connected": "Bağlantı tamam",
+    "saved": "Ses ayarları kaydedildi"
   },
   "data": {
     "section": "Veri",

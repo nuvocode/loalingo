@@ -240,6 +240,8 @@
     "ttsSystem": "System voice",
     "stt": "Speech recognition",
     "sttWhisper": "Whisper (local)",
+    "ttsKokoro": "Kokoro (local, natural)",
+    "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
     "reminderTime": "Reminder time",
@@ -410,6 +412,18 @@
     "install": "Update and restart",
     "later": "Later",
     "downloading": "Downloading… {{pct}}%"
+  },
+  "voice": {
+    "kokoroDesc": "A more natural voice. It can take a few seconds per sentence, depending on your computer's speed.",
+    "englishOnly": "Kokoro only speaks English; other languages use the system voice.",
+    "downloading": "Downloading the voice… {{pct}}%",
+    "loadFailed": "Could not load Kokoro: {{error}}. Staying on the system voice.",
+    "listen": "Listen",
+    "whisperDesc": "Runs on this Mac. Your voice never leaves the computer.",
+    "deepgramDesc": "Runs in the cloud. Your recording is sent to Deepgram.",
+    "deepgramKey": "Deepgram API key",
+    "connected": "Connection OK",
+    "saved": "Voice settings saved"
   },
   "data": {
     "section": "Data",
