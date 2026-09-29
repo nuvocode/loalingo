@@ -50,10 +50,10 @@ export function Rail() {
 
       <div className="rail-card">
         <div className="od-row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
-          <h3>{t("league.title", { name: t("mock.leagueName") })}</h3>
+          <h3>{t("league.title", { name: league.name })}</h3>
           <button className="small" style={{ fontWeight: 800, color: "var(--blue)" }} onClick={() => go("league")}>{t("league.all")}</button>
         </div>
-        {league.slice(0, 5).map((p, i) => (
+        {league.rows.slice(0, 5).map((p, i) => (
           <div className={`league-row ${p.me ? "me" : ""}`} key={p.n}>
             <span className={`league-rank ${i < 3 ? "top" : ""}`}>{i + 1}</span>
             <span className="avatar" style={{ width: 30, height: 30, fontSize: 13, background: p.c }}>{p.n[0]}</span>

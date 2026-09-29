@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
-import { LEGEND_PASS, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
+import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
 import { say } from "../Lesson";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
@@ -50,12 +50,22 @@ const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
 
 function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
   const { t } = useTranslation();
-  const { setS, completeStep, openSheet, closeSheet, legendary } = useApp();
+  const { s, setS, completeStep, openSheet, closeSheet, legendary, ai, toast } = useApp();
   const start = useStartLesson();
+  // Legendary costs a shop ticket, else LEGEND_PRICE gems (charged only when the lesson can actually start).
+  const startLegend = (id: string) => {
+    closeSheet();
+    if (!ai) return start(`legend:${id}`); // shows the "set up AI" sheet
+    if (!s.legendTickets && s.gems < LEGEND_PRICE) return toast(t("shop.notEnough"));
+    setS((s) => s.legendTickets ? { ...s, legendTickets: s.legendTickets - 1 } : { ...s, gems: s.gems - LEGEND_PRICE });
+    start(`legend:${id}`);
+  };
   // Done steps: review, or the Legendary version (gold once passed).
   const doneStep = (n: PathNode) => openSheet(<>
     <h3>{n.title}</h3><p>{t(legendary.has(n.id) ? "learn.legendDone" : "learn.legendDesc", { score: LEGEND_PASS })}</p>
-    <button className="btn btn-gold btn-block" onClick={() => { closeSheet(); start(`legend:${n.id}`); }}><Icon name="star" /> {t("learn.legendary")}</button>
+    <button className="btn btn-gold btn-block" onClick={() => startLegend(n.id)}>
+      <Icon name="star" /> {t("learn.legendary")} · {s.legendTickets ? t("learn.legendTicket", { count: s.legendTickets }) : <><Icon name="gem" />{LEGEND_PRICE}</>}
+    </button>
     <button className="btn btn-ghost btn-block" onClick={() => { closeSheet(); start(n.id); }}>{t("learn.review")}</button>
   </>);
   const openChest = async (id: string) => {

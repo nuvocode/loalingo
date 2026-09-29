@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { useBuy } from "./screens/Screens";
 import * as db from "./db";
-import { listenItems, matchesAnswer, normalize, type Item } from "./activities";
+import { SPEECH_PASS, listenItems, madnessItems, matchesAnswer, normalize, speakItems, speechScore, type Item } from "./activities";
+import { MicButton } from "./Mic";
+import { sttReady } from "./stt";
 import { LEGEND_PASS, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
-import { recordSession, today } from "./progress";
+import { recordSession, today, xpMult } from "./progress";
 
 /** Opens a lesson, or the out-of-hearts sheet (design behaviour). Steps need an AI provider (DECISIONS C6). */
 export function useStartLesson() {
@@ -19,7 +21,7 @@ export function useStartLesson() {
       <button className="btn btn-primary btn-block" onClick={() => { closeSheet(); go("settings"); }}>{t("ai.setUp")}</button>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
-    if (!s.heartsOn || s.hearts > 0 || /^(story|chat):/.test(id)) return startLesson(id); // stories and chats cost no hearts
+    if (!s.heartsOn || s.hearts > 0 || /^(story|chat|call):/.test(id) || TIME_LIMIT[id]) return startLesson(id); // stories, chats and timed games cost no hearts
     openSheet(<>
       <h3>{t("sheet.noHearts")}</h3><p>{t("sheet.noHeartsDesc")}</p>
       <button className="btn btn-danger btn-block" onClick={() => buy("refill", 350)}>{t("sheet.refillFor", { count: 350 })}</button>
@@ -59,10 +61,16 @@ type PItem = Item & { mistakeId?: number };
 async function practiceItems(id: string, enrollmentId: number, listenPrompt: string): Promise<PItem[]> {
   if (id === "practice-mistakes") return (await db.listMistakes<Item>(enrollmentId, 10)).map((m) => ({ ...m.item, mistakeId: m.id }));
   if (id === "practice-listen") return listenItems(await db.listWords(enrollmentId), listenPrompt);
+  if (id === "practice-speak") return speakItems(await db.listWords(enrollmentId));
+  if (id === "practice-madness") return madnessItems(await db.listWords(enrollmentId));
+  if (id === "practice-timed") return (await db.cachedLessonItems<Item>(enrollmentId)).sort(() => Math.random() - 0.5).slice(0, 20);
   return [];
 }
 
-const questionOf = (it: Item) => it.kind === "learn" ? it.phrase : it.kind === "match" ? "match" : [it.prompt, "context" in it ? it.context : "", "listen" in it ? it.listen : ""].filter(Boolean).join(" — ");
+/** Timed practice modes (seconds); the session ends when the clock runs out. */
+export const TIME_LIMIT: Record<string, number> = { "practice-madness": 90, "practice-timed": 120 };
+
+const questionOf = (it: Item) => it.kind === "learn" || it.kind === "speak" ? it.phrase : it.kind === "match" ? "match" : [it.prompt, "context" in it ? it.context : "", "listen" in it ? it.listen : ""].filter(Boolean).join(" — ");
 
 type Fb = { ok: boolean; correct: string; given: string; note?: string } | null;
 type Load = { state: "loading" } | { state: "error"; msg: string } | { state: "ready"; items: PItem[] };
@@ -89,8 +97,13 @@ export function Lesson({ id }: { id: string }) {
   const [bankSel, setBankSel] = useState<number[]>([]);
   const [text, setText] = useState("");
   const [matched, setMatched] = useState<{ done: string[]; left: string | null; wrong: string[]; misses: number }>({ done: [], left: null, wrong: [], misses: 0 });
+  const [heard, setHeard] = useState<string | null>(null); // speak: last transcript ("" = nothing heard)
+  const [stt, setStt] = useState(false);
+  useEffect(() => { sttReady().then(setStt); }, []);
+  const limit = TIME_LIMIT[id];
+  const [left, setLeft] = useState(limit ?? 0);
 
-  function reset() { setSel(null); setBankSel([]); setText(""); setFb(null); setMatched({ done: [], left: null, wrong: [], misses: 0 }); }
+  function reset() { setSel(null); setBankSel([]); setText(""); setHeard(null); setFb(null); setMatched({ done: [], left: null, wrong: [], misses: 0 }); }
 
   useEffect(() => {
     if (!enrollment || (!ctx && !practice)) return;
@@ -104,7 +117,9 @@ export function Lesson({ id }: { id: string }) {
 
   useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = ""; }; }, []);
 
-  const list = load.state === "ready" ? load.items : [];
+  // Speaking items need the bundled model and the Settings switch; otherwise they are left out (D2).
+  const speakOk = stt && s.speakOn;
+  const list = useMemo(() => load.state === "ready" ? load.items.filter((x) => x.kind !== "speak" || speakOk) : [], [load, speakOk]);
   const it = list[i] as PItem | undefined;
 
   // Auto-play listening items once.
@@ -127,9 +142,13 @@ export function Lesson({ id }: { id: string }) {
   });
 
   const finish = () => {
-    const total = list.filter((x) => x.kind !== "learn").length || 1; // learn cards are not scored
-    const acc = Math.round((score.correct / total) * 100), gems = score.correct * 2, xp = score.xp;
-    setS((s) => recordSession(s, { xp, gems, kind: practice ? "practice" : "lesson" }, today()));
+    // learn cards are not scored; timed modes count only the questions reached before the clock ran out
+    const total = (limit ? i + (fb ? 1 : 0) : list.filter((x) => x.kind !== "learn").length) || 1;
+    const acc = Math.round((score.correct / total) * 100), gems = score.correct * 2, xp = score.xp * xpMult(s);
+    setS((s) => {
+      const n = recordSession(s, { xp, gems, kind: practice ? "practice" : "lesson" }, today());
+      return id === "practice-madness" ? { ...n, madnessBest: Math.max(n.madnessBest, score.correct * 5) } : n; // best = pairs matched
+    });
     const required = legend ? LEGEND_PASS : ctx?.levelDef.checkpoint?.required_score;
     const passed = exam || legend ? acc >= required! : undefined;
     if (enrollment) {
@@ -147,6 +166,17 @@ export function Lesson({ id }: { id: string }) {
     setResult({ xp, acc, gems, passed, required });
   };
 
+  // Clock for timed modes: ticks while the session runs, finishes it at 0 (ref: the interval must call the latest finish).
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+  const running = !!limit && load.state === "ready" && !result;
+  useEffect(() => {
+    if (!running) return;
+    const h = setInterval(() => setLeft((l) => l - 1), 1000);
+    return () => clearInterval(h);
+  }, [running]);
+  useEffect(() => { if (running && left <= 0) finishRef.current(); }, [running, left]);
+
   const next = () => {
     if (i + 1 >= list.length) return finish();
     setI(i + 1); reset();
@@ -160,7 +190,7 @@ export function Lesson({ id }: { id: string }) {
       else if (!ok && !mistakeId) db.addMistake(enrollment.id, item);
     }
     if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
-    else if (s.heartsOn) {
+    else if (s.heartsOn && !limit) {
       const hearts = Math.max(0, s.hearts - 1);
       setS((s) => ({ ...s, hearts }));
       if (hearts <= 0) openSheet(<HeartsOut onEnd={quit} />);
@@ -197,6 +227,12 @@ export function Lesson({ id }: { id: string }) {
     const done = [...matched.done, pair[0], pair[1]];
     setMatched((m) => ({ ...m, done, left: null, wrong: [] }));
     if (done.length === it.pairs.length * 2) {
+      if (id === "practice-madness") { // speed game: misses only cost time, next board right away
+        setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
+        sfx("ok");
+        if (i + 1 >= list.length) return setLeft(0); // out of boards: let the clock effect finish with the updated score
+        return next();
+      }
       const ok = matched.misses <= 1; // ponytail: one slip allowed, no heart loss inside match
       if (ok) setScore((sc) => ({ correct: sc.correct + 1, xp: sc.xp + 10 }));
       sfx(ok ? "ok" : "bad");
@@ -253,6 +289,22 @@ export function Lesson({ id }: { id: string }) {
         {listenBtn(it.phrase)}
         {it.note && <p className="small" style={{ marginTop: 14 }}>{it.note}</p>}
       </div>
+    </>
+  );
+  else if (it.kind === "speak") body = (
+    <>
+      <h2 className="ex-title">{t("lesson.speakTitle")}</h2>
+      <p className="ex-sub">{t("lesson.speakSub")}</p>
+      <div className="card" style={{ textAlign: "center", padding: 22 }}>
+        <p lang={lang} style={{ fontSize: 26, fontWeight: 900 }}>{it.phrase}</p>
+        <p className="muted" style={{ fontWeight: 700, margin: "4px 0 12px" }}>{it.translation}</p>
+        {listenBtn(it.phrase)}
+      </div>
+      <MicButton lang={lang} disabled={!!fb} onText={(txt) => {
+        setHeard(txt);
+        if (txt) grade(speechScore(it.phrase, txt) >= SPEECH_PASS, it.phrase, txt, t("lesson.heard", { text: txt }));
+      }} />
+      {heard === "" && <p className="small" role="alert" style={{ textAlign: "center", color: "var(--orange)", fontWeight: 800 }}>{t("lesson.heardNothing")}</p>}
     </>
   );
   else if (it.kind === "choice") body = (
@@ -321,7 +373,8 @@ export function Lesson({ id }: { id: string }) {
         {ctx && !result && (
           <button className="icon-btn" onClick={() => setGen((g) => g + 1)} disabled={load.state === "loading"} aria-label={t("ai.regenerate")} title={t("ai.regenerate")}><Icon name="refresh" /></button>
         )}
-        {s.heartsOn && <div className="hearts-box"><Icon name="heart" />{s.hearts}</div>}
+        {limit ? <div className={`timer-box ${left <= 10 ? "low" : ""}`} role="timer" aria-label={t("practice.timeLeft", { count: left })}><Icon name="clock" />{Math.floor(left / 60)}:{String(Math.max(left, 0) % 60).padStart(2, "0")}</div>
+          : s.heartsOn && <div className="hearts-box"><Icon name="heart" />{s.hearts}</div>}
       </div>
 
       <div className="lesson-body"><div className="lesson-inner">{body}</div></div>
@@ -349,8 +402,8 @@ export function Lesson({ id }: { id: string }) {
               </>
             ) : (
               <>
-                <button className="btn btn-ghost" onClick={next}>{t("lesson.skip")}</button>
-                {it.kind !== "match" && <button className="btn btn-primary" disabled={!canCheck} onClick={check}>{t(checking ? "lesson.checking" : "lesson.check")}</button>}
+                <button className="btn btn-ghost" onClick={next}>{t(it.kind === "speak" ? "lesson.cantSpeak" : "lesson.skip")}</button>
+                {it.kind !== "match" && it.kind !== "speak" && <button className="btn btn-primary" disabled={!canCheck} onClick={check}>{t(checking ? "lesson.checking" : "lesson.check")}</button>}
               </>
             )}
           </div>

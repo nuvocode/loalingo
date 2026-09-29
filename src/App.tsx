@@ -4,6 +4,8 @@ import { Icon, type IconName } from "./icons";
 import { useApp, type Route } from "./store";
 import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
+import { reminderDue, today } from "./progress";
+import { notify } from "./notify";
 import { Chat, Story } from "./Talk";
 import type { CharacterId } from "./lessons";
 import { Learn } from "./screens/Learn";
@@ -37,7 +39,7 @@ function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, profile, route, sheet, closeSheet, toastMsg, toastOn, lessonId, s } = useApp();
+  const { ready, profile, route, sheet, closeSheet, toastMsg, toastOn, lessonId, s, setS } = useApp();
   const Screen = SCREENS[route];
 
   useEffect(() => {
@@ -50,6 +52,19 @@ export default function App() {
     sfxState.on = s.soundOn;
     document.documentElement.dataset.motion = s.reduceMotion ? "reduce" : "full";
   }, [s.soundOn, s.reduceMotion]);
+
+  // Daily reminder (Settings): checked every minute while the app runs, even in the background.
+  useEffect(() => {
+    if (!profile || !s.reminderOn) return;
+    const tick = () => {
+      if (!reminderDue(s)) return;
+      setS((x) => ({ ...x, remindedDay: today() }));
+      notify(t("settings.reminderTitle"), t(s.streak ? "settings.reminderStreak" : "settings.reminderBody", { count: s.streak }));
+    };
+    tick();
+    const h = setInterval(tick, 60_000);
+    return () => clearInterval(h);
+  }, [profile?.id, s.reminderOn, s.reminderTime, s.lastActive, s.remindedDay, s.streak]);
 
   if (!ready) return null;
   return (
@@ -78,7 +93,7 @@ export default function App() {
       </nav>
 
       {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
-        : lessonId.startsWith("chat:") ? <Chat who={lessonId.slice(5) as CharacterId} /> : <Lesson id={lessonId} />)}
+        : /^(chat|call):/.test(lessonId) ? <Chat who={lessonId.slice(5) as CharacterId} voice={lessonId.startsWith("call:")} /> : <Lesson id={lessonId} />)}
       </>}
 
       <div className={`sheet-scrim ${sheet ? "open" : ""}`} onClick={(e) => e.target === e.currentTarget && closeSheet()}>

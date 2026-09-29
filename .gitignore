@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Whisper model (scripts/fetch-model.sh)
+src-tauri/resources/*.bin
+src-tauri/resources/*.part

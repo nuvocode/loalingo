@@ -50,7 +50,9 @@
     "guideGrammar": "Gramer",
     "guideNoAi": "Çeviri, örnek ve açıklamalar için Ayarlar'dan bir yapay zekâ sağlayıcısı kur.",
     "guideLoading": "Rehberin hazırlanıyor…",
-    "guideLoadingDesc": "Yapay zekâ çevirileri, örnek cümleleri ve gramer notlarını ekliyor. Sadece ilk seferde birkaç saniye sürer."
+    "guideLoadingDesc": "Yapay zekâ çevirileri, örnek cümleleri ve gramer notlarını ekliyor. Sadece ilk seferde birkaç saniye sürer.",
+    "legendTicket_one": "{{count}} bilet",
+    "legendTicket_other": "{{count}} bilet"
   },
   "practice": {
     "title": "Pratik Merkezi",
@@ -59,7 +61,7 @@
     "mistakesCount_one": "{{count}} soru seni bekliyor",
     "mistakesCount_other": "{{count}} soru seni bekliyor",
     "speak": "Konuşma pratiği",
-    "speakDesc": "Telaffuzunu ölç — 3 cümle",
+    "speakDesc": "3 ifadeni sesli söyle",
     "listen": "Dinleme pratiği",
     "listenDesc": "Duyduğunu seç — {{count}} soru",
     "start": "Başla",
@@ -68,20 +70,38 @@
     "listenPrompt": "Hangi kelimeyi duydun?",
     "noMistakes": "Düzeltilecek hata yok — harika!",
     "needWords": "Önce derslerde en az {{count}} kelime öğren",
-    "noWords": "Derslerde öğrendiğin kelimeler burada görünür."
+    "noWords": "Derslerde öğrendiğin kelimeler burada görünür.",
+    "madnessDesc": "90 saniyede olabildiğince çok eşleştir",
+    "timed": "Süreli meydan okuma",
+    "timedDesc": "Derslerinden karışık sorular — 2 dakika",
+    "needLesson": "Önce bir ders bitir",
+    "timeLeft_one": "{{count}} saniye kaldı",
+    "timeLeft_other": "{{count}} saniye kaldı"
   },
   "league": {
     "title": "{{name}} Ligi",
-    "rules": "Hafta Pazar 23:59'da biter. İlk 3 yükselir, son 3 düşer.",
-    "timeLeft": "3 gün 14 saat kaldı",
+    "rules": "Hafta Pazar 23:59'da biter. İlk {{up}} yükselir, son {{down}} düşer.",
+    "timeLeft": "{{days}} gün {{hours}} saat kaldı",
     "you": "Sen",
     "youSuffix": " (Sen)",
     "matchSection": "Süreli etkinlik: Match Madness",
     "matchName": "90 saniyede eşleştir",
-    "matchBest": "En yüksek skor: 12 eşleşme",
     "play": "Oyna",
-    "matchToast": "Match Madness yakında — önce dersini bitir",
-    "all": "Tümü"
+    "all": "Tümü",
+    "matchBest_one": "En yüksek skor: {{count}} eşleşme",
+    "matchBest_other": "En yüksek skor: {{count}} eşleşme",
+    "promoted": "{{name}} Ligi'ne yükseldin!",
+    "demoted": "{{name}} Ligi'ne düştün. Bu hafta geri al!",
+    "tier0": "Bronz",
+    "tier1": "Gümüş",
+    "tier2": "Altın",
+    "tier3": "Safir",
+    "tier4": "Yakut",
+    "tier5": "Zümrüt",
+    "tier6": "Ametist",
+    "tier7": "İnci",
+    "tier8": "Obsidyen",
+    "tier9": "Elmas"
   },
   "shop": {
     "title": "Mağaza",
@@ -94,9 +114,11 @@
     "doubleXp": "Çift XP (15 dk)",
     "doubleXpDesc": "15 dakika boyunca her ders 2× XP.",
     "legendary": "Efsanevi deneme",
-    "legendaryDesc": "Kilitli Efsanevi derslerden birini ücretsiz aç.",
+    "legendaryDesc": "Bir Efsanevi deneme hakkı; istediğin zaman kullan.",
     "bought": "Satın alındı: {{name}}",
-    "notEnough": "Yeterli elmasın yok"
+    "notEnough": "Yeterli elmasın yok",
+    "doubleXpActive_one": "2× XP · {{count}} dk kaldı",
+    "doubleXpActive_other": "2× XP · {{count}} dk kaldı"
   },
   "profile": {
     "since": "{{date}} tarihinden beri öğreniyor",
@@ -132,7 +154,6 @@
     "kaiGoal": "Menüden öneri iste",
     "chat": "Sohbet",
     "call": "Ara",
-    "callToast": "Görüntülü arama ses tanıma gerektiriyor — yakında",
     "message": "Mesajın",
     "placeholder": "Öğrendiğin dilde yaz",
     "send": "Gönder",
@@ -140,27 +161,35 @@
     "goalReached": "Hedefe ulaştın! XP'ni almak için bitir.",
     "limit": "Bu sohbet için yeterli — XP'ni almak için bitir.",
     "goalDone": "Hedefe ulaştın!",
-    "done": "Sohbet tamamlandı!"
+    "done": "Sohbet tamamlandı!",
+    "callHint": "Cevabını sesli söyle — bu görüşme sadece sesli."
   },
   "friends": {
     "title": "Arkadaşlar",
     "streak": "{{count}} günlük seri",
-    "duel": "Düello",
-    "duelToast": "{{name}} düelloya davet edildi",
-    "invite": "Arkadaş davet et",
-    "inviteToast": "Davet bağlantısı kopyalandı"
+    "subtitle": "Bu cihazdaki diğer öğrenciler.",
+    "empty": "Bu cihazda henüz başka öğrenen yok. Aile ya da arkadaşlarınla yarışmak için profil ekle.",
+    "add": "Profil değiştir ya da ekle",
+    "weekXp_one": "Bu hafta {{count}} XP",
+    "weekXp_other": "Bu hafta {{count}} XP"
   },
   "notifications": {
     "title": "Bildirimler",
-    "n1": "Serin tehlikede!",
-    "n1Desc": "Bugün henüz pratik yapmadın. 12 günlük serini korumak için bir ders tamamla.",
-    "n1Time": "2 sa",
-    "n2": "Ligde yükseldin",
-    "n2Desc": "Safir liginde 4. sıraya çıktın. İlk 3 bitiş çizgisine çok yakın!",
-    "n2Time": "5 sa",
-    "n3": "Zeynep seni geçti",
-    "n3Desc": "Haftalık XP yarışında Zeynep öne geçti. Karşılık ver!",
-    "n3Time": "1 g"
+    "streakSafe": "Serin bugün güvende",
+    "streakSafeDesc_one": "{{count}} gün oldu. Yarın görüşürüz!",
+    "streakSafeDesc_other": "{{count}} gün oldu. Yarın görüşürüz!",
+    "streakRisk": "Serin tehlikede!",
+    "streakRiskDesc_one": "Bugün pratik yapmadın. {{count}} günlük serini korumak için bir ders bitir.",
+    "streakRiskDesc_other": "Bugün pratik yapmadın. {{count}} günlük serini korumak için bir ders bitir.",
+    "streakStart": "Bugün bir seri başlat",
+    "streakStartDesc": "Günde bir ders alışkanlığı oluşturur.",
+    "league": "{{name}} Ligi'nde {{rank}}. sıradasın",
+    "leagueUp": "Yükselme bölgesindesin. Böyle devam!",
+    "leagueChase": "Bu hafta yükselmek için ilk {{count}}'e gir.",
+    "passed": "{{name}} seni geçti",
+    "passedDesc": "{{name}} bu hafta daha çok XP kazandı. Karşılık ver!",
+    "chest": "Açılmamış bir sandığın var",
+    "chestDesc": "Öğren yolunda aç."
   },
   "settings": {
     "title": "Ayarlar",
@@ -189,7 +218,14 @@
     "editProfile": "Profili düzenle",
     "logout": "Çıkış yap",
     "hearts": "Kalpler",
-    "heartsDesc": "Her hatada bir kalp gider; her gün yenilenir"
+    "heartsDesc": "Her hatada bir kalp gider; her gün yenilenir",
+    "reminderTime": "Hatırlatma saati",
+    "reminderTimeDesc": "loalingo açıkken çalışır, arka planda bile.",
+    "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver.",
+    "reminderTitle": "Ders zamanı",
+    "reminderBody": "Bugün beş dakika, alışkanlığı başlatır.",
+    "reminderStreak_one": "{{count}} günlük serini koru — bir ders yeter.",
+    "reminderStreak_other": "{{count}} günlük serini koru — bir ders yeter."
   },
   "rail": {
     "label": "İlerleme",
@@ -243,10 +279,12 @@
     "examPassed": "{{level}} tamamlandı!",
     "examFailed": "Henüz olmadı",
     "examNeed": "Geçmek için %{{score}} gerekiyor. Tekrar edip yeniden dene.",
-    "legendPassed": "Efsanevi!"
-  },
-  "mock": {
-    "leagueName": "Safir"
+    "legendPassed": "Efsanevi!",
+    "speakTitle": "Konuşma",
+    "speakSub": "Mikrofon düğmesine bas ve cümleyi söyle.",
+    "heard": "Duyulan: “{{text}}”",
+    "heardNothing": "Anlaşılmadı — biraz daha yüksek sesle tekrar dene.",
+    "cantSpeak": "Şu an konuşamam"
   },
   "profiles": {
     "saved": "Profil kaydedildi",
@@ -302,5 +340,16 @@
     "regenerate": "Yeni alıştırmalar üret",
     "thinking": "Düşünüyor…",
     "notSet": "Kurulmadı — dersler kilitli"
+  },
+  "stt": {
+    "idle": "Konuşmak için dokun",
+    "rec": "Dinleniyor… bitince tekrar dokun",
+    "busy": "Bu Mac'te yazıya dökülüyor…",
+    "record": "Kaydet",
+    "stop": "Kaydı durdur",
+    "noMic": "Mikrofon izni yok. Sistem Ayarları → Gizlilik → Mikrofon'dan izin ver.",
+    "failed": "Ses tanıma başarısız",
+    "unavailable": "Konuşma, ses modeli olan masaüstü uygulamasında çalışır.",
+    "off": "Konuşma egzersizleri Ayarlar'da kapalı."
   }
 }

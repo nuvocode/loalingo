@@ -495,3 +495,560 @@ levels:
         - { type: listen_select, count: 3 }
         - { type: translate, count: 3 }
         - { type: dialogue }
+
+  A2:
+    title: Elementary
+    description: >
+      Communicate in simple, routine tasks and describe your background, immediate needs and everyday plans.
+
+    units:
+      - id: jobs-and-work
+        title: Jobs & Work
+        description: Talk about jobs, workplaces and how often you do things.
+        icon: 💼
+        steps:
+          - id: jobs-vocabulary
+            title: Jobs
+            description: Names of common jobs.
+            vocabulary: [teacher, doctor, engineer, chef, driver, nurse, lawyer, "work as"]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: image_select, count: 2 }
+              - { type: listen_select }
+          - id: what-do-you-do
+            title: What Do You Do?
+            description: Ask and talk about someone's job.
+            vocabulary: [office, company, job, work, career]
+            grammar:
+              - pattern: "What do you do?"
+              - pattern: "I work as a teacher."
+              - pattern: "I work for a bank."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_a_coworker
+                goal: Ask a new coworker about their job and describe your own.
+          - id: adverbs-of-frequency
+            title: Always, Often, Never
+            description: Say how often you do something.
+            vocabulary: [always, usually, often, sometimes, rarely, never]
+            grammar:
+              - pattern: "I always start work at nine."
+              - pattern: "She never works on weekends."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: daily-work-tasks
+            title: At the Office
+            description: Everyday office vocabulary.
+            vocabulary: [meeting, email, colleague, deadline, break, computer]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: listen_select }
+          - id: job-interview
+            title: A Job Interview
+            description: Talk about your skills and experience.
+            vocabulary: [experience, skills, apply, interview, cv]
+            grammar:
+              - pattern: "I have three years of experience."
+              - pattern: "Why do you want this job?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: speak }
+              - type: dialogue
+                scenario: job_interview
+                goal: Answer basic interview questions about your job and experience.
+
+      - id: comparing-things
+        title: Comparisons
+        description: Compare people, things and places.
+        icon: ⚖️
+        steps:
+          - id: comparatives
+            title: Bigger, Better, Faster
+            description: Compare two things.
+            vocabulary: [bigger, smaller, faster, slower, cheaper, "more expensive"]
+            grammar:
+              - pattern: "This car is faster than that one."
+              - pattern: "My house is bigger than yours."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: match }
+              - { type: error_correct }
+          - id: superlatives
+            title: The Best & The Worst
+            description: Compare more than two things.
+            vocabulary: ["the best", "the worst", "the biggest", "the most beautiful"]
+            grammar:
+              - pattern: "This is the best restaurant in town."
+              - pattern: "He is the tallest in the class."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+          - id: comparing-places
+            title: Comparing Cities
+            description: Describe and compare places you know.
+            vocabulary: [quiet, crowded, modern, historic, expensive, safe]
+            grammar:
+              - pattern: "London is more crowded than my town."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: translate }
+              - { type: listen_type }
+          - id: as-as
+            title: As...As
+            description: Say two things are equal or not.
+            vocabulary: ["as", same, different]
+            grammar:
+              - pattern: "She is as tall as her brother."
+              - pattern: "This isn't as expensive as that one."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_select }
+
+      - id: shopping-quantities
+        title: At the Shops
+        description: Quantities, supermarkets and returning items.
+        icon: 🛒
+        steps:
+          - id: countable-uncountable
+            title: Countable & Uncountable
+            description: Talk about things you can and can't count.
+            vocabulary: [rice, bread, apple, bottle, box, bag]
+            grammar:
+              - pattern: "There is some rice."
+              - pattern: "There are three apples."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank }
+          - id: some-any
+            title: Some & Any
+            description: Use some and any correctly.
+            grammar:
+              - pattern: "Is there any milk?"
+              - pattern: "There isn't any sugar."
+              - pattern: "There are some eggs."
+            activities:
+              - { type: learn }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_select }
+          - id: much-many
+            title: Much & Many
+            description: Ask about quantities.
+            grammar:
+              - pattern: "How much water do you want?"
+              - pattern: "How many people are coming?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: at-the-supermarket
+            title: At the Supermarket
+            description: Shop for groceries.
+            vocabulary: [basket, trolley, aisle, cashier, receipt, discount]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: listen_type }
+          - id: returning-items
+            title: Returning an Item
+            description: Return or exchange something you bought.
+            vocabulary: [return, refund, receipt, broken, exchange]
+            grammar:
+              - pattern: "I'd like to return this."
+              - pattern: "Can I get a refund?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: shop_return
+                goal: Return a broken item to the shop and ask for a refund.
+
+      - id: health-and-body
+        title: Health & the Body
+        description: Body parts, symptoms and visiting the doctor.
+        icon: 🏥
+        steps:
+          - id: body-parts
+            title: Parts of the Body
+            vocabulary: [head, arm, leg, back, stomach, throat]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: how-do-you-feel
+            title: How Do You Feel?
+            description: Describe how you feel and what hurts.
+            vocabulary: [sick, headache, fever, cough, tired]
+            grammar:
+              - pattern: "I have a headache."
+              - pattern: "My back hurts."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: at-the-doctor
+            title: At the Doctor's
+            description: Explain symptoms and understand advice.
+            vocabulary: [doctor, appointment, medicine, prescription, pain]
+            grammar:
+              - pattern: "You should see a doctor."
+              - pattern: "Take this medicine twice a day."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: doctors_appointment
+                goal: Describe your symptoms to the doctor and get advice.
+          - id: giving-advice
+            title: Should & Shouldn't
+            description: Give simple health advice.
+            vocabulary: [rest, exercise, healthy, stress]
+            grammar:
+              - pattern: "You should drink more water."
+              - pattern: "You shouldn't work so much."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_select }
+
+      - id: travel-plans
+        title: Travel Plans
+        description: Get ready for a trip and find your way around.
+        icon: ✈️
+        steps:
+          - id: travel-vocabulary
+            title: Getting Ready to Travel
+            vocabulary: [passport, suitcase, flight, airport, ticket, luggage]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: image_select, count: 2 }
+              - { type: listen_select }
+          - id: going-to-future
+            title: Going To
+            description: Talk about plans and intentions.
+            grammar:
+              - pattern: "I'm going to visit Rome."
+              - pattern: "We're going to stay for a week."
+              - pattern: "Are you going to travel by plane?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: at-the-airport
+            title: At the Airport
+            vocabulary: [check-in, gate, boarding, delay, security]
+            grammar:
+              - pattern: "Where is gate 12?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: airport_checkin
+                goal: Check in for your flight and ask about your gate.
+          - id: asking-for-directions-travel
+            title: Finding Your Way
+            description: Ask for and understand directions in a new city.
+            vocabulary: [map, sign, turn, cross, block]
+            grammar:
+              - pattern: "Excuse me, how do I get to the hotel?"
+              - pattern: "Go straight and turn right."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: translate }
+              - { type: sentence_complete }
+          - id: booking-a-hotel
+            title: Booking a Hotel
+            vocabulary: [reservation, room, night, "check-out", view]
+            grammar:
+              - pattern: "I'd like to book a room for two nights."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: speak }
+
+      - id: future-predictions
+        title: The Future
+        description: Talk about the future, predictions and plans.
+        icon: 🔮
+        steps:
+          - id: will-future
+            title: Will
+            description: Talk about the future with will.
+            grammar:
+              - pattern: "I will call you tomorrow."
+              - pattern: "It will rain later."
+              - pattern: "She won't be late."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: predictions
+            title: Making Predictions
+            vocabulary: [probably, maybe, definitely, believe, think]
+            grammar:
+              - pattern: "I think it will be sunny."
+              - pattern: "People will probably travel to space."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: translate }
+          - id: future-plans-vs-arrangements
+            title: Plans & Arrangements
+            description: Talk about things already arranged.
+            vocabulary: [plan, arrangement, decide]
+            grammar:
+              - pattern: "What are you doing this weekend?"
+              - pattern: "I'm meeting my friend on Friday."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - type: dialogue
+                scenario: weekend_plans_call
+                goal: Talk on the phone about your plans for next week.
+          - id: life-in-the-future
+            title: Life in the Future
+            vocabulary: [robot, technology, invent, change, future]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: listen_select }
+
+      - id: past-continuous
+        title: What Were You Doing?
+        description: Talk about actions in progress in the past.
+        icon: 🕰️
+        steps:
+          - id: past-continuous-form
+            title: Was/Were + -ing
+            grammar:
+              - pattern: "I was cooking dinner."
+              - pattern: "They were watching TV."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: match }
+              - { type: error_correct }
+          - id: past-continuous-questions
+            title: What Were You Doing?
+            grammar:
+              - pattern: "What were you doing at 8pm?"
+              - pattern: "Were you sleeping?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+              - { type: word_bank }
+          - id: interrupted-actions
+            title: While I Was...
+            description: Combine past continuous and past simple.
+            vocabulary: [while, when, suddenly]
+            grammar:
+              - pattern: "While I was cooking, the phone rang."
+              - pattern: "I was walking when it started to rain."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: telling-a-story-past
+            title: Telling a Story
+            vocabulary: [suddenly, then, "after that", finally]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: retelling_an_event
+                goal: Tell a friend about something unusual that happened to you yesterday.
+
+      - id: life-experiences
+        title: Life Experiences
+        description: Talk about things you have and haven't done.
+        icon: ⭐
+        steps:
+          - id: present-perfect-intro
+            title: Have You Ever...?
+            grammar:
+              - pattern: "Have you ever been to Japan?"
+              - pattern: "I have never tried sushi."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: ever-never
+            title: Ever & Never
+            vocabulary: [ever, never, before]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: already-yet
+            title: Already & Yet
+            grammar:
+              - pattern: "I have already finished."
+              - pattern: "I haven't seen it yet."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: translate, count: 2 }
+              - { type: listen_type }
+          - id: talking-about-experiences
+            title: My Experiences
+            vocabulary: [experience, adventure, achievement, journey]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: sharing_experiences
+                goal: Ask a friend about interesting things they have done and share your own.
+
+      - id: phone-and-email
+        title: Phone Calls & Emails
+        description: Communicate by phone and by email.
+        icon: 📞
+        steps:
+          - id: phone-basics
+            title: On the Phone
+            vocabulary: [call, "hang up", answer, voicemail, busy]
+            grammar:
+              - pattern: "Can I speak to Anna, please?"
+              - pattern: "Can you hold on?"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: image_select, count: 2 }
+              - { type: listen_select }
+          - id: leaving-a-message
+            title: Leaving a Message
+            vocabulary: [message, "call back", available]
+            grammar:
+              - pattern: "Can I take a message?"
+              - pattern: "She'll call you back later."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - type: dialogue
+                scenario: phone_message
+                goal: Leave a message for someone who is not available.
+          - id: writing-an-email
+            title: Writing an Email
+            vocabulary: [dear, regards, attach, subject, reply]
+            grammar:
+              - pattern: "Dear Mr Smith,"
+              - pattern: "I am writing to ask about..."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+              - { type: error_correct }
+          - id: invitations
+            title: Invitations
+            vocabulary: [invite, party, celebrate, rsvp]
+            grammar:
+              - pattern: "Would you like to come to my party?"
+              - pattern: "I'd love to, thanks!"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: speak }
+
+      - id: rules-and-obligations
+        title: Rules & Obligations
+        description: Talk about rules, obligations and permission.
+        icon: 📋
+        steps:
+          - id: must-mustnt
+            title: Must & Mustn't
+            vocabulary: [rule, law, allowed, forbidden]
+            grammar:
+              - pattern: "You must wear a seatbelt."
+              - pattern: "You mustn't smoke here."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: have-to
+            title: Have To
+            grammar:
+              - pattern: "I have to work on Saturday."
+              - pattern: "Do you have to wear a uniform?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+          - id: could-for-suggestions
+            title: Could
+            description: Make suggestions with could.
+            grammar:
+              - pattern: "You could try the new restaurant."
+              - pattern: "We could go by train instead."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: asking-permission
+            title: Asking Permission
+            vocabulary: [permission, allow]
+            grammar:
+              - pattern: "Can I open the window?"
+              - pattern: "Could I leave early today?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: asking_permission_at_work
+                goal: Ask your manager for permission to leave work early and explain why.
+
+    checkpoint:
+      title: A2 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }

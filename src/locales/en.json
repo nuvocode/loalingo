@@ -50,7 +50,9 @@
     "guideGrammar": "Grammar",
     "guideNoAi": "Set up an AI provider in Settings to get translations, examples and explanations.",
     "guideLoading": "Writing your guidebook…",
-    "guideLoadingDesc": "The AI is adding translations, examples and grammar notes. This takes a few seconds, only the first time."
+    "guideLoadingDesc": "The AI is adding translations, examples and grammar notes. This takes a few seconds, only the first time.",
+    "legendTicket_one": "{{count}} ticket",
+    "legendTicket_other": "{{count}} tickets"
   },
   "practice": {
     "title": "Practice Hub",
@@ -59,7 +61,7 @@
     "mistakesCount_one": "{{count}} question waiting for you",
     "mistakesCount_other": "{{count}} questions waiting for you",
     "speak": "Speaking practice",
-    "speakDesc": "Check your pronunciation — 3 sentences",
+    "speakDesc": "Say 3 of your phrases aloud",
     "listen": "Listening practice",
     "start": "Start",
     "myWords": "My words",
@@ -69,20 +71,38 @@
     "listenPrompt": "Which word did you hear?",
     "noMistakes": "No mistakes to fix — nice!",
     "needWords": "Learn at least {{count}} words in lessons first",
-    "noWords": "Words you learn in lessons appear here."
+    "noWords": "Words you learn in lessons appear here.",
+    "madnessDesc": "Match as many pairs as you can in 90 seconds",
+    "timed": "Timed challenge",
+    "timedDesc": "Mixed questions from your lessons — 2 minutes",
+    "needLesson": "Finish a lesson first",
+    "timeLeft_one": "{{count}} second left",
+    "timeLeft_other": "{{count}} seconds left"
   },
   "league": {
     "title": "{{name}} League",
-    "rules": "The week ends Sunday 23:59. Top 3 advance, bottom 3 drop.",
-    "timeLeft": "3 days 14 hours left",
+    "rules": "The week ends Sunday 23:59. Top {{up}} move up, bottom {{down}} move down.",
+    "timeLeft": "{{days}} days {{hours}} hours left",
     "you": "You",
     "youSuffix": " (You)",
     "matchSection": "Timed event: Match Madness",
     "matchName": "Match in 90 seconds",
-    "matchBest": "High score: 12 matches",
     "play": "Play",
-    "matchToast": "Match Madness coming soon — finish your lesson first",
-    "all": "View all"
+    "all": "View all",
+    "matchBest_one": "High score: {{count}} match",
+    "matchBest_other": "High score: {{count}} matches",
+    "promoted": "You moved up to the {{name}} League!",
+    "demoted": "You dropped to the {{name}} League. Win it back this week!",
+    "tier0": "Bronze",
+    "tier1": "Silver",
+    "tier2": "Gold",
+    "tier3": "Sapphire",
+    "tier4": "Ruby",
+    "tier5": "Emerald",
+    "tier6": "Amethyst",
+    "tier7": "Pearl",
+    "tier8": "Obsidian",
+    "tier9": "Diamond"
   },
   "shop": {
     "title": "Shop",
@@ -95,9 +115,11 @@
     "doubleXp": "Double XP (15 min)",
     "doubleXpDesc": "2× XP on every lesson for 15 minutes.",
     "legendary": "Legendary trial",
-    "legendaryDesc": "Unlock one locked Legendary lesson for free.",
+    "legendaryDesc": "One Legendary attempt, ready whenever you are.",
     "bought": "Purchased: {{name}}",
-    "notEnough": "Not enough gems"
+    "notEnough": "Not enough gems",
+    "doubleXpActive_one": "2× XP · {{count}} min left",
+    "doubleXpActive_other": "2× XP · {{count}} min left"
   },
   "profile": {
     "since": "Learning since {{date}}",
@@ -134,7 +156,6 @@
     "kaiGoal": "Ask for a recommendation",
     "chat": "Chat",
     "call": "Call",
-    "callToast": "Video calls need speech recognition — coming soon",
     "message": "Your message",
     "placeholder": "Write in the language you're learning",
     "send": "Send",
@@ -142,28 +163,36 @@
     "goalReached": "Goal reached! Finish to collect your XP.",
     "limit": "That's enough for one chat — finish to collect your XP.",
     "goalDone": "Goal reached!",
-    "done": "Chat complete!"
+    "done": "Chat complete!",
+    "callHint": "Speak your reply — the conversation is voice only."
   },
   "friends": {
     "title": "Friends",
     "streak_one": "{{count}} day streak",
     "streak_other": "{{count}} day streak",
-    "duel": "Duel",
-    "duelToast": "{{name}} was invited to a duel",
-    "invite": "Invite friends",
-    "inviteToast": "Invite link copied"
+    "subtitle": "Other learners on this device.",
+    "empty": "No one else learns on this device yet. Add a profile to compete with family or friends.",
+    "add": "Switch or add profile",
+    "weekXp_one": "{{count}} XP this week",
+    "weekXp_other": "{{count}} XP this week"
   },
   "notifications": {
     "title": "Notifications",
-    "n1": "Your streak is at risk!",
-    "n1Desc": "You haven't practiced today. Finish a lesson to keep your 12-day streak.",
-    "n1Time": "2h",
-    "n2": "You moved up",
-    "n2Desc": "You're now 4th in the Sapphire League. So close to the top 3!",
-    "n2Time": "5h",
-    "n3": "Zeynep passed you",
-    "n3Desc": "Zeynep took the lead in this week's XP race. Fight back!",
-    "n3Time": "1d"
+    "streakSafe": "Streak safe for today",
+    "streakSafeDesc_one": "{{count}} day and counting. See you tomorrow!",
+    "streakSafeDesc_other": "{{count}} days and counting. See you tomorrow!",
+    "streakRisk": "Your streak is at risk!",
+    "streakRiskDesc_one": "You haven't practiced today. Finish a lesson to keep your {{count}}-day streak.",
+    "streakRiskDesc_other": "You haven't practiced today. Finish a lesson to keep your {{count}}-day streak.",
+    "streakStart": "Start a streak today",
+    "streakStartDesc": "One lesson a day builds the habit.",
+    "league": "You're #{{rank}} in the {{name}} League",
+    "leagueUp": "You're in the promotion zone. Keep it up!",
+    "leagueChase": "Reach the top {{count}} to move up this week.",
+    "passed": "{{name}} is ahead of you",
+    "passedDesc": "{{name}} earned more XP this week. Fight back!",
+    "chest": "You have an unopened chest",
+    "chestDesc": "Open it on the Learn path."
   },
   "settings": {
     "title": "Settings",
@@ -192,7 +221,14 @@
     "editProfile": "Edit profile",
     "logout": "Log out",
     "hearts": "Hearts",
-    "heartsDesc": "Lose a heart for each mistake; they refill every day"
+    "heartsDesc": "Lose a heart for each mistake; they refill every day",
+    "reminderTime": "Reminder time",
+    "reminderTimeDesc": "Works while loalingo is open, even in the background.",
+    "reminderBlocked": "Notifications are blocked. Allow them in System Settings.",
+    "reminderTitle": "Time for a lesson",
+    "reminderBody": "Five minutes today builds the habit.",
+    "reminderStreak_one": "Keep your {{count}}-day streak alive — one lesson is enough.",
+    "reminderStreak_other": "Keep your {{count}}-day streak alive — one lesson is enough."
   },
   "rail": {
     "label": "Progress",
@@ -248,10 +284,12 @@
     "examPassed": "{{level}} complete!",
     "examFailed": "Not quite yet",
     "examNeed": "You need {{score}}% to pass. Review and try again.",
-    "legendPassed": "Legendary!"
-  },
-  "mock": {
-    "leagueName": "Sapphire"
+    "legendPassed": "Legendary!",
+    "speakTitle": "Speak this sentence",
+    "speakSub": "Tap the microphone and say the sentence.",
+    "heard": "Heard: “{{text}}”",
+    "heardNothing": "Didn't catch that — try again a little louder.",
+    "cantSpeak": "Can't speak now"
   },
   "profiles": {
     "saved": "Profile saved",
@@ -307,5 +345,16 @@
     "regenerate": "Generate new exercises",
     "thinking": "Thinking…",
     "notSet": "Not set up — lessons are locked"
+  },
+  "stt": {
+    "idle": "Tap to speak",
+    "rec": "Listening… tap again when you're done",
+    "busy": "Transcribing on this Mac…",
+    "record": "Record",
+    "stop": "Stop recording",
+    "noMic": "No microphone access. Allow it in System Settings → Privacy → Microphone.",
+    "failed": "Speech recognition failed",
+    "unavailable": "Speaking needs the desktop app with the speech model.",
+    "off": "Speaking exercises are off in Settings."
   }
 }

@@ -11,6 +11,7 @@ export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(
 /** `legend:<step>`: a finished step replayed without teaching cards, written one CEFR level harder (PLAN §3.3). */
 export const legendStep = (id: string) => id.startsWith("legend:") ? id.slice(7) : undefined;
 export const LEGEND_PASS = 80; // % needed to turn the step gold
+export const LEGEND_PRICE = 100; // gems per attempt, or one shop ticket
 
 /** Finds a step and its surroundings in the course tree; exams get a synthetic step covering the whole level. */
 export function stepContext(course: Course, stepId: string, native: string): LessonContext | null {

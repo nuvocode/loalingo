@@ -8,7 +8,8 @@ export type Item =
   | { kind: "choice"; prompt: string; context: string; big: boolean; listen: string; options: string[]; answer: number }
   | { kind: "bank"; prompt: string; answer: string[]; bank: string[] }
   | { kind: "input"; prompt: string; context: string; listen: string; answer: string; accepted: string[] }
-  | { kind: "match"; pairs: [string, string][] };
+  | { kind: "match"; pairs: [string, string][] }
+  | { kind: "speak"; phrase: string; translation: string };
 
 const s = z.string();
 const options = z.array(s).min(3).max(4);
@@ -27,6 +28,11 @@ const choice = (guide: string, extra: Record<string, z.ZodType>, map: (g: any) =
 });
 
 export const REGISTRY: Partial<Record<string, Def>> = {
+  speak: {
+    guide: "A short target-language sentence (3–8 words) from this step for the learner to say aloud, plus its translation. Everyday wording, no names or numbers.",
+    schema: z.object({ sentence: s, translation: s }),
+    toItem: (g) => ({ kind: "speak", phrase: g.sentence, translation: g.translation }),
+  },
   learn: {
     guide: "Teach one new word or phrase from the step: the target-language phrase, its translation, and a one-sentence usage note in the native language.",
     schema: z.object({ phrase: s, translation: s, note: s }),
@@ -108,6 +114,7 @@ export function mistakeLine(it: Item): string | null {
   if (it.kind === "choice") return `${it.prompt} → ${it.options[it.answer]}`;
   if (it.kind === "input") return `${it.prompt} → ${it.answer}`;
   if (it.kind === "bank") return `${it.prompt} → ${it.answer.join(" ")}`;
+  if (it.kind === "speak") return `Say aloud → ${it.phrase}`;
   return null;
 }
 
@@ -132,10 +139,36 @@ export const normalize = (t: string) =>
 export const matchesAnswer = (given: string, item: { answer: string; accepted: string[] }) =>
   [item.answer, ...item.accepted].some((a) => normalize(a) === normalize(given));
 
+/** Speaking check: share of the expected words the transcript contains (order-free, each word counted once). */
+export function speechScore(expected: string, heard: string) {
+  const want = normalize(expected).split(" ").filter(Boolean), got = normalize(heard).split(" ");
+  let hit = 0;
+  for (const w of want) { const k = got.indexOf(w); if (k >= 0) { hit++; got.splice(k, 1); } }
+  return want.length ? hit / want.length : 0;
+}
+export const SPEECH_PASS = 0.75; // ponytail: word overlap, not phoneme scoring; whisper already forgives accents
+
 // ---- Practice built locally from the learner's own words (no AI call) ----
 
 export type PracticeWord = { word: string; translation: string; strength: number };
 export const LISTEN_MIN_WORDS = 4;
+export const MADNESS_MIN_WORDS = 5;
+
+/** Match Madness: boards of 5 random pairs from the learner's words (words repeat across boards); played against the clock. */
+/** Speaking practice: the weakest learned phrases (multi-word first), said aloud. */
+export function speakItems(words: PracticeWord[], n = 3): Item[] {
+  const multi = (w: PracticeWord) => +(w.word.trim().split(/\s+/).length > 1);
+  return [...words].sort((a, b) => multi(b) - multi(a) || a.strength - b.strength).slice(0, n)
+    .map((w) => ({ kind: "speak", phrase: w.word, translation: w.translation }));
+}
+
+export function madnessItems(words: PracticeWord[], boards = 20): Item[] {
+  if (words.length < MADNESS_MIN_WORDS) return [];
+  return Array.from({ length: boards }, () => ({
+    kind: "match" as const, // ponytail: sort-shuffle, bias is fine for a game
+    pairs: [...words].sort(() => Math.random() - 0.5).slice(0, MADNESS_MIN_WORDS).map((w): [string, string] => [w.word, w.translation]),
+  }));
+}
 
 /** Weakest words first: hear the word, pick it among 3 other known words. */
 export function listenItems(words: PracticeWord[], prompt: string, n = 6): Item[] {

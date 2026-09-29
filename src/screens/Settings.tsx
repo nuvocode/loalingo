@@ -5,6 +5,7 @@ import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
 import { PROVIDERS, getKey, listModels, setKey, type AiConfig, type ProviderId } from "../ai";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
+import { notifyAllowed } from "../notify";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -98,7 +99,7 @@ function AiSheet() {
 
 export function Settings() {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout, ai, s, setS } = useApp();
+  const { theme, setTheme, course, enrollment, profile, updateProfile, openSheet, closeSheet, logout, ai, s, setS, toast } = useApp();
   const langName = useLangName();
   const themes: ThemePref[] = ["system", "light", "dark"];
   const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
@@ -114,8 +115,18 @@ export function Settings() {
         </div>
         <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
         <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
-        <ToggleRow k="speaking" initial />
-        <ToggleRow k="reminder" initial />
+        <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
+        <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
+          setS((s) => ({ ...s, reminderOn }));
+          if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
+        }} />
+        {s.reminderOn && (
+          <label className="card od-row" style={gap("12px")}>
+            <span className="od-field od-fill"><b>{t("settings.reminderTime")}</b><span className="muted small">{t("settings.reminderTimeDesc")}</span></span>
+            <input className="input" type="time" style={{ width: 130 }} value={s.reminderTime}
+              onChange={(e) => e.target.value && setS((s) => ({ ...s, reminderTime: e.target.value, remindedDay: "" }))} />
+          </label>
+        )}
         <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
       </div>
 

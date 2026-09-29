@@ -75,13 +75,13 @@ Bir kısmı **soru tipi**, bir kısmı soru tiplerinden oluşan **pratik modu**.
 | `sentence_complete` | Cümle tamamlama | ✅ | `choice` |
 | `error_correct` | Hata düzeltme | ✅ | `choice`/input |
 | `dialogue` | Karakter diyaloğu | ✅ | `choice` + balonlar |
-| `speak` | Konuşma | 🔜 | `speak` (tasarım var) |
+| `speak` | Konuşma | ✅ | `speak` (tasarım var) |
 | `story` | Hikâyeler | ✅ faz 4 | — |
-| `roleplay` | Roleplay (AI sohbet) | ✅ faz 4 (yazılı; sesli arama 🔜) | — |
-| `video_call` | Video Call | 🔜 | — |
+| `roleplay` | Roleplay (AI sohbet) | ✅ faz 4 (yazılı + sesli arama) | — |
+| `video_call` | Video Call | ✅ (Rol Yapma sesli arama) | — |
 
 **Pratik modları** (Pratik ekranı; yeni tip değil, yukarıdakilerin kombinasyonu):
-`listen` (dinleme tipleri) · `speak` 🔜 · `words` (öğrenilmiş kelimeler) · `mistakes` (hata tablosundan) · `match_madness` 🔜 (`match` + süre) · `timed_challenge` 🔜 (karışık + süre) · `legendary` ✅ (yolda tamamlanmış adıma dokununca; bir üst CEFR zorluğunda).
+`listen` (dinleme tipleri) · `speak` ✅ · `words` (öğrenilmiş kelimeler) · `mistakes` (hata tablosundan) · `match_madness` ✅ (`match` + süre) · `timed_challenge` ✅ (karışık + süre) · `legendary` ✅ (yolda tamamlanmış adıma dokununca; bir üst CEFR zorluğunda).
 
 Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hatırla=`match` → Üret=`word_bank/translate` → Dinle=`listen_*` → Konuş=`speak` → Hata yap → `mistakes` tekrarı.
 
@@ -136,9 +136,19 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - İkisi de kalp harcamaz; XP + seri + "alıştırma" görevi sayılır.
 - Efsanevi (`legendary`): tamamlanmış adıma dokununca "Efsanevi / Tekrar et" sheet'i. Efsanevi ders = aynı adım, öğretici kart yok, bir üst CEFR zorluğunda (`legend:<adım>`, ayrı önbellek). %80 ile geçilirse düğüm altın yıldız olur (`step_progress.legendary`). Ücretsiz — elmas bedeli Mağaza ile birlikte.
 - Kişiselleştirme: yeni üretilen her ders promptuna kursun son 8 hatası girer (§3.3). Önbellekteki dersler değişmez; "Yeniden üret" hataları da alır.
-- Ayarlar: ses efektleri (Web Audio, dosyasız doğru/yanlış/bitti sesleri) ve hareketi azalt çalışıyor, profil başına saklanır. Konuşma egzersizleri ve günlük hatırlatıcı hâlâ görsel.
+- Ayarlar: ses efektleri (Web Audio, dosyasız doğru/yanlış/bitti sesleri) ve hareketi azalt çalışıyor, profil başına saklanır. Konuşma ve hatırlatıcı: Faz 5.
 - Rehber (B8): ünite başlığındaki buton; ünitenin kelime + gramer listesi. AI çeviri, örnek cümle ve açıklama yazar (`guide:<ünite>` önbelleği); AI yoksa ya da beklenirken YAML listeleri görünür. Kelimeye/örneğe dokununca sesli okunur.
-- "Yakında" kalanlar: Konuşma/STT ve Görüntülü arama (D2), Lig, Arkadaşlar, Mağaza, Bildirimler (E1), `match_madness`, `timed_challenge`.
+
+**Faz 5 — Konuşma, oyunlaştırma, A2** ✅
+- Konuşma/STT (D2): whisper.cpp uygulamanın içinde (`whisper-rs`, Metal). Model `ggml-base-q5_1.bin` (~57 MB) `src-tauri/resources`'a paketlenir; `pnpm fetch-model` indirir, `tauri build` otomatik çağırır. Ayrı servis gerekmez. Mikrofon → 16 kHz → `transcribe` komutu; kelime örtüşmesi ≥ %75 geçer. Model yoksa ya da Ayarlar'da kapalıysa konuşma maddeleri atlanır.
+- Konuşma pratiği (Pratik), ders içi `speak` maddesi, Rol Yapma'da sesli arama (`call:<karakter>`).
+- Lig: yerel, yapay rakipli (9 rakip, haftaya+kademeye göre sabit tohum). Pazartesi kapanır: ilk 3 yükselir, son 3 düşer, 10 kademe.
+- Match Madness (90 sn) ve Zamanlı Meydan Okuma (120 sn, önbellekteki derslerden). Kalp harcamaz.
+- Mağaza: 2× XP (süreli), efsanevi bilet; efsanevi ders 100 elmas ya da bilet.
+- Arkadaşlar: bu cihazdaki diğer profiller. Bildirimler: gerçek durumdan (seri, lig, sandık…).
+- Günlük hatırlatıcı: sistem bildirimi; yalnızca uygulama açıkken (dakikada bir kontrol).
+- A2 kursu: 10 ünite, 43 adım + checkpoint.
+- ✔ Whisper Rust testi (`cargo test -- --ignored whisper`) geçiyor. Dev uygulamada mikrofonla elle test bekliyor.
 
 ## 5. Kararlar
 

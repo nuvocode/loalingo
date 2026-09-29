@@ -177,6 +177,12 @@ export async function completeLevel(enrollmentId: number, ids: string[], next: C
   if (next) await (await db()).execute("UPDATE enrollments SET level = $1 WHERE id = $2", [next, enrollmentId]);
 }
 
+/** Scored items of every cached step lesson (not legend/story/guide/exam keys, which contain ":"), for the timed challenge. */
+export async function cachedLessonItems<T extends { kind: string }>(enrollmentId: number) {
+  const r = await (await db()).select<{ content: string }>("SELECT content FROM content_cache WHERE enrollment_id = $1 AND step_id NOT LIKE '%:%'", [enrollmentId]);
+  return r.flatMap((x) => JSON.parse(x.content) as T[]).filter((it) => it.kind !== "learn");
+}
+
 // ---- Mistakes and words (per enrollment, DECISIONS E6) ----
 
 export async function addMistake(enrollmentId: number, item: unknown) {

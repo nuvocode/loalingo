@@ -11,7 +11,7 @@ test("answer check ignores case, punctuation and curly quotes; accepts variants"
 });
 
 test("lesson plan skips v1-unsupported types, applies default count, validates and maps output", () => {
-  const acts = plannedActivities([{ type: "speak" }, { type: "word_select", count: 1 }, { type: "match" }]);
+  const acts = plannedActivities([{ type: "video_call" }, { type: "word_select", count: 1 }, { type: "match" }]);
   assert.deepEqual(acts.map((a) => [a.key, a.type, a.count]), [["a0", "word_select", 1], ["a1", "match", 2]]);
   const out = lessonSchema(acts).parse({
     a0: [{ prompt: "Hello?", options: ["Merhaba", "Hoşça kal", "Evet", "Hayır"], answer_index: 0 }],
@@ -46,4 +46,21 @@ test("recent mistakes reach the lesson prompt as one line each", async () => {
   const c = { unitTitle: "U", step: { title: "S", vocabulary: [], grammar: [] } } as any;
   assert.ok(lessonPrompt(c, [], ["Hi? → b"]).includes("- Hi? → b"));
   assert.ok(!lessonPrompt(c, []).includes("got these wrong"));
+});
+
+test("match madness boards have 5 distinct pairs and need 5 words", async () => {
+  const { madnessItems } = await import("./activities.ts");
+  const words = Array.from({ length: 12 }, (_, i) => ({ word: `w${i}`, translation: `t${i}`, strength: 1 }));
+  const items = madnessItems(words, 3);
+  assert.equal(items.length, 3);
+  for (const it of items) assert.ok(it.kind === "match" && new Set(it.pairs.map((p) => p[0])).size === 5 && it.pairs.every(([w, t]) => t === w.replace("w", "t")));
+  assert.equal(madnessItems(words.slice(0, 4)).length, 0);
+});
+
+test("speaking check forgives order, case and punctuation but not missing words", async () => {
+  const { speechScore, SPEECH_PASS } = await import("./activities.ts");
+  assert.equal(speechScore("Nice to meet you!", " nice to meet you."), 1);
+  assert.ok(speechScore("I'm fine, thank you.", "I'm fine thank you") >= SPEECH_PASS);
+  assert.ok(speechScore("Good morning, how are you?", "good morning") < SPEECH_PASS);
+  assert.equal(speechScore("thank thank", "thank"), 0.5, "each heard word counts once");
 });

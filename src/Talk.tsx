@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { say, sfx } from "./Lesson";
+import { MicButton } from "./Mic";
 import { CHARACTERS, chatTurn, loadStory, type CharacterId, type ChatMsg, type Story as StoryData } from "./lessons";
-import { recordSession, today } from "./progress";
+import { recordSession, today, xpMult } from "./progress";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 const CHAT_TURNS = 10; // ponytail: fixed cap so a chat always ends; make it per character if scenarios grow
@@ -94,7 +95,7 @@ function useQuit(active: boolean) {
 
 export function Story({ unitId }: { unitId: string }) {
   const { t } = useTranslation();
-  const { course, enrollment, profile, setS, completeStep } = useApp();
+  const { course, enrollment, profile, s, setS, completeStep } = useApp();
   const level = enrollment?.level;
   const unit = level && course?.levels[level]?.units.find((u) => u.id === unitId);
   const lang = course?.iso ?? "en";
@@ -133,7 +134,7 @@ export function Story({ unitId }: { unitId: string }) {
 
   const next = () => {
     if (p + 1 < seq.length) { setP(p + 1); setSel(null); setChecked(false); return; }
-    const xp = 10 + correct * 10, gems = correct * 2;
+    const xp = (10 + correct * 10) * xpMult(s), gems = correct * 2;
     setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
     completeStep(`story:${unitId}`, xp);
     sfx("done");
@@ -184,11 +185,11 @@ export function Story({ unitId }: { unitId: string }) {
     onRegen={story && !result ? () => setGen((g) => g + 1) : undefined} body={body} footer={footer} />;
 }
 
-// ---- Roleplay: free text chat with a character; the model corrects each message ----
+// ---- Roleplay: free text chat with a character; the model corrects each message. `voice` = video-call mode: speak instead of type ----
 
-export function Chat({ who }: { who: CharacterId }) {
+export function Chat({ who, voice = false }: { who: CharacterId; voice?: boolean }) {
   const { t } = useTranslation();
-  const { course, enrollment, profile, setS, gainXp } = useApp();
+  const { course, enrollment, profile, s, setS, gainXp } = useApp();
   const ch = CHARACTERS[who];
   const lang = course?.iso ?? "en";
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
@@ -218,15 +219,15 @@ export function Chat({ who }: { who: CharacterId }) {
   const opened = useRef(false); // StrictMode runs effects twice; open the scene once
   useEffect(() => { if (!opened.current) { opened.current = true; turn([]); } }, []);
 
-  const send = () => {
-    const v = text.trim();
+  const send = (said?: string) => {
+    const v = (said ?? text).trim();
     if (!v || busy) return;
     setText("");
     turn([...msgs, { from: "me", text: v }]);
   };
   const finish = () => {
     const clean = msgs.filter((m) => m.from === "me" && !m.correction).length;
-    const xp = mine * 5 + clean * 5 + (goal ? 20 : 0), gems = goal ? 10 : 0;
+    const xp = (mine * 5 + clean * 5 + (goal ? 20 : 0)) * xpMult(s), gems = goal ? 10 : 0;
     setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
     gainXp(xp);
     sfx("done");
@@ -258,16 +259,19 @@ export function Chat({ who }: { who: CharacterId }) {
       </div>
       {err && <Failed msg={err} retry={() => turn(msgs)} quit={quit} />}
       {over && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t(goal ? "roleplay.goalReached" : "roleplay.limit")}</p>}
+      {voice && !over && <MicButton lang={lang} disabled={busy} onText={(said) => send(said)} />}
       <div ref={endRef} />
     </>;
-    footer = over
-      ? <><span className="muted small">{t("roleplay.tapHint")}</span><button className="btn btn-primary" disabled={busy} onClick={finish}>{t("lesson.finish")}</button></>
+    footer = over || voice
+      ? voice && !over
+        ? <><span className="muted small">{t("roleplay.callHint")}</span>{mine > 0 ? <button className="btn btn-ghost" disabled={busy} onClick={finish}>{t("lesson.finish")}</button> : <span />}</>
+        : <><span className="muted small">{t("roleplay.tapHint")}</span><button className="btn btn-primary" disabled={busy} onClick={finish}>{t("lesson.finish")}</button></>
       : <>
         <input className="input" style={{ flex: 1, fontSize: 17 }} lang={lang} value={text} autoFocus aria-label={t("roleplay.message")} placeholder={t("roleplay.placeholder")}
           onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") send(); }} />
         <span className="od-row" style={gap("10px")}>
           {mine > 0 && <button className="btn btn-ghost" disabled={busy} onClick={finish}>{t("lesson.finish")}</button>}
-          <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={send}>{t("roleplay.send")}</button>
+          <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={() => send()}>{t("roleplay.send")}</button>
         </span>
       </>;
   }

@@ -373,3 +373,14 @@ button.bubble:hover{border-color:var(--blue)}
 .guide-status-ico{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--blue);color:var(--on-accent)}
 .guide-status.bad{border-color:var(--red);background:var(--red-tint)}
 .guide-status.bad .guide-status-ico{background:var(--red)}
+.timer-box{display:flex;align-items:center;gap:4px;font-weight:900;color:var(--blue);font-size:16px;font-variant-numeric:tabular-nums}
+.timer-box.low{color:var(--red)}
+/* League promotion / demotion cut lines */
+.league-row.cut-up{border-bottom:2px dashed var(--green);border-radius:var(--r) var(--r) 0 0}
+.league-row.cut-down{border-bottom:2px dashed var(--red);border-radius:var(--r) var(--r) 0 0}
+/* Speaking: design's round mic button (docs/design speak screen) */
+.mic-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:26px 0}
+.mic-btn{width:84px;height:84px;border-radius:50%;background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--blue-dark);display:flex;align-items:center;justify-content:center}
+.mic-btn svg{width:34px;height:34px}
+.mic-btn.rec{background:var(--red);box-shadow:0 5px 0 var(--red-dark);animation:pulse 1.2s infinite;outline:4px solid var(--red-tint)}
+.mic-btn:disabled{opacity:.6}
