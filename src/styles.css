@@ -201,6 +201,15 @@ svg{display:block}
 .avatar{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px}
 .league-name{flex:1;min-width:0;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .league-xp{font-weight:800;color:var(--text-muted);white-space:nowrap;font-size:14px}
+.tier-rail{position:relative;--od-gap:10px;align-items:center;padding-block:6px 4px}
+.tier{display:flex;flex-direction:column;align-items:center;gap:6px;width:64px}
+.tier-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text-faint)}
+.tier.passed .tier-badge{background:var(--green-tint);color:var(--green)}
+.tier.current{width:88px}
+.tier.current .tier-badge{width:72px;height:72px;background:var(--gold-tint);color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
+.tier-name{font-size:12px;font-weight:800;color:var(--text-faint);white-space:nowrap}
+.tier.passed .tier-name{color:var(--text-muted)}
+.tier.current .tier-name{color:var(--text);font-size:13px}
 
 /* shop */
 .shop-item{display:flex;align-items:center;gap:14px;border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px}
@@ -320,7 +329,7 @@ svg{display:block}
 
 /* ===== additions (not in design export) ===== */
 /* Design bug: icons outside nav/node/stat had no size and rendered 0×0 (guidebook, quests, chest, result, cards). */
-:where(.ic) > svg{width:24px;height:24px}
+:where(.ic) > svg{width:var(--ic,24px);height:var(--ic,24px)}
 .guidebook svg{width:20px;height:20px}
 .chest-box svg{width:48px;height:48px}
 .result-badge svg{width:60px;height:60px}

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
 import { useSpeakBlock } from "../Mic";
-import { msLeft, rivalXp, PROMOTE, DEMOTE } from "../league";
+import { msLeft, rivalXp, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, today } from "../progress";
@@ -96,6 +96,26 @@ export function Practice() {
   );
 }
 
+/** All league tiers in a horizontal strip, current one centred: passed tiers on the left, locked ones on the right. */
+function TierRail({ tier }: { tier: number }) {
+  const { t } = useTranslation();
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { // scrollLeft instead of scrollIntoView so the page itself never jumps
+    const el = ref.current, cur = el?.querySelector<HTMLElement>(".tier.current");
+    if (el && cur) el.scrollLeft = cur.offsetLeft - (el.clientWidth - cur.clientWidth) / 2;
+  }, [tier]);
+  return (
+    <div className="od-rail tier-rail" ref={ref}>
+      {Array.from({ length: TIERS }, (_, i) => (
+        <div key={i} className={`tier ${i < tier ? "passed" : i === tier ? "current" : "locked"}`} aria-current={i === tier ? "step" : undefined}>
+          <span className="tier-badge"><Icon name={i > tier ? "lock" : "trophy"} size={i === tier ? 40 : 22} /></span>
+          <span className="tier-name">{t(`league.tier${i}`)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function League() {
   const { t } = useTranslation();
   const { toast, s, enrollment } = useApp();
@@ -111,9 +131,7 @@ export function League() {
         <span><b>{t(last === "up" ? "league.promoted" : "league.demoted", { name })}</b></span>
       </div>}
       <div className="card" style={{ marginTop: 14, textAlign: "center", padding: 28 }}>
-        <div style={{ display: "flex", justifyContent: "center", color: "var(--gold)" }}>
-          <span style={{ width: 56, height: 56, display: "inline-flex" }}><Icon name="trophy" /></span>
-        </div>
+        <TierRail tier={s.league?.tier ?? 0} />
         <h1 style={{ fontSize: 22, fontWeight: 900, marginTop: 8 }}>{t("league.title", { name })}</h1>
         <p className="muted small">{t("league.rules", { up: PROMOTE, down: DEMOTE })}</p>
         <p style={{ marginTop: 8, fontWeight: 800, color: "var(--orange)" }}><Icon name="clock" /> {t("league.timeLeft", { days, hours })}</p>
@@ -147,8 +165,8 @@ export function Shop() {
       <span className="s-icon" style={{ background: bg, color: fg }}><Icon name={ic} /></span>
       <span className="s-body"><h4>{t(`shop.${id}`)}</h4><p className="muted small">{t(`shop.${id}Desc`)}</p></span>
       {owned ? <span className="price-tag owned">{t("shop.owned", { count: owned })}</span> : (
-        <button className="btn btn-danger" onClick={() => buy(id, price)}>
-          <span style={{ width: 18, height: 18, display: "inline-flex" }}><Icon name="gem" /></span>{price}
+        <button className="btn btn-blue" onClick={() => buy(id, price)}>
+          <span style={{ width: 18, height: 18, display: "inline-flex" }}><Icon name="gem" size={18} /></span>{price}
         </button>
       )}
     </div>
@@ -158,7 +176,7 @@ export function Shop() {
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("shop.title")}</h1>
       <div className="card od-row" style={{ marginBottom: 18, "--od-gap": "10px" } as React.CSSProperties}>
-        <span style={{ width: 26, height: 26, display: "inline-flex" }}><Icon name="gem" /></span>
+        <span style={{ width: 26, height: 26, display: "inline-flex" }}><Icon name="gem" size={26} /></span>
         <b style={{ fontSize: 18 }}>{s.gems}</b><span className="muted">{t("shop.gemsHave")}</span>
         {boostMin > 0 && <span className="price-tag owned" style={{ marginLeft: "auto" }}>{t("shop.doubleXpActive", { count: boostMin })}</span>}
       </div>

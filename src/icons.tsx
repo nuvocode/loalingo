@@ -31,6 +31,7 @@ const I = {
 
 export type IconName = keyof typeof I;
 
-export function Icon({ name, className }: { name: IconName; className?: string }) {
-  return <span className={className ? `ic ${className}` : "ic"} style={{ display: "inline-flex" }} dangerouslySetInnerHTML={{ __html: I[name] }} />;
+/** `size` (px) overrides the default 24px glyph; a fixed-size wrapper alone does not resize the SVG. */
+export function Icon({ name, className, size }: { name: IconName; className?: string; size?: number }) {
+  return <span className={className ? `ic ${className}` : "ic"} style={{ display: "inline-flex", ...(size && { "--ic": `${size}px` }) } as React.CSSProperties} dangerouslySetInnerHTML={{ __html: I[name] }} />;
 }

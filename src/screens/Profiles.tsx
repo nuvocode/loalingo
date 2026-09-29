@@ -139,7 +139,7 @@ export function ProfileGate() {
             <button key={p.id} className="card row-item" onClick={() => p.pin_hash ? openSheet(<PinSheet p={p} />) : login(p)}>
               <Avatar p={p} />
               <span className="od-field od-fill"><b>{p.name}</b></span>
-              {p.pin_hash && <span className="muted" aria-label={t("profiles.locked")} style={{ width: 22, height: 22, display: "inline-flex" }}><Icon name="lock" /></span>}
+              {p.pin_hash && <span className="muted" aria-label={t("profiles.locked")} style={{ width: 22, height: 22, display: "inline-flex" }}><Icon name="lock" size={22} /></span>}
             </button>
           ))}
           <button className="btn btn-ghost btn-block" onClick={() => setCreating(true)}>+ {t("profiles.add")}</button>
@@ -168,7 +168,7 @@ export function CourseSheet() {
         <button key={e.id} className="card row-item" onClick={() => pick(c!)} aria-current={e.id === enrollment?.id}>
           <span style={{ fontSize: 28 }}><CourseFlag c={c!} /></span>
           <span className="od-field od-fill"><b>{langName(c!.iso)}</b><span className="muted small">{e.level} · {e.xp} XP</span></span>
-          {e.id === enrollment?.id && <span style={{ color: "var(--green)", width: 24, height: 24, display: "inline-flex" }}><Icon name="check" /></span>}
+          {e.id === enrollment?.id && <span style={{ color: "var(--green)", width: 24, height: 24, display: "inline-flex" }}><Icon name="check" size={24} /></span>}
         </button>
       ))}
     </div>
