@@ -21,7 +21,7 @@ const http = (isTauri ? tauriFetch : window.fetch.bind(window)) as typeof fetch;
 export async function deepgramTranscribe(wav: Uint8Array, lang: string, key?: string | null): Promise<string> {
   key ??= await getDeepgramKey();
   if (!key) throw new Error("No Deepgram key");
-  const r = await http(`https://api.deepgram.com/v1/listen?model=nova-3&language=${encodeURIComponent(lang.slice(0, 2))}`, {
+  const r = await http(`https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&language=${encodeURIComponent(lang.slice(0, 2))}`, {
     method: "POST", headers: { Authorization: `Token ${key}`, "Content-Type": "audio/wav" }, body: wav as BodyInit,
   });
   if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
