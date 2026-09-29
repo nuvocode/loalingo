@@ -8,6 +8,7 @@ import { isTauri } from "../db";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
+import { DataSection } from "./DataSettings";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -233,6 +234,7 @@ export function Settings() {
         <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
       </div>
 
+      <DataSection />
       <h2 className="section-title">{t("update.section")}</h2>
       <VersionRow />
 

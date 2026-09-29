@@ -80,10 +80,15 @@ export async function resetDataDir() {
   location.reload();
 }
 
-/** Releases the lock, closes the pool and restarts the app (after the database file or folder changed). */
-export async function restart(closeDb = false) {
+/** Before the database file is replaced: stops the heartbeat and closes the pool (checkpoints the WAL). Restart next. */
+export async function closeTauriDb() {
   clearInterval(beat);
-  if (closeDb) await opened?.close().catch(() => {});
+  await opened?.close().catch((e) => console.error("close", e));
+}
+
+/** Releases the lock and restarts the app (after the database file or folder changed). */
+export async function restart() {
+  clearInterval(beat);
   await invoke("lock_remove", { dir: (await dataLocation()).dataDir }).catch(() => {});
   await (await import("@tauri-apps/plugin-process")).relaunch();
 }
