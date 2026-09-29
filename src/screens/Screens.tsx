@@ -20,7 +20,7 @@ export function useLeague() {
   const { s, profile } = useApp();
   const l = s.league, now = Date.now();
   const rows = (l?.rivals ?? []).map((r) => ({ n: r.n, c: r.c, xp: rivalXp(r, l!.week, now), me: false }))
-    .concat({ n: t("league.you"), c: profile?.color ?? "#ffc800", xp: s.weekXp, me: true })
+    .concat({ n: t("league.you"), c: profile?.color ?? "#f5b014", xp: s.weekXp, me: true })
     .sort((a, b) => b.xp - a.xp || +b.me - +a.me); // ties go to the learner, as in rankOf
   return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? msLeft(l, now) : 0, last: l?.last };
 }

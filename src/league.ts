@@ -7,7 +7,7 @@ export const TIERS = 10; // Bronze … Diamond (names: i18n league.tier0..9)
 export const PROMOTE = 3, DEMOTE = 3;
 const NAMES = ["Aylin", "Mert", "Zeynep", "Kaan", "Elif", "Deniz", "Baran", "Selin", "Umut", "Lena", "Jonas", "Sofia", "Mateo", "Yuki", "Aarav",
   "Chloe", "Liam", "Nora", "Omar", "Ines", "Marco", "Hana", "Leo", "Maya", "Ivan", "Sara", "Theo", "Amir", "Lucia", "Emil"];
-const COLORS = ["#e91e63", "#1cb0f6", "#58cc02", "#ce82ff", "#ff9600", "#00b8a9", "#8d6e63", "#5c6bc0", "#ef5350", "#ffc800"];
+const COLORS = ["#e91e63", "#4c6ef5", "#12b886", "#b07cf0", "#f4862a", "#00b8a9", "#8d6e63", "#5c6bc0", "#ef5350", "#f5b014"];
 
 /** Monday of the week containing `day` (YYYY-MM-DD, local). */
 export function weekOf(day: string) {

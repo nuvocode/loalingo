@@ -159,8 +159,8 @@ export async function loadStory(enrollmentId: number, c: Base, unit: Unit, fresh
 
 // Roleplay characters from the design; the scenario is described in English for the model, the UI text comes from i18n.
 export const CHARACTERS = {
-  lily: { name: "Lily", color: "#ce82ff", role: "a hotel receptionist", goal: "check in and ask for a room" },
-  kai: { name: "Kai", color: "#1cb0f6", role: "a restaurant chef", goal: "ask the chef for a recommendation and order" },
+  lily: { name: "Lily", color: "#b07cf0", role: "a hotel receptionist", goal: "check in and ask for a room" },
+  kai: { name: "Kai", color: "#4c6ef5", role: "a restaurant chef", goal: "ask the chef for a recommendation and order" },
 } as const;
 export type CharacterId = keyof typeof CHARACTERS;
 export type ChatMsg = { from: "ai" | "me"; text: string; translation?: string; correction?: string };

@@ -8,7 +8,7 @@ export type Stats = {
   gems: number; todayXp: number; bestDayXp: number; chests: number;
   day: string; lastActive: string | null; // local dates, YYYY-MM-DD
   quests: Quest[];
-  doubleXpUntil: number; legendTickets: number; madnessBest: number; // shop + Match Madness
+  doubleXpUntil: number; legendTickets: number; madnessBest: number; // shop + Word Rush
   league: LeagueState | null; weekXp: number;
   reminderOn: boolean; reminderTime: string; remindedDay: string; // daily reminder, "HH:MM" local
   speakOn: boolean;

@@ -7,7 +7,7 @@ import * as db from "../db";
 import type { Profile } from "../db";
 import type { Course } from "../course";
 
-const COLORS = ["#58cc02", "#1cb0f6", "#ce82ff", "#ff9600", "#e91e63", "#00b8a9", "#ffc800", "#5c6bc0"];
+const COLORS = ["#12b886", "#4c6ef5", "#b07cf0", "#f4862a", "#e91e63", "#00b8a9", "#f5b014", "#5c6bc0"];
 // ponytail: fixed list of native languages the AI can translate into; extend when someone asks.
 const NATIVE = ["en", "tr", "de", "fr", "es", "it", "pt", "ru", "ar", "ja", "ko", "zh"];
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;

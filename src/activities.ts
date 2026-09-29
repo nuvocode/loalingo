@@ -154,7 +154,7 @@ export type PracticeWord = { word: string; translation: string; strength: number
 export const LISTEN_MIN_WORDS = 4;
 export const MADNESS_MIN_WORDS = 5;
 
-/** Match Madness: boards of 5 random pairs from the learner's words (words repeat across boards); played against the clock. */
+/** Word Rush: boards of 5 random pairs from the learner's words (words repeat across boards); played against the clock. */
 /** Speaking practice: the weakest learned phrases (multi-word first), said aloud. */
 export function speakItems(words: PracticeWord[], n = 3): Item[] {
   const multi = (w: PracticeWord) => +(w.word.trim().split(/\s+/).length > 1);

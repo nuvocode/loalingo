@@ -33,26 +33,26 @@
 /* /OD-LAYOUT-PRIMITIVES v1 */
 
 :root{
-  --green:#58cc02; --green-dark:#46a302; --green-bright:#a5ed6e;
-  --blue:#1cb0f6; --blue-dark:#1899d6; --sky:#ddf4ff;
-  --gold:#ffc800; --gold-dark:#e0a800;
-  --red:#ff4b4b; --red-dark:#ea2b2b;
-  --purple:#ce82ff; --orange:#ff9600;
-  --text:#3c3c3c; --text-muted:#777; --text-faint:#afafaf;
-  --border:#e5e5e5; --bg:#fff; --surface:#f7f7f7; --card:#fff;
-  --purple-dark:#a25cd6; --on-accent:#fff; --locked-shadow:#d4d4d4;
-  --green-tint:#e9f9d8; --green-tint-border:#b8e28a;
+  --green:#12b886; --green-dark:#0c8f68; --green-bright:#8ce9c6;
+  --blue:#4c6ef5; --blue-dark:#3b5bdb; --sky:#e7ecff;
+  --gold:#f5b014; --gold-dark:#d4930b;
+  --red:#f0565c; --red-dark:#d63c42;
+  --purple:#b07cf0; --orange:#f4862a;
+  --text:#2f3437; --text-muted:#6b7075; --text-faint:#a9adb1;
+  --border:#e3e5e8; --bg:#fff; --surface:#f6f7f9; --card:#fff;
+  --purple-dark:#8b57d1; --on-accent:#fff; --locked-shadow:#d3d6db;
+  --green-tint:#e3f8ef; --green-tint-border:#a8e3cb;
   --red-tint:#ffe3e3; --red-tint-border:#f5b3b3;
-  --gold-tint:#fff3d6; --purple-tint:#f3e5ff;
+  --gold-tint:#fff3d6; --purple-tint:#f1e8fd;
   --scrim:rgba(0,0,0,.4);
   --r:12px;
   --sidebar-w:240px; --rail-w:340px; --center-w:640px;
 }
 html[data-theme="dark"]{
-  --bg:#131f24; --surface:#223038; --card:#1e2c33; --text:#eceff1;
-  --text-muted:#9fb0b8; --text-faint:#647680;
-  --border:#2c3e47; --sky:#173a4a; --locked-shadow:#1a262c;
-  --green-tint:#1e3a1e; --green-tint-border:#2f5a1f;
+  --bg:#15181e; --surface:#22262e; --card:#1b1f26; --text:#eceff1;
+  --text-muted:#9aa1ab; --text-faint:#626874;
+  --border:#2c313a; --sky:#1f2a4a; --locked-shadow:#1a1d23;
+  --green-tint:#173a2e; --green-tint-border:#245a45;
   --red-tint:#3f1d1d; --red-tint-border:#6a2a2a;
   --gold-tint:#3a3116; --purple-tint:#33224a;
   --scrim:rgba(0,0,0,.6);
