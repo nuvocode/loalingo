@@ -182,10 +182,11 @@ export function ProfileGate() {
                 <span className="od-field od-fill"><b>{p.name}</b></span>
                 {p.pin_hash && <span className="muted" aria-label={t("profiles.locked")} style={{ width: 22, height: 22, display: "inline-flex" }}><Icon name="lock" size={22} /></span>}
               </button>
+              {/* ponytail: WebKit (Tauri on macOS) doesn't focus clicked buttons, so the menu keeps focus on mousedown or it closes before the click lands */}
               <div className="menu-wrap" onBlur={(e) => e.currentTarget.contains(e.relatedTarget) || setMenu(null)}>
                 <button className="btn btn-ghost" aria-label={t("profiles.more", { name: p.name })} aria-haspopup="menu" aria-expanded={menu === p.id}
                   onClick={() => setMenu(menu === p.id ? null : p.id)}>⋯</button>
-                {menu === p.id && <div className="menu" role="menu"><button role="menuitem" className="menu-item danger" autoFocus onClick={() => askDelete(p)}>{t("profiles.delete")}</button></div>}
+                {menu === p.id && <div className="menu" role="menu" onMouseDown={(e) => e.preventDefault()}><button role="menuitem" className="menu-item danger" autoFocus onClick={() => askDelete(p)}>{t("profiles.delete")}</button></div>}
               </div>
             </div>
           ))}
