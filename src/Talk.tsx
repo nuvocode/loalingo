@@ -6,12 +6,11 @@ import { useApp } from "./store";
 import { sfx } from "./Lesson";
 import { loadKokoro, speak, stopSpeaking, usesKokoro } from "./tts";
 import { MicButton } from "./Mic";
-import { CHARACTERS, FREE_GOAL, type CharacterId } from "./characters";
+import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
-const CHAT_TURNS = 10; // ponytail: fixed cap so a chat always ends; make it per character if scenarios grow
 
 type Result = { xp: number; gems: number };
 
@@ -226,7 +225,8 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
       say(r.reply, fixed.length);
-      if (r.goal_reached && history.length) setGoal(true);
+      // The prompt holds the goal back too; this guards models that wrap up early anyway.
+      if (r.goal_reached && history.filter((m) => m.from === "me").length >= CHAT_MIN_TURNS) setGoal(true);
     } catch (e) { setErr((e as Error).message); setMsgs(history); }
     finally { setBusy(false); }
   };

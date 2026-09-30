@@ -91,8 +91,9 @@ export function extractJson(text: string): unknown {
   return JSON.parse(text.slice(a, b + 1));
 }
 
-/** Structured generation with the active provider. */
-export async function generate<S extends z.ZodType>(schema: S, system: string, prompt: string, cfg = active): Promise<z.infer<S>> {
+/** Structured generation with the active provider. `loose` parses replies the strict `schema` rejected
+ *  (e.g. fills a field the model left out); the schema sent to the provider stays strict for OpenAI's strict mode. */
+export async function generate<S extends z.ZodType>(schema: S, system: string, prompt: string, cfg = active, loose: z.ZodType = schema): Promise<z.infer<S>> {
   if (!cfg) throw new Error("AI provider is not set up");
   // Some servers ignore response_format (e.g. Ollama cloud models), so the schema is in the prompt too.
   system += `\n\nJSON schema of the reply:\n${JSON.stringify(z.toJSONSchema(schema))}`;
@@ -106,7 +107,7 @@ export async function generate<S extends z.ZodType>(schema: S, system: string, p
       return r.output as z.infer<S>;
     } catch (e) {
       if (!NoObjectGeneratedError.isInstance(e) || !e.text) throw e;
-      return schema.parse(extractJson(e.text)) as z.infer<S>; // lenient retry on fenced / chatty replies
+      return loose.parse(extractJson(e.text)) as z.infer<S>; // lenient retry on fenced / chatty replies
     }
   };
   // Models sometimes drop a field or break the JSON; ask again. Network, auth and timeouts fail at once.

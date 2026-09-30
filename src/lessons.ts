@@ -3,7 +3,7 @@ import { z } from "zod";
 import { generate, generatePlain } from "./ai";
 import { getCached, listMistakes, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
-import { CHARACTERS, type CharacterId } from "./characters";
+import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -174,23 +174,37 @@ export async function loadStory(enrollmentId: number, c: Base, unit: Unit, fresh
 export type ChatMsg = { from: "ai" | "me"; text: string; translation?: string; correction?: string };
 
 const turnSchema = z.object({ correction: z.string(), reply: z.string(), translation: z.string(), goal_reached: z.boolean() });
+// Some models (glm on Ollama) drop goal_reached or correction every time, so retrying can't help; a missing one means "no".
+const looseTurn = turnSchema.extend({ correction: z.string().catch(""), goal_reached: z.boolean().catch(false) });
 
 /** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
 export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
   const ch = CHARACTERS[who], native = langEn(c.native);
+  const free = topic.goal.startsWith(FREE_GOAL);
+  const sent = history.filter((m) => m.from === "me").length;
   const system = [
-    `You are ${ch.name} in a roleplay inside a language-learning app. ${ch.persona} The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}. The learner's goal: ${topic.goal}.`,
-    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, moving the scene toward the goal, in your own manner. Always ${c.course.name}, even when the learner or the goal is written in another language. \`translation\`: the reply in ${native}.`,
+    `You are ${ch.name} in a roleplay inside a language-learning app. The learner is a native ${native} speaker learning ${c.course.name} at CEFR level ${c.level}.`,
+    free
+      // A free topic is the learner's own; the job in the persona must not pull it back into a work scene (a landlord asking about rent in a football chat).
+      ? `Your personality: ${ch.persona} The learner picked the topic, so this is a casual chat between two people, not a scene from your job. Keep your personality and manner, but never bring up your work, customers, place or tasks unless the learner does. Topic: ${topic.goal.slice(FREE_GOAL.length)}.`
+      : `${ch.persona} The learner's goal: ${topic.goal}.`,
+    `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, in your own manner. Always ${c.course.name}, even when the learner or the goal is written in another language. \`translation\`: the reply in ${native}.`,
+    free
+      ? "Keep the chat going: react to what the learner just said and ask one follow-up question about the topic or their experience with it."
+      : `Pace the scene so it lasts about ${CHAT_MIN_TURNS}–${CHAT_MAX_TURNS} learner messages: one small step per turn, with realistic details to sort out (names, dates, preferences, a small complication) and a question the learner has to answer. Never solve several steps at once.`,
     `\`correction\`: if the learner's last message has a mistake, the corrected sentence and a very short explanation in ${native}; otherwise "". Ignore capitalization and punctuation.`,
-    "`goal_reached`: true once the learner has achieved the goal; then wrap up the scene politely in `reply`. If the goal is an open conversation, keep it false unless the learner clearly wraps up.",
+    free
+      ? "`goal_reached`: keep it false unless the learner clearly says goodbye; then say goodbye in `reply`."
+      : `\`goal_reached\`: the learner has sent ${sent} message${sent === 1 ? "" : "s"}. Before ${CHAT_MIN_TURNS} it must be false: keep the scene going with the next step. From then on, true once the learner has achieved the goal; then wrap up the scene politely in \`reply\`.`,
     "Respond only with JSON matching the schema.",
   ].join("\n");
   const last = history[history.length - 1];
   const prompt = last
     ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
       `Check only this last learner message for \`correction\` (earlier ones were already corrected): "${last.text}"\nThen write ${ch.name}'s next turn.`
+    : free ? "Open the chat: a short, friendly greeting and a first question about the topic."
     : "Open the scene: a short greeting that leads straight into the goal and invites the learner to start.";
-  return generate(turnSchema, system, prompt);
+  return generate(turnSchema, system, prompt, undefined, looseTurn);
 }
 
 // ---- Guidebook (DECISIONS B8): the unit's vocabulary and grammar, explained once and cached ----

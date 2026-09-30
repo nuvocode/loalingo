@@ -67,6 +67,9 @@ export const CHARACTERS = {
 } satisfies Record<string, Character>;
 export type CharacterId = keyof typeof CHARACTERS;
 
+/** Learner messages: the goal can't end a chat before MIN; MAX always ends it. */
+export const CHAT_MIN_TURNS = 6, CHAT_MAX_TURNS = 12;
+
 const FREE = "free";
 export const FREE_GOAL = "have a natural conversation about: ";
 
