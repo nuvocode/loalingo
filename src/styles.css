@@ -8,7 +8,7 @@
   .od-fill    { flex: 1 1 0; min-width: 0; }
   .od-fixed   { flex: none; }
   .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
-  .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+  .od-stat, .od-field, .od-cell { --od-gap: 2px; display: grid; gap: var(--od-gap); } /* own default: a row's gap must not leak into its title/description */
   :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
   .od-tile { display: grid; grid-template-rows: auto 1fr; }
   :where(.od-tile) > :where(*) { display: block; }
