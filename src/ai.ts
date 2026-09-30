@@ -8,6 +8,7 @@ import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { invoke } from "@tauri-apps/api/core";
 import { z } from "zod";
 import { isTauri, getSetting, setSetting } from "./db";
+import { retry } from "./retry";
 
 export type ProviderId = "ollama" | "lmstudio" | "openai" | "anthropic" | "gemini";
 export const PROVIDERS: Record<ProviderId, { label: string; baseURL: string; needsKey: boolean }> = {
@@ -95,18 +96,26 @@ export async function generate<S extends z.ZodType>(schema: S, system: string, p
   if (!cfg) throw new Error("AI provider is not set up");
   // Some servers ignore response_format (e.g. Ollama cloud models), so the schema is in the prompt too.
   system += `\n\nJSON schema of the reply:\n${JSON.stringify(z.toJSONSchema(schema))}`;
-  try {
-    const r = await generateText({
-      model: model(cfg.cfg, cfg.key), reasoning: reasoning(cfg.cfg), system, prompt, maxRetries: 1,
-      output: Output.object({ schema }),
-      abortSignal: AbortSignal.timeout(180_000),
-    });
-    return r.output as z.infer<S>;
-  } catch (e) {
-    if (!NoObjectGeneratedError.isInstance(e) || !e.text) throw e;
-    return schema.parse(extractJson(e.text)); // lenient retry on fenced / chatty replies
-  }
+  const once = async () => {
+    try {
+      const r = await generateText({
+        model: model(cfg.cfg, cfg.key), reasoning: reasoning(cfg.cfg), system, prompt, maxRetries: 1,
+        output: Output.object({ schema }),
+        abortSignal: AbortSignal.timeout(180_000),
+      });
+      return r.output as z.infer<S>;
+    } catch (e) {
+      if (!NoObjectGeneratedError.isInstance(e) || !e.text) throw e;
+      return schema.parse(extractJson(e.text)) as z.infer<S>; // lenient retry on fenced / chatty replies
+    }
+  };
+  // Models sometimes drop a field or break the JSON; ask again. Network, auth and timeouts fail at once.
+  // ponytail: fixed 3 tries; per-provider setting if a slow model makes this too long
+  return retry(once, badReply);
 }
+
+const badReply = (e: unknown) => NoObjectGeneratedError.isInstance(e) || e instanceof z.ZodError || e instanceof SyntaxError ||
+  (e instanceof Error && e.message === "no JSON object in the reply");
 
 export async function generatePlain(system: string, prompt: string) {
   if (!active) throw new Error("AI provider is not set up");
