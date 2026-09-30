@@ -27,6 +27,7 @@ export function useStartLesson() {
     if (!s.heartsOn || s.hearts > 0 || /^(story|chat|call):/.test(id) || TIME_LIMIT[id]) return startLesson(id); // stories, chats and timed games cost no hearts
     openSheet(<>
       <h3>{t("sheet.noHearts")}</h3><p>{t("sheet.noHeartsDesc")}</p>
+      <Balance gems={s.gems} />
       <button className="btn btn-danger btn-block" onClick={() => buy("refill", 350)}>{t("sheet.refillFor", { count: 350 })}</button>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
@@ -514,10 +515,17 @@ function AppealSheet({ onSend }: { onSend: (reason: string) => Promise<void> }) 
 
 function HeartsOut({ onEnd }: { onEnd: () => void }) {
   const { t } = useTranslation();
+  const { s } = useApp();
   const buy = useBuy();
   return <>
     <h3>{t("sheet.heartsOut")}</h3><p>{t("sheet.heartsOutDesc")}</p>
+    <Balance gems={s.gems} />
     <button className="btn btn-danger btn-block" onClick={() => buy("refill", 350)}>{t("sheet.refillFor", { count: 350 })}</button>
     <button className="btn btn-ghost btn-block" onClick={onEnd}>{t("sheet.endLesson")}</button>
   </>;
 }
+
+/** The learner's coins, shown where they can spend them. */
+const Balance = ({ gems }: { gems: number }) => (
+  <span className="stat-chip sheet-balance" style={{ color: "var(--gold-dark)" }}><Icon name="gem" />{gems}</span>
+);

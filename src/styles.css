@@ -305,7 +305,9 @@ svg{display:block}
 .sheet{background:var(--card);border-radius:20px;max-width:420px;width:100%;padding:24px;text-align:center}
 .sheet h3{font-size:20px;font-weight:900;margin-bottom:8px}
 .sheet p{color:var(--text-muted);margin-bottom:20px}
-.sheet .btn{margin:4px 0}
+.sheet .btn{margin:6px 0}
+.sheet .btn + .btn{margin-top:12px}
+.sheet-balance{justify-content:center;margin:-8px 0 16px}
 
 /* mobile */
 .bottom-nav{display:none}
