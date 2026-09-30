@@ -408,3 +408,15 @@ button.bubble:hover{border-color:var(--blue)}
 .boot-error .card{max-width:440px;padding:24px}
 .boot-error h3{margin-bottom:8px}
 .boot-detail{margin-top:12px;font-size:12px;white-space:pre-wrap;word-break:break-word;color:var(--text-muted)}
+
+/* Character faces (spec K): parts in src/face/parts.tsx, variables set by src/face/Face.tsx */
+.face{--blink:0;--mouth:0;--look-x:0px;--look-y:0px;--brow:0px;display:block;flex:none;border-radius:50%;overflow:hidden;background:color-mix(in srgb,var(--c) 30%,var(--surface))}
+.face svg{display:block;width:100%;height:100%}
+.face .lid,.face .mouth-open{transform-box:fill-box;transform-origin:50% 0}
+.face .lid{transform:scaleY(var(--blink));transition:transform 60ms}
+.face .eye.sleepy .lid{transform:scaleY(max(var(--blink),.35))}
+.face .mouth-open{transform:scaleY(var(--mouth))}
+.face .pupil{transform:translate(var(--look-x),var(--look-y));transition:transform .2s}
+.face .brows{transform:translateY(var(--brow));transition:transform .2s}
+.face.thinking{--look-x:4px;--look-y:-3px;--brow:-3px}
+@media (prefers-reduced-motion:reduce){.face .pupil,.face .brows{transform:none}}

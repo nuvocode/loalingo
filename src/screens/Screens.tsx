@@ -10,6 +10,7 @@ import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, today } from "../progress";
 import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
+import { Face } from "../face/Face";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -295,10 +296,10 @@ export function Roleplay() {
       <p className="muted" style={{ marginBottom: 18 }}>{t("roleplay.subtitle")}</p>
       <div className="od-grid" style={{ "--od-cols": 1, "--od-gap": "14px" } as React.CSSProperties}>
         {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
-          const { name, color } = CHARACTERS[k];
+          const { name, color, face } = CHARACTERS[k];
           return (
             <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
-              <span className="avatar" style={{ width: 56, height: 56, fontSize: 22, background: color }}>{name[0]}</span>
+              <Face spec={face} color={color} size={56} label={name} />
               <span className="od-field od-fill"><b>{name}</b></span>
               <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
                 <button className="btn btn-ghost" onClick={() => openSheet(<TopicSheet who={k} voice={false} />)}>{t("roleplay.chat")}</button>
