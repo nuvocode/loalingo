@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { matchesAnswer, plannedActivities, lessonSchema, toItems } from "./activities.ts";
+import { hideAnswer, matchesAnswer, plannedActivities, lessonSchema, toItems } from "./activities.ts";
 
 test("answer check ignores case, punctuation and curly quotes; accepts variants", () => {
   const item = { answer: "I'm fine, thank you.", accepted: ["I am fine, thanks"] };
@@ -63,4 +63,11 @@ test("speaking check forgives order, case and punctuation but not missing words"
   assert.ok(speechScore("I'm fine, thank you.", "I'm fine thank you") >= SPEECH_PASS);
   assert.ok(speechScore("Good morning, how are you?", "good morning") < SPEECH_PASS);
   assert.equal(speechScore("thank thank", "thank"), 0.5, "each heard word counts once");
+});
+
+test("hideAnswer keeps only the meaning of a word-tile prompt", () => {
+  const a = "They played football in the park yesterday.";
+  assert.equal(hideAnswer(`'${a}' (Dün parkta futbol oynadılar.)`, a), "Dün parkta futbol oynadılar.");
+  assert.equal(hideAnswer(`Dün parkta futbol oynadılar: "they played football in the park yesterday"`, a), "Dün parkta futbol oynadılar");
+  assert.equal(hideAnswer("Dün parkta futbol oynadılar.", a), "Dün parkta futbol oynadılar.");
 });

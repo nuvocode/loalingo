@@ -4,7 +4,7 @@ import { Icon } from "./icons";
 import { useApp } from "./store";
 import { useBuy } from "./screens/Screens";
 import * as db from "./db";
-import { SPEECH_PASS, listenItems, madnessItems, matchesAnswer, normalize, speakItems, speechScore, type Item } from "./activities";
+import { SPEECH_PASS, hideAnswer, listenItems, madnessItems, matchesAnswer, normalize, speakItems, speechScore, type Item } from "./activities";
 import { MicButton } from "./Mic";
 import { sttReady } from "./stt";
 import { speak } from "./tts";
@@ -388,7 +388,7 @@ export function Lesson({ id }: { id: string }) {
   );
   else if (it.kind === "bank") body = (
     <>
-      <h2 className="ex-title">{it.prompt}</h2>
+      <h2 className="ex-title">{hideAnswer(it.prompt, it.answer.join(" "))}</h2>
       <div className="bank-area">
         {bankSel.map((j) => <button className="tok" key={j} disabled={!!fb} onClick={() => setBankSel(bankSel.filter((x) => x !== j))}>{it.bank[j]}</button>)}
       </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
-import type { Item } from "./activities";
+import { hideAnswer, type Item } from "./activities";
 import { currentItem, type Answered, type PracticeState, type Topic } from "./practice";
 
 type Props = {
@@ -69,7 +69,7 @@ function Exercise({ it, last, lang, onAnswer, onHint }: { it: Item; last: Answer
     <div className="practice-actions">{hint}</div>
   </>;
   if (it.kind === "bank") return <>
-    <h2 className="ex-title">{it.prompt}</h2>
+    <h2 className="ex-title">{hideAnswer(it.prompt, it.answer.join(" "))}</h2>
     <div className="bank-area" lang={lang}>
       {sel.map((j) => <button className="tok" key={j} disabled={!!last} onClick={() => setSel(sel.filter((x) => x !== j))}>{it.bank[j]}</button>)}
     </div>

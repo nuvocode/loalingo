@@ -57,7 +57,7 @@ export const REGISTRY: Partial<Record<string, Def>> = {
       : { kind: "choice", prompt: g.prompt, context: g.dialogue_lines.join("\n"), big: false, listen: "", ...shuffleAnswer(g.options, g.answer_index) },
   },
   word_bank: {
-    guide: "The learner builds a target-language sentence from word tiles. `answer_words` is the correct sentence split into words (punctuation attached to words), `distractor_words` 2–4 plausible wrong tiles. `prompt` shows the native-language meaning.",
+    guide: "The learner builds a target-language sentence from word tiles. `answer_words` is the correct sentence split into words (punctuation attached to words), `distractor_words` 2–4 plausible wrong tiles. `prompt` is only the native-language meaning: never write the target sentence in it.",
     schema: z.object({ prompt: s, answer_words: z.array(s).min(2).max(10), distractor_words: z.array(s).min(1).max(4) }),
     toItem: (g) => ({ kind: "bank", prompt: g.prompt, answer: g.answer_words, bank: shuffle([...g.answer_words, ...g.distractor_words]) }),
   },
@@ -135,6 +135,17 @@ export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes:
 
 export const normalize = (t: string) =>
   t.normalize("NFKC").toLocaleLowerCase().replace(/[’`]/g, "'").replace(/[\p{P}\p{S}]/gu, (ch) => (ch === "'" ? ch : " ")).replace(/\s+/g, " ").trim();
+
+/** Shown instead of a word-tile prompt (also for items cached before this fix). Models sometimes write the tile sentence into the prompt ("'They played…' (Dün…)"): cut it out, keep the meaning. */
+export function hideAnswer(prompt: string, answer: string) {
+  const words = answer.replace(/[.!?…]+$/, "").trim().split(/\s+/).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (!words[0]) return prompt;
+  const rest = prompt.replace(new RegExp(`${words.join("\\s+")}[.!?…]*`, "iu"), "")
+    .replace(/(["'“”‘’«»])\s*(["'“”‘’«»])/g, "").trim()
+    .replace(/^[\s:–—-]+|[\s:–—-]+$/g, "");
+  const m = /^\((.*)\)$/s.exec(rest);
+  return m ? m[1].trim() : rest;
+}
 
 export const matchesAnswer = (given: string, item: { answer: string; accepted: string[] }) =>
   [item.answer, ...item.accepted].some((a) => normalize(a) === normalize(given));
