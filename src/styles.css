@@ -414,16 +414,20 @@ button.bubble:hover{border-color:var(--blue)}
 .boot-detail{margin-top:12px;font-size:12px;white-space:pre-wrap;word-break:break-word;color:var(--text-muted)}
 
 /* Character faces (spec K): parts in src/face/parts.tsx, variables set by src/face/Face.tsx */
-.face{--blink:0;--mouth:0;--look-x:0px;--look-y:0px;--brow:0px;display:block;flex:none;border-radius:50%;overflow:hidden;background:color-mix(in srgb,var(--c) 30%,var(--surface))}
-.face svg{display:block;width:100%;height:100%}
-.face .lid,.face .mouth-open{transform-box:fill-box;transform-origin:50% 0}
+.face{--blink:0;--look-x:0px;--look-y:0px;--brow:0px;--raise:0px;display:block;flex:none;border-radius:50%;overflow:hidden;background:color-mix(in srgb,var(--c) 30%,var(--surface))}
+.face{position:relative}
+.face svg{position:relative;display:block;width:100%;height:100%}
+.face .scene{position:absolute;inset:0}
+html[data-theme="dark"] .face .scene{filter:brightness(.6) saturate(.8)}
+.face .lid{transform-box:fill-box;transform-origin:50% 0}
 .face .lid{transform:scaleY(var(--blink));transition:transform 60ms}
 .face .eye.sleepy .lid{transform:scaleY(max(var(--blink),.35))}
-.face .mouth-open{transform:scaleY(var(--mouth))}
 .face .pupil{transform:translate(var(--look-x),var(--look-y));transition:transform .2s}
-.face .brows{transform:translateY(var(--brow));transition:transform .2s}
-.face.thinking{--look-x:4px;--look-y:-3px;--brow:-3px}
-@media (prefers-reduced-motion:reduce){.face .pupil,.face .brows{transform:none}}
+.face .brow{transform-box:fill-box;transform-origin:50% 50%;transform:translateY(calc(var(--brow) + var(--raise)));transition:transform .18s ease-out}
+.face.thinking .brow-l{transform:translateY(calc(var(--brow) - 2px)) rotate(8deg)}
+.face.thinking .brow-r{transform:translateY(calc(var(--brow) + 1.5px)) rotate(-4deg)}
+.face.thinking{--look-x:3px;--look-y:-2px;--brow:-2px}
+@media (prefers-reduced-motion:reduce){.face .pupil,.face .brow,.face.thinking .brow-l,.face.thinking .brow-r{transform:none}}
 
 /* Keyboard control (spec L) */
 .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;margin-left:6px;border:2px solid currentColor;border-radius:6px;font:inherit;font-size:11px;font-weight:800;opacity:.6}
@@ -436,11 +440,16 @@ button.bubble:hover{border-color:var(--blue)}
 .rp-face{position:relative;aspect-ratio:4/3;border-radius:var(--r);overflow:hidden}
 .rp-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media (max-width:560px){.rp-grid{grid-template-columns:1fr}}
+/* Tutor picker: one wide scene per tutor, name as a badge */
+.sheet:has(.tutor-pick){max-height:85vh;overflow-y:auto}
+.tutor-pick{position:relative;display:block;width:100%;aspect-ratio:2/1;padding:0;border:0;border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .12s}
+.tutor-pick:hover{transform:scale(1.015)}
+.tutor-pick:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 /* Tutor call (spec T) */
 .lesson-inner:has(> .call-grid){max-width:none}
 .call-grid{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .call-pane{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;border-radius:var(--r);background:var(--surface);overflow:hidden}
-.call-pane.tutor .face,.rp-face .face{position:absolute;inset:0;width:auto;height:auto;border-radius:0}
+.call-pane.tutor .face,.rp-face .face,.tutor-pick .face{position:absolute;inset:0;width:auto;height:auto;border-radius:0}
 .call-pane.me{box-shadow:inset 0 0 0 calc(var(--level,0) * 6px) var(--green);transition:box-shadow .08s linear}
 .call-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .call-name{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:99px;background:rgb(0 0 0 / .45);color:#fff;font-size:14px}

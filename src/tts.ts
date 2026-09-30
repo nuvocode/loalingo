@@ -2,7 +2,7 @@
 // Kokoro runs in src/kokoro.worker.ts and streams one sentence at a time, so the first sentence plays while the rest is made.
 import { getSetting } from "./db";
 import { pickSystemVoice } from "./voices";
-import { mouthLevel, remember } from "./audio";
+import { mouthBright, mouthLevel, remember, zcr } from "./audio";
 
 export type Voice = { gender: "f" | "m"; kokoro?: string };
 type Chunk = { audio: Float32Array; rate: number };
@@ -148,32 +148,37 @@ export async function speak(text: string, lang: string, voice?: Voice): Promise<
   return over;
 }
 
-// ---- Mouth: how open a talking face's mouth is, 0..1, every animation frame ----
-const mouthSubs = new Set<(open: number) => void>();
+// ---- Mouth: how open a talking face's mouth is (0..1) and its shape (0 round .. 1 wide), every animation frame ----
+const mouthSubs = new Set<(open: number, bright: number) => void>();
 const frame = new Float32Array(1024);
-let raf = 0, lastT = 0, level = 0;
+let raf = 0, lastT = 0, level = 0, bright = 0;
 
 function tick(t: number) {
   const dt = lastT ? Math.min(0.1, (t - lastT) / 1000) : 0;
   lastT = t;
-  let rms = 0;
-  // The system voice gives no audio to measure: a steady ~3 syllables per second while it speaks.
-  if (speechSynthesis.speaking) rms = 0.02 + 0.18 * (0.5 + 0.5 * Math.sin((2 * Math.PI * 3 * t) / 1000));
-  else if (analyser) {
+  let rms = 0, rate = 0;
+  // The system voice gives no audio to measure: uneven pseudo-syllables (three beats that drift in and out of step) instead of a metronome.
+  if (speechSynthesis.speaking) {
+    const s = t / 1000, beat = Math.sin(2 * Math.PI * 3.1 * s) * 0.6 + Math.sin(2 * Math.PI * 4.7 * s) * 0.4;
+    rms = 0.02 + 0.2 * Math.max(0, beat) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 0.7 * s));
+    rate = 0.03 + 0.07 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 1.9 * s));
+  } else if (analyser) {
     analyser.getFloatTimeDomainData(frame);
     rms = Math.sqrt(frame.reduce((n, x) => n + x * x, 0) / frame.length);
+    rate = zcr(frame);
   }
   level = mouthLevel(level, rms, dt);
+  if (rms > 0.03) bright = mouthBright(bright, rate, dt); // silence is noisy, keep the last vowel's shape
   raf = requestAnimationFrame(tick); // before the callbacks, so one that throws can't stop the loop
-  mouthSubs.forEach((f) => f(level));
+  mouthSubs.forEach((f) => f(level, bright));
 }
 
-/** Calls `cb` with the mouth openness every frame until the returned function is called. */
-export function onMouth(cb: (open: number) => void) {
+/** Calls `cb` with the mouth openness and shape every frame until the returned function is called. */
+export function onMouth(cb: (open: number, bright: number) => void) {
   mouthSubs.add(cb);
   if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
   return () => {
     mouthSubs.delete(cb);
-    if (!mouthSubs.size) { cancelAnimationFrame(raf); raf = 0; level = 0; }
+    if (!mouthSubs.size) { cancelAnimationFrame(raf); raf = 0; level = 0; bright = 0; }
   };
 }

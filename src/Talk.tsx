@@ -287,7 +287,7 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     body = <>
       {voice ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 16, textAlign: "center" }}>
-          <Face spec={ch.face} color={ch.color} size={220} label={ch.name} state={faceState} />
+          <Face spec={ch.face} color={ch.color} size={220} label={ch.name} state={faceState} scene={who} />
           <b>{ch.name}</b><span className="muted small">{topicLabel}</span>
         </div>
       ) : (

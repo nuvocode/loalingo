@@ -21,9 +21,22 @@ export function remember<K, V>(m: Map<K, V>, k: K, v: V, max = 20) {
 
 /** Speech loudness (RMS of the last audio frame) → mouth openness 0..1. Opens fast, closes slower so it doesn't flicker. */
 export function mouthLevel(prev: number, rms: number, dt: number): number {
-  const target = Math.min(1, Math.max(0, (rms - 0.02) / 0.18)); // ~0.02 is silence, ~0.2 a loud syllable
-  const tau = target > prev ? 0.04 : 0.12; // seconds
+  const target = Math.min(1, Math.max(0, (rms - 0.02) / 0.22)) ** 0.8; // ~0.02 is silence, ~0.24 a loud syllable
+  const tau = target > prev ? 0.07 : 0.11; // seconds: a slower attack keeps quiet syllables from snapping fully open
   return prev + (target - prev) * (1 - Math.exp(-dt / tau));
+}
+
+/** Zero-crossing rate of the frame (crossings per sample): high for hissy sounds like "s" and "ee", low for "o" and "a". */
+export function zcr(frame: Float32Array): number {
+  let n = 0;
+  for (let i = 1; i < frame.length; i++) if ((frame[i - 1] < 0) !== (frame[i] < 0)) n++;
+  return n / frame.length;
+}
+
+/** Zero-crossing rate → mouth shape 0..1, smoothed: 0 = round and deep ("o"), 1 = wide and shallow with teeth showing ("ee", "s"). */
+export function mouthBright(prev: number, rate: number, dt: number): number {
+  const target = Math.min(1, Math.max(0, (rate - 0.03) / 0.12));
+  return prev + (target - prev) * (1 - Math.exp(-dt / 0.08));
 }
 
 /** Voice detector knobs (tutor call). RMS is after the browser's noise suppression; raise `threshold` if a noisy room keeps triggering it. */

@@ -27,9 +27,9 @@ function TutorSheet() {
       {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
         const { name, color, face } = CHARACTERS[k];
         return (
-          <button key={k} className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} onClick={() => { closeSheet(); start(`tutor:${k}`); }}>
-            <Face spec={face} color={color} size={48} label={name} />
-            <span className="od-field od-fill" style={{ textAlign: "left" }}><b>{name}</b><span className="muted small">{t(`roleplay.roles.${k}`)}</span></span>
+          <button key={k} className="tutor-pick" onClick={() => { closeSheet(); start(`tutor:${k}`); }}>
+            <Face spec={face} color={color} label={name} scene={k} />
+            <b className="call-name">{name}</b>
           </button>
         );
       })}
@@ -325,7 +325,7 @@ export function Roleplay() {
           const { name, color, face } = CHARACTERS[k];
           return (
             <div className="card rp-card" key={k}>
-              <div className="rp-face"><Face spec={face} color={color} label={name} /></div>
+              <div className="rp-face"><Face spec={face} color={color} label={name} scene={k} /></div>
               <span className="od-field"><b>{name}</b><span className="muted">{t(`roleplay.roles.${k}`)}</span></span>
               <span className="rp-actions">
                 <button className="btn btn-ghost" onClick={() => openSheet(<TopicSheet who={k} voice={false} />)}>{t("roleplay.chat")}</button>

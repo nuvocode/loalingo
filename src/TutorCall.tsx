@@ -199,7 +199,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     body = err ? <Failed msg={err} retry={retry} quit={quit} /> : (
       <div className="call-grid">
         <section className="call-pane tutor" aria-label={ch.name}>
-          <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} />
+          <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} scene={who} />
           <b className="call-name">{ch.name}</b>
           {last?.correction.trim() && <p className="call-fix small"><Icon name="spark" /> {last.correction}</p>}
           {captions && <div className="call-transcript" lang={lang} aria-live="polite" ref={(el) => el?.scrollTo(0, el.scrollHeight)}>
