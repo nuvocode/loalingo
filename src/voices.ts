@@ -1,19 +1,25 @@
 // Pure system-voice picking by gender (tested by src/voices.test.ts). Names are macOS voices.
 type V = { name: string; lang: string };
+/** Preferred first. macOS (Samantha, Daniel; the newer Eddy/Reed/Rocko/Flo/Sandy/Shelley ship in many languages) and Windows ("Microsoft David - English …"). */
+const ANY = { f: ["Flo", "Sandy", "Shelley", "Grandma"], m: ["Reed", "Eddy", "Rocko", "Grandpa"] };
 const NAMES: Record<string, { f: string[]; m: string[] }> = {
-  en: { f: ["Samantha", "Karen", "Moira", "Tessa", "Serena", "Victoria"], m: ["Daniel", "Alex", "Fred", "Oliver", "Tom", "Rishi"] },
-  tr: { f: ["Yelda"], m: [] },
-  de: { f: ["Anna", "Petra", "Helena"], m: ["Markus", "Yannick"] },
-  es: { f: ["Monica", "Paulina", "Marisol"], m: ["Jorge", "Diego", "Juan"] },
-  fr: { f: ["Amelie", "Audrey", "Marie"], m: ["Thomas", "Daniel", "Nicolas"] },
+  en: { f: ["Samantha", "Ava", "Allison", "Susan", "Karen", "Moira", "Tessa", "Serena", "Victoria", "Kathy", "Aria", "Jenny", "Zira", "Hazel"], m: ["Daniel", "Alex", "Tom", "Oliver", "Evan", "Guy", "Ryan", "David", "Mark", "George", ...ANY.m, "Aman", "Rishi", "Fred", "Ralph"] },
+  tr: { f: ["Yelda", "Emel", "Seda"], m: ["Tolga", "Ahmet", "Cem"] },
+  de: { f: ["Anna", "Petra", "Helena", "Katja", "Hedda"], m: ["Markus", "Yannick", "Conrad", "Stefan"] },
+  es: { f: ["Monica", "Mónica", "Paulina", "Marisol", "Elvira", "Helena", "Laura"], m: ["Jorge", "Diego", "Juan", "Alvaro", "Pablo"] },
+  fr: { f: ["Amelie", "Amélie", "Audrey", "Marie", "Denise", "Julie", "Hortense"], m: ["Thomas", "Daniel", "Nicolas", "Jacques", "Henri", "Paul"] },
 };
+const has = (voice: string, name: string) => new RegExp(`(^|[\\s(])${name}([\\s(-]|$)`, "i").test(voice);
 
-/** A voice matching `gender` when a known name is installed, else the language's first voice with a pitch shift. */
+/** The most preferred installed voice of `gender`, else the language's first voice with a pitch shift. */
 export function pickSystemVoice<T extends V>(voices: T[], lang: string, gender?: "f" | "m"): { voice?: T; pitch: number } {
   const code = lang.slice(0, 2).toLowerCase();
   const ofLang = voices.filter((v) => v.lang.slice(0, 2).toLowerCase() === code);
   if (!gender) return { voice: ofLang[0], pitch: 1 };
-  const hit = ofLang.find((v) => NAMES[code]?.[gender].some((n) => v.name.startsWith(n)));
-  if (hit) return { voice: hit, pitch: 1 };
-  return { voice: ofLang[0], pitch: gender === "f" ? 1.15 : 0.85 };
+  const wanted = [...(NAMES[code]?.[gender] ?? []), ...ANY[gender]];
+  for (const n of wanted) {
+    const hit = ofLang.find((v) => has(v.name, n));
+    if (hit) return { voice: hit, pitch: 1 };
+  }
+  return { voice: ofLang[0], pitch: gender === "f" ? 1.15 : 0.8 };
 }

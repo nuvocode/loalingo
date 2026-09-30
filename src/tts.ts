@@ -69,10 +69,23 @@ export function stopSpeaking() {
   finish();
 }
 
-function system(text: string, lang: string, gender: "f" | "m" | undefined, done: () => void) {
+/** The system voice list, which browsers fill in after startup: an empty first answer would mean the default (often female) voice. */
+function systemVoices(): Promise<SpeechSynthesisVoice[]> {
+  const now = speechSynthesis.getVoices();
+  if (now.length) return Promise.resolve(now);
+  return new Promise((ok) => {
+    const got = () => { clearTimeout(t); speechSynthesis.removeEventListener("voiceschanged", got); ok(speechSynthesis.getVoices()); };
+    const t = setTimeout(got, 1500);
+    speechSynthesis.addEventListener("voiceschanged", got);
+  });
+}
+
+async function system(text: string, lang: string, gender: "f" | "m" | undefined, mine: number, done: () => void) {
+  const voices = await systemVoices();
+  if (mine !== seq) return; // cut while waiting
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang;
-  const { voice, pitch } = pickSystemVoice(speechSynthesis.getVoices(), lang, gender);
+  const { voice, pitch } = pickSystemVoice(voices, lang, gender);
   if (voice) u.voice = voice;
   u.pitch = pitch;
   u.onend = u.onerror = done;
@@ -144,7 +157,7 @@ export async function speak(text: string, lang: string, voice?: Voice): Promise<
     }
   }
   if (mine !== seq) return over;
-  system(text, lang, voice?.gender, done);
+  await system(text, lang, voice?.gender, mine, done);
   return over;
 }
 

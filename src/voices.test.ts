@@ -13,11 +13,21 @@ test("known names match by gender", () => {
 test("no known name falls back to the first voice with a pitch shift", () => {
   const r = pickSystemVoice(voices, "tr-TR", "m");
   assert.equal(r.voice?.name, "Yelda");
-  assert.equal(r.pitch, 0.85);
+  assert.equal(r.pitch, 0.8);
   assert.equal(pickSystemVoice(voices, "tr", "f").pitch, 1);
   assert.equal(pickSystemVoice(voices, "xx", "f").voice, undefined);
 });
 
 test("no gender keeps the default", () => {
   assert.deepEqual(pickSystemVoice(voices, "tr-TR"), { voice: voices[3], pitch: 1 });
+});
+
+test("preference order beats install order; full macOS and Windows names match", () => {
+  const mac = [{ name: "Fred", lang: "en-US" }, { name: "Eddy (English (US))", lang: "en-US" }, { name: "Daniel (English (UK))", lang: "en-GB" }];
+  assert.equal(pickSystemVoice(mac, "en-US", "m").voice?.name, "Daniel (English (UK))");
+  assert.equal(pickSystemVoice(mac.slice(0, 2), "en-US", "m").voice?.name, "Eddy (English (US))"); // natural voices before novelty ones
+  assert.equal(pickSystemVoice([{ name: "Eddy (German (Germany))", lang: "de-DE" }], "de", "m").voice?.name, "Eddy (German (Germany))");
+  const win = [{ name: "Microsoft Zira - English (United States)", lang: "en-US" }, { name: "Microsoft David - English (United States)", lang: "en-US" }];
+  assert.equal(pickSystemVoice(win, "en-US", "m").voice?.name, "Microsoft David - English (United States)");
+  assert.equal(pickSystemVoice([{ name: "Tomas", lang: "en-US" }], "en-US", "m").pitch, 0.8); // "Tom" is a whole name, not a prefix
 });
