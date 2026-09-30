@@ -13,12 +13,14 @@
 
 | Dosya | Görev |
 |---|---|
-| `src/tutor.ts` (yeni) | Beyin: `TutorEvent` tipi, `TUTOR_ACTIONS`, zod şeması, prompt kurucu, `tutorTurn(ctx, state, event)`. Arayüz yok. |
-| `src/listen.ts` (yeni) | Eller serbest dinleme. `stt.ts` yakalama/örnekleme hattını kullanır, üstüne sessizlik algılama ekler. API: `listen(lang, { onUtterance, onLevel, onError })` → `{ stop(), pause(), resume() }`. Saf fonksiyon `segment(levels, threshold, silenceMs)` konuşma sınırlarını bulur. |
+| `src/tutor.ts` (yeni) | Beyin, saf modül: `TutorEvent` tipi, `TUTOR_ACTIONS`, zod şeması, prompt kurucu, sessizlik/kuyruk/gürültü kuralları, `currentUnit`. Arayüz ve model çağrısı yok. |
+| `src/lessons.ts` | `tutorTurn(...)`: `tutor.ts`'teki prompt ile tek `generate()` çağrısı (`chatTurn`'ün yanında). |
+| `src/audio.ts` | Saf ses algılayıcı `vadStep(vad, rms, ms)` ve ayar düğmesi `VAD` (eşik, 150 ms başlama, 1,2 sn bitiş, 15 sn üst sınır); `rms`, `concat`. |
+| `src/stt.ts` | Eller serbest dinleme: `listen(lang, { utterance, speech, level, error })` → `{ pause(), resume(), stop() }`. `startRecording` ile aynı yakalama ve metne çevirme (`transcribeSamples`) kullanılır. |
 | `src/TutorCall.tsx` (yeni) | Ekran: iki bölme, alt çubuk, mesaj çekmecesi, bitiş özeti. |
 | `src/App.tsx` | `tutor:` önekini `TutorCall`'a yönlendirir. |
 | `src/screens/Screens.tsx` | Alıştırma ekranına "Tutor ile ders" kartı. Kart, 6 karakterin listelendiği bir sayfa açar; seçilen karakterle `startLesson("tutor:<char>")` çağrılır (`useStartLesson` AI ayarını denetler). |
-| `src-tauri/Info.plist` | `NSCameraUsageDescription` eklenir. |
+| `src-tauri/Info.plist`, `src-tauri/Entitlements.plist` | `NSCameraUsageDescription` ve `com.apple.security.device.camera` (hardened runtime kamerayı bunsuz engeller). |
 | `src/locales/*.json` | Yeni anahtarlar, 5 dilde (en, tr, de, fr, es). |
 
 ## Ekran (`TutorCall`)
@@ -43,7 +45,7 @@
 | `start` | Ekran açılınca (StrictMode çift çalışmasına karşı ref ile bir kez). |
 | `user_said(text)` | `listen.ts` bir konuşmayı metne çevirdi. |
 | `user_typed(text)` | Mesaj çekmecesinden gönderildi. |
-| `silence(sec)` | Mikrofon açık, tutorun son sözü soru ve 20 sn ses yok. `wait` eyleminden sonra eşik 60 sn. Arka arkaya en fazla 2 `check_in`; sonra kullanıcı dönene kadar tutor susar. |
+| `silence(sec)` | Mikrofon açık, tutorun son sözü soru ve 20 sn ses yok. `wait` eyleminden sonra eşik 60 sn. Kullanıcı bir şey söyleyene kadar en fazla 2 `silence` olayı; sonra tutor susar. |
 | `mic(on)` / `cam(on)` | Kullanıcı düğmeye bastı. |
 
 **Şema:**
@@ -66,7 +68,7 @@
 
 ## Bitiş
 
-- "Sonlandır" (`useQuit` onayı) ya da tutorun `end` eylemi.
+- "Sonlandır" düğmesi (onaysız, doğrudan özete; kullanıcı hiç konuşmadıysa özetsiz çıkar) ya da tutorun `end` eylemi. Üstteki X / Esc ise `useQuit` onayıyla özetsiz çıkar.
 - Özet ekranı `Done` bileşenini kullanır, altına `corrections` listesi eklenir.
 - XP: kullanıcı turu × 5 + düzeltmesiz tur × 5 + çağrı 5 dakikayı geçtiyse +20, `xpMult(s)` ile çarpılır; `recordSession(kind: "practice")`.
 - Tur sınırı yok.
@@ -76,14 +78,14 @@
 - **AI çağrısı başarısız:** mevcut `Failed` (yeniden dene / çık) küçük bir katman olarak açılır; yeniden dene aynı olayı tekrar gönderir.
 - **Mikrofon izni yok ya da `sttReady()` false:** mikrofon düğmesi devre dışı, açıklamalı; mesaj çekmecesi kendiliğinden açılır, ders yazıyla sürer.
 - **Kamera izni yok:** sağ bölme profilde kalır, kamera düğmesi devre dışı.
-- **Boş ya da tek kelimelik gürültü metni:** olay gönderilmez.
+- **Boş ya da yalnız etiket olan metin** (`[BLANK_AUDIO]`, `(wind)`): olay gönderilmez. Tek kelimelik cevaplar ("Yes") geçerlidir.
 - **Uzun konuşma:** bir konuşma en fazla 15 sn (`MAX_RECORD_S`), sonra tur kendiliğinden biter.
 - **Ekrandan çıkış:** mikrofon, kamera, TTS ve zamanlayıcılar temizlenir.
 
 ## Testler
 
 - `src/tutor.test.ts`: prompt olayı, seviyeyi, ünite kelimelerini ve `notes`'u içerir; gevşek şema eksik/geçersiz `action`'ı `speak`'e çevirir.
-- `src/listen.test.ts`: `segment()` enerji dizisinden doğru konuşma sınırlarını çıkarır (kısa gürültü yok sayılır, 1,2 sn sessizlik turu bitirir, 15 sn üst sınır).
+- `src/audio.test.ts`: `vadStep()` doğru konuşma sınırlarını çıkarır (kısa gürültü yok sayılır, 1,2 sn sessizlik turu bitirir, kısa duraklama turu bölmez, 15 sn üst sınır).
 - Yerel ayar anahtarları mevcut `locales.test.ts` ile denetlenir.
 - Elle: `pnpm tauri dev` → konuş, sus → tur biter; "one sec" yaz → tutor bekler; 60 sn sus → tutor halini sorar; kamerayı aç/kapat.
 
