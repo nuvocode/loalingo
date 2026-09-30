@@ -24,7 +24,7 @@ export function useStartLesson() {
       <button className="btn btn-primary btn-block" onClick={() => { closeSheet(); go("settings"); }}>{t("ai.setUp")}</button>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </>);
-    if (!s.heartsOn || s.hearts > 0 || /^(story|chat|call):/.test(id) || TIME_LIMIT[id]) return startLesson(id); // stories, chats and timed games cost no hearts
+    if (!s.heartsOn || s.hearts > 0 || /^(story|chat|call|tutor):/.test(id) || TIME_LIMIT[id]) return startLesson(id); // stories, chats and timed games cost no hearts
     openSheet(<>
       <h3>{t("sheet.noHearts")}</h3><p>{t("sheet.noHeartsDesc")}</p>
       <Balance gems={s.gems} />
