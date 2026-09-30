@@ -13,7 +13,7 @@ import { Chat, Story } from "./Talk";
 import { parseTalkId } from "./characters";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
-import { ProfileGate, useLangName } from "./screens/Profiles";
+import { Avatar, ProfileGate, useLangName } from "./screens/Profiles";
 import { Practice, League, Shop, Profile, Stories, Roleplay, Friends, Notifications } from "./screens/Screens";
 
 const NAV: { id: Route; icon: IconName }[] = [
@@ -73,7 +73,7 @@ function BootErrorScreen({ e }: { e: BootError }) {
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS, course } = useApp();
+  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS, course, logout } = useApp();
   const langName = useLangName();
   const Screen = SCREENS[route];
   const talk = lessonId && /^(chat|call):/.test(lessonId) ? parseTalkId(lessonId) : undefined;
@@ -129,6 +129,9 @@ export default function App() {
             </div>
             {MORE.map((n) => <NavBtn key={n.id} {...n} />)}
           </nav>
+          <button className="nav-item nav-more profile-switch" onClick={logout} title={t("settings.logout")} aria-label={`${profile.name} · ${t("settings.logout")}`}>
+            <Avatar p={profile} size={30} /><span className="od-fill">{profile.name}</span><Icon name="swap" />
+          </button>
         </aside>
         <main className="main">
           <div className="main-inner">

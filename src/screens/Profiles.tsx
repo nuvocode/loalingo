@@ -19,7 +19,7 @@ export function useLangName() {
   return (iso: string) => { const n = dn.of(iso) ?? iso; return n[0].toLocaleUpperCase(i18n.language) + n.slice(1); };
 }
 
-const Avatar = ({ p, size = 48 }: { p: Pick<Profile, "name" | "color">; size?: number }) => (
+export const Avatar = ({ p, size = 48 }: { p: Pick<Profile, "name" | "color">; size?: number }) => (
   <span className="avatar" style={{ width: size, height: size, fontSize: size * 0.4, background: p.color }} aria-hidden="true">{(p.name || "?")[0].toUpperCase()}</span>
 );
 
