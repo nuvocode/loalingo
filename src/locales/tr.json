@@ -468,7 +468,10 @@
     "systemGood": "En hızlısı, ama robotik bir ses.",
     "piperGood": "Gerçekçi ve hızlı, biraz robotik.",
     "kokoroGood": "En gerçekçi ses; biraz gecikebilir.",
-    "about": "Kokoro hakkında"
+    "about": "{{name}} hakkında",
+    "whisperGood": "Gizli ve çevrimdışı; biraz daha yavaş.",
+    "deepgramGood": "En hızlı ve en doğru; internet ve anahtar gerekir.",
+    "configure": "Deepgram ayarları"
   },
   "data": {
     "section": "Veri",

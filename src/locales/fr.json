@@ -489,7 +489,10 @@
     "systemGood": "Le plus rapide, mais robotique.",
     "piperGood": "Réaliste et rapide, un peu robotique.",
     "kokoroGood": "Le plus réaliste ; peut avoir un petit délai.",
-    "about": "À propos de Kokoro"
+    "about": "À propos de {{name}}",
+    "whisperGood": "Privé et hors ligne ; un peu plus lent.",
+    "deepgramGood": "Le plus rapide et le plus précis ; nécessite Internet et une clé.",
+    "configure": "Réglages Deepgram"
   },
   "data": {
     "section": "Données",

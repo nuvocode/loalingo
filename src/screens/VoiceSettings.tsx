@@ -30,6 +30,17 @@ const Signal = ({ bars, color }: { bars: number; color: string }) => (
   </svg>
 );
 
+/** An info icon whose note shows on hover, focus or tap. */
+function InfoTip({ label, children }: { label: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="voice-info">
+      <button className="icon-btn" aria-label={label} aria-expanded={open} onClick={() => setOpen(!open)}><Icon name="info" /></button>
+      <span className={`voice-tip${open ? " open" : ""}`} role="tooltip">{children}</span>
+    </span>
+  );
+}
+
 export function TtsRow() {
   const { t } = useTranslation();
   const { openSheet } = useApp();
@@ -50,7 +61,6 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
   const [v, setV] = useState(initial);
   const [pct, setPct] = useState<number | null>(null); // a local voice downloading
   const [err, setErr] = useState("");
-  const [info, setInfo] = useState(false);
   // Picking saves; a local voice only once its model has loaded, otherwise the choice stays where it was.
   const pick = async (next: TtsProvider) => {
     if (pct !== null || next === v) return;
@@ -69,17 +79,12 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
       <h3 style={{ textAlign: "center" }}>{t("settings.tts")}</h3>
       <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.tts")}>
         {TTS.map(({ p, bars, color }) => (
-          <div key={p} className={`tts-option${v === p ? " on" : ""}`}>
+          <div key={p} className={`voice-option${v === p ? " on" : ""}`}>
             <button role="radio" aria-checked={v === p} disabled={pct !== null} onClick={() => pick(p)}>
               <Signal bars={bars} color={color} />
               <span className="od-field od-fill"><b>{t(ttsName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
             </button>
-            {p === "kokoro" && (
-              <span className="tts-info">
-                <button className="icon-btn" aria-label={t("voice.about")} aria-expanded={info} onClick={() => setInfo(!info)}><Icon name="info" /></button>
-                <span className={`tts-tip${info ? " open" : ""}`} role="tooltip">{t("voice.kokoroDesc")} {t("voice.englishOnly")}</span>
-              </span>
-            )}
+            {p === "kokoro" && <InfoTip label={t("voice.about", { name: "Kokoro" })}>{t("voice.kokoroDesc")} {t("voice.englishOnly")}</InfoTip>}
           </div>
         ))}
       </div>
@@ -111,14 +116,56 @@ export function SttRow() {
   );
 }
 
+const STT = [
+  { p: "whisper", icon: "lock", color: "var(--green)" },
+  { p: "deepgram", icon: "bolt", color: "var(--blue)" },
+] as const;
+const sttName = (p: SttProvider) => (p === "deepgram" ? "settings.sttDeepgram" : "settings.sttWhisper");
+
+// Picking saves. Deepgram needs its key first: without one, picking it opens the key sheet; with one, the gear edits it.
 function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: SttProvider) => void }) {
   const { t } = useTranslation();
-  const { toast, closeSheet } = useApp();
+  const { toast, openSheet, closeSheet } = useApp();
   const [v, setV] = useState(initial);
+  const [hasKey, setHasKey] = useState(false);
+  useEffect(() => { getDeepgramKey().then((k) => setHasKey(!!k)).catch(() => {}); }, []);
+  const back = () => openSheet(<SttSheet initial={v} onChange={onChange} />);
+  const configure = () => openSheet(<DeepgramSheet onSaved={() => { onChange("deepgram"); openSheet(<SttSheet initial="deepgram" onChange={onChange} />); }} onCancel={back} />);
+  const pick = async (next: SttProvider) => {
+    if (next === v) return;
+    if (next === "deepgram" && !hasKey) return configure();
+    await setSetting("stt", next);
+    resetSttReady();
+    setV(next); onChange(next);
+    toast(t("voice.saved"));
+  };
+  return (
+    <div className="od-stack" style={sheet}>
+      <h3 style={{ textAlign: "center" }}>{t("settings.stt")}</h3>
+      <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.stt")}>
+        {STT.map(({ p, icon, color }) => (
+          <div key={p} className={`voice-option${v === p ? " on" : ""}`}>
+            <button role="radio" aria-checked={v === p} onClick={() => pick(p)}>
+              <span className="voice-icon" style={{ color }}><Icon name={icon} /></span>
+              <span className="od-field od-fill"><b>{t(sttName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
+            </button>
+            {p === "deepgram" && hasKey && <button className="icon-btn" aria-label={t("voice.configure")} onClick={configure}><Icon name="gear" /></button>}
+            <InfoTip label={t("voice.about", { name: p === "deepgram" ? "Deepgram" : "Whisper" })}>{t(p === "deepgram" ? "voice.deepgramDesc" : "voice.whisperDesc")}</InfoTip>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
+/** The Deepgram key: test it, then save it and switch speech recognition to Deepgram. */
+function DeepgramSheet({ onSaved, onCancel }: { onSaved: () => void; onCancel: () => void }) {
+  const { t } = useTranslation();
+  const { toast } = useApp();
   const [key, setKey] = useState("");
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const deepgram = v === "deepgram";
   useEffect(() => { getDeepgramKey().then((k) => setKey(k ?? "")).catch(() => {}); }, []);
 
   const test = async () => {
@@ -132,36 +179,28 @@ function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: S
   const save = async () => {
     setBusy(true);
     try {
-      if (deepgram) await setDeepgramKey(key.trim());
-      await setSetting("stt", v);
+      await setDeepgramKey(key.trim());
+      await setSetting("stt", "deepgram");
       resetSttReady();
-      onChange(v);
       toast(t("voice.saved"));
-      closeSheet();
+      onSaved();
     } catch (e) { setStatus({ ok: false, msg: (e as Error).message }); setBusy(false); }
   };
   return (
     <div className="od-stack" style={sheet}>
-      <h3 style={{ textAlign: "center" }}>{t("settings.stt")}</h3>
-      <div className="seg" role="radiogroup" aria-label={t("settings.stt")}>
-        {(["whisper", "deepgram"] as const).map((p) => (
-          <button key={p} role="radio" aria-checked={v === p} className={`btn ${v === p ? "btn-blue" : "btn-ghost"}`} onClick={() => { setV(p); setStatus(null); }}>
-            {t(p === "deepgram" ? "settings.sttDeepgram" : "settings.sttWhisper")}
-          </button>
-        ))}
-      </div>
-      <p className="small">{t(deepgram ? "voice.deepgramDesc" : "voice.whisperDesc")}</p>
-      {deepgram && (
-        <label className="od-field"><b>{t("voice.deepgramKey")}</b><span className="muted small">{t("ai.apiKeyDesc")}</span>
-          <input className="input" type="password" autoComplete="off" spellCheck={false} value={key} onChange={(e) => setKey(e.target.value)} />
-        </label>
-      )}
+      <h3 style={{ textAlign: "center" }}>{t("settings.sttDeepgram")}</h3>
+      <p className="small">{t("voice.deepgramDesc")}</p>
+      <label className="od-field"><b>{t("voice.deepgramKey")}</b><span className="muted small">{t("ai.apiKeyDesc")}</span>
+        <input className="input" type="password" autoComplete="off" spellCheck={false} value={key} onChange={(e) => setKey(e.target.value)} />
+      </label>
       {status && <p className="small" role="status" style={{ color: status.ok ? "var(--green)" : "var(--red)", overflowWrap: "anywhere" }}>{status.msg}</p>}
-      <div className="od-row" style={gap("10px")}>
-        {deepgram && <button className="btn btn-ghost" disabled={busy || !key.trim()} onClick={test}>{t("ai.test")}</button>}
-        <button className="btn btn-primary od-fill" disabled={busy || (deepgram && !key.trim())} onClick={save}>{t("ai.save")}</button>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <div className="od-row" style={gap("8px")}>
+          <button className="btn btn-ghost" disabled={busy || !key.trim()} onClick={test}>{t("ai.test")}</button>
+          <button className="btn btn-primary od-fill" disabled={busy || !key.trim()} onClick={save}>{t("ai.save")}</button>
+        </div>
+        <button className="btn btn-ghost btn-block" onClick={onCancel}>{t("sheet.cancel")}</button>
       </div>
-      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </div>
   );
 }

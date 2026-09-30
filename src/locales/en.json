@@ -473,7 +473,10 @@
     "systemGood": "Fastest, but sounds robotic.",
     "piperGood": "Realistic and fast, a little robotic.",
     "kokoroGood": "The most realistic; may lag a moment.",
-    "about": "About Kokoro"
+    "about": "About {{name}}",
+    "whisperGood": "Private and offline; a bit slower.",
+    "deepgramGood": "Fastest and most accurate; needs internet and a key.",
+    "configure": "Deepgram settings"
   },
   "data": {
     "section": "Data",

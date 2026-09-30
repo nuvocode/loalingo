@@ -501,13 +501,14 @@ html[data-theme="dark"] .face .scene{filter:brightness(.6) saturate(.8)}
   .call-grid.practice-open .call-practice{grid-row:auto;grid-column:1 / 3}
 }
 
-/* Settings > speech voice options: full-width rows, signal bars for how natural the voice is, Kokoro's note behind an info icon */
-.tts-option{position:relative;display:flex;align-items:center;border:2px solid var(--border);border-radius:14px;background:var(--card)}
-.tts-option.on{border-color:var(--blue);background:var(--sky)}
-.tts-option > button[role=radio]{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;border-radius:12px}
-.tts-option > button[role=radio]:disabled{cursor:default;opacity:.6}
+/* Settings > speech voice and recognition options: full-width rows, an icon on the left, notes behind an info icon */
+.voice-option{position:relative;display:flex;align-items:center;border:2px solid var(--border);border-radius:14px;background:var(--card)}
+.voice-option.on{border-color:var(--blue);background:var(--sky)}
+.voice-option > button[role=radio]{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer;border-radius:12px}
+.voice-option > button[role=radio]:disabled{cursor:default;opacity:.6}
 .tts-signal{width:22px;height:22px;flex:none}
-.tts-info{position:relative;margin-right:6px;flex:none}
-.tts-tip{display:none;position:absolute;right:0;bottom:calc(100% + 6px);width:260px;max-width:70vw;padding:10px 12px;border-radius:12px;background:var(--text);color:var(--bg);font-size:13px;line-height:1.4;z-index:2;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-.tts-info:hover .tts-tip,.tts-info:focus-within .tts-tip,.tts-tip.open{display:block}
+.voice-info{position:relative;margin-right:6px;flex:none}
+.voice-tip{display:none;position:absolute;right:0;bottom:calc(100% + 6px);width:260px;max-width:70vw;padding:10px 12px;border-radius:12px;background:var(--text);color:var(--bg);font-size:13px;line-height:1.4;z-index:2;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.voice-info:hover .voice-tip,.voice-info:focus-within .voice-tip,.voice-tip.open{display:block}
 .sheet .sheet-actions .btn{margin:0}
+.voice-icon{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center}
