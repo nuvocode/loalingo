@@ -550,5 +550,21 @@
         "b": "One short lesson before bed keeps your root count at {{count}} and growing."
       }
     ]
+  },
+  "tutor": {
+    "card": "Lesson with a tutor",
+    "cardDesc": "A live video lesson on your current unit",
+    "pick": "Who should teach you today?",
+    "message": "Messages",
+    "micOn": "Turn microphone on",
+    "micOff": "Turn microphone off",
+    "micDenied": "Microphone isn’t available — type instead",
+    "camOn": "Turn camera on",
+    "camOff": "Turn camera off",
+    "camDenied": "Camera isn’t available",
+    "end": "End call",
+    "placeholder": "Write a message — your tutor answers out loud",
+    "done": "Lesson complete!",
+    "corrections": "Corrections from this lesson"
   }
 }

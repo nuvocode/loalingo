@@ -10,7 +10,8 @@ import { keepInBackground, notify } from "./notify";
 import { takeOver, resetDataDir } from "./datadir";
 import { findUpdate, UpdateSheet } from "./Update";
 import { Chat, Story } from "./Talk";
-import { parseTalkId } from "./characters";
+import { TutorCall } from "./TutorCall";
+import { CHARACTERS, parseTalkId, type CharacterId } from "./characters";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
 import { Avatar, ProfileGate, useLangName } from "./screens/Profiles";
@@ -145,6 +146,7 @@ export default function App() {
       </nav>
 
       {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
+        : lessonId.startsWith("tutor:") ? (lessonId.slice(6) in CHARACTERS && <TutorCall key={lessonId} who={lessonId.slice(6) as CharacterId} />)
         : /^(chat|call):/.test(lessonId) ? (talk && <Chat key={lessonId} who={talk.who} topic={talk.topic} voice={talk.voice} />) : <Lesson id={lessonId} />)}
       </>}
 

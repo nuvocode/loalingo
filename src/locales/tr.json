@@ -545,5 +545,21 @@
         "b": "Yatmadan önce kısa bir ders, {{count}} günlük köklerin için."
       }
     ]
+  },
+  "tutor": {
+    "card": "Tutor ile ders",
+    "cardDesc": "Bulunduğun ünite üzerine canlı görüntülü ders",
+    "pick": "Bugün sana kim ders versin?",
+    "message": "Mesajlar",
+    "micOn": "Mikrofonu aç",
+    "micOff": "Mikrofonu kapat",
+    "micDenied": "Mikrofon kullanılamıyor — yazarak devam et",
+    "camOn": "Kamerayı aç",
+    "camOff": "Kamerayı kapat",
+    "camDenied": "Kamera kullanılamıyor",
+    "end": "Aramayı bitir",
+    "placeholder": "Mesaj yaz — tutor sesli cevap verir",
+    "done": "Ders tamamlandı!",
+    "corrections": "Bu dersteki düzeltmeler"
   }
 }

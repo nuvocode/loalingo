@@ -2,7 +2,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { isTauri, getSetting } from "./db";
-import { resample } from "./audio";
+import { VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
 import { wav16 } from "./wav";
 
 export type SttProvider = "whisper" | "deepgram";
@@ -61,13 +61,59 @@ export async function startRecording(lang: string, onAutoStop?: () => void) {
       stream.getTracks().forEach((t) => t.stop());
       const rate = ctx.sampleRate;
       await ctx.close();
-      const all = new Float32Array(chunks.reduce((n, c) => n + c.length, 0));
-      chunks.reduce((o, c) => (all.set(c, o), o + c.length), 0);
-      if (!transcribe || all.length < rate * 0.3) return ""; // under 0.3 s: nothing said
-      if ((await sttProvider()) === "deepgram") return deepgramTranscribe(wav16(resample(all, rate)), lang);
-      // ponytail: samples go over IPC as JSON numbers (~1 MB for 15 s); raw bytes if it ever feels slow
-      return invoke<string>("transcribe", { samples: Array.from(resample(all, rate)), lang });
+      return transcribe ? transcribeSamples(concat(chunks), rate, lang) : "";
     },
   };
 }
 export type Recording = Awaited<ReturnType<typeof startRecording>>;
+
+/** Transcript of raw mic samples at `rate` Hz; under 0.3 s counts as nothing said. */
+async function transcribeSamples(all: Float32Array, rate: number, lang: string): Promise<string> {
+  if (all.length < rate * 0.3) return "";
+  if ((await sttProvider()) === "deepgram") return deepgramTranscribe(wav16(resample(all, rate)), lang);
+  // ponytail: samples go over IPC as JSON numbers (~1 MB for 15 s); raw bytes if it ever feels slow
+  return invoke<string>("transcribe", { samples: Array.from(resample(all, rate)), lang });
+}
+
+export type Listener = { pause(): void; resume(): void; stop(): Promise<void> };
+
+/** Hands-free listening (tutor call, spec T): the voice detector cuts the mic stream into utterances and each one is transcribed. */
+export async function listen(lang: string, on: { utterance: (text: string) => void; speech?: () => void; level?: (rms: number) => void; error?: (e: Error) => void }): Promise<Listener> {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+  const ctx = new AudioContext();
+  void ctx.resume(); // created after an await, so it may start suspended
+  const src = ctx.createMediaStreamSource(stream);
+  const proc = ctx.createScriptProcessor(4096, 1, 1); // ponytail: same deprecated node as startRecording
+  let v = VAD_IDLE, e: VadEvent, paused = false, stopped = false, pre: Float32Array[] = [], chunks: Float32Array[] = [];
+  const reset = () => { v = VAD_IDLE; pre = []; chunks = []; };
+  proc.onaudioprocess = (ev) => {
+    if (paused) return;
+    const d = new Float32Array(ev.inputBuffer.getChannelData(0));
+    const r = rms(d);
+    on.level?.(r);
+    [v, e] = vadStep(v, r, (d.length / ctx.sampleRate) * 1000);
+    if (e === "start") { chunks = [...pre]; on.speech?.(); }
+    if (v.speaking || e === "end") chunks.push(d);
+    else { pre.push(d); if (pre.length > 3) pre.shift(); } // ~250 ms before the detector fired, so the first syllable is kept
+    if (e !== "end") return;
+    const all = concat(chunks);
+    reset();
+    transcribeSamples(all, ctx.sampleRate, lang).then(
+      (x) => { if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
+      (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
+    );
+  };
+  src.connect(proc);
+  proc.connect(ctx.destination);
+  return {
+    pause() { paused = true; reset(); on.level?.(0); },
+    resume() { paused = false; },
+    async stop() {
+      if (stopped) return;
+      stopped = paused = true;
+      proc.disconnect(); src.disconnect();
+      stream.getTracks().forEach((x) => x.stop());
+      await ctx.close();
+    },
+  };
+}

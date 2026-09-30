@@ -5,5 +5,7 @@
   <!-- Merged into the bundle's Info.plist by Tauri. Speech stays on this Mac (bundled Whisper). -->
   <key>NSMicrophoneUsageDescription</key>
   <string>Sprigo listens while you practise speaking. Your voice is transcribed on this Mac and never uploaded.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Sprigo shows your camera to you during tutor lessons. The picture stays on this Mac and is never uploaded.</string>
 </dict>
 </plist>

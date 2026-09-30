@@ -566,5 +566,21 @@
         "b": "Une petite leçon avant de dormir, et ton compteur de racines reste à {{count}} et grandit."
       }
     ]
+  },
+  "tutor": {
+    "card": "Cours avec un tuteur",
+    "cardDesc": "Un cours vidéo en direct sur ton unité actuelle",
+    "pick": "Qui t’enseigne aujourd’hui ?",
+    "message": "Messages",
+    "micOn": "Activer le micro",
+    "micOff": "Couper le micro",
+    "micDenied": "Micro indisponible — écris plutôt",
+    "camOn": "Activer la caméra",
+    "camOff": "Couper la caméra",
+    "camDenied": "Caméra indisponible",
+    "end": "Raccrocher",
+    "placeholder": "Écris un message — ton tuteur répond à voix haute",
+    "done": "Cours terminé !",
+    "corrections": "Corrections de ce cours"
   }
 }

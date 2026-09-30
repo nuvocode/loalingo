@@ -14,9 +14,9 @@ import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
-type Result = { xp: number; gems: number };
+export type Result = { xp: number; gems: number };
 
-function Shell({ label, progress, onClose, onRegen, body, footer }: {
+export function Shell({ label, progress, onClose, onRegen, body, footer }: {
   label: string; progress: number; onClose: () => void; onRegen?: () => void; body: React.ReactNode; footer?: React.ReactNode;
 }) {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ function Loading({ title }: { title: string }) {
   );
 }
 
-function Failed({ msg, retry, quit }: { msg: string; retry: () => void; quit: () => void }) {
+export function Failed({ msg, retry, quit }: { msg: string; retry: () => void; quit: () => void }) {
   const { t } = useTranslation();
   const { go } = useApp();
   return (
@@ -67,7 +67,7 @@ function Failed({ msg, retry, quit }: { msg: string; retry: () => void; quit: ()
   );
 }
 
-function Done({ title, r }: { title: string; r: Result }) {
+export function Done({ title, r }: { title: string; r: Result }) {
   const { t } = useTranslation();
   return (
     <div className="result-wrap">
@@ -82,12 +82,12 @@ function Done({ title, r }: { title: string; r: Result }) {
 }
 
 /** Loads Kokoro while the first line is being written, so its voice is not waiting on the model too. */
-function usePrewarm(lang: string) {
+export function usePrewarm(lang: string) {
   useEffect(() => { usesKokoro(lang).then((k) => { if (k) return loadKokoro(); }).catch(() => {}); }, [lang]);
 }
 
 /** Asks before leaving a story or chat that is under way. */
-function useQuit(active: boolean) {
+export function useQuit(active: boolean) {
   const { t } = useTranslation();
   const { openSheet, closeSheet, endLesson } = useApp();
   const quit = () => { closeSheet(); endLesson(); stopSpeaking(); };

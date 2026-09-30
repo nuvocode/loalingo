@@ -430,3 +430,23 @@ button.bubble:hover{border-color:var(--blue)}
 .tok.sel{border-color:var(--blue);background:var(--sky)}
 .bank-typed{text-align:center;font-weight:800;color:var(--blue);margin:-12px 0 0}
 @media(min-width:768px){.mobile-only{display:none !important}}
+/* Tutor call (spec T) */
+.lesson-inner:has(> .call-grid){max-width:1100px}
+.call-grid{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:440px}
+.call-grid.with-drawer{grid-template-columns:1fr 1fr 320px}
+.call-pane{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;border-radius:var(--r);background:var(--surface);overflow:hidden;text-align:center}
+.call-pane.me{box-shadow:inset 0 0 0 calc(var(--level,0) * 6px) var(--green);transition:box-shadow .08s linear}
+.call-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.call-caption{max-width:440px;display:flex;flex-direction:column;gap:4px;font-size:18px;font-weight:700;color:var(--text)}
+.call-caption small{font-size:14px;font-weight:600;color:var(--text-faint)}
+.call-fix{max-width:440px;padding:8px 12px;border-radius:var(--r);background:var(--gold-tint);color:var(--gold-dark)}
+.call-fixes{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px}
+.call-drawer{display:flex;flex-direction:column;gap:10px;min-height:0;max-height:440px}
+.call-drawer .chat{flex:1;overflow-y:auto}
+.call-bar{display:flex;gap:12px;margin:0 auto}
+.call-btn{width:52px;height:52px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text)}
+.call-btn.on{background:var(--blue);color:var(--on-accent)}
+.call-btn.off{color:var(--red)}
+.call-btn.end{background:var(--red);color:var(--on-accent)}
+.call-btn:disabled{opacity:.4;cursor:not-allowed}
+@media (max-width:760px){.call-grid,.call-grid.with-drawer{grid-template-columns:1fr}}

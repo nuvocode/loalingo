@@ -16,6 +16,28 @@ const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
 });
 
+/** Picks the tutor for a video lesson (spec T). */
+function TutorSheet() {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  const start = useStartLesson();
+  return (
+    <div className="od-stack" style={{ "--od-gap": "10px" } as React.CSSProperties}>
+      <h3 style={{ textAlign: "center" }}>{t("tutor.pick")}</h3>
+      {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
+        const { name, color, face } = CHARACTERS[k];
+        return (
+          <button key={k} className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} onClick={() => { closeSheet(); start(`tutor:${k}`); }}>
+            <Face spec={face} color={color} size={48} label={name} />
+            <span className="od-field od-fill" style={{ textAlign: "left" }}><b>{name}</b><span className="muted small">{t(`roleplay.roles.${k}`)}</span></span>
+          </button>
+        );
+      })}
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
 /** This week's standings: simulated rivals + the learner (weekly XP). */
 export function useLeague() {
   const { t } = useTranslation();
@@ -46,7 +68,7 @@ export function useBuy() {
 
 export function Practice() {
   const { t } = useTranslation();
-  const { toast, enrollment, lessonId } = useApp();
+  const { toast, enrollment, lessonId, openSheet } = useApp();
   const start = useStartLesson();
   const [data, setData] = useState<{ mistakes: number; words: db.Word[]; timed: number }>({ mistakes: 0, words: [], timed: 0 });
   // Reloads when a practice session closes (lessonId → null).
@@ -69,6 +91,7 @@ export function Practice() {
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("practice.title")}</h1>
       <p className="muted" style={{ marginBottom: 20 }}>{t("practice.subtitle")}</p>
       <div className="od-grid" style={{ "--od-cols": 1, "--od-gap": "14px" } as React.CSSProperties}>
+        {card(() => openSheet(<TutorSheet />), "video", "var(--green-tint)", "var(--green)", t("tutor.card"), t("tutor.cardDesc"))}
         {card(() => mistakes ? start("practice-mistakes") : toast(t("practice.noMistakes")), "refresh", "var(--red-tint)", "var(--red)", t("practice.mistakes"),
           mistakes ? t("practice.mistakesCount", { count: mistakes }) : t("practice.noMistakes"))}
         {/* Speaking: bundled Whisper (DECISIONS D2). */}
