@@ -32,7 +32,7 @@ const Signal = ({ bars, color }: { bars: number; color: string }) => (
 );
 
 /** An info icon whose note shows on hover, focus or tap. */
-function InfoTip({ label, children }: { label: string; children: React.ReactNode }) {
+export function InfoTip({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="voice-info">

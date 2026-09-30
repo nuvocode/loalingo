@@ -9,7 +9,8 @@ import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
 import { DataSection } from "./DataSettings";
-import { SttRow, TtsRow } from "./VoiceSettings";
+import { InfoTip, SttRow, TtsRow } from "./VoiceSettings";
+import { Icon, type IconName } from "../icons";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -77,26 +78,57 @@ function LocalSetup({ onPick }: { onPick: (p: ProviderId, models: string[]) => v
   );
 }
 
-/** DECISIONS C1/C6: device-wide provider, key in the OS keychain. */
+const AI_ROWS: { p: ProviderId; icon: IconName; color: string }[] = [
+  { p: "ollama", icon: "lock", color: "var(--green)" },
+  { p: "lmstudio", icon: "lock", color: "var(--green)" },
+  { p: "openai", icon: "spark", color: "var(--blue)" },
+  { p: "anthropic", icon: "spark", color: "var(--orange)" },
+  { p: "gemini", icon: "spark", color: "var(--purple)" },
+];
+
+/** DECISIONS C1/C6: device-wide provider, key in the OS keychain. One row per provider; picking one opens its settings. */
 export function AiSheet() {
   const { t } = useTranslation();
-  const { ai, setAi, toast, closeSheet } = useApp();
-  const [provider, setProvider] = useState<ProviderId>(ai?.provider ?? "ollama");
-  const [baseURL, setBaseURL] = useState(ai?.baseURL ?? PROVIDERS[provider].baseURL);
-  const [model, setModel] = useState(ai?.model ?? "");
+  const { ai, openSheet, closeSheet } = useApp();
+  const [found, setFound] = useState<{ p: ProviderId; models: string[] } | null>(null); // first run: a local server with models
+  const configure = (p: ProviderId) => openSheet(<AiConfigSheet provider={p} models={found?.p === p ? found.models : []} />);
+  return (
+    <div className="od-stack" style={{ ...gap("14px"), textAlign: "left" }}>
+      <h3 style={{ textAlign: "center" }}>{t("ai.title")}</h3>
+      {!ai && <LocalSetup onPick={(p, models) => setFound({ p, models })} />}
+      <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("ai.provider")}>
+        {AI_ROWS.map(({ p, icon, color }) => (
+          <div key={p} className={`voice-option${ai?.provider === p ? " on" : ""}`}>
+            <button role="radio" aria-checked={ai?.provider === p} onClick={() => ai?.provider !== p && configure(p)}>
+              <span className="voice-icon" style={{ color }}><Icon name={icon} /></span>
+              <span className="od-field od-fill"><b>{PROVIDERS[p].label}</b>
+                <span className="muted small">{ai?.provider === p ? `${ai.model} · ` : ""}{t(`ai.${p}Good`)}</span></span>
+            </button>
+            <button className="icon-btn" aria-label={t("ai.configure", { name: PROVIDERS[p].label })} onClick={() => configure(p)}><Icon name="gear" /></button>
+            <InfoTip label={t("voice.about", { name: PROVIDERS[p].label })}>{t(`ai.${p}Info`)}</InfoTip>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
+/** One provider's server, key and model; saving makes it the active provider. */
+function AiConfigSheet({ provider, models: found }: { provider: ProviderId; models: string[] }) {
+  const { t } = useTranslation();
+  const { ai, setAi, toast, openSheet } = useApp();
+  const mine = ai?.provider === provider ? ai : null;
+  const [baseURL, setBaseURL] = useState(mine?.baseURL ?? PROVIDERS[provider].baseURL);
+  const [model, setModel] = useState(mine?.model ?? (found.includes(RECOMMENDED_OLLAMA.model) ? RECOMMENDED_OLLAMA.model : found[0] ?? ""));
   const [key, setKeyState] = useState("");
-  const [models, setModels] = useState<string[]>([]);
+  const [models, setModels] = useState(found);
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const needsKey = PROVIDERS[provider].needsKey;
+  const back = () => openSheet(<AiSheet />);
 
-  useEffect(() => { getKey(provider).then((k) => setKeyState(k ?? "")); setModels([]); setStatus(null); }, [provider]);
-
-  const pick = (p: ProviderId) => {
-    setProvider(p);
-    setBaseURL(ai?.provider === p ? ai.baseURL : PROVIDERS[p].baseURL);
-    setModel(ai?.provider === p ? ai.model : "");
-  };
+  useEffect(() => { getKey(provider).then((k) => setKeyState(k ?? "")); }, [provider]);
   const cfg: AiConfig = { provider, baseURL: baseURL.trim(), model: model.trim() };
 
   const test = async () => {
@@ -115,23 +147,14 @@ export function AiSheet() {
       if (needsKey) await setKey(provider, key.trim() || null);
       await setAi(cfg);
       toast(t("ai.saved"));
-      closeSheet();
-    } catch (e) { setStatus({ ok: false, msg: (e as Error).message }); }
-    finally { setBusy(false); }
+      back();
+    } catch (e) { setStatus({ ok: false, msg: (e as Error).message }); setBusy(false); }
   };
 
   return (
     <div className="od-stack" style={{ ...gap("14px"), textAlign: "left" }}>
-      <h3 style={{ textAlign: "center" }}>{t("ai.title")}</h3>
-      {!ai && <LocalSetup onPick={(p, list) => {
-        setProvider(p); setBaseURL(PROVIDERS[p].baseURL); setModels(list);
-        setModel(list.includes(RECOMMENDED_OLLAMA.model) ? RECOMMENDED_OLLAMA.model : list[0]);
-      }} />}
-      <div className="seg" role="radiogroup" aria-label={t("ai.provider")}>
-        {(Object.keys(PROVIDERS) as ProviderId[]).map((p) => (
-          <button key={p} role="radio" aria-checked={provider === p} className={`btn ${provider === p ? "btn-blue" : "btn-ghost"}`} onClick={() => pick(p)}>{PROVIDERS[p].label}</button>
-        ))}
-      </div>
+      <h3 style={{ textAlign: "center" }}>{PROVIDERS[provider].label}</h3>
+      <p className="small">{t(`ai.${provider}Info`)}</p>
       <label className="od-field"><b>{t("ai.baseURL")}</b>
         <input className="input" value={baseURL} spellCheck={false} onChange={(e) => setBaseURL(e.target.value)} placeholder={PROVIDERS[provider].baseURL} />
       </label>
@@ -145,11 +168,13 @@ export function AiSheet() {
         <datalist id="ai-models">{models.map((m) => <option key={m} value={m} />)}</datalist>
       </label>
       {status && <p className="small" role="status" style={{ color: status.ok ? "var(--green)" : "var(--red)", overflowWrap: "anywhere" }}>{status.msg}</p>}
-      <div className="od-row" style={gap("10px")}>
-        <button className="btn btn-ghost" disabled={busy || (needsKey && !key.trim())} onClick={test}>{t("ai.test")}</button>
-        <button className="btn btn-primary od-fill" disabled={busy || !cfg.model || (needsKey && !key.trim())} onClick={save}>{t("ai.save")}</button>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <div className="od-row" style={gap("8px")}>
+          <button className="btn btn-ghost" disabled={busy || (needsKey && !key.trim())} onClick={test}>{t("ai.test")}</button>
+          <button className="btn btn-primary od-fill" disabled={busy || !cfg.model || (needsKey && !key.trim())} onClick={save}>{t("ai.save")}</button>
+        </div>
+        <button className="btn btn-ghost btn-block" onClick={back}>{t("sheet.cancel")}</button>
       </div>
-      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
     </div>
   );
 }

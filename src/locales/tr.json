@@ -430,7 +430,18 @@
     "noLocal": "Yerel model bulunamadı",
     "noLocalDesc": "Ücretsiz Ollama uygulamasını kur, aç ve tekrar kontrol et. Ya da yukarıdan bir bulut sağlayıcısı seç.",
     "getOllama": "Ollama'yı indir",
-    "rescan": "Tekrar kontrol et"
+    "rescan": "Tekrar kontrol et",
+    "ollamaGood": "Ücretsiz, bu Mac'te çalışır; hızı bilgisayarına bağlı.",
+    "ollamaInfo": "Modelleri bu Mac'te çalıştırır; derslerin çevrimdışı ve gizli kalır. Ollama uygulaması kurulu ve açık olmalı; bulut modelleri (adı :cloud ile bitenler) de çalışır.",
+    "lmstudioGood": "Ücretsiz ve yerel; modelleri görsel bir uygulamada yönetirsin.",
+    "lmstudioInfo": "LM Studio'nun yerel sunucusuna bağlanır. Önce LM Studio'da bir model yükleyip sunucuyu başlat.",
+    "openaiGood": "Hızlı ve güçlü bulut modelleri; ücretli API anahtarı gerekir.",
+    "openaiInfo": "Derslerini ve sohbetlerini GPT modelleri yazar. İstekler OpenAI'a gider, kullanıma göre ücretlendirilir.",
+    "anthropicGood": "Claude modelleri; doğal sohbet ve anlaşılır açıklamalar.",
+    "anthropicInfo": "Derslerini ve sohbetlerini Claude modelleri yazar. İstekler Anthropic'e gider, kullanıma göre ücretlendirilir.",
+    "geminiGood": "Google'ın hızlı bulut modelleri; API anahtarı gerekir.",
+    "geminiInfo": "Derslerini ve sohbetlerini Gemini modelleri yazar. İstekler Google'a gider; kullanım sınırı ve ücret anahtarına bağlıdır.",
+    "configure": "{{name}} ayarları"
   },
   "stt": {
     "idle": "Konuşmak için dokun",

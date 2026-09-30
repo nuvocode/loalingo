@@ -435,7 +435,18 @@
     "noLocal": "Kein lokales Modell gefunden",
     "noLocalDesc": "Installiere die kostenlose Ollama-App, öffne sie und prüfe dann erneut. Oder wähle oben einen Cloud-Anbieter.",
     "getOllama": "Ollama holen",
-    "rescan": "Erneut prüfen"
+    "rescan": "Erneut prüfen",
+    "ollamaGood": "Kostenlos und läuft auf diesem Mac; Tempo hängt vom Rechner ab.",
+    "ollamaInfo": "Führt Modelle auf diesem Mac aus, deine Lektionen bleiben offline und privat. Die Ollama-App muss installiert und geöffnet sein; ihre Cloud-Modelle (Namen mit :cloud) funktionieren auch.",
+    "lmstudioGood": "Kostenlos und lokal; Modelle in einer grafischen App verwalten.",
+    "lmstudioInfo": "Verbindet sich mit dem lokalen Server von LM Studio. Lade dort zuerst ein Modell und starte den Server.",
+    "openaiGood": "Schnelle, starke Cloud-Modelle; braucht einen kostenpflichtigen API-Schlüssel.",
+    "openaiInfo": "GPT-Modelle schreiben deine Lektionen und Chats. Anfragen gehen an OpenAI und werden nach Nutzung abgerechnet.",
+    "anthropicGood": "Claude-Modelle; natürliche Gespräche und klare Erklärungen.",
+    "anthropicInfo": "Claude-Modelle schreiben deine Lektionen und Chats. Anfragen gehen an Anthropic und werden nach Nutzung abgerechnet.",
+    "geminiGood": "Schnelle Cloud-Modelle von Google; braucht einen API-Schlüssel.",
+    "geminiInfo": "Gemini-Modelle schreiben deine Lektionen und Chats. Anfragen gehen an Google; Limits und Preise hängen von deinem Schlüssel ab.",
+    "configure": "{{name}}-Einstellungen"
   },
   "stt": {
     "idle": "Zum Sprechen tippen",
