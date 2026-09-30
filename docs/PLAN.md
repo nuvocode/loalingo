@@ -107,7 +107,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Profil seçme / oluşturma / PIN ekranları (`src/screens/Profiles.tsx`); son profil PIN'siz ise otomatik açılır. Ayarlar > "Çıkış yap" → profil seçme; "Profili düzenle" (ad, renk, ana dil, PIN).
 - Tema ve arayüz dili profile yazılır (giriş ekranı için son seçim localStorage'da kalır).
 - Kurs değiştirme sheet'i: ray bayrak çipi + Ayarlar > Kurs; "Yeni dil ekle".
-- YAML şeması (zod, `src/course.ts`), `courses/en.yml` (A1: 10 ünite, 40 adım + checkpoint). Kullanıcı kursları: `~/Library/Application Support/com.nuvocode.sprigo/courses/*.yml` (aynı iso gömülüyü ezer). Bozuk dosya Öğren ekranında dosya + yol + nedenle gösterilir.
+- YAML şeması (zod, `src/course.ts`), `courses/en.yml` (A1: 10 ünite, 40 adım + checkpoint). Kullanıcı kursları: `~/Library/Application Support/com.ozerozdas.sprigo/courses/*.yml` (aynı iso gömülüyü ezer). Bozuk dosya Öğren ekranında dosya + yol + nedenle gösterilir.
 - Öğren ekranı: sadece aktif seviye, seviye seçici çipi + sheet, ünite sonu sandığı (+20 elmas), checkpoint düğümü ve seviye kartı ("X ders kaldı"). Checkpoint ve seviye testi Faz 3'te açıldı.
 - Ders bitince adım tamamlanır ve XP kursa yazılır.
 - Test: `pnpm test` (loader + path). Tarayıcı önizlemesinde SQLite yerine sql.js çalışır (sadece dev).
@@ -149,7 +149,7 @@ Döngü eşlemesi: Öğret=`learn` → Tanı=`word_select/image_select` → Hat�
 - Günlük hatırlatıcı: sistem bildirimi, dakikada bir kontrol. Açıkken pencereyi kapatmak uygulamayı gizler (Dock'tan geri gelir, ⌘Q kapatır) ve uygulama oturum açılışında gizli başlar (`tauri-plugin-autostart`, LaunchAgent). Kapatınca ikisi de geri alınır. PIN'li profil otomatik girilmediği için onun hatırlatıcısı giriş yapılana kadar çalışmaz.
 - A2, B1 ve B2 kursları: her biri 10 ünite, 43 adım + checkpoint.
 - İlk açılış (C6): sağlayıcı yoksa kurulum sheet'i girişte bir kez kendiliğinden açılır. Bu Mac'te Ollama / LM Studio aranır; model varsa seçili gelir. Ollama çalışıyor ama modeli yoksa önerilen model (`RECOMMENDED_OLLAMA`, qwen3:8b) uygulamadan ilerlemeyle indirilir (`/api/pull`). Hiçbiri yoksa "Ollama'yı indir" (opener) + "Tekrar kontrol et".
-- Uygulama içi güncelleme: `tauri-plugin-updater`, `https://github.com/nuvocode/sprigo/releases/latest/download/latest.json`. Açılışta sessiz kontrol, Ayarlar → Güncellemeler → Denetle. ✔ 0.1.0 → 0.1.1 uçtan uca test edildi: önce yerel sunucuyla, sonra GitHub Releases üzerinden (`/Applications`’a kurulu 0.1.0 uygulama içinden güncellendi).
+- Uygulama içi güncelleme: `tauri-plugin-updater`, `https://github.com/ozerozdas/sprigo/releases/latest/download/latest.json`. Açılışta sessiz kontrol, Ayarlar → Güncellemeler → Denetle. ✔ 0.1.0 → 0.1.1 uçtan uca test edildi: önce yerel sunucuyla, sonra GitHub Releases üzerinden (`/Applications`’a kurulu 0.1.0 uygulama içinden güncellendi).
 - ✔ Whisper Rust testi (`cargo test -- --ignored whisper`) geçiyor. Dev uygulamada mikrofonla elle test bekliyor.
 
 ## 5. Kararlar
@@ -162,9 +162,9 @@ Tüm açık kararlar: [DECISIONS.md](DECISIONS.md)
 - İmza: ad-hoc (`bundle.macOS.signingIdentity: "-"`). Bu Mac'te ve "Yine de aç" ile başka Mac'lerde çalışır. Dağıtım için Developer ID Application sertifikası + notarization gerekir (şu an yalnızca Apple Development sertifikası var).
 - `[profile.release.build-override] strip = false`: macOS 27 bağlayıcısıyla strip edilen proc-macro dylib'leri (sqlx-macros) yüklenemiyor. Uygulama binary'si yine strip edilir.
 - CI (`.github/workflows/release.yml`): `v*` etiketi → macOS arm64 + x86_64, Windows, Linux derlenir, birleşik `latest.json` ile taslak release'e yüklenir; hepsi yeşilse taslak yayınlanır. İmza anahtarı `TAURI_SIGNING_PRIVATE_KEY` repo secret'ında (dosyanın içeriği). Whisper Metal yalnızca macOS'ta, diğerlerinde CPU.
-- Yerel sürüm yayınlama (yalnızca macOS): `tauri.conf.json` ve `Cargo.toml` sürümünü artır → `pnpm release` → `dist-release/` içindekileri (`.dmg`, `Sprigo.app.tar.gz`, `latest.json`) `nuvocode/sprigo` reposunda `v<sürüm>` etiketli GitHub release'e yükle. Repo public olmalı (updater giriş yapmadan indirir).
+- Yerel sürüm yayınlama (yalnızca macOS): `tauri.conf.json` ve `Cargo.toml` sürümünü artır → `pnpm release` → `dist-release/` içindekileri (`.dmg`, `Sprigo.app.tar.gz`, `latest.json`) `ozerozdas/sprigo` reposunda `v<sürüm>` etiketli GitHub release'e yükle. Repo public olmalı (updater giriş yapmadan indirir).
 - İmza anahtarı: `~/.tauri/loalingo.key` (şifresiz, repoda değil; kaybolursa yayınlanmış uygulamalar yeni sürümleri kabul etmez, yedekle). `createUpdaterArtifacts: true` olduğundan her `tauri build` bu anahtarı ister: `TAURI_SIGNING_PRIVATE_KEY=~/.tauri/loalingo.key`.
 - Updater, güncellemeyi sistemin geçici klasöründen uygulamanın yanına taşır. Uygulama başka bir diskte çalışıyorsa (ör. `/Volumes/...`) "Cross-device link" hatası verir. `/Applications`'da sorun yok.
 - `tauri-plugin-http` Rust tarafında `~2.7` (npm paketi 2.7.0; sürümler uyuşmazsa `tauri build` durur).
-- ✔ Release uygulamasında test edildi: gerçek SQLite (mevcut veriler), Ollama bağlantısı ve ders üretimi (Tauri HTTP), bulut isteği (OpenAI 401 → CORS yok), API anahtarı macOS anahtarlığına yazılıp okunuyor ve veritabanında yok, kullanıcı kurs klasörü (`~/Library/Application Support/com.nuvocode.sprigo/courses`).
+- ✔ Release uygulamasında test edildi: gerçek SQLite (mevcut veriler), Ollama bağlantısı ve ders üretimi (Tauri HTTP), bulut isteği (OpenAI 401 → CORS yok), API anahtarı macOS anahtarlığına yazılıp okunuyor ve veritabanında yok, kullanıcı kurs klasörü (`~/Library/Application Support/com.ozerozdas.sprigo/courses`).
 

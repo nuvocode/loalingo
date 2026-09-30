@@ -1,6 +1,6 @@
 # Sprigo ↔ Verba köprüsü
 
-**Durum:** Plan · **Kapsam:** iki repo (`nuvocode/sprigo`, `nuvocode/verba`) · **Relay:** Sprigo projesi, "Köprü" fazları
+**Durum:** Plan · **Kapsam:** iki repo (`ozerozdas/sprigo`, `nuvocode/verba`) · **Relay:** Sprigo projesi, "Köprü" fazları
 
 ## 0. Neden
 
