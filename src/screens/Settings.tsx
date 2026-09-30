@@ -180,6 +180,7 @@ export function Settings() {
   const langName = useLangName();
   const themes: ThemePref[] = ["system", "light", "dark"];
   const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+  const [advanced, setAdvanced] = useState(!ai); // AI not set up yet → open, so its warning stays visible
   return (
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("settings.title")}</h1>
@@ -224,19 +225,26 @@ export function Settings() {
         </div>
       </div>
 
-      <h2 className="section-title">{t("settings.aiVoice")}</h2>
-      <div className="od-stack" style={gap("12px")}>
-        <div className="card od-row" style={gap("12px")}>
-          <span className="od-field od-fill"><b>{t("ai.title")}</b>
-            {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
-              : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
-          <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
-        </div>
-        <TtsRow />
-        <SttRow />
-      </div>
+      <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
+        {t("settings.advanced")} <span aria-hidden="true">{advanced ? "▴" : "▾"}</span>
+      </button>
+      {advanced && (
+        <>
+          <h2 className="section-title">{t("settings.aiVoice")}</h2>
+          <div className="od-stack" style={gap("12px")}>
+            <div className="card od-row" style={gap("12px")}>
+              <span className="od-field od-fill"><b>{t("ai.title")}</b>
+                {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
+                  : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
+              <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
+            </div>
+            <TtsRow />
+            <SttRow />
+          </div>
 
-      <DataSection />
+          <DataSection />
+        </>
+      )}
 
       <h2 className="section-title">{t("update.section")}</h2>
       <VersionRow />
