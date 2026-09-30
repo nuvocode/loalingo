@@ -471,7 +471,16 @@
     "about": "{{name}} hakkında",
     "whisperGood": "Gizli ve çevrimdışı; biraz daha yavaş.",
     "deepgramGood": "En hızlı ve en doğru; internet ve anahtar gerekir.",
-    "configure": "Deepgram ayarları"
+    "configure": "Deepgram ayarları",
+    "try": "Dene",
+    "tryTitle": "{{name}} deneme",
+    "tryHint": "Bir şey söyle; durakladığında her cümle aşağıda görünür.",
+    "hearing": "Seni duyuyorum…",
+    "nothingYet": "Henüz bir şey duyulmadı.",
+    "back": "Geri",
+    "noKey": "Önce bir Deepgram anahtarı ekle.",
+    "whisperMissing": "Whisper modeli bu sürümde yok (yalnız masaüstü uygulamasında çalışır).",
+    "micBlocked": "Mikrofona erişilemedi: {{error}}"
   },
   "data": {
     "section": "Veri",

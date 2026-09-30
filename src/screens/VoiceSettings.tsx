@@ -1,11 +1,12 @@
 // Settings > AI and voice: speech provider rows and their sheets (spec D).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { setSetting } from "../db";
 import { loadKokoro, loadPiper, speak, ttsProvider, type TtsProvider } from "../tts";
 import { Icon } from "../icons";
-import { deepgramTranscribe, getDeepgramKey, resetSttReady, setDeepgramKey, sttProvider, type SttProvider } from "../stt";
+import { deepgramTranscribe, getDeepgramKey, listen, resetSttReady, setDeepgramKey, sttProvider, sttReady, type Listener, type SttProvider } from "../stt";
+import { isNoise } from "../tutor";
 import { wav16 } from "../wav";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -154,7 +155,52 @@ function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: S
           </div>
         ))}
       </div>
-      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <button className="btn btn-blue btn-block" onClick={() => openSheet(<SttTrySheet provider={v} onBack={back} />)}><Icon name="mic" /> {t("voice.try")}</button>
+        <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      </div>
+    </div>
+  );
+}
+
+/** Tries the saved recognizer: listens until the sheet closes and lists each utterance it heard. */
+function SttTrySheet({ provider, onBack }: { provider: SttProvider; onBack: () => void }) {
+  const { t } = useTranslation();
+  const { course } = useApp();
+  const lang = course?.iso ?? "en";
+  const [heard, setHeard] = useState<string[]>([]);
+  const [level, setLevel] = useState(0);
+  const [speaking, setSpeaking] = useState(false);
+  const [err, setErr] = useState("");
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let mic: Listener | undefined, gone = false;
+    (async () => {
+      if (!(await sttReady())) throw new Error(t(provider === "deepgram" ? "voice.noKey" : "voice.whisperMissing"));
+      const l = await listen(lang, {
+        level: setLevel,
+        speech: () => setSpeaking(true),
+        utterance: (x) => { setSpeaking(false); if (!isNoise(x)) setHeard((h) => [...h, x]); },
+        error: (e) => { setSpeaking(false); setErr(e.message); },
+      });
+      if (gone) l.stop(); else mic = l;
+    })().catch((e) => setErr(e instanceof DOMException ? t("voice.micBlocked", { error: e.message }) : (e as Error).message)); // DOMException: getUserMedia
+    return () => { gone = true; mic?.stop(); };
+  }, [lang, provider]);
+  useEffect(() => { list.current?.scrollTo(0, list.current.scrollHeight); }, [heard]);
+  return (
+    <div className="od-stack" style={sheet}>
+      <h3 style={{ textAlign: "center" }}>{t("voice.tryTitle", { name: t(sttName(provider)) })}</h3>
+      <div className="od-row" style={gap("10px")} role="status">
+        <span className="voice-icon" style={{ color: err ? "var(--text-faint)" : "var(--red)" }}><Icon name="mic" /></span>
+        <div className="progress-track od-fill"><div className="progress-fill green" style={{ width: `${Math.min(100, Math.round(level * 800))}%`, transition: "none" }} /></div>
+      </div>
+      <span className="muted small">{t(speaking ? "voice.hearing" : "voice.tryHint")}</span>
+      <div ref={list} className="stt-heard">
+        {heard.length ? heard.map((x, i) => <p key={i}>{x}</p>) : <p className="muted small">{t("voice.nothingYet")}</p>}
+      </div>
+      {err && <p className="small" role="status" style={{ color: "var(--red)", overflowWrap: "anywhere" }}>{err}</p>}
+      <button className="btn btn-ghost btn-block" onClick={onBack}>{t("voice.back")}</button>
     </div>
   );
 }

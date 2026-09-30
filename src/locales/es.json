@@ -492,7 +492,16 @@
     "about": "Sobre {{name}}",
     "whisperGood": "Privado y sin conexión; algo más lento.",
     "deepgramGood": "El más rápido y preciso; necesita internet y una clave.",
-    "configure": "Ajustes de Deepgram"
+    "configure": "Ajustes de Deepgram",
+    "try": "Probar",
+    "tryTitle": "Probar {{name}}",
+    "tryHint": "Di algo; cada frase aparece abajo cuando haces una pausa.",
+    "hearing": "Te escucho…",
+    "nothingYet": "Aún no se ha oído nada.",
+    "back": "Atrás",
+    "noKey": "Primero añade una clave de Deepgram.",
+    "whisperMissing": "El modelo Whisper no está en esta versión (solo en la app de escritorio).",
+    "micBlocked": "No se pudo usar el micrófono: {{error}}"
   },
   "data": {
     "section": "Datos",

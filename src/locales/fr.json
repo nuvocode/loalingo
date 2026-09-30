@@ -492,7 +492,16 @@
     "about": "À propos de {{name}}",
     "whisperGood": "Privé et hors ligne ; un peu plus lent.",
     "deepgramGood": "Le plus rapide et le plus précis ; nécessite Internet et une clé.",
-    "configure": "Réglages Deepgram"
+    "configure": "Réglages Deepgram",
+    "try": "Essayer",
+    "tryTitle": "Essayer {{name}}",
+    "tryHint": "Dis quelque chose ; chaque phrase s'affiche ci-dessous quand tu fais une pause.",
+    "hearing": "Je t'entends…",
+    "nothingYet": "Rien entendu pour l'instant.",
+    "back": "Retour",
+    "noKey": "Ajoute d'abord une clé Deepgram.",
+    "whisperMissing": "Le modèle Whisper n'est pas dans cette version (application de bureau uniquement).",
+    "micBlocked": "Micro inaccessible : {{error}}"
   },
   "data": {
     "section": "Données",

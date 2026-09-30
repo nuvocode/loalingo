@@ -476,7 +476,16 @@
     "about": "Über {{name}}",
     "whisperGood": "Privat und offline; etwas langsamer.",
     "deepgramGood": "Am schnellsten und genauesten; braucht Internet und einen Schlüssel.",
-    "configure": "Deepgram-Einstellungen"
+    "configure": "Deepgram-Einstellungen",
+    "try": "Ausprobieren",
+    "tryTitle": "{{name}} testen",
+    "tryHint": "Sag etwas; jeder Satz erscheint unten, sobald du eine Pause machst.",
+    "hearing": "Ich höre dich…",
+    "nothingYet": "Noch nichts gehört.",
+    "back": "Zurück",
+    "noKey": "Füge zuerst einen Deepgram-Schlüssel hinzu.",
+    "whisperMissing": "Das Whisper-Modell fehlt in diesem Build (nur in der Desktop-App).",
+    "micBlocked": "Mikrofon nicht verfügbar: {{error}}"
   },
   "data": {
     "section": "Daten",
