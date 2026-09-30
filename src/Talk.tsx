@@ -10,6 +10,7 @@ import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
+import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
@@ -102,7 +103,7 @@ function useQuit(active: boolean) {
 
 export function Story({ unitId }: { unitId: string }) {
   const { t } = useTranslation();
-  const { course, enrollment, profile, s, setS, completeStep } = useApp();
+  const { course, enrollment, profile, s, setS, completeStep, sheet } = useApp();
   const level = enrollment?.level;
   const unit = level && course?.levels[level]?.units.find((u) => u.id === unitId);
   const lang = course?.iso ?? "en";
@@ -149,6 +150,32 @@ export function Story({ unitId }: { unitId: string }) {
     setResult({ xp, gems });
   };
   const check = () => { setChecked(true); sfx(sel === q!.answer ? "ok" : "bad"); if (sel === q!.answer) setCorrect((c) => c + 1); };
+
+  // Keyboard (spec L): digits pick an answer, Enter is the footer button, Space replays the line. Esc stays in useQuit.
+  const keyState: KeyState = {
+    kind: q && !checked ? "choice" : "other",
+    answered: false,
+    options: q?.options.length ?? 0,
+    listen: !!story && !result && !q,
+  };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (sheet || inField(e.target)) return;
+      const a = keyAction(e, keyState);
+      if (!a) return;
+      e.preventDefault();
+      if (a.do === "pick") return setSel(a.index);
+      if (a.do === "listen") return speak(story!.lines[lastLine].text, lang);
+      if (a.do !== "primary") return;
+      if (err) return setGen((g) => g + 1);
+      if (!story) return;
+      if (result) return quit();
+      if (q && !checked) { if (sel !== null) check(); return; }
+      next();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  });
 
   const title = story?.title ?? unit?.title ?? "";
   let body: React.ReactNode, footer: React.ReactNode;
