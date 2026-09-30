@@ -353,3 +353,99 @@ git commit -m "Seed each learner's league and keep the standings live
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
+
+---
+
+### Task 3: En alt ligde düşme, en üst ligde yükselme yok
+
+Kullanıcı isteği (2026-09-30): Tohum ligde (tier 0) kimse düşmez, en üst ligde (tier `TIERS - 1`) kimse yükselmez. Kural, çizgiler ve metinler buna göre değişir.
+
+**Files:**
+- Modify: `src/league.ts` (`zones` ekle, `rollLeague` kullanır)
+- Modify: `src/league.test.ts` (settle testi)
+- Modify: `src/screens/Screens.tsx` (League: kural metni + çizgiler; Notifications: lig açıklaması)
+- Modify: `src/locales/{tr,en,de,es,fr}.json` (3 yeni anahtar)
+
+**Interfaces:**
+- Consumes: Task 1'in `TIERS`, `PROMOTE`, `DEMOTE`, `rollLeague`
+- Produces: `zones(tier: number): { up: number; down: number }` — o ligde kaç kişinin yükseldiği / düştüğü (tier 0: `down = 0`, tier 9: `up = 0`).
+
+- [ ] **Step 1: Test.** `src/league.test.ts` importuna `zones` ekle. "new week settles the league" testinde `"no tier below Seed"` satırını şununla değiştir:
+
+```ts
+  assert.deepEqual(zones(0), { up: 3, down: 0 });
+  assert.deepEqual(zones(4), { up: 3, down: 3 });
+  assert.deepEqual(zones(9), { up: 0, down: 3 });
+  const seed = rollLeague(newLeague(W, 0), 0, "2026-10-05").league;
+  assert.equal(seed.tier, 0); assert.equal(seed.last, "stay", "nobody drops out of Seed");
+  const top = rollLeague(newLeague(W, 9), 1e6, "2026-10-05").league;
+  assert.equal(top.tier, 9); assert.equal(top.last, "stay", "nobody moves up from the top league");
+```
+
+- [ ] **Step 2:** `node --test src/league.test.ts` → FAIL (`zones` yok).
+
+- [ ] **Step 3: `src/league.ts`.** `PROMOTE, DEMOTE` satırının altına:
+
+```ts
+/** How many move up / down from `tier`: nobody moves up from the top league, nobody drops out of Seed. */
+export const zones = (tier: number) => ({ up: tier < TIERS - 1 ? PROMOTE : 0, down: tier > 0 ? DEMOTE : 0 });
+```
+
+`rollLeague`'in son üç satırını (`last`, `tier`, `return`) şununla değiştir:
+
+```ts
+  const { up, down } = zones(l.tier);
+  const last = weekXp > 0 && rank <= up ? "up" : rank > l.rivals.length + 1 - down ? "down" : "stay";
+  return { league: newLeague(week, l.tier + (last === "up" ? 1 : last === "down" ? -1 : 0), last, who), weekXp: 0 };
+```
+
+- [ ] **Step 4:** `node --test src/league.test.ts` → hepsi pass.
+
+- [ ] **Step 5: Locale anahtarları.** Her dosyada `league.rules`'ın hemen altına `rulesSeed` ve `rulesTop`, `notifications.leagueChase`'in hemen altına `leagueTop`:
+
+| dil | league.rulesSeed | league.rulesTop | notifications.leagueTop |
+|---|---|---|---|
+| tr | Hafta Pazar 23:59'da biter. İlk {{up}} yükselir. | Hafta Pazar 23:59'da biter. Son {{down}} düşer. | En üst ligdesin. Düşmemek için son {{count}}'e kalma. |
+| en | The week ends Sunday 23:59. Top {{up}} move up. | The week ends Sunday 23:59. Bottom {{down}} move down. | You're in the top league. Stay out of the bottom {{count}}. |
+| de | Die Woche endet Sonntag um 23:59 Uhr. Die Top {{up}} steigen auf. | Die Woche endet Sonntag um 23:59 Uhr. Die letzten {{down}} steigen ab. | Du bist in der höchsten Liga. Bleib raus aus den letzten {{count}}. |
+| es | La semana termina el domingo a las 23:59. Los {{up}} primeros suben. | La semana termina el domingo a las 23:59. Los {{down}} últimos bajan. | Estás en la liga más alta. No acabes entre los {{count}} últimos. |
+| fr | La semaine se termine dimanche à 23:59. Les {{up}} premiers montent. | La semaine se termine dimanche à 23:59. Les {{down}} derniers descendent. | Tu es dans la meilleure ligue. Reste hors des {{count}} derniers. |
+
+- [ ] **Step 6: `src/screens/Screens.tsx`.** Importta `PROMOTE, DEMOTE` yerine `zones` (başka kullanım kalmadıysa `PROMOTE`/`DEMOTE` importunu kaldır).
+
+`League` içinde `useLeague()` satırından sonra:
+
+```ts
+  const { up, down } = zones(s.league?.tier ?? 0);
+```
+
+Kural metni:
+
+```tsx
+        <p className="muted small">{t(!down ? "league.rulesSeed" : !up ? "league.rulesTop" : "league.rules", { up, down })}</p>
+```
+
+Satır çizgileri:
+
+```tsx
+          <div className={`league-row ${p.me ? "me" : ""} ${up && i === up - 1 ? "cut-up" : down && i === rows.length - down - 1 ? "cut-down" : ""}`} key={p.n}>
+```
+
+`Notifications` içinde lig maddesi:
+
+```tsx
+    { icon: "trophy", title: t("notifications.league", { rank, name }), desc: !zones(s.league?.tier ?? 0).up ? t("notifications.leagueTop", { count: DEMOTE }) : t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
+```
+
+(Bu satır `PROMOTE`/`DEMOTE` kullandığı için import'ta kalırlar; yalnız `zones` eklenir.)
+
+- [ ] **Step 7: Doğrula.** `pnpm test`, `pnpm -s tsc --noEmit -p .` → hepsi pass. Tarayıcı önizlemesinde (`preview_start` name `web`) Tohum ligde kural metni yalnız yükselmeyi anlatır ve kırmızı düşme çizgisi görünmez.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add src/league.ts src/league.test.ts src/screens/Screens.tsx src/locales
+git commit -m "Keep Seed without demotion and the top league without promotion
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```

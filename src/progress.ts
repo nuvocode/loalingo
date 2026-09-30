@@ -1,5 +1,5 @@
 // Profile stats (DECISIONS E2, E6): XP, streak, daily goal/quests, optional hearts. Pure module, tested by src/progress.test.ts.
-import { rollLeague, type LeagueState } from "./league.ts"; // .ts: node --test runs this file directly
+import { rollLeague, type LeagueState, type Who } from "./league.ts"; // .ts: node --test runs this file directly
 
 export type Quest = { id: "q1" | "q2" | "q3"; icon: "bolt" | "book" | "dumbbell"; cur: number; goal: number };
 export type Stats = {
@@ -42,10 +42,9 @@ const addDays = (day: string, n: number) => { const [y, m, d] = day.split("-").m
 const daysBetween = (a: string, b: string) => { let n = 0; while (addDays(a, n) < b) n++; return n; }; // ponytail: loop, gaps are days not years
 
 /** Starts a new day: daily counters reset, hearts refill, a missed day breaks the streak unless freezes cover it. */
-export function rollDay(s: Stats, day: string): Stats {
-  if (s.day === day && s.league) return s;
-  const lg = rollLeague(s.league, s.weekXp, day); // a new day may also start a new league week
-  if (s.day === day) return { ...s, ...lg };
+export function rollDay(s: Stats, day: string, who?: Who): Stats {
+  const lg = rollLeague(s.league, s.weekXp, day, who); // a new day may also start a new league week (or redraw an old-format one)
+  if (s.day === day) return lg.league === s.league ? s : { ...s, ...lg };
   let { streak, streakFreeze, lastActive } = s;
   if (lastActive && lastActive < day) {
     const missed = daysBetween(lastActive, day) - 1;

@@ -6,6 +6,7 @@
 
 - İsimler ağırlıklı karışık: rakiplerin yaklaşık yarısı kullanıcının arayüz dilinden.
 - Rakipler kullanıcıya tepki vermez. Haftanın akışı lig kurulurken belirlenir.
+- Tohum ligde (en alt) kimse düşmez, en üst ligde kimse yükselmez. Kural metni ve çizgiler buna göre değişir.
 - Oturumlar kaydedilmez, tohumdan hesaplanır. Kayıtta yalnız isim, renk, hedef ve tutku durur.
 
 ## Rakip modeli
@@ -27,7 +28,7 @@
   - `type Rival = { n: string; c: string; total: number; passion: number }`
   - `type LeagueState = { week; tier; rivals: Rival[]; last?; who?: { id: number; lang: string } }`
   - `newLeague(week, tier, last?, who?)`
-  - `sessions(r: Rival, week: string, seed: string): { at: number; xp: number }[]`: `at` ms cinsinden, zamana göre sıralı. Sonuç önbelleğe alınır.
+  - `sessions(r: Rival, week: string): { at: number; xp: number }[]`: `at` ms cinsinden, zamana göre sıralı. Sonuç önbelleğe alınır.
   - `rivalXp(r, week, now)` = `now`'a kadarki oturumların toplamı. İmza aynı kalır. Oturum tohumu rakibin kendi alanlarından (`week`, isim, `total`, `passion`) türetilir, böylece `rivalXp` ek parametre istemez.
   - `rollLeague(l, weekXp, day, who = l?.who)`. Aynı hafta ama eski biçimli rakipler (`total` yok) varsa ligi aynı hafta ve seviyeyle yeniden kurar, `last` ve `weekXp` korunur.
 - `src/progress.ts`: `rollDay(s, day, who?)`, `who`'yu `rollLeague`'e iletir. `recordSession` değişmez.

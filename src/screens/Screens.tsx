@@ -4,10 +4,10 @@ import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
 import { useSpeakBlock } from "../Mic";
-import { msLeft, rivalXp, PROMOTE, DEMOTE, TIERS } from "../league";
+import { msLeft, rivalXp, zones, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
-import { DOUBLE_XP_MS, today } from "../progress";
+import { DOUBLE_XP_MS, rollDay, today } from "../progress";
 import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { Face } from "../face/Face";
@@ -24,7 +24,7 @@ export function useLeague() {
   const rows = (l?.rivals ?? []).map((r) => ({ n: r.n, c: r.c, xp: rivalXp(r, l!.week, now), me: false }))
     .concat({ n: t("league.you"), c: profile?.color ?? "#f5b014", xp: s.weekXp, me: true })
     .sort((a, b) => b.xp - a.xp || +b.me - +a.me); // ties go to the learner, as in rankOf
-  return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? msLeft(l, now) : 0, last: l?.last };
+  return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? Math.max(0, msLeft(l, now)) : 0, last: l?.last };
 }
 
 export function useBuy() {
@@ -120,11 +120,14 @@ function TierRail({ tier }: { tier: number }) {
 
 export function League() {
   const { t } = useTranslation();
-  const { toast, s, enrollment } = useApp();
+  const { toast, s, setS, enrollment } = useApp();
   const start = useStartLesson();
   const playMadness = async () => enrollment && (await db.listWords(enrollment.id)).length >= MADNESS_MIN_WORDS
     ? start("practice-madness") : toast(t("practice.needWords", { count: MADNESS_MIN_WORDS }));
+  const [, tick] = useState(0);
+  useEffect(() => { const id = setInterval(() => { tick((n) => n + 1); setS((s) => (s.day === today() ? s : rollDay(s, today()))); }, 60_000); return () => clearInterval(id); }, [setS]); // rivals keep studying; a new week rolls while open
   const { rows, name, left, last } = useLeague();
+  const { up, down } = zones(s.league?.tier ?? 0);
   const days = Math.floor(left / 86_400_000), hours = Math.floor((left % 86_400_000) / 3_600_000);
   return (
     <>
@@ -135,12 +138,12 @@ export function League() {
       <div className="card" style={{ marginTop: 14, textAlign: "center", padding: 28 }}>
         <TierRail tier={s.league?.tier ?? 0} />
         <h1 style={{ fontSize: 22, fontWeight: 900, marginTop: 8 }}>{t("league.title", { name })}</h1>
-        <p className="muted small">{t("league.rules", { up: PROMOTE, down: DEMOTE })}</p>
+        <p className="muted small">{t(!down ? "league.rulesSeed" : !up ? "league.rulesTop" : "league.rules", { up, down })}</p>
         <p style={{ marginTop: 8, fontWeight: 800, color: "var(--orange)" }}><Icon name="clock" /> {t("league.timeLeft", { days, hours })}</p>
       </div>
       <div className="card" style={{ marginTop: 14, padding: 8 }}>
         {rows.map((p, i) => (
-          <div className={`league-row ${p.me ? "me" : ""} ${i === PROMOTE - 1 ? "cut-up" : i === rows.length - DEMOTE - 1 ? "cut-down" : ""}`} key={p.n}>
+          <div className={`league-row ${p.me ? "me" : ""} ${up && i === up - 1 ? "cut-up" : down && i === rows.length - down - 1 ? "cut-down" : ""}`} key={p.n}>
             <span className={`league-rank ${i < 3 ? "top" : ""}`}>{i + 1}</span>
             <span className="avatar" style={{ background: p.c }} aria-hidden="true">{p.n[0]}</span>
             <span className="league-name">{p.n}{p.me ? t("league.youSuffix") : ""}</span>
@@ -357,7 +360,7 @@ export function Notifications() {
     s.lastActive === today()
       ? { icon: "roots", title: t("notifications.streakSafe"), desc: t("notifications.streakSafeDesc", { count: s.streak }) }
       : { icon: "roots", title: t(s.streak ? "notifications.streakRisk" : "notifications.streakStart"), desc: t(s.streak ? "notifications.streakRiskDesc" : "notifications.streakStartDesc", { count: s.streak }) },
-    { icon: "trophy", title: t("notifications.league", { rank, name }), desc: t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
+    { icon: "trophy", title: t("notifications.league", { rank, name }), desc: !zones(s.league?.tier ?? 0).up ? t("notifications.leagueTop", { count: DEMOTE }) : t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
   ];
   if (last && last !== "stay") items.push({ icon: "trophy", title: t(last === "up" ? "league.promoted" : "league.demoted", { name }), desc: "" });
   if (ahead) items.push({ icon: "users", title: t("notifications.passed", { name: ahead.name }), desc: t("notifications.passedDesc", { name: ahead.name }) });

@@ -96,6 +96,8 @@
   "league": {
     "title": "{{name}}-Liga",
     "rules": "Die Woche endet Sonntag um 23:59 Uhr. Die Top {{up}} steigen auf, die letzten {{down}} steigen ab.",
+    "rulesSeed": "Die Woche endet Sonntag um 23:59 Uhr. Die Top {{up}} steigen auf.",
+    "rulesTop": "Die Woche endet Sonntag um 23:59 Uhr. Die letzten {{down}} steigen ab.",
     "timeLeft": "Noch {{days}} Tage {{hours}} Stunden",
     "you": "Du",
     "youSuffix": " (Du)",
@@ -250,6 +252,7 @@
     "league": "Du bist Platz {{rank}} in der {{name}}-Liga",
     "leagueUp": "Du bist in der Aufstiegszone. Weiter so!",
     "leagueChase": "Komm in die Top {{count}}, um diese Woche aufzusteigen.",
+    "leagueTop": "Du bist in der höchsten Liga. Bleib raus aus den letzten {{count}}.",
     "passed": "{{name}} liegt vor dir",
     "passedDesc": "{{name}} hat diese Woche mehr XP gesammelt. Schlag zurück!",
     "chest": "Du hast einen ungeöffneten Erntekorb",
