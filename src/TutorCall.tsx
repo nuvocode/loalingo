@@ -22,6 +22,7 @@ type Call = {
   hist: TutorMsg[]; notes: string; last: TutorReply | null; queue: TutorEvent[]; fixes: string[];
   nudges: number; // silence events since the learner last said something
   running: boolean; over: boolean; opened: boolean; micOn: boolean; failed: TutorEvent | null;
+  speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
 };
 
 export function TutorCall({ who }: { who: CharacterId }) {
@@ -33,7 +34,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -66,9 +67,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
 
   const voice = async (line: string) => {
     if (!line.trim() || c.over) return;
-    mic.current?.pause(); setTalking(true); // the mic would hear the tutor
+    c.speaking = true; mic.current?.pause(); setTalking(true); // the mic would hear the tutor
     try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }); } catch { /* the caption still shows it */ }
-    finally { setTalking(false); mic.current?.resume(); }
+    finally { c.speaking = false; setTalking(false); mic.current?.resume(); }
   };
 
   /** One event → one reply, spoken. False when the model call failed. */
@@ -105,7 +106,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (e.kind === "user_said" || e.kind === "user_typed") c.queue.push(e); // silence and toggles while busy are dropped
   };
   const input = (kind: "user_said" | "user_typed", said: string) => {
-    if (isNoise(said)) return;
+    if (isNoise(said)) { if (!c.running) armSilence(); return; }
     c.nudges = 0;
     push({ from: "me", text: said.trim(), via: kind === "user_said" ? "voice" : "text" });
     fire({ kind, text: said.trim() });
@@ -113,18 +114,22 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const retry = () => { const e = c.failed; c.failed = null; setErr(""); if (e) fire(e); };
 
   const micStart = async (announce: boolean) => {
+    if (c.micStarting) return;
+    c.micStarting = true;
     try {
       const m = await listen(lang, {
         utterance: (x) => input("user_said", x),
         speech: clearSilence, // the learner started talking: no nudge mid-sentence
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
-        error: (x) => toast(x.message),
+        error: (x) => { toast(x.message); if (!c.running) armSilence(); },
       });
       if (c.over) return void m.stop();
+      if (c.speaking) m.pause(); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
       if (announce) fire({ kind: "mic", on: true });
       else if (!c.running) armSilence();
     } catch { setMicBlock("tutor.micDenied"); setDrawer(true); }
+    finally { c.micStarting = false; }
   };
   const micStop = () => {
     c.micOn = false; setMicOn(false); clearSilence();
@@ -137,8 +142,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const camStop = () => { cam.current?.getTracks().forEach((x) => x.stop()); cam.current = null; setCamOn(false); };
   const toggleCam = async () => {
     if (cam.current) { camStop(); return fire({ kind: "cam", on: false }); }
-    try { cam.current = await navigator.mediaDevices.getUserMedia({ video: true }); setCamOn(true); fire({ kind: "cam", on: true }); }
+    if (c.camStarting) return;
+    c.camStarting = true;
+    try {
+      const st = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (c.over) return void st.getTracks().forEach((x) => x.stop());
+      cam.current = st; setCamOn(true); fire({ kind: "cam", on: true });
+    }
     catch { setCamOk(false); }
+    finally { c.camStarting = false; }
   };
 
   const finish = () => {

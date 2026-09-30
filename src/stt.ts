@@ -97,7 +97,10 @@ export async function listen(lang: string, on: { utterance: (text: string) => vo
     if (e !== "end") return;
     const all = concat(chunks);
     reset();
-    transcribeSamples(all, ctx.sampleRate, lang).then((x) => { if (x.trim()) on.utterance(x.trim()); }, (x) => on.error?.(x as Error));
+    transcribeSamples(all, ctx.sampleRate, lang).then(
+      (x) => { if (!stopped && x.trim()) on.utterance(x.trim()); },
+      (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
+    );
   };
   src.connect(proc);
   proc.connect(ctx.destination);
