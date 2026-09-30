@@ -22,7 +22,7 @@ export function useLeague() {
   const { s, profile } = useApp();
   const l = s.league, now = Date.now();
   const rows = (l?.rivals ?? []).map((r) => ({ n: r.n, c: r.c, xp: rivalXp(r, l!.week, now), me: false }))
-    .concat({ n: t("league.you"), c: profile?.color ?? "#f5b014", xp: s.weekXp, me: true })
+    .concat({ n: profile?.name ?? "", c: profile?.color ?? "#f5b014", xp: s.weekXp, me: true })
     .sort((a, b) => b.xp - a.xp || +b.me - +a.me); // ties go to the learner, as in rankOf
   return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? Math.max(0, msLeft(l, now)) : 0, last: l?.last };
 }
@@ -146,7 +146,7 @@ export function League() {
           <div className={`league-row ${p.me ? "me" : ""} ${up && i === up - 1 ? "cut-up" : down && i === rows.length - down - 1 ? "cut-down" : ""}`} key={p.n}>
             <span className={`league-rank ${i < 3 ? "top" : ""}`}>{i + 1}</span>
             <span className="avatar" style={{ background: p.c }} aria-hidden="true">{p.n[0]}</span>
-            <span className="league-name">{p.n}{p.me ? t("league.youSuffix") : ""}</span>
+            <span className="league-name">{p.n}</span>
             <span className="league-xp od-nowrap">{p.xp} XP</span>
           </div>
         ))}

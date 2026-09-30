@@ -99,8 +99,6 @@
     "rulesSeed": "The week ends Sunday 23:59. Top {{up}} move up.",
     "rulesTop": "The week ends Sunday 23:59. Bottom {{down}} move down.",
     "timeLeft": "{{days}} days {{hours}} hours left",
-    "you": "You",
-    "youSuffix": " (You)",
     "matchSection": "Timed event: Word Rush",
     "matchName": "Match in 90 seconds",
     "play": "Play",
