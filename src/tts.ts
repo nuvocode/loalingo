@@ -164,8 +164,8 @@ function tick(t: number) {
     rms = Math.sqrt(frame.reduce((n, x) => n + x * x, 0) / frame.length);
   }
   level = mouthLevel(level, rms, dt);
+  raf = requestAnimationFrame(tick); // before the callbacks, so one that throws can't stop the loop
   mouthSubs.forEach((f) => f(level));
-  raf = requestAnimationFrame(tick);
 }
 
 /** Calls `cb` with the mouth openness every frame until the returned function is called. */

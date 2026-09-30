@@ -28,7 +28,7 @@ export function Face({ spec, color, size, label, state = "idle" }: { spec: FaceS
   useEffect(() => {
     if (state !== "talking") return;
     const r = reduced();
-    const off = onMouth((v) => set("--mouth", String(r ? (v > 0.25 ? 0.5 : 0) : v)));
+    const off = onMouth((v) => set("--mouth", String(r ? (v > 0.25 ? 0.5 : 0) : v < 0.05 ? 0 : v)));
     return () => { off(); set("--mouth", "0"); };
   }, [state]);
 

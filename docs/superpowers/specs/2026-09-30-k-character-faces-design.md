@@ -83,7 +83,7 @@ Görsel kontrolde bir yüz kötü duruyorsa atama değiştirilebilir; kural yaln
 - `src/audio.ts` (saf, testli): `mouthLevel(prev: number, rms: number, dt: number): number` — RMS'i 0–1'e çevirir (`rms` ~0.02 altı 0, ~0.2 üstü 1, arası doğrusal), açılırken hızlı (τ ≈ 40 ms), kapanırken yavaş (τ ≈ 120 ms) yumuşatır.
 - `src/tts.ts`:
   - Kokoro kaynakları `destination` yerine tek bir `AnalyserNode`'a (`fftSize` 1024), o da `destination`'a bağlanır.
-  - `onMouth(cb: (open: number) => void): () => void` — ilk abonede `requestAnimationFrame` döngüsü başlar, son abone çıkınca durur. Kokoro çalarken değer analizörden (`getFloatTimeDomainData` → RMS → `mouthLevel`). Sistem sesi konuşurken (`speechSynthesis.speaking`) değer `0.5 + 0.5 * sin(2π · 3 Hz · t)` (≈ saniyede 3 hece), ikisi de değilse `mouthLevel` ile 0'a söner.
+  - `onMouth(cb: (open: number) => void): () => void` — ilk abonede `requestAnimationFrame` döngüsü başlar, son abone çıkınca durur. Kokoro çalarken değer analizörden (`getFloatTimeDomainData` → RMS → `mouthLevel`). Sistem sesi konuşurken (`speechSynthesis.speaking`) değer `0.5 + 0.5 * sin(2π · 3 Hz · t)` (≈ saniyede 3 hece), ikisi de değilse `mouthLevel` ile 0'a söner. Uygulamada sinüs de RMS gibi `mouthLevel`'dan geçer (0.34–0.91 arası yumuşak salınım, heceler arası tam kapanmaz).
 
 ## Durumu belirleme ve yerleşim
 
@@ -91,6 +91,7 @@ Görsel kontrolde bir yüz kötü duruyorsa atama değiştirilebilir; kural yaln
 - **Ara modu** (`voice`): başlık satırı yerine sohbet alanının üstünde ortalanmış 220 px `Face`; isim ve konu altında. Balonlar ve mikrofon butonu yerinde kalır.
 - **Rol Yapma listesi** ([Screens.tsx:301](../../../src/screens/Screens.tsx)): 56 px daire → 56 px `Face`, `idle`.
 - Yüz karakter renginde yuvarlak bir fonda durur (mevcut `.avatar` görünümü korunur; büst dairenin altından kırpılır).
+  - Uygulamada fon, karakter renginin %30 tonu (`color-mix`): kıyafet de `--c` ile çizildiği için tam renkli fonda kayboluyordu.
 - Lig, arkadaşlar, profil avatarları değişmez.
 
 ## Test
