@@ -39,17 +39,6 @@ test("quests and chest reward", () => {
   assert.equal(rollDay({ ...s, hearts: 0 }, "2026-03-02").hearts, 5);
 });
 
-test("daily reminder fires once, after its time, only on days without practice", async () => {
-  const { reminderDue } = await import("./progress.ts");
-  const s = { ...NEW_STATS, reminderOn: true, reminderTime: "19:00" };
-  const at = (h: number, m = 0) => new Date(2026, 2, 5, h, m);
-  assert.equal(reminderDue(s, at(18, 59)), false);
-  assert.equal(reminderDue(s, at(19)), true);
-  assert.equal(reminderDue({ ...s, lastActive: "2026-03-05" }, at(20)), false, "already practiced");
-  assert.equal(reminderDue({ ...s, remindedDay: "2026-03-05" }, at(20)), false, "already reminded");
-  assert.equal(reminderDue({ ...s, reminderOn: false }, at(20)), false);
-});
-
 test("rollDay redraws an old-format league the same day and passes the learner on", () => {
   const old = { week: "2026-09-28", tier: 2, rivals: [{ n: "Aylin", c: "#000", rate: 20 }] } as unknown as LeagueState;
   const s = { ...NEW_STATS, day: "2026-10-01", league: old, weekXp: 80 };

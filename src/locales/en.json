@@ -266,8 +266,8 @@
     "soundDesc": "Correct/incorrect feedback sounds",
     "speaking": "Speaking exercises",
     "speakingDesc": "Exercises that use the microphone",
-    "reminder": "Daily reminder",
-    "reminderDesc": "While on, Sprigo stays in the background and starts at login",
+    "reminder": "Reminders",
+    "reminderDesc": "Sprigo nudges you a few times a day and goes quiet once you've practiced. While on, it stays in the background.",
     "reduceMotion": "Reduce motion",
     "reduceMotionDesc": "Keep animations to a minimum",
     "appearance": "Appearance",
@@ -286,6 +286,7 @@
     "logout": "Switch profile",
     "general": "General",
     "aiVoice": "AI and voice",
+    "advanced": "Advanced",
     "tts": "Text to speech",
     "ttsSystem": "System voice",
     "stt": "Speech recognition",
@@ -294,13 +295,7 @@
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
-    "reminderTime": "Reminder time",
-    "reminderTimeDesc": "Works while Sprigo is open, even in the background.",
-    "reminderBlocked": "Notifications are blocked. Allow them in System Settings.",
-    "reminderTitle": "Time for a lesson",
-    "reminderBody": "Five minutes today builds the habit.",
-    "reminderStreak_one": "Keep your {{count}} day of roots growing — one lesson is enough.",
-    "reminderStreak_other": "Keep your {{count}} days of roots growing — one lesson is enough."
+    "reminderBlocked": "Notifications are blocked. Allow them in System Settings."
   },
   "rail": {
     "label": "Progress",
@@ -501,5 +496,61 @@
     "notDb": "That file isn't a Sprigo database",
     "failed": "That didn't work: {{error}}",
     "fileType": "Sprigo data"
+  },
+  "nudges": {
+    "general": [
+      {
+        "t": "What word is waiting for you today? 🌱",
+        "b": "{{lang}} won't learn itself. Five minutes is plenty."
+      },
+      {
+        "t": "A lesson while the kettle boils?",
+        "b": "Short lesson, big difference. Let's go."
+      },
+      {
+        "t": "Sprigo misses you",
+        "b": "Your {{lang}} words are feeling a little lonely. Drop by?"
+      },
+      {
+        "t": "Got five minutes?",
+        "b": "Finish one lesson and the rest of the day is yours."
+      },
+      {
+        "t": "Small steps, big language",
+        "b": "Even one {{lang}} lesson today counts."
+      },
+      {
+        "t": "Brain workout time 🧠",
+        "b": "A few questions, a few words. You've got this!"
+      }
+    ],
+    "streak": [
+      {
+        "t": "Your roots are thirsty 💧",
+        "b": "Root count: {{count}}. One lesson keeps them growing."
+      },
+      {
+        "t": "Don't break the chain!",
+        "b": "Your root count is {{count}}. Don't let it slip — one short lesson will do."
+      },
+      {
+        "t": "Your sprout is growing",
+        "b": "Root count: {{count}} and climbing. Come back today and make your garden happy."
+      },
+      {
+        "t": "One lesson, one more day",
+        "b": "Your root count is {{count}}. Add one more?"
+      }
+    ],
+    "evening": [
+      {
+        "t": "Midnight is close ⏰",
+        "b": "Root count {{count}} — don't let them dry out. Quick lesson?"
+      },
+      {
+        "t": "Last call for today",
+        "b": "One short lesson before bed keeps your root count at {{count}} and growing."
+      }
+    ]
   }
 }

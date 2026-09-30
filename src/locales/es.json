@@ -280,8 +280,8 @@
     "soundDesc": "Sonidos de acierto y error",
     "speaking": "Ejercicios orales",
     "speakingDesc": "Ejercicios que usan el micrófono",
-    "reminder": "Recordatorio diario",
-    "reminderDesc": "Mientras esté activado, Sprigo sigue en segundo plano y se inicia al arrancar",
+    "reminder": "Recordatorios",
+    "reminderDesc": "Sprigo te avisa varias veces al día y se calla cuando ya has practicado. Mientras esté activado, sigue en segundo plano.",
     "reduceMotion": "Reducir movimiento",
     "reduceMotionDesc": "Mantén las animaciones al mínimo",
     "appearance": "Apariencia",
@@ -300,6 +300,7 @@
     "logout": "Cambiar de perfil",
     "general": "General",
     "aiVoice": "IA y voz",
+    "advanced": "Avanzado",
     "tts": "Texto a voz",
     "ttsSystem": "Voz del sistema",
     "stt": "Reconocimiento de voz",
@@ -308,14 +309,7 @@
     "sttDeepgram": "Deepgram (nube)",
     "hearts": "Gotas",
     "heartsDesc": "Pierdes una gota por cada error; se recargan cada día",
-    "reminderTime": "Hora del recordatorio",
-    "reminderTimeDesc": "Funciona mientras Sprigo esté abierto, incluso en segundo plano.",
-    "reminderBlocked": "Las notificaciones están bloqueadas. Permítelas en Ajustes del Sistema.",
-    "reminderTitle": "Hora de una lección",
-    "reminderBody": "Cinco minutos hoy crean el hábito.",
-    "reminderStreak_one": "Sigue cultivando tus {{count}} día de raíces: basta con una lección.",
-    "reminderStreak_many": "Sigue cultivando tus {{count}} días de raíces: basta con una lección.",
-    "reminderStreak_other": "Sigue cultivando tus {{count}} días de raíces: basta con una lección."
+    "reminderBlocked": "Las notificaciones están bloqueadas. Permítelas en Ajustes del Sistema."
   },
   "rail": {
     "label": "Progreso",
@@ -518,5 +512,61 @@
     "notDb": "Ese archivo no es una base de datos de Sprigo",
     "failed": "No funcionó: {{error}}",
     "fileType": "datos de Sprigo"
+  },
+  "nudges": {
+    "general": [
+      {
+        "t": "¿Qué palabra te espera hoy? 🌱",
+        "b": "{{lang}} no se aprende solo. Con cinco minutos basta."
+      },
+      {
+        "t": "¿Una lección mientras se hace el té?",
+        "b": "Lección corta, gran diferencia. ¡Vamos!"
+      },
+      {
+        "t": "Sprigo te echa de menos",
+        "b": "{{lang}}: tus palabras se sienten algo solas. ¿Te pasas?"
+      },
+      {
+        "t": "¿Tienes cinco minutos?",
+        "b": "Termina una lección y el resto del día es tuyo."
+      },
+      {
+        "t": "Pasos pequeños, gran idioma",
+        "b": "{{lang}}: hoy basta con una sola lección."
+      },
+      {
+        "t": "Hora de gimnasia mental 🧠",
+        "b": "Unas preguntas, unas palabras. ¡Tú puedes!"
+      }
+    ],
+    "streak": [
+      {
+        "t": "Tus raíces tienen sed 💧",
+        "b": "Contador de raíces: {{count}}. Una lección las mantiene creciendo."
+      },
+      {
+        "t": "¡No rompas la cadena!",
+        "b": "Tu contador de raíces está en {{count}}. Basta con una lección corta."
+      },
+      {
+        "t": "Tu brote está creciendo",
+        "b": "Contador de raíces: {{count}} y subiendo. Vuelve hoy y alegra tu jardín."
+      },
+      {
+        "t": "Una lección, un día más",
+        "b": "Tu contador de raíces marca {{count}}. ¿Sumas uno?"
+      }
+    ],
+    "evening": [
+      {
+        "t": "Falta poco para medianoche ⏰",
+        "b": "Contador de raíces: {{count}}. Que no se sequen. ¿Una lección rápida?"
+      },
+      {
+        "t": "Última llamada de hoy",
+        "b": "Una lección corta antes de dormir y tu contador de raíces sigue en {{count}} y creciendo."
+      }
+    ]
   }
 }
