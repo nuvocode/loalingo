@@ -565,6 +565,9 @@
     "end": "Anruf beenden",
     "placeholder": "Schreib eine Nachricht – dein Tutor antwortet laut",
     "done": "Stunde geschafft!",
-    "corrections": "Korrekturen aus dieser Stunde"
+    "corrections": "Korrekturen aus dieser Stunde",
+    "transcriptOn": "Transkript anzeigen",
+    "transcriptOff": "Transkript ausblenden",
+    "noMessages": "Noch keine Nachrichten"
   }
 }

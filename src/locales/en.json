@@ -565,6 +565,9 @@
     "end": "End call",
     "placeholder": "Write a message — your tutor answers out loud",
     "done": "Lesson complete!",
-    "corrections": "Corrections from this lesson"
+    "corrections": "Corrections from this lesson",
+    "transcriptOn": "Show transcript",
+    "transcriptOff": "Hide transcript",
+    "noMessages": "No messages yet"
   }
 }

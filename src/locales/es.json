@@ -581,6 +581,9 @@
     "end": "Colgar",
     "placeholder": "Escribe un mensaje: tu tutor responde en voz alta",
     "done": "¡Clase terminada!",
-    "corrections": "Correcciones de esta clase"
+    "corrections": "Correcciones de esta clase",
+    "transcriptOn": "Mostrar transcripción",
+    "transcriptOff": "Ocultar transcripción",
+    "noMessages": "Aún no hay mensajes"
   }
 }
