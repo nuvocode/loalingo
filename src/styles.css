@@ -420,3 +420,8 @@ button.bubble:hover{border-color:var(--blue)}
 .face .brows{transform:translateY(var(--brow));transition:transform .2s}
 .face.thinking{--look-x:4px;--look-y:-3px;--brow:-3px}
 @media (prefers-reduced-motion:reduce){.face .pupil,.face .brows{transform:none}}
+
+/* Keyboard control (spec L) */
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;margin-left:6px;border:2px solid currentColor;border-radius:6px;font:inherit;font-size:11px;font-weight:800;opacity:.6}
+.tok.sel{border-color:var(--blue);background:var(--sky)}
+.bank-typed{text-align:center;font-weight:800;color:var(--blue);margin:-12px 0 0}

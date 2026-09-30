@@ -11,6 +11,7 @@ import { speak } from "./tts";
 import { LEGEND_PASS, appeal, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 import { acceptAppeal } from "./appeal";
+import { bankMatch, inField, keyAction, type KeyAction, type KeyState } from "./keys";
 
 /** Opens a lesson, or the out-of-hearts sheet (design behaviour). Steps need an AI provider (DECISIONS C6). */
 export function useStartLesson() {
@@ -91,6 +92,8 @@ export function Lesson({ id }: { id: string }) {
   const [sel, setSel] = useState<number | null>(null);
   const [bankSel, setBankSel] = useState<number[]>([]);
   const [text, setText] = useState("");
+  const [typed, setTyped] = useState(""); // bank: letters typed to pick a word (spec L)
+  const [micPress, setMicPress] = useState(0); // speak: Space bumps this to press the mic
   const [matched, setMatched] = useState<{ done: string[]; left: string | null; wrong: string[]; misses: number }>({ done: [], left: null, wrong: [], misses: 0 });
   const [heard, setHeard] = useState<string | null>(null); // speak: last transcript ("" = nothing heard)
   const [stt, setStt] = useState(false);
@@ -98,7 +101,7 @@ export function Lesson({ id }: { id: string }) {
   const limit = TIME_LIMIT[id];
   const [left, setLeft] = useState(limit ?? 0);
 
-  function reset() { setSel(null); setBankSel([]); setText(""); setHeard(null); setFb(null); setMatched({ done: [], left: null, wrong: [], misses: 0 }); }
+  function reset() { setSel(null); setBankSel([]); setText(""); setTyped(""); setHeard(null); setFb(null); setMatched({ done: [], left: null, wrong: [], misses: 0 }); }
 
   useEffect(() => {
     if (!enrollment || (!ctx && !practice)) return;
@@ -129,12 +132,6 @@ export function Lesson({ id }: { id: string }) {
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.keepGoing")}</button>
     </>);
   };
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !sheet) askQuit(); };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  });
 
   const finish = () => {
     // learn cards are not scored; timed modes count only the questions reached before the clock ran out
@@ -210,6 +207,9 @@ export function Lesson({ id }: { id: string }) {
     setFb((f) => f && { ...f, ok: true, note: r.reason, judged: false, appealed: true, verdict: undefined });
   };
 
+  const openExplain = () => { if (it && ctx && fb) openSheet(<ExplainSheet run={() => explain(ctx, questionOf(it), fb.correct, fb.given)} />); };
+  const openAppeal = () => openSheet(<AppealSheet onSend={submitAppeal} />);
+
   const check = async () => {
     if (!it) return;
     if (it.kind === "choice") return grade(sel === it.answer, it.options[it.answer], sel === null ? "" : it.options[sel]);
@@ -256,6 +256,53 @@ export function Lesson({ id }: { id: string }) {
   const progress = result ? 100 : list.length ? (i / list.length) * 100 : 0;
   const last = i + 1 >= list.length;
   const listenBtn = (txt: string) => <button className="prompt-word" onClick={() => speak(txt, lang)}><Icon name="headphones" /> {t("lesson.listen")}</button>;
+
+  // Keyboard (spec L): one listener maps keys to the same actions as the buttons.
+  const hit = it?.kind === "bank" ? bankMatch(it.bank, bankSel, typed) : -1;
+  const audio = !it ? "" : it.kind === "learn" ? it.phrase : (it.kind === "choice" || it.kind === "input") ? it.listen : "";
+  const keyState: KeyState = {
+    kind: load.state !== "ready" || result || !it || it.kind === "learn" ? "other" : it.kind,
+    answered: !!fb && !result,
+    options: it?.kind === "choice" ? it.options.length : 0,
+    matchL: matchCols?.l.length, matchR: matchCols?.r.length,
+    typed, hit, listen: !!audio && !result,
+    canExplain: !!fb && !fb.ok && !!ctx && !result,
+    canAppeal: !!fb?.judged && !fb.appealed && !!ctx && !result,
+  };
+  const primary = () => {
+    if (load.state === "error") return setGen((g) => g + 1);
+    if (load.state !== "ready") return;
+    if (result || !it) return quit();
+    if (fb || it.kind === "learn") return next();
+    if (canCheck) check();
+  };
+  const run = (a: KeyAction) => {
+    if (!it && a.do !== "primary") return;
+    switch (a.do) {
+      case "primary": return primary();
+      case "pick": return setSel(a.index);
+      case "match": return matchCols && pickMatch(a.side, matchCols[a.side][a.index]);
+      case "bankType": return setTyped(a.text);
+      case "bankAdd": setBankSel([...bankSel, a.index]); return setTyped("");
+      case "bankUndo": return setBankSel(bankSel.slice(0, -1));
+      case "explain": return openExplain();
+      case "appeal": return openAppeal();
+      case "listen": return speak(audio, lang);
+      case "mic": return setMicPress((n) => n + 1);
+    }
+  };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { if (!sheet) askQuit(); return; }
+      if (sheet || inField(e.target) || checking) return;
+      const a = keyAction(e, keyState);
+      if (!a) return;
+      e.preventDefault();
+      run(a);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  });
 
   let body: React.ReactNode;
   if (load.state === "loading") body = (
@@ -312,7 +359,7 @@ export function Lesson({ id }: { id: string }) {
         <p className="muted" style={{ fontWeight: 700, margin: "4px 0 12px" }}>{it.translation}</p>
         {listenBtn(it.phrase)}
       </div>
-      <MicButton lang={lang} disabled={!!fb} onText={(txt) => {
+      <MicButton lang={lang} disabled={!!fb} trigger={micPress} onText={(txt) => {
         setHeard(txt);
         if (txt) grade(speechScore(it.phrase, txt) >= SPEECH_PASS, it.phrase, txt, t("lesson.heard", { text: txt }));
       }} />
@@ -344,9 +391,10 @@ export function Lesson({ id }: { id: string }) {
       <div className="bank-area">
         {bankSel.map((j) => <button className="tok" key={j} disabled={!!fb} onClick={() => setBankSel(bankSel.filter((x) => x !== j))}>{it.bank[j]}</button>)}
       </div>
+      {typed && <p className="bank-typed" aria-live="polite">{typed}</p>}
       <div className="bank">
         {it.bank.map((w, j) => (
-          <button className={`tok ${bankSel.includes(j) ? "used" : ""}`} key={j} disabled={!!fb} onClick={() => setBankSel([...bankSel, j])}>{w}</button>
+          <button className={`tok ${bankSel.includes(j) ? "used" : j === hit ? "sel" : ""}`} key={j} disabled={!!fb} onClick={() => setBankSel([...bankSel, j])}>{w}</button>
         ))}
       </div>
     </>
@@ -367,9 +415,11 @@ export function Lesson({ id }: { id: string }) {
       <div className="od-grid" style={{ "--od-cols": 2, "--od-gap": "12px" } as React.CSSProperties}>
         {(["l", "r"] as const).map((side) => (
           <div className="opt-grid" key={side} style={{ gridTemplateColumns: "1fr" }}>
-            {matchCols![side].map((v) => {
+            {matchCols![side].map((v, vi) => {
               const cls = matched.done.includes(v) ? "correct" : matched.wrong.includes(v) ? "wrong" : matched.left === v ? "sel" : "";
-              return <button key={v} className={`opt ${cls}`} disabled={matched.done.includes(v) || !!fb} onClick={() => pickMatch(side, v)}><span>{v}</span></button>;
+              const n = (side === "l" ? vi : matchCols!.l.length + vi) + 1;
+              return <button key={v} className={`opt ${cls}`} disabled={matched.done.includes(v) || !!fb} onClick={() => pickMatch(side, v)}>
+                {matchCols!.l.length + matchCols!.r.length <= 10 && <span className="opt-num">{n % 10}</span>}<span>{v}</span></button>;
             })}
           </div>
         ))}
@@ -409,8 +459,8 @@ export function Lesson({ id }: { id: string }) {
                       {fb.verdict && <small role="status">{t("lesson.appealRejected", { reason: fb.verdict })}</small>}</span></span>
                 )}
                 <span className="od-row" style={gap("10px")}>
-                  {fb.judged && !fb.appealed && ctx && <button className="btn btn-ghost" onClick={() => openSheet(<AppealSheet onSend={submitAppeal} />)}>🚩 {t("lesson.appeal")}</button>}
-                  {!fb.ok && ctx && <button className="btn btn-ghost" onClick={() => openSheet(<ExplainSheet run={() => explain(ctx, questionOf(it), fb.correct, fb.given)} />)}>{t("lesson.explain")}</button>}
+                  {fb.judged && !fb.appealed && ctx && <button className="btn btn-ghost" onClick={openAppeal}>🚩 {t("lesson.appeal")} <kbd className="kbd">2</kbd></button>}
+                  {!fb.ok && ctx && <button className="btn btn-ghost" onClick={openExplain}>{t("lesson.explain")} <kbd className="kbd">1</kbd></button>}
                   <button className={`btn ${fb.ok ? "btn-primary" : "btn-danger"}`} onClick={next}>{t(last ? "lesson.finish" : "lesson.continue")}</button>
                 </span>
               </>
@@ -436,7 +486,7 @@ function ExplainSheet({ run }: { run: () => Promise<string> }) {
   return <>
     <h3>{t("lesson.explain")}</h3>
     <p role="status" style={{ margin: "12px 0 18px", whiteSpace: "pre-wrap" }}>{txt ?? t("ai.thinking")}</p>
-    <button className="btn btn-primary btn-block" onClick={closeSheet}>{t("lesson.gotIt")}</button>
+    <button className="btn btn-primary btn-block" autoFocus onClick={closeSheet}>{t("lesson.gotIt")}</button>
   </>;
 }
 

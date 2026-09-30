@@ -13,7 +13,7 @@ export function useSpeakBlock() {
 }
 
 /** Tap to talk, tap again to stop (design: round blue button + status line). Calls `onText` with the transcript. */
-export function MicButton({ lang, onText, disabled }: { lang: string; onText: (text: string) => void; disabled?: boolean }) {
+export function MicButton({ lang, onText, disabled, trigger = 0 }: { lang: string; onText: (text: string) => void; disabled?: boolean; trigger?: number }) {
   const { t } = useTranslation();
   const [state, setState] = useState<"idle" | "rec" | "busy">("idle");
   const [err, setErr] = useState("");
@@ -36,6 +36,8 @@ export function MicButton({ lang, onText, disabled }: { lang: string; onText: (t
     catch { setErr(t("stt.noMic")); }
   };
   useEffect(() => () => { rec.current?.stop(false); }, []);
+  // Keyboard (spec L): each bump of `trigger` presses the button.
+  useEffect(() => { if (trigger && !disabled) toggle(); }, [trigger]);
 
   return (
     <div className="mic-wrap">
