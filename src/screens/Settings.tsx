@@ -201,13 +201,6 @@ export function Settings() {
           setS((s) => ({ ...s, reminderOn }));
           if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
         }} />
-        {s.reminderOn && (
-          <label className="card od-row" style={gap("12px")}>
-            <span className="od-field od-fill"><b>{t("settings.reminderTime")}</b><span className="muted small">{t("settings.reminderTimeDesc")}</span></span>
-            <input className="input" type="time" style={{ width: 130 }} value={s.reminderTime}
-              onChange={(e) => e.target.value && setS((s) => ({ ...s, reminderTime: e.target.value, remindedDay: "" }))} />
-          </label>
-        )}
         <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
       </div>
 

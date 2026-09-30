@@ -10,7 +10,7 @@ export type Stats = {
   quests: Quest[];
   doubleXpUntil: number; legendTickets: number; madnessBest: number; // shop + Word Rush
   league: LeagueState | null; weekXp: number;
-  reminderOn: boolean; reminderTime: string; remindedDay: string; // daily reminder, "HH:MM" local
+  reminderOn: boolean; reminded: string; // nudges: last sent "YYYY-MM-DD:slot"
   speakOn: boolean;
 };
 
@@ -24,13 +24,8 @@ export const NEW_STATS: Stats = {
   hearts: 5, maxHearts: 5, heartsOn: true, soundOn: true, reduceMotion: false, streak: 0, bestStreak: 0, streakFreeze: 0,
   gems: 0, todayXp: 0, bestDayXp: 0, chests: 0, day: "", lastActive: null, quests: QUESTS,
   doubleXpUntil: 0, legendTickets: 0, madnessBest: 0, league: null, weekXp: 0,
-  reminderOn: false, reminderTime: "19:00", remindedDay: "", speakOn: true,
+  reminderOn: false, reminded: "", speakOn: true,
 };
-
-/** Daily reminder: once a day, after the chosen time, only if the learner has not practiced yet. */
-export const reminderDue = (s: Stats, now = new Date()) =>
-  s.reminderOn && s.lastActive !== today(now) && s.remindedDay !== today(now) &&
-  `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` >= s.reminderTime;
 
 /** Shop "Double XP": 15 minutes of ×2 on everything earned. */
 export const DOUBLE_XP_MS = 15 * 60_000;

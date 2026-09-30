@@ -4,7 +4,8 @@ import { Icon, type IconName } from "./icons";
 import { useApp, type BootError, type Route } from "./store";
 import { Rail } from "./Rail";
 import { Lesson, sfxState } from "./Lesson";
-import { reminderDue, today } from "./progress";
+import { today } from "./progress";
+import { nudgeDue, nudgeMessage } from "./nudge";
 import { keepInBackground, notify } from "./notify";
 import { takeOver, resetDataDir } from "./datadir";
 import { findUpdate, UpdateSheet } from "./Update";
@@ -12,7 +13,7 @@ import { Chat, Story } from "./Talk";
 import { parseTalkId } from "./characters";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
-import { ProfileGate } from "./screens/Profiles";
+import { ProfileGate, useLangName } from "./screens/Profiles";
 import { Practice, League, Shop, Profile, Stories, Roleplay, Friends, Notifications } from "./screens/Screens";
 
 const NAV: { id: Route; icon: IconName }[] = [
@@ -72,7 +73,8 @@ function BootErrorScreen({ e }: { e: BootError }) {
 
 export default function App() {
   const { t } = useTranslation();
-  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS } = useApp();
+  const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS, course } = useApp();
+  const langName = useLangName();
   const Screen = SCREENS[route];
   const talk = lessonId && /^(chat|call):/.test(lessonId) ? parseTalkId(lessonId) : undefined;
   const badTalk = talk === null;
@@ -95,18 +97,22 @@ export default function App() {
   // ponytail: a PIN-locked profile never auto-signs in, so its reminder only fires once someone signs in
   useEffect(() => { keepInBackground(!!profile && s.reminderOn); }, [profile?.id, s.reminderOn]);
 
-  // Daily reminder (Settings): checked every minute while the app runs, even in the background.
+  // Nudges (Settings → Reminders): up to 3 a day, checked every minute while the app runs, even in the background.
   useEffect(() => {
-    if (!profile || !s.reminderOn) return;
+    if (!profile || !s.reminderOn || !course) return;
     const tick = () => {
-      if (!reminderDue(s)) return;
-      setS((x) => ({ ...x, remindedDay: today() }));
-      notify(t("settings.reminderTitle"), t(s.streak ? "settings.reminderStreak" : "settings.reminderBody", { count: s.streak }));
+      const slot = nudgeDue(s);
+      if (slot === null) return;
+      const day = today();
+      setS((x) => ({ ...x, reminded: `${day}:${slot}` }));
+      const { group, i } = nudgeMessage(slot, s.streak, day);
+      const vars = { count: s.streak, lang: langName(course.iso) };
+      notify(t(`nudges.${group}.${i}.t`, vars), t(`nudges.${group}.${i}.b`, vars));
     };
     tick();
     const h = setInterval(tick, 60_000);
     return () => clearInterval(h);
-  }, [profile?.id, s.reminderOn, s.reminderTime, s.lastActive, s.remindedDay, s.streak]);
+  }, [profile?.id, s.reminderOn, s.lastActive, s.reminded, s.streak, course?.iso]);
 
   if (bootError) return <BootErrorScreen e={bootError} />;
   if (!ready) return null;
