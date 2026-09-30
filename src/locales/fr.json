@@ -280,8 +280,8 @@
     "soundDesc": "Sons de bonne et de mauvaise réponse",
     "speaking": "Exercices oraux",
     "speakingDesc": "Exercices qui utilisent le micro",
-    "reminder": "Rappel quotidien",
-    "reminderDesc": "Quand il est activé, Sprigo reste en arrière-plan et se lance à l'ouverture de session",
+    "reminder": "Rappels",
+    "reminderDesc": "Sprigo te fait signe plusieurs fois par jour et se tait dès que tu as pratiqué. Quand il est activé, il reste en arrière-plan.",
     "reduceMotion": "Réduire les animations",
     "reduceMotionDesc": "Limiter les animations au minimum",
     "appearance": "Apparence",
@@ -300,6 +300,7 @@
     "logout": "Changer de profil",
     "general": "Général",
     "aiVoice": "IA et voix",
+    "advanced": "Avancé",
     "tts": "Synthèse vocale",
     "ttsSystem": "Voix du système",
     "stt": "Reconnaissance vocale",
@@ -308,14 +309,7 @@
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Gouttes",
     "heartsDesc": "Tu perds une goutte à chaque erreur ; elles se rechargent chaque jour",
-    "reminderTime": "Heure du rappel",
-    "reminderTimeDesc": "Fonctionne tant que Sprigo est ouvert, même en arrière-plan.",
-    "reminderBlocked": "Les notifications sont bloquées. Autorise-les dans les Réglages Système.",
-    "reminderTitle": "C'est l'heure d'une leçon",
-    "reminderBody": "Cinq minutes aujourd'hui, et l'habitude s'installe.",
-    "reminderStreak_one": "Continue de faire pousser ton {{count}} jour de racines — une leçon suffit.",
-    "reminderStreak_other": "Continue de faire pousser tes {{count}} jours de racines — une leçon suffit.",
-    "reminderStreak_many": "Continue de faire pousser tes {{count}} jours de racines — une leçon suffit."
+    "reminderBlocked": "Les notifications sont bloquées. Autorise-les dans les Réglages Système."
   },
   "rail": {
     "label": "Progression",
@@ -518,5 +512,61 @@
     "notDb": "Ce fichier n'est pas une base de données Sprigo",
     "failed": "Ça n'a pas marché : {{error}}",
     "fileType": "données Sprigo"
+  },
+  "nudges": {
+    "general": [
+      {
+        "t": "Quel mot t'attend aujourd'hui ? 🌱",
+        "b": "{{lang}} ne s'apprend pas tout seul. Cinq minutes suffisent."
+      },
+      {
+        "t": "Une leçon le temps que le thé infuse ?",
+        "b": "Leçon courte, grande différence. C'est parti !"
+      },
+      {
+        "t": "Sprigo s'ennuie de toi",
+        "b": "{{lang}} t'attend : tes mots se sentent un peu seuls. Tu passes ?"
+      },
+      {
+        "t": "Tu as cinq minutes ?",
+        "b": "Termine une leçon, et le reste de la journée est à toi."
+      },
+      {
+        "t": "Petits pas, grande langue",
+        "b": "{{lang}} du jour : une seule leçon compte déjà."
+      },
+      {
+        "t": "C'est l'heure de la gym cérébrale 🧠",
+        "b": "Quelques questions, quelques mots. Tu vas assurer !"
+      }
+    ],
+    "streak": [
+      {
+        "t": "Tes racines ont soif 💧",
+        "b": "Compteur de racines : {{count}}. Une leçon les fait pousser."
+      },
+      {
+        "t": "Ne casse pas la chaîne !",
+        "b": "Ton compteur de racines est à {{count}}. Une petite leçon suffit."
+      },
+      {
+        "t": "Ta pousse grandit",
+        "b": "Compteur de racines : {{count}} et ça monte. Reviens aujourd'hui, ton jardin sera ravi."
+      },
+      {
+        "t": "Une leçon, un jour de plus",
+        "b": "Ton compteur de racines affiche {{count}}. On en ajoute un ?"
+      }
+    ],
+    "evening": [
+      {
+        "t": "Minuit approche ⏰",
+        "b": "Compteur de racines : {{count}}. Ne les laisse pas sécher. Une leçon rapide ?"
+      },
+      {
+        "t": "Dernier appel pour aujourd'hui",
+        "b": "Une petite leçon avant de dormir, et ton compteur de racines reste à {{count}} et grandit."
+      }
+    ]
   }
 }

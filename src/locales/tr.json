@@ -263,8 +263,8 @@
     "soundDesc": "Doğru/yanlış geri bildirim sesleri",
     "speaking": "Konuşma egzersizleri",
     "speakingDesc": "Mikrofonlu alıştırmalar",
-    "reminder": "Günlük hatırlatma",
-    "reminderDesc": "Açıkken Sprigo arka planda kalır ve oturum açılışında başlar",
+    "reminder": "Hatırlatmalar",
+    "reminderDesc": "Sprigo gün içinde birkaç kez seni derse çağırır; o gün çalıştıysan susar. Açıkken arka planda kalır.",
     "reduceMotion": "Hareket azaltma",
     "reduceMotionDesc": "Animasyonları en aza indir",
     "appearance": "Görünüm",
@@ -283,6 +283,7 @@
     "logout": "Profil değiştir",
     "general": "Genel",
     "aiVoice": "Yapay zekâ ve ses",
+    "advanced": "Gelişmiş",
     "tts": "Seslendirme",
     "ttsSystem": "Sistem sesi",
     "stt": "Konuşma tanıma",
@@ -291,13 +292,7 @@
     "sttDeepgram": "Deepgram (bulut)",
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
-    "reminderTime": "Hatırlatma saati",
-    "reminderTimeDesc": "Sprigo açıkken çalışır, arka planda bile.",
-    "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver.",
-    "reminderTitle": "Ders zamanı",
-    "reminderBody": "Bugün beş dakika, alışkanlığı başlatır.",
-    "reminderStreak_one": "{{count}} gündür kök salıyorsun — bir ders yeter.",
-    "reminderStreak_other": "{{count}} gündür kök salıyorsun — bir ders yeter."
+    "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver."
   },
   "rail": {
     "label": "İlerleme",
@@ -496,5 +491,61 @@
     "notDb": "Bu dosya bir Sprigo veritabanı değil",
     "failed": "Olmadı: {{error}}",
     "fileType": "Sprigo verisi"
+  },
+  "nudges": {
+    "general": [
+      {
+        "t": "Bugün hangi kelime seni bekliyor? 🌱",
+        "b": "{{lang}} kendi kendine öğrenilmiyor. Beş dakika yeter."
+      },
+      {
+        "t": "Çay demlenene kadar bir ders?",
+        "b": "Kısa bir ders, büyük bir fark. Hadi başla."
+      },
+      {
+        "t": "Sprigo seni özledi",
+        "b": "{{lang}} kelimelerin biraz yalnız kaldı. Uğrar mısın?"
+      },
+      {
+        "t": "Beş dakikan var mı?",
+        "b": "Bir ders bitir, günün geri kalanı senin."
+      },
+      {
+        "t": "Küçük adım, büyük dil",
+        "b": "Bugün {{lang}} için tek bir ders bile sayılır."
+      },
+      {
+        "t": "Beyin jimnastiği zamanı 🧠",
+        "b": "Birkaç soru, birkaç kelime. Kolay gelsin!"
+      }
+    ],
+    "streak": [
+      {
+        "t": "Köklerin su istiyor 💧",
+        "b": "{{count}} gündür kök salıyorsun. Bugün de bir ders yeter."
+      },
+      {
+        "t": "Zinciri koparma!",
+        "b": "{{count}} günlük emeğin boşa gitmesin. Kısa bir ders yeter."
+      },
+      {
+        "t": "Filizin büyüyor",
+        "b": "{{count}} gündür buradasın. Bugün de gel, bahçen sevinsin."
+      },
+      {
+        "t": "Bir ders, bir gün daha",
+        "b": "Kök sayacın {{count}} gösteriyor. Bir tane daha ekle?"
+      }
+    ],
+    "evening": [
+      {
+        "t": "Gece yarısına az kaldı ⏰",
+        "b": "{{count}} günlük köklerin kurumasın. Hemen bir ders?"
+      },
+      {
+        "t": "Günün son çağrısı",
+        "b": "Yatmadan önce kısa bir ders, {{count}} günlük köklerin için."
+      }
+    ]
   }
 }

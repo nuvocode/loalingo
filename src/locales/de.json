@@ -266,8 +266,8 @@
     "soundDesc": "Töne für richtige und falsche Antworten",
     "speaking": "Sprechübungen",
     "speakingDesc": "Übungen, die das Mikrofon nutzen",
-    "reminder": "Tägliche Erinnerung",
-    "reminderDesc": "Wenn aktiv, läuft Sprigo im Hintergrund und startet beim Anmelden",
+    "reminder": "Erinnerungen",
+    "reminderDesc": "Sprigo erinnert dich ein paarmal am Tag und ist still, sobald du geübt hast. Wenn aktiv, läuft es im Hintergrund.",
     "reduceMotion": "Bewegung reduzieren",
     "reduceMotionDesc": "Animationen auf ein Minimum beschränken",
     "appearance": "Darstellung",
@@ -286,6 +286,7 @@
     "logout": "Profil wechseln",
     "general": "Allgemein",
     "aiVoice": "KI und Stimme",
+    "advanced": "Erweitert",
     "tts": "Sprachausgabe",
     "ttsSystem": "Systemstimme",
     "stt": "Spracherkennung",
@@ -294,13 +295,7 @@
     "sttDeepgram": "Deepgram (Cloud)",
     "hearts": "Tropfen",
     "heartsDesc": "Für jeden Fehler verlierst du einen Tropfen; sie füllen sich täglich wieder auf",
-    "reminderTime": "Erinnerungszeit",
-    "reminderTimeDesc": "Funktioniert, solange Sprigo geöffnet ist, auch im Hintergrund.",
-    "reminderBlocked": "Mitteilungen sind blockiert. Erlaube sie in den Systemeinstellungen.",
-    "reminderTitle": "Zeit für eine Lektion",
-    "reminderBody": "Fünf Minuten heute bauen die Gewohnheit auf.",
-    "reminderStreak_one": "Lass deinen {{count}} Tag mit Wurzeln weiterwachsen – eine Lektion reicht.",
-    "reminderStreak_other": "Lass deine {{count}} Tage mit Wurzeln weiterwachsen – eine Lektion reicht."
+    "reminderBlocked": "Mitteilungen sind blockiert. Erlaube sie in den Systemeinstellungen."
   },
   "rail": {
     "label": "Fortschritt",
@@ -501,5 +496,61 @@
     "notDb": "Diese Datei ist keine sprigo-Datenbank",
     "failed": "Das hat nicht geklappt: {{error}}",
     "fileType": "sprigo-Daten"
+  },
+  "nudges": {
+    "general": [
+      {
+        "t": "Welches Wort wartet heute auf dich? 🌱",
+        "b": "{{lang}} lernt sich nicht von allein. Fünf Minuten reichen."
+      },
+      {
+        "t": "Eine Lektion, bis der Tee zieht?",
+        "b": "Kurze Lektion, großer Unterschied. Los geht's."
+      },
+      {
+        "t": "Sprigo vermisst dich",
+        "b": "Deine {{lang}}-Vokabeln fühlen sich etwas einsam. Schaust du vorbei?"
+      },
+      {
+        "t": "Hast du fünf Minuten?",
+        "b": "Eine Lektion, und der Rest des Tages gehört dir."
+      },
+      {
+        "t": "Kleine Schritte, große Sprache",
+        "b": "Heute zählt schon eine einzige Lektion {{lang}}."
+      },
+      {
+        "t": "Zeit fürs Gehirnjogging 🧠",
+        "b": "Ein paar Fragen, ein paar Wörter. Du schaffst das!"
+      }
+    ],
+    "streak": [
+      {
+        "t": "Deine Wurzeln haben Durst 💧",
+        "b": "Wurzelzähler: {{count}}. Eine Lektion lässt sie weiterwachsen."
+      },
+      {
+        "t": "Nicht abreißen lassen!",
+        "b": "Dein Wurzelzähler steht bei {{count}}. Eine kurze Lektion genügt."
+      },
+      {
+        "t": "Dein Spross wächst",
+        "b": "Wurzelzähler: {{count}} und steigend. Komm heute wieder, dein Garten freut sich."
+      },
+      {
+        "t": "Eine Lektion, ein Tag mehr",
+        "b": "Dein Wurzelzähler zeigt {{count}}. Noch einen dazu?"
+      }
+    ],
+    "evening": [
+      {
+        "t": "Bald ist Mitternacht ⏰",
+        "b": "Wurzelzähler {{count}} – lass sie nicht austrocknen. Schnell eine Lektion?"
+      },
+      {
+        "t": "Letzter Aufruf für heute",
+        "b": "Eine kurze Lektion vor dem Schlafen, und dein Wurzelzähler bleibt bei {{count}} und wächst."
+      }
+    ]
   }
 }
