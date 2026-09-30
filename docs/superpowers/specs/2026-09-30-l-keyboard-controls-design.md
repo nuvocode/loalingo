@@ -22,7 +22,7 @@
 | Tür | Tuşlar |
 |---|---|
 | Seçmeli (ders ve hikâye) | `1`–`9` seçeneği seçer, `Enter` kontrol eder. 9'dan fazla seçenekte numaralar çalışmaz. |
-| Eşleştirme | Sol sütun `1`–`5`, sağ sütun `6`–`9`, `0` (10. kutu). Kutularda numara rozeti görünür. |
+| Eşleştirme | Numaralar sütunlar boyunca sıkı verilir: sağ sütun sol sütunun hemen ardından devam eder (3+3 kutuda sağ `4`–`6`; 5+5 kutuda sağ `6`–`9`, `0`). 10 kutudan fazlasında kapalı. Kutularda numara rozeti görünür. |
 | Kelime bankası | Harf yazdıkça, yazılanla başlayan ilk kullanılmamış kelime vurgulanır. `Space` ya da `Enter` onu ekler. `Backspace` önce yazılanı siler, boşsa son eklenen kelimeyi geri alır. Yazılan boşken `Enter` kontrol eder. |
 | Yazma | Bugünkü gibi: `Enter` kontrol eder, `Shift+Enter` yeni satır. Cevaptan sonra kutu kilitlenir, `Enter` Devam olur. |
 | Konuşma | `Space` mikrofonu başlatır ya da durdurur. |

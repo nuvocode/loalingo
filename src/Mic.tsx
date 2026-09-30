@@ -37,7 +37,9 @@ export function MicButton({ lang, onText, disabled, trigger = 0 }: { lang: strin
   };
   useEffect(() => () => { rec.current?.stop(false); }, []);
   // Keyboard (spec L): each bump of `trigger` presses the button.
-  useEffect(() => { if (trigger && !disabled) toggle(); }, [trigger]);
+  // Starts at the mount value so a leftover count from an earlier speak item does not press it on mount.
+  const seen = useRef(trigger);
+  useEffect(() => { if (trigger !== seen.current) { seen.current = trigger; if (!disabled) toggle(); } }, [trigger]);
 
   return (
     <div className="mic-wrap">

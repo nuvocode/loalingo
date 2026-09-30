@@ -404,7 +404,7 @@ export function Lesson({ id }: { id: string }) {
       <h2 className="ex-title">{it.prompt}</h2>
       {it.listen && listenBtn(it.listen)}
       {it.context && <div className="card" style={{ fontWeight: 700, fontSize: 18, marginBottom: 16 }}>{it.context}</div>}
-      <textarea className="input" rows={3} value={text} disabled={!!fb || checking} autoFocus aria-label={t("lesson.yourAnswer")} placeholder={t("lesson.typeHere")}
+      <textarea key={i} className="input" rows={3} value={text} disabled={!!fb || checking} autoFocus aria-label={t("lesson.yourAnswer")} placeholder={t("lesson.typeHere")}
         style={{ width: "100%", resize: "none", fontSize: 18 }}
         onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (canCheck) check(); } }} />
     </>
@@ -459,8 +459,8 @@ export function Lesson({ id }: { id: string }) {
                       {fb.verdict && <small role="status">{t("lesson.appealRejected", { reason: fb.verdict })}</small>}</span></span>
                 )}
                 <span className="od-row" style={gap("10px")}>
-                  {fb.judged && !fb.appealed && ctx && <button className="btn btn-ghost" onClick={openAppeal}>🚩 {t("lesson.appeal")} <kbd className="kbd">2</kbd></button>}
-                  {!fb.ok && ctx && <button className="btn btn-ghost" onClick={openExplain}>{t("lesson.explain")} <kbd className="kbd">1</kbd></button>}
+                  {!fb.ok && ctx && <button className="btn btn-ghost" aria-keyshortcuts="1" onClick={openExplain}>{t("lesson.explain")} <kbd className="kbd" aria-hidden="true">1</kbd></button>}
+                  {fb.judged && !fb.appealed && ctx && <button className="btn btn-ghost" aria-keyshortcuts="2" onClick={openAppeal}>🚩 {t("lesson.appeal")} <kbd className="kbd" aria-hidden="true">2</kbd></button>}
                   <button className={`btn ${fb.ok ? "btn-primary" : "btn-danger"}`} onClick={next}>{t(last ? "lesson.finish" : "lesson.continue")}</button>
                 </span>
               </>

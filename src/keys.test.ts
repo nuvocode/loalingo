@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { bankMatch, keyAction, type KeyState } from "./keys.ts";
+import { bankMatch, inField, keyAction, type KeyState } from "./keys.ts";
 
 const k = (key: string, extra = {}) => ({ key, ...extra });
 const choice: KeyState = { kind: "choice", answered: false, options: 4 };
@@ -9,6 +9,7 @@ test("choice: digits pick, Enter is the main button", () => {
   assert.deepEqual(keyAction(k("1"), choice), { do: "pick", index: 0 });
   assert.deepEqual(keyAction(k("4"), choice), { do: "pick", index: 3 });
   assert.equal(keyAction(k("5"), choice), null);
+  assert.deepEqual(keyAction(k("9"), { ...choice, options: 9 }), { do: "pick", index: 8 });
   assert.deepEqual(keyAction(k("Enter"), choice), { do: "primary" });
   assert.equal(keyAction(k("1"), { ...choice, options: 10 }), null); // more options than digits: off
 });
@@ -36,6 +37,7 @@ test("match: left 1–5, right 6–9 then 0", () => {
   const small: KeyState = { kind: "match", answered: false, matchL: 3, matchR: 3 };
   assert.deepEqual(keyAction(k("4"), small), { do: "match", side: "r", index: 0 });
   assert.equal(keyAction(k("7"), small), null);
+  assert.equal(keyAction(k("1"), { kind: "match", answered: false, matchL: 6, matchR: 5 }), null); // 11 boxes: off
 });
 
 test("bank: typing, adding, undoing, checking", () => {
@@ -44,7 +46,9 @@ test("bank: typing, adding, undoing, checking", () => {
   assert.deepEqual(keyAction(k("a"), b("c", 2)), { do: "bankType", text: "ca" });
   assert.deepEqual(keyAction(k(" "), b("ca", 2)), { do: "bankAdd", index: 2 });
   assert.deepEqual(keyAction(k("Enter"), b("ca", 2)), { do: "bankAdd", index: 2 });
-  assert.equal(keyAction(k("Enter"), b("zz", -1)), null);
+  assert.deepEqual(keyAction(k("Enter"), b("zz", -1)), { do: "bankType", text: "zz" });
+  assert.deepEqual(keyAction(k(" "), b("zz", -1)), { do: "bankType", text: "zz" });
+  assert.deepEqual(keyAction(k("C", { shiftKey: true }), b("", -1)), { do: "bankType", text: "C" });
   assert.equal(keyAction(k(" "), b("", -1)), null);
   assert.deepEqual(keyAction(k("Backspace"), b("ca", 2)), { do: "bankType", text: "c" });
   assert.deepEqual(keyAction(k("Backspace"), b("", -1)), { do: "bankUndo" });
@@ -62,6 +66,7 @@ test("after an answer: Enter continues, 1 explains, 2 appeals", () => {
   assert.deepEqual(keyAction(k("2"), a), { do: "appeal" });
   assert.equal(keyAction(k("1"), { ...a, canExplain: false }), null);
   assert.equal(keyAction(k("2"), { ...a, canAppeal: false }), null);
+  assert.deepEqual(keyAction(k(" "), { ...a, listen: true }), { do: "listen" });
   assert.equal(keyAction(k("c"), { kind: "bank", answered: true, typed: "", hit: -1 }), null);
 });
 
@@ -73,4 +78,10 @@ test("bankMatch: first unused word starting with the typed text, ignoring case a
   assert.equal(bankMatch(bank, [0, 1], "ca"), 3);
   assert.equal(bankMatch(bank, [], "x"), -1);
   assert.equal(bankMatch(bank, [], ""), -1);
+});
+
+test("inField: anything inside an input, textarea or contenteditable", () => {
+  assert.equal(inField({ closest: (_s: string) => ({}) } as unknown as EventTarget), true);
+  assert.equal(inField({ closest: () => null } as unknown as EventTarget), false);
+  assert.equal(inField(null), false);
 });

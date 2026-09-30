@@ -47,7 +47,7 @@ export function keyAction(e: KeyEvt, s: KeyState): KeyAction | null {
     case "bank": {
       const typed = s.typed ?? "", hit = s.hit ?? -1;
       if (e.key === "Backspace") return typed ? { do: "bankType", text: typed.slice(0, -1) } : { do: "bankUndo" };
-      if (typed && (e.key === " " || e.key === "Enter")) return hit >= 0 ? { do: "bankAdd", index: hit } : null;
+      if (typed && (e.key === " " || e.key === "Enter")) return hit >= 0 ? { do: "bankAdd", index: hit } : { do: "bankType", text: typed };
       if (e.key.length === 1 && e.key !== " ") return { do: "bankType", text: typed + e.key };
       break;
     }
