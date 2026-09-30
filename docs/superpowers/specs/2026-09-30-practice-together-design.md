@@ -67,7 +67,7 @@ Yeni eylemler:
 ## Yerleşim
 
 - **Geniş ekran (≥768 px):** `.call-grid.practice-open` iki sütun olur (`2fr 1fr`). Sol sütunun tamamında pratik paneli durur. Sağ sütunda tutor ve kullanıcı kartları alt alta yer alır (`grid-template-rows: 1fr 1fr`).
-- **Mobil (<768 px):** Üst satırda pratik paneli (`1fr`), alt satırda tutor ve kullanıcı yan yana durur (yaklaşık `40vh`, `1fr 1fr`).
+- **Mobil (<768 px):** Üst satırda pratik paneli (`1fr`), alt satırda tutor ve kullanıcı yan yana durur (yaklaşık `30vh`, `1fr 1fr`).
 - Pratik açıkken `Face` küçük kartta da ölçeklenir. Mevcut SVG `viewBox` bunu zaten karşılar.
 
 ## Puan ve bitiş

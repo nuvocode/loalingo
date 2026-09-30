@@ -1,6 +1,6 @@
 // Tutor video call (spec T): the tutor on the left, the learner's camera or profile on the right, a thin control bar below.
 // Each event (speech, a typed message, silence, mic/cam toggles) gets one model reply; the rules live in src/tutor.ts.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
@@ -10,9 +10,12 @@ import { listen, sttReady, type Listener } from "./stt";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
-import { tutorTurn } from "./lessons";
+import { loadPractice, tutorTurn } from "./lessons";
 import { NOTES_MAX, currentUnit, isNoise, mergeInput, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
+import * as db from "./db";
+import { PracticePanel } from "./PracticePanel";
+import { PRACTICE_XP, answer, begin, currentItem, describePractice, findTopic, next, openPractice, practiceTopics, type PracticeState, type Topic } from "./practice";
 import { Done, Failed, Shell, useQuit, usePrewarm, type Result } from "./Talk";
 
 const BONUS_MS = 5 * 60_000; // a call this long earns +20 XP
@@ -23,6 +26,7 @@ type Call = {
   nudges: number; // silence events since the learner last said something
   running: boolean; over: boolean; opened: boolean; micOn: boolean; failed: TutorEvent | null;
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
+  pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
 };
 
 export function TutorCall({ who }: { who: CharacterId }) {
@@ -34,7 +38,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -57,13 +61,23 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const [now, setNow] = useState(Date.now());
   const [result, setResult] = useState<(Result & { fixes: string[] }) | null>(null);
   const { quit, askQuit } = useQuit(!result);
+  const topics = useMemo(() => (course && enrollment ? practiceTopics(course, enrollment.level, done) : []), [course, enrollment, done]);
+  const [pr, setPr] = useState<PracticeState | null>(null);
+  const [prLoading, setPrLoading] = useState(false);
+  const [prErr, setPrErr] = useState("");
+  const prTopic = useRef<Topic | null>(null); // the topic being loaded or shown
+  const setPractice = (p: PracticeState | null) => { c.pr = p; setPr(p); };
 
   const push = (m: TutorMsg) => { c.hist = [...c.hist, m]; setMsgs(c.hist); };
   const clearSilence = () => clearTimeout(silence.current);
   const armSilence = () => {
     clearSilence();
     const sec = c.micOn && !c.over && !c.failed ? silenceDelay(c.last, c.nudges) : null;
-    if (sec) silence.current = setTimeout(() => { c.nudges++; fire({ kind: "silence", seconds: sec }); }, sec * 1000);
+    if (sec) silence.current = setTimeout(() => {
+      c.nudges++;
+      const stuck = !!c.pr && !!currentItem(c.pr) && !c.pr.last;
+      fire(stuck ? { kind: "practice_stuck" } : { kind: "silence", seconds: sec });
+    }, sec * 1000);
   };
 
   const voice = async (line: string) => {
@@ -76,15 +90,24 @@ export function TutorCall({ who }: { who: CharacterId }) {
   /** One event → one reply, spoken. False when the model call failed. */
   const step = async (e: TutorEvent) => {
     if (!course || !enrollment || !profile || !unit) return false;
+    if (e.kind.startsWith("practice_") && e.kind !== "practice_done" && !c.pr) return true; // the panel was closed meanwhile
+    if (e.kind === "practice_item" && c.pr?.stage === "reading" && c.pr.set) await voice(c.pr.set.reading.text);
+    const screen = c.pr; // what the learner was looking at when they spoke
     setThinking(true); setErr("");
     try {
-      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e);
+      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics));
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
       if (r.correction.trim()) c.fixes.push(r.correction.trim());
       if (r.say.trim()) push({ from: "tutor", text: r.say.trim(), via: "voice" });
       setLast(r); setShowTr(false); setThinking(false);
+      if (r.action === "start_practice") practiceOpen(false);
+      if (r.action === "stop_practice") practiceClose();
+      // `answer` only relays what the learner said; on app events the model sometimes invents a "next" and skips a step.
+      // If the screen changed meanwhile (Next, a click), the answer was for the old one.
+      if (c.pr && c.pr === screen && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
       await voice(r.say);
+      if (e.kind === "practice_answer") advance(); // the tutor has explained the answer: on to the next exercise
       if (r.action === "end") finish();
       return true;
     } catch (x) {
@@ -93,18 +116,20 @@ export function TutorCall({ who }: { who: CharacterId }) {
     }
   };
 
-  /** Runs events one at a time; learner input that arrives meanwhile is merged into the next event. */
+  /** Runs events one at a time; a waiting practice event goes first, learner input that arrived meanwhile is merged into one event. */
   const run = async (first: TutorEvent) => {
     c.running = true; clearSilence();
     let e: TutorEvent | null = first;
-    while (e && !c.over && (await step(e))) e = mergeInput(c.queue.splice(0));
+    while (e && !c.over && (await step(e))) { e = c.pending ?? mergeInput(c.queue.splice(0)); c.pending = null; }
     c.running = false;
     armSilence();
   };
   const fire = (e: TutorEvent) => {
     if (c.over) return;
     if (!c.running) return void run(e);
-    if (e.kind === "user_said" || e.kind === "user_typed") c.queue.push(e); // silence and toggles while busy are dropped
+    if (e.kind === "user_said" || e.kind === "user_typed") c.queue.push(e);
+    else if (e.kind.startsWith("practice_")) c.pending = e; // ponytail: only the latest practice event waits; the screen already shows the rest
+    // silence and toggles while busy are dropped
   };
   const input = (kind: "user_said" | "user_typed", said: string) => {
     if (isNoise(said)) { if (!c.running) armSilence(); return; }
@@ -113,6 +138,51 @@ export function TutorCall({ who }: { who: CharacterId }) {
     fire({ kind, text: said.trim() });
   };
   const retry = () => { const e = c.failed; c.failed = null; setErr(""); if (e) fire(e); };
+
+  const practiceOpen = (byButton: boolean) => {
+    if (c.pr) return;
+    setPrErr(""); prTopic.current = null; setPractice(openPractice());
+    if (byButton) fire({ kind: "practice_opened" });
+  };
+  const practiceClose = () => { setPractice(null); setPrLoading(false); setPrErr(""); prTopic.current = null; };
+  const chooseTopic = async (tp: Topic) => {
+    if (!course || !enrollment || !profile || c.pr?.stage !== "topics" || prTopic.current) return;
+    prTopic.current = tp; setPrLoading(true); setPrErr("");
+    try {
+      const set = await loadPractice(enrollment.id, { course, level: tp.level, native: profile.native_lang }, tp.unit);
+      if (c.over || c.pr?.stage !== "topics" || prTopic.current !== tp) return;
+      setPractice(begin(c.pr, set));
+      fire({ kind: "practice_item" });
+    } catch (x) { if (prTopic.current === tp) setPrErr((x as Error).message); }
+    finally { if (prTopic.current === tp) setPrLoading(false); }
+  };
+  const retryTopic = () => { const tp = prTopic.current; prTopic.current = null; if (tp) void chooseTopic(tp); };
+  /** A click or a spoken answer on the exercise on screen; answers that match no option are ignored. */
+  const submit = (given: string) => {
+    const st = c.pr, it = st && currentItem(st);
+    if (!st || !it) return;
+    const after = answer(st, given);
+    if (!after.last || after === st) return;
+    setPractice(after); c.nudges = 0;
+    if (after.last.correct) c.pxp += PRACTICE_XP;
+    else if (enrollment) db.addMistake(enrollment.id, it).catch(() => {}); // ponytail: a lost mistake row only weakens later review
+    sfx(after.last.correct ? "ok" : "bad");
+    fire({ kind: "practice_answer", ...after.last });
+  };
+  const advance = () => {
+    if (!c.pr || c.pr.stage === "topics") return; // a late reply after the panel was reopened
+    c.queue.length = 0; // input queued for the old screen would be graded against the new one; it stays in the history
+    const n = next(c.pr);
+    if (n.stage === "done") { practiceClose(); return fire({ kind: "practice_done", score: n.score, total: n.total }); }
+    setPractice(n); fire({ kind: "practice_item" });
+  };
+  /** The tutor's `answer` field: a topic title, "next", or the learner's spoken answer. */
+  const answerField = (a: string) => {
+    const st = c.pr!;
+    if (st.stage === "topics") { const tp = findTopic(topics, a); if (tp) void chooseTopic(tp); }
+    else if (a.toLowerCase() === "next") { if (st.stage === "reading" || st.stage === "discussion") advance(); }
+    else submit(a);
+  };
 
   const micStart = async (announce: boolean) => {
     if (c.micStarting) return;
@@ -159,12 +229,12 @@ export function TutorCall({ who }: { who: CharacterId }) {
     c.over = true; void micStop(); camStop(); stopSpeaking();
     const mine = c.hist.filter((m) => m.from === "me").length;
     const clean = Math.max(0, mine - c.fixes.length);
-    const xp = (mine * 5 + clean * 5 + (Date.now() - started.current >= BONUS_MS ? 20 : 0)) * xpMult(s);
+    const xp = (mine * 5 + clean * 5 + c.pxp + (Date.now() - started.current >= BONUS_MS ? 20 : 0)) * xpMult(s);
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
   };
-  const end = () => (c.hist.some((m) => m.from === "me") ? finish() : quit());
+  const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 
   useEffect(() => {
     c.over = false; // StrictMode mounts twice: the first cleanup must not end the call
@@ -184,6 +254,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const micLabel = t(micOn ? "tutor.micOff" : "tutor.micOn"), camLabel = t(camOn ? "tutor.camOff" : "tutor.camOn");
   const spoken = msgs.filter((m) => m.via === "voice"), typed = msgs.filter((m) => m.via === "text"); // ponytail: the tutor only speaks for now; a "message" action would add tutor lines to `typed`
   const lastTutor = spoken.filter((m) => m.from === "tutor").pop();
+  const prLabel = t(pr ? "tutor.practiceClose" : "tutor.practice");
   const capLabel = t(captions ? "tutor.transcriptOff" : "tutor.transcriptOn");
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
@@ -197,7 +268,10 @@ export function TutorCall({ who }: { who: CharacterId }) {
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else {
     body = err ? <Failed msg={err} retry={retry} quit={quit} /> : (
-      <div className="call-grid">
+      <div className={`call-grid${pr ? " practice-open" : ""}`}>
+        {pr && <PracticePanel pr={pr} topics={topics} loading={prLoading} error={prErr} lang={lang}
+          onTopic={(tp) => void chooseTopic(tp)} onAnswer={submit} onNext={advance} onHint={() => fire({ kind: "practice_stuck" })}
+          onRetry={retryTopic} onClose={practiceClose} />}
         <section className="call-pane tutor" aria-label={ch.name}>
           <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} scene={who} />
           <b className="call-name">{ch.name}</b>
@@ -229,6 +303,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       <div className="call-bar">
         <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-expanded={drawer} aria-label={t("tutor.message")} title={t("tutor.message")}><Icon name="chat" /></button>
         <button className={`call-btn${captions ? " on" : ""}`} onClick={() => setCaptions((v) => !v)} aria-pressed={captions} aria-label={capLabel} title={capLabel}><Icon name="captions" /></button>
+        <button className={`call-btn${pr ? " on" : ""}`} onClick={() => (pr ? practiceClose() : practiceOpen(true))} aria-pressed={!!pr} aria-label={prLabel} title={prLabel}><Icon name="book" /></button>
         <button className={`call-btn${micOn ? " on" : " off"}`} disabled={!!micBlock} onClick={toggleMic} aria-pressed={micOn} aria-label={micLabel} title={micBlock ? t(micBlock) : micLabel}><Icon name="mic" /></button>
         <button className={`call-btn${camOn ? " on" : " off"}`} disabled={!camOk} onClick={toggleCam} aria-pressed={camOn} aria-label={camLabel} title={camOk ? camLabel : t("tutor.camDenied")}><Icon name="video" /></button>
         <button className="call-btn end" onClick={end} aria-label={t("tutor.end")} title={t("tutor.end")}><Icon name="phone" /></button>

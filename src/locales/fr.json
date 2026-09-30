@@ -584,6 +584,21 @@
     "corrections": "Corrections de ce cours",
     "transcriptOn": "Afficher la transcription",
     "transcriptOff": "Masquer la transcription",
-    "noMessages": "Pas encore de messages"
+    "noMessages": "Pas encore de messages",
+    "practice": "Pratiquer ensemble",
+    "practiceClose": "Fermer la pratique",
+    "hint": "Indice",
+    "check": "Vérifier",
+    "next": "Suivant",
+    "retry": "Réessayer",
+    "preparing": "Préparation des exercices…",
+    "practiceFailed": "Les exercices n’ont pas pu être préparés.",
+    "stage": {
+      "topics": "Choisis un sujet",
+      "warmup": "Échauffement",
+      "reading": "Lecture",
+      "comprehension": "Questions",
+      "discussion": "Discussion"
+    }
   }
 }

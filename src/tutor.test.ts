@@ -7,7 +7,7 @@ const ctx = { name: "Mia", persona: "Cheerful barista.", target: "English", nati
 
 test("system prompt carries level, languages, unit material and every action", () => {
   const p = tutorSystem(ctx);
-  for (const s of ["A2", "English", "Turkish", "Food", "apple, bread", "I like + noun", "speak", "wait", "check_in", "end", "Have you ever", "Cheerful barista."]) assert.ok(p.includes(s), s);
+  for (const s of ["A2", "English", "Turkish", "Food", "apple, bread", "I like + noun", "speak", "wait", "check_in", "end", "start_practice", "stop_practice", "never give away", "Have you ever", "Cheerful barista."]) assert.ok(p.includes(s), s);
 });
 
 test("prompt has the notes, only the latest history and the event", () => {
@@ -30,11 +30,11 @@ test("describeEvent covers the events", () => {
 });
 
 test("loose reply: a broken action means speak, missing text is empty", () => {
-  assert.deepEqual(looseTutor.parse({ action: "dance", say: "Hi!" }), { action: "speak", say: "Hi!", translation: "", correction: "", notes: "" });
+  assert.deepEqual(looseTutor.parse({ action: "dance", say: "Hi!" }), { action: "speak", say: "Hi!", translation: "", correction: "", notes: "", answer: "" });
 });
 
 test("silence delay: questions 20 s, after wait 60 s, none for statements or an ended call, none after 2 nudges", () => {
-  const r = (action: TutorReply["action"], say: string): TutorReply => ({ action, say, translation: "", correction: "", notes: "" });
+  const r = (action: TutorReply["action"], say: string): TutorReply => ({ action, say, translation: "", correction: "", notes: "", answer: "" });
   assert.equal(silenceDelay(r("speak", "How are you?"), 0), 20);
   assert.equal(silenceDelay(r("wait", "Sure, take your time."), 0), 60);
   assert.equal(silenceDelay(r("speak", "Great."), 0), null);
@@ -62,4 +62,23 @@ test("currentUnit: the first unit with an unfinished step, else the last", () =>
   assert.equal(currentUnit(lv, new Set()).id, "u1");
   assert.equal(currentUnit(lv, new Set(["a", "b"])).id, "u2");
   assert.equal(currentUnit(lv, new Set(["a", "b", "c"])).id, "u2");
+});
+
+test("describeEvent covers the practice events", () => {
+  assert.match(describeEvent({ kind: "practice_opened" }), /meant to open it.*stop_practice/);
+  assert.match(describeEvent({ kind: "practice_item" }), /without giving the answer/);
+  assert.match(describeEvent({ kind: "practice_answer", correct: false, given: "likes", expected: "like" }), /"likes".*wrong.*"like".*why it is wrong/);
+  assert.match(describeEvent({ kind: "practice_answer", correct: true, given: "like", expected: "like" }), /correct.*why it is right/);
+  assert.match(describeEvent({ kind: "practice_stuck" }), /hint.*never say the answer/);
+  assert.match(describeEvent({ kind: "practice_done", score: 3, total: 4 }), /3 of 4/);
+});
+
+test("prompt shows the practice screen only when there is one", () => {
+  assert.ok(tutorPrompt("Mia", [], "", { kind: "practice_item" }, "Stage: reading.").includes("Practice screen:\nStage: reading."));
+  assert.ok(!tutorPrompt("Mia", [], "", { kind: "start" }).includes("Practice screen"));
+});
+
+test("loose reply keeps a spoken practice answer", () => {
+  assert.equal(looseTutor.parse({ action: "speak", say: "", answer: "likes" }).answer, "likes");
+  assert.equal(looseTutor.parse({ action: "start_practice", say: "Let's practise!" }).action, "start_practice");
 });

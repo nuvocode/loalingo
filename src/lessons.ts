@@ -6,6 +6,7 @@ import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActiv
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
+import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
@@ -233,11 +234,24 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
 
 // ---- Tutor call (spec T): the tutor's reply to one event ----
 
-export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent) {
+export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "") {
   const ch = CHARACTERS[who];
   const system = tutorSystem({
     name: ch.name, persona: ch.persona, target: c.course.name, native: langEn(c.native), level: c.level,
     unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit),
   });
-  return generate(tutorSchema, system, tutorPrompt(ch.name, history, notes, event), undefined, looseTutor);
+  return generate(tutorSchema, system, tutorPrompt(ch.name, history, notes, event, screen), undefined, looseTutor);
+}
+
+// ---- Practice together (spec P): one call per unit, cached ----
+
+export async function loadPractice(enrollmentId: number, c: Base, unit: Unit): Promise<PracticeSet> {
+  const key = `practice:${unit.id}`;
+  const cached = await getCached<PracticeSet>(enrollmentId, key);
+  if (cached) return cached;
+  const out = await generate(practiceSchema, systemPrompt(c), practicePrompt(unit.title, unitWords(unit), unitGrammar(unit)));
+  const set = toPracticeSet(out as Record<string, unknown>);
+  if (!set.warmup.length && !set.comprehension.length && !set.discussion.length) throw new Error("The model returned no usable exercises.");
+  await putCached(enrollmentId, key, set);
+  return set;
 }

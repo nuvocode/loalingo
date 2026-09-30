@@ -563,6 +563,21 @@
     "corrections": "Bu dersteki düzeltmeler",
     "transcriptOn": "Transkripti göster",
     "transcriptOff": "Transkripti gizle",
-    "noMessages": "Henüz mesaj yok"
+    "noMessages": "Henüz mesaj yok",
+    "practice": "Birlikte pratik",
+    "practiceClose": "Pratiği kapat",
+    "hint": "İpucu",
+    "check": "Kontrol et",
+    "next": "Devam",
+    "retry": "Tekrar dene",
+    "preparing": "Alıştırmalar hazırlanıyor…",
+    "practiceFailed": "Alıştırmalar hazırlanamadı.",
+    "stage": {
+      "topics": "Bir konu seç",
+      "warmup": "Isınma",
+      "reading": "Okuma",
+      "comprehension": "Sorular",
+      "discussion": "Tartışma"
+    }
   }
 }

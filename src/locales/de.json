@@ -568,6 +568,21 @@
     "corrections": "Korrekturen aus dieser Stunde",
     "transcriptOn": "Transkript anzeigen",
     "transcriptOff": "Transkript ausblenden",
-    "noMessages": "Noch keine Nachrichten"
+    "noMessages": "Noch keine Nachrichten",
+    "practice": "Gemeinsam üben",
+    "practiceClose": "Übung schließen",
+    "hint": "Tipp",
+    "check": "Prüfen",
+    "next": "Weiter",
+    "retry": "Nochmal versuchen",
+    "preparing": "Übungen werden vorbereitet…",
+    "practiceFailed": "Die Übungen konnten nicht vorbereitet werden.",
+    "stage": {
+      "topics": "Wähle ein Thema",
+      "warmup": "Aufwärmen",
+      "reading": "Lesen",
+      "comprehension": "Fragen",
+      "discussion": "Diskussion"
+    }
   }
 }
