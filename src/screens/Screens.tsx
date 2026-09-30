@@ -300,7 +300,7 @@ export function Roleplay() {
           return (
             <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
               <Face spec={face} color={color} size={56} label={name} />
-              <span className="od-field od-fill"><b>{name}</b></span>
+              <span className="od-field od-fill"><b>{name}</b><span className="muted">{t(`roleplay.roles.${k}`)}</span></span>
               <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
                 <button className="btn btn-ghost" onClick={() => openSheet(<TopicSheet who={k} voice={false} />)}>{t("roleplay.chat")}</button>
                 <button className="btn btn-blue" onClick={() => speakBlock ? toast(t(speakBlock)) : openSheet(<TopicSheet who={k} voice />)}><Icon name="video" /> {t("roleplay.call")}</button>

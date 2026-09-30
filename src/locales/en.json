@@ -164,6 +164,14 @@
   "roleplay": {
     "title": "Roleplay",
     "subtitle": "Chat with AI characters in real-life scenarios. They correct your messages as you go.",
+    "roles": {
+      "mia": "Hotel receptionist",
+      "kai": "Chef",
+      "nora": "Doctor",
+      "tom": "Landlord",
+      "emma": "Recruiter",
+      "leo": "Tour guide"
+    },
     "topics": {
       "mia": {
         "checkIn": "Check in",

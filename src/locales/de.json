@@ -164,6 +164,14 @@
   "roleplay": {
     "title": "Rollenspiel",
     "subtitle": "Chatte mit KI-Figuren in Alltagssituationen. Sie korrigieren deine Nachrichten direkt.",
+    "roles": {
+      "mia": "Hotelrezeptionistin",
+      "kai": "Koch",
+      "nora": "Ärztin",
+      "tom": "Vermieter",
+      "emma": "Personalvermittlerin",
+      "leo": "Reiseleiter"
+    },
     "topics": {
       "mia": {
         "checkIn": "Einchecken",

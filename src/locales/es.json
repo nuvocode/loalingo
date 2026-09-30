@@ -174,6 +174,14 @@
   "roleplay": {
     "title": "Roleplay",
     "subtitle": "Chatea con personajes de IA en situaciones de la vida real. Te corrigen los mensajes sobre la marcha.",
+    "roles": {
+      "mia": "Recepcionista de hotel",
+      "kai": "Chef",
+      "nora": "Doctora",
+      "tom": "Casero",
+      "emma": "Reclutadora",
+      "leo": "Guía turístico"
+    },
     "topics": {
       "mia": {
         "checkIn": "Hacer el check-in",

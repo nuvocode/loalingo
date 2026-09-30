@@ -162,6 +162,14 @@
   "roleplay": {
     "title": "Rol Yapma",
     "subtitle": "Gerçek hayat senaryolarında yapay zekâ karakterleriyle yazış. Mesajlarını düzeltirler.",
+    "roles": {
+      "mia": "Otel resepsiyonisti",
+      "kai": "Şef",
+      "nora": "Doktor",
+      "tom": "Ev sahibi",
+      "emma": "İşe alım uzmanı",
+      "leo": "Tur rehberi"
+    },
     "topics": {
       "mia": {
         "checkIn": "Check-in yap",
