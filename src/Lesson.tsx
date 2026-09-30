@@ -231,7 +231,7 @@ export function Lesson({ id }: { id: string }) {
   const matchCols = useMemo(() => it?.kind === "match"
     ? { l: it.pairs.map((p) => p[0]), r: it.pairs.map((p) => p[1]).sort(() => Math.random() - 0.5) } : null, [it]);
   const pickMatch = (side: "l" | "r", v: string) => {
-    if (fb || it?.kind !== "match") return;
+    if (fb || it?.kind !== "match" || matched.done.includes(v)) return;
     if (side === "l") return setMatched((m) => ({ ...m, left: v, wrong: [] }));
     if (!matched.left) return;
     const pair = it.pairs.find((p) => p[0] === matched.left)!;
