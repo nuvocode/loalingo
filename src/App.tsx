@@ -41,7 +41,7 @@ function NavBtn({ id, icon, onGo }: { id: Route; icon: IconName; onGo?: () => vo
   );
 }
 
-/** Phone bottom bar: the main tabs, then "…" opening the rest upwards. */
+/** Phone bottom bar: the main tabs, then "…" opening profile and the rest upwards. */
 function BottomNav() {
   const { t } = useTranslation();
   const { route } = useApp();
@@ -52,13 +52,14 @@ function BottomNav() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-  const inMore = MORE.some((n) => n.id === route);
+  const tabs = NAV.filter((n) => n.id !== "profile"), rest = [...NAV.filter((n) => n.id === "profile"), ...MORE];
+  const inMore = rest.some((n) => n.id === route);
   return (
     <>
       {open && <div className="more-backdrop" onClick={() => setOpen(false)} />}
-      {open && <div className="more-menu" id="more-menu">{MORE.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}</div>}
+      {open && <div className="more-menu" id="more-menu">{rest.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}</div>}
       <nav className="bottom-nav" aria-label={t("nav.bottom")}>
-        {NAV.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}
+        {tabs.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}
         <button className={`nav-item ${inMore || open ? "active" : ""}`} onClick={() => setOpen((o) => !o)}
           aria-expanded={open} aria-controls="more-menu">
           <Icon name="dots" /><span>{t("nav.more")}</span>
