@@ -332,6 +332,10 @@ svg{display:block}
     padding:6px 4px calc(6px + env(safe-area-inset-bottom));
   }
   .bottom-nav .nav-item{flex-direction:column;gap:2px;font-size:10px;padding:6px 2px;letter-spacing:.4px;justify-content:center}
+  .bottom-nav .nav-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .more-backdrop{position:fixed;inset:0;z-index:49;background:rgb(0 0 0 / .25)}
+  .more-menu{position:fixed;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:51;min-width:210px;display:flex;flex-direction:column;gap:2px;padding:8px;border:2px solid var(--border);border-radius:var(--r);background:var(--card);box-shadow:0 8px 30px rgb(0 0 0 / .2);animation:more-up .15s ease-out}
+  @keyframes more-up{from{opacity:0;transform:translateY(8px)}}
   .center{padding-bottom:140px}
   .ex-title{font-size:20px}
 }
