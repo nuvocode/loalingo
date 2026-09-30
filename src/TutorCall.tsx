@@ -162,7 +162,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (!after.last || after === st) return;
     setPractice(after); c.nudges = 0;
     if (after.last.correct) c.pxp += PRACTICE_XP;
-    else if (enrollment) void db.addMistake(enrollment.id, it);
+    else if (enrollment) db.addMistake(enrollment.id, it).catch(() => {}); // ponytail: a lost mistake row only weakens later review
     sfx(after.last.correct ? "ok" : "bad");
     fire({ kind: "practice_answer", ...after.last });
   };
@@ -230,7 +230,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
   };
-  const end = () => (c.hist.some((m) => m.from === "me") ? finish() : quit());
+  const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 
   useEffect(() => {
     c.over = false; // StrictMode mounts twice: the first cleanup must not end the call
