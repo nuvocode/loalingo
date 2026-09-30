@@ -7,7 +7,7 @@ import { useSpeakBlock } from "../Mic";
 import { msLeft, rivalXp, zones, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
-import { DOUBLE_XP_MS, today } from "../progress";
+import { DOUBLE_XP_MS, rollDay, today } from "../progress";
 import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { Face } from "../face/Face";
@@ -24,7 +24,7 @@ export function useLeague() {
   const rows = (l?.rivals ?? []).map((r) => ({ n: r.n, c: r.c, xp: rivalXp(r, l!.week, now), me: false }))
     .concat({ n: t("league.you"), c: profile?.color ?? "#f5b014", xp: s.weekXp, me: true })
     .sort((a, b) => b.xp - a.xp || +b.me - +a.me); // ties go to the learner, as in rankOf
-  return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? msLeft(l, now) : 0, last: l?.last };
+  return { rows, name: t(`league.tier${l?.tier ?? 0}`), left: l ? Math.max(0, msLeft(l, now)) : 0, last: l?.last };
 }
 
 export function useBuy() {
@@ -120,12 +120,12 @@ function TierRail({ tier }: { tier: number }) {
 
 export function League() {
   const { t } = useTranslation();
-  const { toast, s, enrollment } = useApp();
+  const { toast, s, setS, enrollment } = useApp();
   const start = useStartLesson();
   const playMadness = async () => enrollment && (await db.listWords(enrollment.id)).length >= MADNESS_MIN_WORDS
     ? start("practice-madness") : toast(t("practice.needWords", { count: MADNESS_MIN_WORDS }));
   const [, tick] = useState(0);
-  useEffect(() => { const id = setInterval(() => tick((n) => n + 1), 60_000); return () => clearInterval(id); }, []); // rivals keep studying
+  useEffect(() => { const id = setInterval(() => { tick((n) => n + 1); setS((s) => (s.day === today() ? s : rollDay(s, today()))); }, 60_000); return () => clearInterval(id); }, [setS]); // rivals keep studying; a new week rolls while open
   const { rows, name, left, last } = useLeague();
   const { up, down } = zones(s.league?.tier ?? 0);
   const days = Math.floor(left / 86_400_000), hours = Math.floor((left % 86_400_000) / 3_600_000);

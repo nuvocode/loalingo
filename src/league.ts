@@ -25,8 +25,9 @@ export function weekOf(day: string) {
   const dt = new Date(y, m - 1, d - ((new Date(y, m - 1, d).getDay() + 6) % 7));
   return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
 }
-const weekStartMs = (week: string) => { const [y, m, d] = week.split("-").map(Number); return new Date(y, m - 1, d).getTime(); };
-const DAY_MS = 86_400_000, HOUR_MS = 3_600_000;
+/** Next Monday 00:00 local (not start + 7×24h: a DST week is 167 or 169 hours). */
+const weekEndMs = (week: string) => { const [y, m, d] = week.split("-").map(Number); return new Date(y, m - 1, d + 7).getTime(); };
+const HOUR_MS = 3_600_000;
 
 // Seeded PRNG (mulberry32) so a week's rivals are stable and tests are deterministic.
 function rng(seed: string) {
@@ -37,7 +38,7 @@ const shuffle = <T,>(a: T[], r: () => number) => a.map((x) => [r(), x] as const)
 
 export function newLeague(week: string, tier: number, last?: LeagueState["last"], who?: Who): LeagueState {
   const r = rng(`${week}:${tier}:${who?.id ?? 0}`);
-  const lang = who && NAMES[who.lang] ? who.lang : "en";
+  const lang = who && Object.prototype.hasOwnProperty.call(NAMES, who.lang) ? who.lang : "en";
   const local = 4 + Math.floor(r() * 2); // 4 or 5 from the learner's language
   const others = shuffle(Object.entries(NAMES).filter(([k]) => k !== lang).flatMap(([, v]) => v), r);
   const names = shuffle([...shuffle(NAMES[lang], r).slice(0, local), ...others.slice(0, 9 - local)], r);
@@ -54,7 +55,7 @@ export function newLeague(week: string, tier: number, last?: LeagueState["last"]
   };
 }
 
-const cache = new Map<string, { at: number; xp: number }[]>(); // ponytail: never evicted, ~9 rivals a week
+const cache = new Map<string, readonly { at: number; xp: number }[]>(); // ponytail: never evicted, ~9 rivals a week
 
 /** A rival's study sessions this week, oldest first: 10–40 XP each (in fives), 08:00–24:00 local, summing to `total`. */
 export function sessions(r: Rival, week: string) {
@@ -72,6 +73,7 @@ export function sessions(r: Rival, week: string) {
     out.push({ at: new Date(y, m - 1, d + day, 8).getTime() + Math.floor((t - day) * 16 * HOUR_MS), xp });
   }
   out.sort((a, b) => a.at - b.at);
+  Object.freeze(out);
   cache.set(key, out);
   return out;
 }
@@ -83,18 +85,18 @@ export const rivalXp = (r: Rival, week: string, now: number) =>
 /** 1-based rank of the learner among rivals (ties go to the learner). */
 export const rankOf = (l: LeagueState, myXp: number, now: number) => 1 + l.rivals.filter((r) => rivalXp(r, l.week, now) > myXp).length;
 
-/** New week: settle the old one (top 3 up, bottom 3 down) and draw new rivals. Returns the same objects if nothing changes.
+/** New week: settle the old one (top 3 up, bottom 3 down, see `zones`) and draw new rivals. Returns the same objects if nothing changes.
  *  A league saved before rivals had `total` (old `rate` format) is redrawn at the same tier. */
 export function rollLeague(l: LeagueState | null, weekXp: number, day: string, who = l?.who): { league: LeagueState; weekXp: number } {
   const week = weekOf(day);
   if (!l) return { league: newLeague(week, 0, undefined, who), weekXp: 0 };
-  const legacy = l.rivals.some((r) => typeof r.total !== "number");
+  const legacy = l.rivals.some((r) => typeof r.total !== "number" || typeof r.passion !== "number");
   if (l.week === week) return legacy ? { league: newLeague(week, l.tier, l.last, who), weekXp } : { league: l, weekXp };
   if (legacy) return { league: newLeague(week, l.tier, "stay", who), weekXp: 0 };
-  const rank = rankOf(l, weekXp, weekStartMs(l.week) + 7 * DAY_MS);
+  const rank = rankOf(l, weekXp, weekEndMs(l.week));
   const { up, down } = zones(l.tier);
   const last = weekXp > 0 && rank <= up ? "up" : rank > l.rivals.length + 1 - down ? "down" : "stay";
   return { league: newLeague(week, l.tier + (last === "up" ? 1 : last === "down" ? -1 : 0), last, who), weekXp: 0 };
 }
 
-export const msLeft = (l: LeagueState, now: number) => weekStartMs(l.week) + 7 * DAY_MS - now;
+export const msLeft = (l: LeagueState, now: number) => weekEndMs(l.week) - now;

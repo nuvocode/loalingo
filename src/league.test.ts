@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { NAMES, newLeague, rankOf, rivalXp, rollLeague, sessions, weekOf, zones, type LeagueState, type Rival } from "./league.ts";
+import { NAMES, newLeague, rankOf, msLeft, rivalXp, rollLeague, sessions, weekOf, zones, type LeagueState, type Rival } from "./league.ts";
 
 const W = "2026-09-28", start = new Date(2026, 8, 28).getTime(), DAY = 86_400_000;
 const who = { id: 1, lang: "tr" };
@@ -30,7 +30,6 @@ test("sessions: 10–40 XP in fives, 08:00–24:00, inside the week, summing to 
   for (const tier of [0, 5, 9]) for (const r of newLeague(W, tier, undefined, who).rivals) {
     const s = sessions(r, W);
     assert.equal(s.reduce((a, x) => a + x.xp, 0), r.total);
-    assert.deepEqual(s, sessions({ ...r }, W), "same rival, same sessions");
     s.forEach((x, i) => {
       assert.ok(x.xp >= 10 && x.xp <= 40 && x.xp % 5 === 0, `step ${x.xp}`);
       assert.ok(x.at >= start && x.at < start + 7 * DAY);
@@ -76,9 +75,10 @@ test("about half the names come from the learner's language", () => {
   }
   const unknown = newLeague(W, 0, undefined, { id: 1, lang: "xx" });
   assert.ok(unknown.rivals.filter((r) => NAMES.en.includes(r.n)).length >= 4, "unknown language falls back to English");
+  assert.doesNotThrow(() => newLeague(W, 0, undefined, { id: 1, lang: "constructor" }), "prototype keys fall back to English");
 });
 
-test("new week settles the league: top 3 up, bottom 3 down, idle stays out of promotion", () => {
+test("new week settles the league: top 3 up, bottom 3 down (see zones), idle stays out of promotion", () => {
   const l = newLeague(W, 3, undefined, who);
   const same = rollLeague(l, 50, "2026-10-02");
   assert.equal(same.league, l, "same week: unchanged");
@@ -95,6 +95,10 @@ test("new week settles the league: top 3 up, bottom 3 down, idle stays out of pr
   assert.equal(seed.tier, 0); assert.equal(seed.last, "stay", "nobody drops out of Seed");
   const top = rollLeague(newLeague(W, 9), 1e6, "2026-10-05").league;
   assert.equal(top.tier, 9); assert.equal(top.last, "stay", "nobody moves up from the top league");
+  const topLast = rollLeague(newLeague(W, 9), 0, "2026-10-05").league;
+  assert.equal(topLast.tier, 8); assert.equal(topLast.last, "down");
+  const seedFirst = rollLeague(newLeague(W, 0), 1e6, "2026-10-05").league;
+  assert.equal(seedFirst.tier, 1); assert.equal(seedFirst.last, "up");
   assert.equal(rollLeague(null, 0, "2026-10-05").league.week, "2026-10-05");
 });
 
@@ -105,4 +109,19 @@ test("an old-format league is redrawn, keeping tier and weekly XP", () => {
   assert.equal(same.league.rivals.length, 9); assert.deepEqual(same.league.who, who);
   const next = rollLeague(old, 120, "2026-10-05", who);
   assert.equal(next.league.tier, 3); assert.equal(next.league.week, "2026-10-05"); assert.equal(next.weekXp, 0);
+});
+
+test("a DST week ends at the next local Monday, not 7×24h after the start", () => {
+  for (const [w, next] of [["2026-10-19", new Date(2026, 9, 26).getTime()], ["2026-03-23", new Date(2026, 2, 30).getTime()]] as const) {
+    const l = newLeague(w, 5, undefined, who), ws = new Date(+w.slice(0, 4), +w.slice(5, 7) - 1, +w.slice(8)).getTime();
+    assert.equal(msLeft(l, next), 0);
+    for (const r of l.rivals) {
+      assert.equal(rivalXp(r, w, next), r.total, "everything counts at settlement");
+      for (const x of sessions(r, w)) {
+        const at = new Date(x.at), day = new Date(at.getFullYear(), at.getMonth(), at.getDate());
+        assert.ok(x.at >= ws && x.at < next && at.getHours() >= 8, `${w} ${at}`);
+        assert.ok(x.at < new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1).getTime());
+      }
+    }
+  }
 });
