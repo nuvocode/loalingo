@@ -6,6 +6,7 @@ import { useApp } from "./store";
 import { sfx } from "./Lesson";
 import { loadKokoro, speak, stopSpeaking, usesKokoro } from "./tts";
 import { MicButton } from "./Mic";
+import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
@@ -249,16 +250,25 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
   };
   const over = goal || mine >= CHAT_TURNS;
 
+  const faceState: FaceState = busy ? "thinking" : voicing !== null ? "talking" : "idle";
+  const topicLabel = topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
     body = <Done title={t(goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else {
     body = <>
-      <div className="od-row" style={{ ...gap("12px"), marginBottom: 16 }}>
-        <span className="avatar" style={{ width: 48, height: 48, fontSize: 20, background: ch.color }}>{ch.name[0]}</span>
-        <span className="od-field od-fill"><b>{ch.name}</b><span className="muted small">{topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length)}</span></span>
-      </div>
+      {voice ? (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 16, textAlign: "center" }}>
+          <Face spec={ch.face} color={ch.color} size={220} label={ch.name} state={faceState} />
+          <b>{ch.name}</b><span className="muted small">{topicLabel}</span>
+        </div>
+      ) : (
+        <div className="od-row" style={{ ...gap("12px"), marginBottom: 16 }}>
+          <Face spec={ch.face} color={ch.color} size={96} label={ch.name} state={faceState} />
+          <span className="od-field od-fill"><b>{ch.name}</b><span className="muted small">{topicLabel}</span></span>
+        </div>
+      )}
       <div className="chat">
         {msgs.map((m, i) => m.from === "ai" ? (
           <button key={i} className="bubble" lang={lang} aria-busy={voicing === i} onClick={() => { say(m.text, i); setOpen((s) => new Set(s).add(i)); }}>
