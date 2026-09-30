@@ -99,7 +99,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Loads everything that belongs to a profile (E6) and applies its UI prefs.
   const login = useCallback(async (p: Profile) => {
     const fresh = (await db.getProfile(p.id))!;
-    const stats = rollDay(fresh.stats, today());
+    const stats = rollDay(fresh.stats, today(), { id: fresh.id, lang: fresh.ui_lang });
     if (stats !== fresh.stats) { fresh.stats = stats; await db.updateProfile(p.id, { stats }); }
     setEnrollments(await db.listEnrollments(p.id));
     setViewLevel(null);

@@ -124,6 +124,8 @@ export function League() {
   const start = useStartLesson();
   const playMadness = async () => enrollment && (await db.listWords(enrollment.id)).length >= MADNESS_MIN_WORDS
     ? start("practice-madness") : toast(t("practice.needWords", { count: MADNESS_MIN_WORDS }));
+  const [, tick] = useState(0);
+  useEffect(() => { const id = setInterval(() => tick((n) => n + 1), 60_000); return () => clearInterval(id); }, []); // rivals keep studying
   const { rows, name, left, last } = useLeague();
   const days = Math.floor(left / 86_400_000), hours = Math.floor((left % 86_400_000) / 3_600_000);
   return (

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { NEW_STATS, recordSession, rollDay } from "./progress.ts";
+import type { LeagueState } from "./league.ts";
 
 const lesson = { xp: 30, gems: 4, kind: "lesson" as const };
 
@@ -47,4 +48,14 @@ test("daily reminder fires once, after its time, only on days without practice",
   assert.equal(reminderDue({ ...s, lastActive: "2026-03-05" }, at(20)), false, "already practiced");
   assert.equal(reminderDue({ ...s, remindedDay: "2026-03-05" }, at(20)), false, "already reminded");
   assert.equal(reminderDue({ ...s, reminderOn: false }, at(20)), false);
+});
+
+test("rollDay redraws an old-format league the same day and passes the learner on", () => {
+  const old = { week: "2026-09-28", tier: 2, rivals: [{ n: "Aylin", c: "#000", rate: 20 }] } as unknown as LeagueState;
+  const s = { ...NEW_STATS, day: "2026-10-01", league: old, weekXp: 80 };
+  const r = rollDay(s, "2026-10-01", { id: 7, lang: "de" });
+  assert.equal(r.league!.tier, 2); assert.equal(r.weekXp, 80);
+  assert.deepEqual(r.league!.who, { id: 7, lang: "de" });
+  assert.ok(r.league!.rivals.every((x) => x.total > 0));
+  assert.equal(rollDay(r, "2026-10-01"), r, "nothing to do: same object");
 });
