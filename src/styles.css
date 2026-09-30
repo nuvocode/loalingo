@@ -319,12 +319,14 @@ svg{display:block}
 
 /* mobile */
 .bottom-nav{display:none}
+.nav-live.mobile-only{display:none}
 @media(max-width:1099px){
   .rail{display:none}
 }
 @media(max-width:767px){
   .app{grid-template-columns:1fr}
   .sidebar{display:none}
+  .nav-live.mobile-only{display:flex;margin:16px 0 0}
   .bottom-nav{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:2px solid var(--border);
     padding:6px 4px calc(6px + env(safe-area-inset-bottom));
