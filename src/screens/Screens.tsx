@@ -16,7 +16,18 @@ const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
 });
 
-/** Picks the tutor for a video lesson (spec T); also opened from the sidebar's live lesson button. */
+/** The eye-catching entry to a tutor call: top of the sidebar, and top of Learn on phones. */
+export function LiveButton({ className = "" }: { className?: string }) {
+  const { t } = useTranslation();
+  const { openSheet } = useApp();
+  return (
+    <button className={`nav-live ${className}`} onClick={() => openSheet(<TutorSheet />)}>
+      <Icon name="video" /><span>{t("nav.live")}</span><i className="live-dot" aria-hidden="true" />
+    </button>
+  );
+}
+
+/** Picks the tutor for a video lesson (spec T); also opened from the live lesson button. */
 export function TutorSheet() {
   const { t } = useTranslation();
   const { closeSheet } = useApp();

@@ -6,6 +6,7 @@ import { useStartLesson } from "../Lesson";
 import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
 import { speak } from "../tts";
 import { AiSheet } from "./Settings";
+import { LiveButton } from "./Screens";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -228,6 +229,7 @@ export function Learn() {
   const total = course.levels[level]!.units.reduce((a, u) => a + u.steps.length, 0);
   return (
     <>
+      <LiveButton className="mobile-only" />
       {setup}{errors}
       <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => openSheet(<LevelSheet />)} aria-haspopup="dialog">
         {level} · {course.levels[level]!.title} ▾
