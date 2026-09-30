@@ -2,7 +2,7 @@
 // Kokoro runs in src/kokoro.worker.ts and streams one sentence at a time, so the first sentence plays while the rest is made.
 import { getSetting } from "./db";
 import { pickSystemVoice } from "./voices";
-import { remember } from "./audio";
+import { mouthLevel, remember } from "./audio";
 
 export type Voice = { gender: "f" | "m"; kokoro?: string };
 type Chunk = { audio: Float32Array; rate: number };
@@ -50,6 +50,11 @@ export const usesKokoro = async (lang: string) => lang.startsWith("en") && (awai
 let seq = 0;
 let sources: AudioBufferSourceNode[] = [];
 let actx: AudioContext | undefined;
+let analyser: AnalyserNode | undefined; // Kokoro audio passes through it so faces can read the loudness
+const out = (ctx: AudioContext) => {
+  if (!analyser) { analyser = ctx.createAnalyser(); analyser.fftSize = 1024; analyser.connect(ctx.destination); }
+  return analyser;
+};
 let next = 0; // when the queued sentences end, in AudioContext time
 let finish = () => {}; // resolves the current speak()
 const cache = new Map<string, Chunk[]>();
@@ -88,7 +93,7 @@ async function viaKokoro(text: string, voice: string, mine: number, done: () => 
     buf.copyToChannel(c.audio as Float32Array<ArrayBuffer>, 0);
     const src = ctx.createBufferSource();
     src.buffer = buf;
-    src.connect(ctx.destination);
+    src.connect(out(ctx));
     const at = Math.max(ctx.currentTime, next);
     next = at + buf.duration;
     left++;
@@ -141,4 +146,34 @@ export async function speak(text: string, lang: string, voice?: Voice): Promise<
   if (mine !== seq) return over;
   system(text, lang, voice?.gender, done);
   return over;
+}
+
+// ---- Mouth: how open a talking face's mouth is, 0..1, every animation frame ----
+const mouthSubs = new Set<(open: number) => void>();
+const frame = new Float32Array(1024);
+let raf = 0, lastT = 0, level = 0;
+
+function tick(t: number) {
+  const dt = lastT ? Math.min(0.1, (t - lastT) / 1000) : 0;
+  lastT = t;
+  let rms = 0;
+  // The system voice gives no audio to measure: a steady ~3 syllables per second while it speaks.
+  if (speechSynthesis.speaking) rms = 0.02 + 0.18 * (0.5 + 0.5 * Math.sin((2 * Math.PI * 3 * t) / 1000));
+  else if (analyser) {
+    analyser.getFloatTimeDomainData(frame);
+    rms = Math.sqrt(frame.reduce((n, x) => n + x * x, 0) / frame.length);
+  }
+  level = mouthLevel(level, rms, dt);
+  mouthSubs.forEach((f) => f(level));
+  raf = requestAnimationFrame(tick);
+}
+
+/** Calls `cb` with the mouth openness every frame until the returned function is called. */
+export function onMouth(cb: (open: number) => void) {
+  mouthSubs.add(cb);
+  if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
+  return () => {
+    mouthSubs.delete(cb);
+    if (!mouthSubs.size) { cancelAnimationFrame(raf); raf = 0; level = 0; }
+  };
 }
