@@ -17,7 +17,7 @@
 | `src/practice.ts` (yeni) | Saf modül, testi `practice.test.ts`. İçerdikleri: `PracticeSet` zod şeması, `PracticeState`, `answer(state, given)` (puanlama ve aşama geçişi), `current(state)`, `practiceTopics(course, done, level)` (bitirilen üniteler), `practicePrompt(...)`. |
 | `src/tutor.ts` | `TUTOR_ACTIONS` listesine `start_practice` ve `stop_practice` eklenir. Şemaya `answer` alanı eklenir (varsayılan `""`). Yeni olaylar (aşağıda) tanımlanır. `tutorPrompt`, pratik açıkken ekrandaki soruyu ve aşamayı bağlama ekler. |
 | `src/lessons.ts` | `loadPractice(unit)`: önbellekte varsa oradan okur, yoksa `generate()` ile üretir. |
-| `src/PracticePanel.tsx` (yeni) | Pratik alanı: konu kartları, ısınma soruları, okuma metni ve tartışma soruları. Seçmeli / kelime bankası / boşluk doldurma için mevcut `Lesson.tsx` öğe bileşenleri yeniden kullanılır; yalnızca sunum katmanı alınır, can ve ilerleme mantığı alınmaz. |
+| `src/PracticePanel.tsx` (yeni) | Pratik alanı: konu kartları, ısınma soruları, okuma metni ve tartışma soruları. Seçmeli ve kelime bankası soruları `Lesson.tsx` ile aynı CSS sınıflarıyla (`opt-grid`, `opt`, `bank`, `tok`) çizilir. `Lesson.tsx` içindeki çiziciler ayrı bileşen olmadığı için yeniden kullanılmaz; can ve ilerleme mantığı da alınmaz. |
 | `src/TutorCall.tsx` | `practice` durumu, alt çubuktaki buton, yeni eylemlerin işleyicileri ve `practice-open` yerleşim sınıfı. |
 | `src/styles.css` | Pratik açıkken kullanılan grid (aşağıda). |
 | `src/locales/*.json` | Yeni anahtarlar, 5 dilde (en, tr, de, fr, es). |
