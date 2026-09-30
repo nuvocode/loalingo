@@ -5,6 +5,7 @@ import { getCached, listMistakes, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
+import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
@@ -228,4 +229,15 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
   ].join("\n"));
   await putCached(enrollmentId, key, g);
   return g;
+}
+
+// ---- Tutor call (spec T): the tutor's reply to one event ----
+
+export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent) {
+  const ch = CHARACTERS[who];
+  const system = tutorSystem({
+    name: ch.name, persona: ch.persona, target: c.course.name, native: langEn(c.native), level: c.level,
+    unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit),
+  });
+  return generate(tutorSchema, system, tutorPrompt(ch.name, history, notes, event), undefined, looseTutor);
 }
