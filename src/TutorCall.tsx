@@ -51,7 +51,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const [micBlock, setMicBlock] = useState<string | null>(null); // i18n key: why the mic can't be used
   const [camOn, setCamOn] = useState(false);
   const [camOk, setCamOk] = useState(true);
-  const [drawer, setDrawer] = useState(false);
+  const [drawer, setDrawer] = useState(false); // messages popup
+  const [captions, setCaptions] = useState(false); // transcript of what was said
   const [text, setText] = useState("");
   const [now, setNow] = useState(Date.now());
   const [result, setResult] = useState<(Result & { fixes: string[] }) | null>(null);
@@ -128,7 +129,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       mic.current = m; c.micOn = true; setMicOn(true);
       if (announce) fire({ kind: "mic", on: true });
       else if (!c.running) armSilence();
-    } catch { setMicBlock("tutor.micDenied"); setDrawer(true); }
+    } catch { setMicBlock("tutor.micDenied"); }
     finally { c.micStarting = false; }
   };
   const micStop = () => {
@@ -171,7 +172,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       c.opened = true;
       sttReady().then((ok) => {
         if (ok && s.speakOn) return micStart(false);
-        setMicBlock(ok ? "stt.off" : "stt.unavailable"); setDrawer(true);
+        setMicBlock(ok ? "stt.off" : "stt.unavailable");
       });
       fire({ kind: "start" });
     }
@@ -181,6 +182,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
 
   const faceState: FaceState = thinking ? "thinking" : talking ? "talking" : "idle";
   const micLabel = t(micOn ? "tutor.micOff" : "tutor.micOn"), camLabel = t(camOn ? "tutor.camOff" : "tutor.camOn");
+  const spoken = msgs.filter((m) => m.via === "voice"), typed = msgs.filter((m) => m.via === "text"); // ponytail: the tutor only speaks for now; a "message" action would add tutor lines to `typed`
+  const lastTutor = spoken.filter((m) => m.from === "tutor").pop();
+  const capLabel = t(captions ? "tutor.transcriptOff" : "tutor.transcriptOn");
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
     body = <>
@@ -193,23 +197,27 @@ export function TutorCall({ who }: { who: CharacterId }) {
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else {
     body = err ? <Failed msg={err} retry={retry} quit={quit} /> : (
-      <div className={`call-grid${drawer ? " with-drawer" : ""}`}>
-        <section className="call-pane" aria-label={ch.name}>
-          <Face spec={ch.face} color={ch.color} size={200} label={ch.name} state={faceState} />
-          <b>{ch.name}</b>
-          {last?.say && <button className="call-caption" lang={lang} onClick={() => setShowTr((v) => !v)}>
-            <span>{last.say}</span>{showTr && <small>{last.translation}</small>}
-          </button>}
+      <div className="call-grid">
+        <section className="call-pane tutor" aria-label={ch.name}>
+          <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} />
+          <b className="call-name">{ch.name}</b>
           {last?.correction.trim() && <p className="call-fix small"><Icon name="spark" /> {last.correction}</p>}
+          {captions && <div className="call-transcript" lang={lang} aria-live="polite" ref={(el) => el?.scrollTo(0, el.scrollHeight)}>
+            {spoken.map((m, i) => m === lastTutor
+              ? <button key={i} className="call-line" onClick={() => setShowTr((v) => !v)}><b>{ch.name}:</b> {m.text}{showTr && last?.translation && <small>{last.translation}</small>}</button>
+              : <p key={i} className="call-line"><b>{m.from === "me" ? profile?.name : ch.name}:</b> {m.text}</p>)}
+          </div>}
         </section>
         <section className="call-pane me" ref={ring} aria-label={profile?.name}>
           {camOn
             ? <video className="call-video" autoPlay muted playsInline ref={(el) => { if (el && el.srcObject !== cam.current) el.srcObject = cam.current; }} />
-            : profile && <><Avatar p={profile} size={96} /><b>{profile.name}</b></>}
+            : profile && <Avatar p={profile} size={96} />}
+          {profile && <b className="call-name">{profile.name}</b>}
         </section>
         {drawer && <section className="call-drawer" aria-label={t("tutor.message")}>
           <div className="chat">
-            {msgs.map((m, i) => <div key={i} className={`bubble${m.from === "me" ? " me" : ""}`} lang={lang}><span>{m.text}</span></div>)}
+            {typed.length ? typed.map((m, i) => <div key={i} className="bubble me" lang={lang}><span>{m.text}</span></div>)
+              : <p className="small muted">{t("tutor.noMessages")}</p>}
           </div>
           <input className="input" lang={lang} value={text} autoFocus aria-label={t("roleplay.message")} placeholder={t("tutor.placeholder")}
             onChange={(e) => setText(e.target.value)}
@@ -219,7 +227,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     );
     footer = (
       <div className="call-bar">
-        <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-label={t("tutor.message")} title={t("tutor.message")}><Icon name="chat" /></button>
+        <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-expanded={drawer} aria-label={t("tutor.message")} title={t("tutor.message")}><Icon name="chat" /></button>
+        <button className={`call-btn${captions ? " on" : ""}`} onClick={() => setCaptions((v) => !v)} aria-pressed={captions} aria-label={capLabel} title={capLabel}><Icon name="captions" /></button>
         <button className={`call-btn${micOn ? " on" : " off"}`} disabled={!!micBlock} onClick={toggleMic} aria-pressed={micOn} aria-label={micLabel} title={micBlock ? t(micBlock) : micLabel}><Icon name="mic" /></button>
         <button className={`call-btn${camOn ? " on" : " off"}`} disabled={!camOk} onClick={toggleCam} aria-pressed={camOn} aria-label={camLabel} title={camOk ? camLabel : t("tutor.camDenied")}><Icon name="video" /></button>
         <button className="call-btn end" onClick={end} aria-label={t("tutor.end")} title={t("tutor.end")}><Icon name="phone" /></button>

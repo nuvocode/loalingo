@@ -8,7 +8,7 @@ import { FaceArt } from "./parts";
 export type FaceState = "idle" | "thinking" | "talking";
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function Face({ spec, color, size, label, state = "idle" }: { spec: FaceSpec; color: string; size: number; label: string; state?: FaceState }) {
+export function Face({ spec, color, size, label, state = "idle" }: { spec: FaceSpec; color: string; size?: number; label: string; state?: FaceState }) {
   const ref = useRef<HTMLSpanElement>(null);
   const set = (k: string, v: string) => ref.current?.style.setProperty(k, v);
 
@@ -34,7 +34,7 @@ export function Face({ spec, color, size, label, state = "idle" }: { spec: FaceS
 
   return (
     <span ref={ref} className={`face ${state}`} role="img" aria-label={label} style={{ width: size, height: size, "--c": color } as React.CSSProperties}>
-      <svg viewBox="0 0 200 200" aria-hidden="true"><FaceArt spec={spec} /></svg>
+      <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><FaceArt spec={spec} /></svg>
     </span>
   );
 }

@@ -560,6 +560,9 @@
     "end": "Aramayı bitir",
     "placeholder": "Mesaj yaz — tutor sesli cevap verir",
     "done": "Ders tamamlandı!",
-    "corrections": "Bu dersteki düzeltmeler"
+    "corrections": "Bu dersteki düzeltmeler",
+    "transcriptOn": "Transkripti göster",
+    "transcriptOff": "Transkripti gizle",
+    "noMessages": "Henüz mesaj yok"
   }
 }

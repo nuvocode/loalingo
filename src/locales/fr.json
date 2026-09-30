@@ -581,6 +581,9 @@
     "end": "Raccrocher",
     "placeholder": "Écris un message — ton tuteur répond à voix haute",
     "done": "Cours terminé !",
-    "corrections": "Corrections de ce cours"
+    "corrections": "Corrections de ce cours",
+    "transcriptOn": "Afficher la transcription",
+    "transcriptOff": "Masquer la transcription",
+    "noMessages": "Pas encore de messages"
   }
 }
