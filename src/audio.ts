@@ -18,3 +18,10 @@ export function remember<K, V>(m: Map<K, V>, k: K, v: V, max = 20) {
   m.set(k, v);
   if (m.size > max) m.delete(m.keys().next().value as K);
 }
+
+/** Speech loudness (RMS of the last audio frame) → mouth openness 0..1. Opens fast, closes slower so it doesn't flicker. */
+export function mouthLevel(prev: number, rms: number, dt: number): number {
+  const target = Math.min(1, Math.max(0, (rms - 0.02) / 0.18)); // ~0.02 is silence, ~0.2 a loud syllable
+  const tau = target > prev ? 0.04 : 0.12; // seconds
+  return prev + (target - prev) * (1 - Math.exp(-dt / tau));
+}
