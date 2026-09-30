@@ -105,6 +105,7 @@ test("describePractice tells the tutor what is on screen", () => {
   let dis = next(next(next(answer(next(answer(st, "like")), "I like tea")))); // → reading → comprehension → discussion
   assert.equal(dis.stage, "discussion");
   assert.match(describePractice(dis, ts), /question 1 of 2: "Q1\?"/);
+  assert.ok(!describePractice(dis, ts).includes("Q2?"), "the next question stays hidden, or the tutor asks it twice");
   dis = next(dis);
   assert.match(describePractice(dis, ts), /ask you this question/);
 });

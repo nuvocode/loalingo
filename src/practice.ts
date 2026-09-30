@@ -147,15 +147,16 @@ export function describePractice(st: PracticeState | null, topics: Topic[]): str
         : "The learner has not answered yet. If they give an answer aloud or in the chat (\"I think it's like\", \"number 2\"), copy it into `answer` (the option's text or number, or the whole sentence for word tiles) and leave `say` empty: the app checks it and tells you the result. Never ask them to tap the screen instead.",
     ].filter(Boolean).join("\n");
   }
-  if (st.stage === "reading") return `Stage: reading. On screen, the text "${set.reading.title}": ${set.reading.text}\nWhen the learner is ready for the questions, set \`answer\` to "next".`;
+  if (st.stage === "reading") return `Stage: reading. On screen, the text "${set.reading.title}": ${set.reading.text}\nWhen the learner is ready for the questions, set \`answer\` to "next" and do not ask a question yet: the app shows it and asks you to introduce it.`;
   if (st.stage === "discussion") {
     const q = set.discussion, lastQ = st.i === q.length - 1;
     return [
-      `Stage: discussion, question ${st.i + 1} of ${q.length}: "${q[st.i]}". All questions on screen: ${q.map((x, k) => `${k + 1}. ${x}`).join(" ")}`,
+      // Only the current question: shown the rest, the model asks the next one before the app moves on, then again after.
+      `Stage: discussion, question ${st.i + 1} of ${q.length}: "${q[st.i]}".`,
       `They build on the reading text: ${set.reading.text}`,
       lastQ ? "This is the last question: ask the learner to ask you this question, then answer it from your own experience."
         : "Ask it, react to the learner's answer, share a short story of your own (up to 3 sentences) and ask at most one follow-up.",
-      `When this question has been talked through, set \`answer\` to "next".`,
+      `When this question has been talked through, set \`answer\` to "next" and only close it (e.g. "Nice story!"): the app then shows the next question and asks you to introduce it.`,
     ].join("\n");
   }
   return "The practice is finished.";

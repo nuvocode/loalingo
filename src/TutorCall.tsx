@@ -85,7 +85,12 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (!line.trim() || c.over) return;
     c.speaking = true; mic.current?.pause(); setTalking(true); // the mic would hear the tutor
     try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }); } catch { /* the caption still shows it */ }
-    finally { c.speaking = false; setTalking(false); mic.current?.resume(); }
+    finally {
+      c.speaking = false; setTalking(false);
+      // The speakers are still ringing out when playback ends: resumed at once, the mic heard the tutor's last words
+      // as the learner's (a second "hello"). ponytail: fixed 400 ms, measure the output latency if a headset still echoes.
+      setTimeout(() => { if (!c.speaking) mic.current?.resume(); }, 400);
+    }
   };
 
   /** One event → one reply, spoken. False when the model call failed. */
@@ -106,11 +111,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
       if (r.action === "stop_practice") practiceClose();
       // `answer` only relays what the learner said; on app events the model sometimes invents a "next" and skips a step.
       // If the screen changed meanwhile (Next, a click), the answer was for the old one.
-      if (c.pr && c.pr === screen && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
+      const a = c.pr && c.pr === screen && (e.kind === "user_said" || e.kind === "user_typed") ? r.answer.trim() : "";
+      const moveOn = a.toLowerCase() === "next";
+      if (a && !moveOn) answerField(a);
       await voice(r.say);
+      if (moveOn && c.pr === screen) answerField(a); // after the tutor has closed the step, not while it is still talking about it
       // The tutor has announced the reading; the app reads it aloud, then the tutor asks if it was understood.
       if (e.kind === "practice_item" && screen?.stage === "reading" && c.pr === screen && screen.set) { await voice(screen.set.reading.text); fire({ kind: "practice_read" }); }
-      if (e.kind === "practice_answer") advance(); // the tutor has explained the answer: on to the next exercise
+      // The tutor has explained the answer: on to the next exercise, unless the learner already pressed Next.
+      if (e.kind === "practice_answer" && c.pr === screen) advance();
       if (r.action === "end") finish();
       return true;
     } catch (x) {
