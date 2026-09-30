@@ -2,16 +2,33 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
-import { getSetting, setSetting } from "../db";
-import { loadKokoro, speak } from "../tts";
+import { setSetting } from "../db";
+import { loadKokoro, loadPiper, speak, ttsProvider, type TtsProvider } from "../tts";
+import { Icon } from "../icons";
 import { deepgramTranscribe, getDeepgramKey, resetSttReady, setDeepgramKey, sttProvider, type SttProvider } from "../stt";
 import { wav16 } from "../wav";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 const sheet = { ...gap("14px"), textAlign: "left" } as React.CSSProperties;
 
-type TtsProvider = "system" | "kokoro";
-const ttsProvider = async (): Promise<TtsProvider> => ((await getSetting("tts")) === "kokoro" ? "kokoro" : "system");
+const TTS = [
+  { p: "system", bars: 1, color: "var(--orange)" },
+  { p: "piper", bars: 2, color: "var(--gold)" },
+  { p: "kokoro", bars: 3, color: "var(--green)" },
+] as const;
+const ttsName = (p: TtsProvider) => `settings.tts${p[0].toUpperCase()}${p.slice(1)}`;
+const HELLO: Record<string, string> = {
+  en: "Hello! Nice to meet you. How are you today?", tr: "Merhaba! Tanıştığıma memnun oldum. Bugün nasılsın?",
+  de: "Hallo! Schön, dich kennenzulernen. Wie geht es dir heute?", fr: "Bonjour ! Ravi de te rencontrer. Comment vas-tu aujourd'hui ?",
+  es: "¡Hola! Encantado de conocerte. ¿Cómo estás hoy?",
+};
+
+/** Voice quality as signal bars: more bars, more natural. */
+const Signal = ({ bars, color }: { bars: number; color: string }) => (
+  <svg className="tts-signal" viewBox="0 0 20 20" aria-hidden="true" style={{ color }}>
+    {[0, 1, 2].map((k) => <rect key={k} x={2 + k * 6} y={12 - k * 5} width="4" height={6 + k * 5} rx="1.5" fill="currentColor" opacity={k < bars ? 1 : 0.25} />)}
+  </svg>
+);
 
 export function TtsRow() {
   const { t } = useTranslation();
@@ -20,7 +37,7 @@ export function TtsRow() {
   useEffect(() => { ttsProvider().then(setV); }, []);
   return (
     <div className="card od-row" style={gap("12px")}>
-      <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t(v === "kokoro" ? "settings.ttsKokoro" : "settings.ttsSystem")}</span></span>
+      <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t(ttsName(v))}</span></span>
       <button className="btn btn-ghost" onClick={() => openSheet(<TtsSheet initial={v} onChange={setV} />)}>{t("settings.change")}</button>
     </div>
   );
@@ -28,18 +45,20 @@ export function TtsRow() {
 
 function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: TtsProvider) => void }) {
   const { t } = useTranslation();
-  const { closeSheet } = useApp();
+  const { course, closeSheet } = useApp();
+  const lang = course?.iso ?? "en";
   const [v, setV] = useState(initial);
-  const [pct, setPct] = useState<number | null>(null); // Kokoro download running
+  const [pct, setPct] = useState<number | null>(null); // a local voice downloading
   const [err, setErr] = useState("");
-  // Picking saves; Kokoro only once its model has loaded, otherwise the choice stays where it was.
+  const [info, setInfo] = useState(false);
+  // Picking saves; a local voice only once its model has loaded, otherwise the choice stays where it was.
   const pick = async (next: TtsProvider) => {
     if (pct !== null || next === v) return;
     setErr("");
-    if (next === "kokoro") {
+    if (next !== "system") {
       setPct(0);
-      try { await loadKokoro(setPct); }
-      catch (e) { setErr(t("voice.loadFailed", { error: (e as Error).message })); setPct(null); return; }
+      try { await (next === "kokoro" ? loadKokoro(setPct) : loadPiper(lang, setPct)); }
+      catch (e) { setErr(t("voice.loadFailed", { name: t(ttsName(next)), error: (e as Error).message })); setPct(null); return; }
       setPct(null);
     }
     await setSetting("tts", next);
@@ -48,15 +67,22 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
   return (
     <div className="od-stack" style={sheet}>
       <h3 style={{ textAlign: "center" }}>{t("settings.tts")}</h3>
-      <div className="seg" role="radiogroup" aria-label={t("settings.tts")}>
-        {(["system", "kokoro"] as const).map((p) => (
-          <button key={p} role="radio" aria-checked={v === p} className={`btn ${v === p ? "btn-blue" : "btn-ghost"}`} disabled={pct !== null} onClick={() => pick(p)}>
-            {t(p === "kokoro" ? "settings.ttsKokoro" : "settings.ttsSystem")}
-          </button>
+      <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.tts")}>
+        {TTS.map(({ p, bars, color }) => (
+          <div key={p} className={`tts-option${v === p ? " on" : ""}`}>
+            <button role="radio" aria-checked={v === p} disabled={pct !== null} onClick={() => pick(p)}>
+              <Signal bars={bars} color={color} />
+              <span className="od-field od-fill"><b>{t(ttsName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
+            </button>
+            {p === "kokoro" && (
+              <span className="tts-info">
+                <button className="icon-btn" aria-label={t("voice.about")} aria-expanded={info} onClick={() => setInfo(!info)}><Icon name="info" /></button>
+                <span className={`tts-tip${info ? " open" : ""}`} role="tooltip">{t("voice.kokoroDesc")} {t("voice.englishOnly")}</span>
+              </span>
+            )}
+          </div>
         ))}
       </div>
-      <p className="small">{t("voice.kokoroDesc")}</p>
-      <p className="muted small">{t("voice.englishOnly")}</p>
       {pct !== null && (
         <div className="od-stack" style={gap("6px")} role="status">
           <div className="progress-track"><div className="progress-fill green" style={{ width: `${Math.round(pct * 100)}%` }} /></div>
@@ -64,8 +90,10 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
         </div>
       )}
       {err && <p className="small" role="status" style={{ color: "var(--red)", overflowWrap: "anywhere" }}>{err}</p>}
-      <button className="btn btn-blue btn-block" disabled={pct !== null} onClick={() => speak("Hello! Nice to meet you. How are you today?", "en-US", { gender: "f" })}>{t("voice.listen")}</button>
-      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <button className="btn btn-blue btn-block" disabled={pct !== null} onClick={() => speak(HELLO[lang] ?? HELLO.en, lang, { gender: "f" })}>{t("voice.listen")}</button>
+        <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      </div>
     </div>
   );
 }

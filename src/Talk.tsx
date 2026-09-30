@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { sfx } from "./Lesson";
-import { loadKokoro, speak, stopSpeaking, usesKokoro } from "./tts";
+import { prewarm, speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
@@ -81,9 +81,9 @@ export function Done({ title, r }: { title: string; r: Result }) {
   );
 }
 
-/** Loads Kokoro while the first line is being written, so its voice is not waiting on the model too. */
-export function usePrewarm(lang: string) {
-  useEffect(() => { usesKokoro(lang).then((k) => { if (k) return loadKokoro(); }).catch(() => {}); }, [lang]);
+/** Loads the local voice while the first line is being written, so its voice is not waiting on the model too. */
+export function usePrewarm(lang: string, gender?: "f" | "m") {
+  useEffect(() => { prewarm(lang, gender && { gender }).catch(() => {}); }, [lang, gender]);
 }
 
 /** Asks before leaving a story or chat that is under way. */
@@ -232,7 +232,7 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     setVoicing(i);
     speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }).finally(() => setVoicing((v) => v === i ? null : v));
   };
-  usePrewarm(lang);
+  usePrewarm(lang, ch.gender);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState("");

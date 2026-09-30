@@ -36,7 +36,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const lang = course?.iso ?? "en";
   const levelDef = course && enrollment ? course.levels[enrollment.level] : undefined;
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
-  usePrewarm(lang);
+  usePrewarm(lang, ch.gender);
 
   const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);

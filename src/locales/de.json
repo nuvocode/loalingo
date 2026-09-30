@@ -288,6 +288,7 @@
     "advanced": "Erweitert",
     "tts": "Sprachausgabe",
     "ttsSystem": "Systemstimme",
+    "ttsPiper": "Piper (lokal, schnell)",
     "stt": "Spracherkennung",
     "sttWhisper": "Whisper (lokal)",
     "ttsKokoro": "Kokoro (lokal, natürlich)",
@@ -462,13 +463,17 @@
     "kokoroDesc": "Eine natürlichere Stimme. Je nach Geschwindigkeit deines Computers kann sie pro Satz einige Sekunden brauchen.",
     "englishOnly": "Kokoro spricht nur Englisch; andere Sprachen nutzen die Systemstimme.",
     "downloading": "Stimme wird heruntergeladen… {{pct}} %",
-    "loadFailed": "Kokoro konnte nicht geladen werden: {{error}}. Es bleibt bei der Systemstimme.",
+    "loadFailed": "{{name}} konnte nicht geladen werden: {{error}}. Die aktuelle Stimme bleibt.",
     "listen": "Anhören",
     "whisperDesc": "Läuft auf diesem Mac. Deine Stimme verlässt den Computer nie.",
     "deepgramDesc": "Läuft in der Cloud. Deine Aufnahme wird an Deepgram gesendet.",
     "deepgramKey": "Deepgram-API-Schlüssel",
     "connected": "Verbindung OK",
-    "saved": "Spracheinstellungen gespeichert"
+    "saved": "Spracheinstellungen gespeichert",
+    "systemGood": "Am schnellsten, klingt aber roboterhaft.",
+    "piperGood": "Realistisch und schnell, etwas roboterhaft.",
+    "kokoroGood": "Am realistischsten; kann kurz verzögern.",
+    "about": "Über Kokoro"
   },
   "data": {
     "section": "Daten",

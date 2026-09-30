@@ -285,6 +285,7 @@
     "advanced": "Gelişmiş",
     "tts": "Seslendirme",
     "ttsSystem": "Sistem sesi",
+    "ttsPiper": "Piper (yerel, hızlı)",
     "stt": "Konuşma tanıma",
     "sttWhisper": "Whisper (yerel)",
     "ttsKokoro": "Kokoro (yerel, doğal)",
@@ -457,13 +458,17 @@
     "kokoroDesc": "Daha doğal bir ses. Bilgisayarının hızına göre cümle başına birkaç saniye sürebilir.",
     "englishOnly": "Kokoro yalnız İngilizce seslendirir; diğer dillerde sistem sesi kullanılır.",
     "downloading": "Ses indiriliyor… %{{pct}}",
-    "loadFailed": "Kokoro yüklenemedi: {{error}}. Sistem sesinde kalındı.",
+    "loadFailed": "{{name}} yüklenemedi: {{error}}. Mevcut seste kalındı.",
     "listen": "Dinle",
     "whisperDesc": "Bu Mac'te çalışır. Sesin bilgisayardan çıkmaz.",
     "deepgramDesc": "Bulutta çalışır. Kaydın Deepgram'a gönderilir.",
     "deepgramKey": "Deepgram API anahtarı",
     "connected": "Bağlantı tamam",
-    "saved": "Ses ayarları kaydedildi"
+    "saved": "Ses ayarları kaydedildi",
+    "systemGood": "En hızlısı, ama robotik bir ses.",
+    "piperGood": "Gerçekçi ve hızlı, biraz robotik.",
+    "kokoroGood": "En gerçekçi ses; biraz gecikebilir.",
+    "about": "Kokoro hakkında"
   },
   "data": {
     "section": "Veri",
