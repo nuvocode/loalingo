@@ -16,6 +16,7 @@
     "useDefault": "Usar la carpeta predeterminada"
   },
   "nav": {
+    "live": "Clase en vivo",
     "main": "Navegación principal",
     "bottom": "Navegación inferior",
     "more": "Más",

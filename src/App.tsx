@@ -15,7 +15,7 @@ import { CHARACTERS, parseTalkId, type CharacterId } from "./characters";
 import { Learn } from "./screens/Learn";
 import { Settings } from "./screens/Settings";
 import { Avatar, ProfileGate, useLangName } from "./screens/Profiles";
-import { Practice, League, Shop, Profile, Stories, Roleplay, Friends, Notifications } from "./screens/Screens";
+import { Practice, League, Shop, Profile, Stories, Roleplay, Friends, Notifications, TutorSheet } from "./screens/Screens";
 
 const NAV: { id: Route; icon: IconName }[] = [
   { id: "learn", icon: "home" }, { id: "practice", icon: "dumbbell" }, { id: "league", icon: "trophy" },
@@ -124,6 +124,9 @@ export default function App() {
         <aside className="sidebar" aria-label={t("nav.main")}>
           <div className="logo">sprigo</div>
           <nav>
+            <button className="nav-live" onClick={() => openSheet(<TutorSheet />)}>
+              <Icon name="video" /><span>{t("nav.live")}</span><i className="live-dot" aria-hidden="true" />
+            </button>
             {NAV.map((n) => <NavBtn key={n.id} {...n} />)}
             <div style={{ margin: "14px 12px 6px", fontSize: 11, fontWeight: 900, letterSpacing: "1.2px", color: "var(--text-faint)", textTransform: "uppercase" }}>
               {t("nav.more")}

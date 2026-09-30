@@ -16,8 +16,8 @@ const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
 });
 
-/** Picks the tutor for a video lesson (spec T). */
-function TutorSheet() {
+/** Picks the tutor for a video lesson (spec T); also opened from the sidebar's live lesson button. */
+export function TutorSheet() {
   const { t } = useTranslation();
   const { closeSheet } = useApp();
   const start = useStartLesson();

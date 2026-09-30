@@ -16,6 +16,7 @@
     "useDefault": "Use the default folder"
   },
   "nav": {
+    "live": "Live lesson",
     "main": "Main navigation",
     "bottom": "Bottom navigation",
     "more": "More",
