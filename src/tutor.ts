@@ -16,6 +16,7 @@ export type TutorEvent =
   // Practice together (spec P): what the screen shows is passed separately, see describePractice in src/practice.ts.
   | { kind: "practice_opened" }
   | { kind: "practice_item" }
+  | { kind: "practice_read" }
   | { kind: "practice_answer"; correct: boolean; given: string; expected: string }
   | { kind: "practice_stuck" }
   | { kind: "practice_done"; score: number; total: number };
@@ -69,7 +70,8 @@ export function describeEvent(e: TutorEvent): string {
     case "mic": return e.on ? "The learner turned their microphone on." : "The learner turned their microphone off; they can still type.";
     case "cam": return e.on ? "The learner turned their camera on." : "The learner turned their camera off.";
     case "practice_opened": return "The learner opened the practice panel with its button. Check the last few messages: if neither of you mentioned practising or exercises, do not ask for a topic yet; ask whether they meant to open it, and use stop_practice if it was a mistake. Only if practising was just discussed, ask which topic to practise.";
-    case "practice_item": return "A new practice step is on the screen. Introduce it briefly and read out any sentence the learner works with, without giving the answer. In the reading stage you have just read the text aloud: ask if the learner understood it and is ready for the questions.";
+    case "practice_item": return "A new practice step is on the screen. Introduce it briefly and read out any sentence the learner works with, without giving the answer. If the screen now shows the reading, the warm-up is over and the practice goes on: lead into the text in one short sentence (e.g. 'Great warm-up! Now let's read a short text about…'). Do not ask whether to continue, and do not read the text or ask about it: the app reads it aloud right after you.";
+    case "practice_read": return "You have just read the reading text aloud. Ask if the learner understood it and is ready for the questions.";
     case "practice_answer": return e.correct
       ? `The learner answered "${e.given}" on the screen, which is correct. Say briefly why it is right.`
       : `The learner answered "${e.given}" on the screen, which is wrong; the correct answer is "${e.expected}". Say directly why it is wrong, then why the correct answer is right.`;
