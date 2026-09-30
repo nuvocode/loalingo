@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { sfx } from "./Lesson";
-import { speak, stopSpeaking } from "./tts";
+import { loadKokoro, speak, stopSpeaking, usesKokoro } from "./tts";
 import { MicButton } from "./Mic";
 import { CHARACTERS, FREE_GOAL, type CharacterId } from "./characters";
 import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
@@ -80,6 +80,11 @@ function Done({ title, r }: { title: string; r: Result }) {
   );
 }
 
+/** Loads Kokoro while the first line is being written, so its voice is not waiting on the model too. */
+function usePrewarm(lang: string) {
+  useEffect(() => { usesKokoro(lang).then((k) => { if (k) return loadKokoro(); }).catch(() => {}); }, [lang]);
+}
+
 /** Asks before leaving a story or chat that is under way. */
 function useQuit(active: boolean) {
   const { t } = useTranslation();
@@ -112,6 +117,7 @@ export function Story({ unitId }: { unitId: string }) {
   const [result, setResult] = useState<Result | null>(null);
   const { quit, askQuit } = useQuit(!!story && !result);
   const endRef = useRef<HTMLDivElement>(null);
+  usePrewarm(lang);
 
   useEffect(() => {
     if (!course || !enrollment || !profile || !unit || !level) return;
@@ -194,7 +200,12 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
   const { course, enrollment, profile, s, setS, gainXp } = useApp();
   const ch = CHARACTERS[who];
   const lang = course?.iso ?? "en";
-  const say = (text: string) => speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice });
+  const [voicing, setVoicing] = useState<number | null>(null); // AI message being spoken (or its voice being made)
+  const say = (text: string, i: number) => {
+    setVoicing(i);
+    speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }).finally(() => setVoicing((v) => v === i ? null : v));
+  };
+  usePrewarm(lang);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState("");
@@ -214,7 +225,7 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
       const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang }, who, topic, history);
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
-      say(r.reply);
+      say(r.reply, fixed.length);
       if (r.goal_reached && history.length) setGoal(true);
     } catch (e) { setErr((e as Error).message); setMsgs(history); }
     finally { setBusy(false); }
@@ -250,8 +261,9 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
       </div>
       <div className="chat">
         {msgs.map((m, i) => m.from === "ai" ? (
-          <button key={i} className="bubble" lang={lang} onClick={() => { say(m.text); setOpen((s) => new Set(s).add(i)); }}>
+          <button key={i} className="bubble" lang={lang} aria-busy={voicing === i} onClick={() => { say(m.text, i); setOpen((s) => new Set(s).add(i)); }}>
             <span>{m.text}</span>{open.has(i) && <small>{m.translation}</small>}
+            {voicing === i && <small className="voicing gen-pulse" role="status"><Icon name="headphones" /> {t("ai.speaking")}</small>}
           </button>
         ) : (
           <div key={i} className="bubble me" lang={lang}>

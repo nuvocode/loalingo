@@ -21,6 +21,8 @@
 
 ### B. `goal_reached` hoşgörüsü (`src/lessons.ts`)
 
+> **Uygulamada atlandı:** `.catch(false)` alanı `required`'da tutuyor ama JSON şemasına `"default"` ekliyor; OpenAI strict modunu bozma riski var. A yeterli.
+
 - JSON şemasında alan zorunlu kalır (OpenAI strict mode için), ama parse hoşgörülü olur: `turnSchema` tanımı aynı kalır; `chatTurn` içinde `generate`'e giden şema `turnSchema.extend({ goal_reached: z.boolean().catch(false), correction: z.string().catch("") })` değil — **`z.toJSONSchema` çıktısının değişmediği** doğrulanmadan `.catch` kullanılmaz. Uygulayıcı önce `z.toJSONSchema(z.object({ a: z.boolean().catch(false) }))` çıktısına bakar: `a` hâlâ `required` içindeyse `.catch` doğrudan `turnSchema`'ya eklenir; değilse bu adım atlanır, A tek başına yeterlidir.
 
 ### C. Kokoro Web Worker'da (`src/kokoro.worker.ts` yeni, `src/tts.ts`)
@@ -65,6 +67,10 @@
 4. D: `Talk.tsx` göstergesi + ön ısıtma. — commit.
 
 Her görevden sonra: `pnpm test`, `pnpm -s tsc --noEmit -p .`.
+
+## Uygulamada bulunan
+
+- kokoro-js 1.2.1 `stream(string)` kendi oluşturduğu splitter'ı kapatmıyor; son cümle tamponda kalıp generator hiç bitmiyordu. Worker kapalı bir `TextSplitterStream` veriyor.
 
 ## Doğrulama
 

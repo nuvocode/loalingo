@@ -413,6 +413,7 @@
     "empty": "Bu derste alıştırma yok.",
     "regenerate": "Yeni alıştırmalar üret",
     "thinking": "Düşünüyor…",
+    "speaking": "Konuşuyor…",
     "notSet": "Kurulmadı — dersler kilitli",
     "scanning": "Bu Mac'te yerel model aranıyor…",
     "foundLocal": "Bu Mac'te {{name}} bulundu — bir model seçip kaydet.",

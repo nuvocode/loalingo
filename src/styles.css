@@ -370,6 +370,8 @@ button.bubble:hover{border-color:var(--blue)}
 .bubble.me{align-self:flex-end;border-radius:16px 16px 4px 16px;background:var(--sky);border-color:var(--blue)}
 .bubble .fix{color:var(--orange);display:flex;gap:6px;align-items:flex-start}
 .bubble .fix svg{width:16px;height:16px;flex:none;margin-top:2px}
+.bubble .voicing{color:var(--blue);display:flex;gap:6px;align-items:center}
+.bubble .voicing svg{width:16px;height:16px}
 .bubble.typing{color:var(--text-muted);letter-spacing:3px}
 .story-line{max-width:100%}
 

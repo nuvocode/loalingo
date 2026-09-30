@@ -435,6 +435,7 @@
     "empty": "Esta lección no tiene ejercicios.",
     "regenerate": "Generar ejercicios nuevos",
     "thinking": "Pensando…",
+    "speaking": "Hablando…",
     "notSet": "Sin configurar: las lecciones están bloqueadas",
     "scanning": "Buscando un modelo local en este Mac…",
     "foundLocal": "{{name}} encontrado en este Mac: elige un modelo y guarda.",

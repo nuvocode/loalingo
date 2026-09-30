@@ -418,6 +418,7 @@
     "empty": "This lesson has no exercises.",
     "regenerate": "Generate new exercises",
     "thinking": "Thinking…",
+    "speaking": "Speaking…",
     "notSet": "Not set up — lessons are locked",
     "scanning": "Looking for a local model on this Mac…",
     "foundLocal": "{{name}} found on this Mac — pick a model and save.",
