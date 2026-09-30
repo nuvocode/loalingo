@@ -550,5 +550,21 @@
         "b": "Eine kurze Lektion vor dem Schlafen, und dein Wurzelzähler bleibt bei {{count}} und wächst."
       }
     ]
+  },
+  "tutor": {
+    "card": "Unterricht mit Tutor",
+    "cardDesc": "Eine Live-Videostunde zu deiner aktuellen Einheit",
+    "pick": "Wer soll dich heute unterrichten?",
+    "message": "Nachrichten",
+    "micOn": "Mikrofon einschalten",
+    "micOff": "Mikrofon ausschalten",
+    "micDenied": "Mikrofon nicht verfügbar – schreib stattdessen",
+    "camOn": "Kamera einschalten",
+    "camOff": "Kamera ausschalten",
+    "camDenied": "Kamera nicht verfügbar",
+    "end": "Anruf beenden",
+    "placeholder": "Schreib eine Nachricht – dein Tutor antwortet laut",
+    "done": "Stunde geschafft!",
+    "corrections": "Korrekturen aus dieser Stunde"
   }
 }

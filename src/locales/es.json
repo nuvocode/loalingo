@@ -566,5 +566,21 @@
         "b": "Una lección corta antes de dormir y tu contador de raíces sigue en {{count}} y creciendo."
       }
     ]
+  },
+  "tutor": {
+    "card": "Clase con tutor",
+    "cardDesc": "Una clase en vídeo en directo sobre tu unidad actual",
+    "pick": "¿Quién te da clase hoy?",
+    "message": "Mensajes",
+    "micOn": "Activar micrófono",
+    "micOff": "Silenciar micrófono",
+    "micDenied": "Micrófono no disponible: escribe en su lugar",
+    "camOn": "Activar cámara",
+    "camOff": "Apagar cámara",
+    "camDenied": "Cámara no disponible",
+    "end": "Colgar",
+    "placeholder": "Escribe un mensaje: tu tutor responde en voz alta",
+    "done": "¡Clase terminada!",
+    "corrections": "Correcciones de esta clase"
   }
 }
