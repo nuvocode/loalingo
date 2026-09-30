@@ -72,7 +72,7 @@ function BootErrorScreen({ e }: { e: BootError }) {
 }
 
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS, course } = useApp();
   const langName = useLangName();
   const Screen = SCREENS[route];
@@ -112,7 +112,7 @@ export default function App() {
     tick();
     const h = setInterval(tick, 60_000);
     return () => clearInterval(h);
-  }, [profile?.id, s.reminderOn, s.lastActive, s.reminded, s.streak, course?.iso]);
+  }, [profile?.id, s.reminderOn, s.lastActive, s.reminded, s.streak, course?.iso, i18n.language]);
 
   if (bootError) return <BootErrorScreen e={bootError} />;
   if (!ready) return null;

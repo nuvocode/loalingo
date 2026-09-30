@@ -517,7 +517,7 @@
     "general": [
       {
         "t": "Quel mot t'attend aujourd'hui ? 🌱",
-        "b": "Au programme : {{lang}}. Cinq minutes suffisent."
+        "b": "{{lang}} au programme. Cinq minutes suffisent."
       },
       {
         "t": "Une leçon le temps que le thé infuse ?",
@@ -533,7 +533,7 @@
       },
       {
         "t": "Petits pas, grande langue",
-        "b": "Objectif {{lang}} : une seule leçon aujourd'hui, et ça compte déjà."
+        "b": "{{lang}} : une seule leçon aujourd'hui, et ça compte déjà."
       },
       {
         "t": "C'est l'heure de la gym cérébrale 🧠",

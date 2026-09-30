@@ -534,7 +534,7 @@
       },
       {
         "t": "Bir ders, bir gün daha",
-        "b": "Kök sayacın {{count}} gösteriyor. Bir tane daha ekle?"
+        "b": "Kök sayacın {{count}} gösteriyor. Bir tane daha ekler misin?"
       }
     ],
     "evening": [
