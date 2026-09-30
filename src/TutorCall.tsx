@@ -92,6 +92,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (!course || !enrollment || !profile || !unit) return false;
     if (e.kind.startsWith("practice_") && e.kind !== "practice_done" && !c.pr) return true; // the panel was closed meanwhile
     if (e.kind === "practice_item" && c.pr?.stage === "reading" && c.pr.set) await voice(c.pr.set.reading.text);
+    const screen = c.pr; // what the learner was looking at when they spoke
     setThinking(true); setErr("");
     try {
       const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics));
@@ -103,7 +104,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
       if (r.action === "start_practice") practiceOpen(false);
       if (r.action === "stop_practice") practiceClose();
       // `answer` only relays what the learner said; on app events the model sometimes invents a "next" and skips a step.
-      if (c.pr && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
+      // If the screen changed meanwhile (Next, a click), the answer was for the old one.
+      if (c.pr && c.pr === screen && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
       await voice(r.say);
       if (e.kind === "practice_answer") advance(); // the tutor has explained the answer: on to the next exercise
       if (r.action === "end") finish();
@@ -168,7 +170,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     fire({ kind: "practice_answer", ...after.last });
   };
   const advance = () => {
-    if (!c.pr) return;
+    if (!c.pr || c.pr.stage === "topics") return; // a late reply after the panel was reopened
+    c.queue.length = 0; // input queued for the old screen would be graded against the new one; it stays in the history
     const n = next(c.pr);
     if (n.stage === "done") { practiceClose(); return fire({ kind: "practice_done", score: n.score, total: n.total }); }
     setPractice(n); fire({ kind: "practice_item" });

@@ -105,11 +105,11 @@ export function currentItem(st: PracticeState): Item | null {
 
 export const expected = (it: Item) => (it.kind === "choice" ? it.options[it.answer] : it.kind === "bank" ? it.answer.join(" ") : "");
 
-/** Which option an answer means: its text, or its number as shown on screen ("2"). -1 for none. */
+/** Which option an answer means: its text, else its number as shown on screen ("2"). -1 for none. */
 function optionIndex(it: Extract<Item, { kind: "choice" }>, given: string) {
-  const g = normalize(given), n = Number(g);
-  if (g && Number.isInteger(n) && n >= 1 && n <= it.options.length) return n - 1;
-  return it.options.findIndex((o) => normalize(o) === g);
+  const g = normalize(given), n = Number(g), k = it.options.findIndex((o) => normalize(o) === g);
+  if (k >= 0 || !g) return k; // text first: in a numbers unit a clicked "3" may be option 1
+  return Number.isInteger(n) && n >= 1 && n <= it.options.length ? n - 1 : -1;
 }
 
 /** Whether the app can grade this answer: one of a choice's options, or any sentence for word tiles. */

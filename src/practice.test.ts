@@ -88,6 +88,12 @@ test("accepts: an option's text or number for choices, any sentence for word til
   assert.ok(!accepts(bank, " "));
 });
 
+test("an option's text wins over its number: clicking \"3\" in a numbers unit", () => {
+  const nums = { kind: "choice", prompt: "three", options: ["3", "1", "2"], answer: 0 } as unknown as Item;
+  const set: PracticeSet = { warmup: [nums], reading: { title: "", text: "" }, comprehension: [], discussion: [] };
+  assert.equal(answer(begin(openPractice(), set), "3").last?.correct, true);
+});
+
 test("describePractice tells the tutor what is on screen", () => {
   const ts = practiceTopics(course, "A1", new Set(["s1", "s2", "s3"]));
   assert.match(describePractice(null, ts), /closed.*Greetings, Food/);
