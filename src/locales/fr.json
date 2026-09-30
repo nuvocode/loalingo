@@ -16,6 +16,7 @@
     "useDefault": "Utiliser le dossier par défaut"
   },
   "nav": {
+    "live": "Cours en direct",
     "main": "Navigation principale",
     "bottom": "Navigation du bas",
     "more": "Plus",
