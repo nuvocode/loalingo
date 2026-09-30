@@ -99,8 +99,6 @@
     "rulesSeed": "Die Woche endet Sonntag um 23:59 Uhr. Die Top {{up}} steigen auf.",
     "rulesTop": "Die Woche endet Sonntag um 23:59 Uhr. Die letzten {{down}} steigen ab.",
     "timeLeft": "Noch {{days}} Tage {{hours}} Stunden",
-    "you": "Du",
-    "youSuffix": " (Du)",
     "matchSection": "Zeitlimit-Event: Word Rush",
     "matchName": "Paare in 90 Sekunden",
     "play": "Spielen",

@@ -98,8 +98,6 @@
     "rulesSeed": "Hafta Pazar 23:59'da biter. İlk {{up}} yükselir.",
     "rulesTop": "Hafta Pazar 23:59'da biter. Son {{down}} düşer.",
     "timeLeft": "{{days}} gün {{hours}} saat kaldı",
-    "you": "Sen",
-    "youSuffix": " (Sen)",
     "matchSection": "Süreli etkinlik: Kelime Yarışı",
     "matchName": "90 saniyede eşleştir",
     "play": "Oyna",

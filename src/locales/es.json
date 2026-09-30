@@ -106,8 +106,6 @@
     "rulesSeed": "La semana termina el domingo a las 23:59. Los {{up}} primeros suben.",
     "rulesTop": "La semana termina el domingo a las 23:59. Los {{down}} últimos bajan.",
     "timeLeft": "Quedan {{days}} d {{hours}} h",
-    "you": "Tú",
-    "youSuffix": " (Tú)",
     "matchSection": "Evento cronometrado: Word Rush",
     "matchName": "Une parejas en 90 segundos",
     "play": "Jugar",
