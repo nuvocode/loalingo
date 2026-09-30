@@ -46,6 +46,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const started = useRef(Date.now());
 
   const [msgs, setMsgs] = useState<TutorMsg[]>([]);
+  const chat = useRef<HTMLDivElement>(null), transcript = useRef<HTMLDivElement>(null);
   const [last, setLast] = useState<TutorReply | null>(null);
   const [thinking, setThinking] = useState(false);
   const [talking, setTalking] = useState(false);
@@ -91,7 +92,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const step = async (e: TutorEvent) => {
     if (!course || !enrollment || !profile || !unit) return false;
     if (e.kind.startsWith("practice_") && e.kind !== "practice_done" && !c.pr) return true; // the panel was closed meanwhile
-    if (e.kind === "practice_item" && c.pr?.stage === "reading" && c.pr.set) await voice(c.pr.set.reading.text);
+    if (e.kind === "practice_read" && c.pr?.stage !== "reading") return true; // the learner moved on before the text was read
     const screen = c.pr; // what the learner was looking at when they spoke
     setThinking(true); setErr("");
     try {
@@ -107,6 +108,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
       // If the screen changed meanwhile (Next, a click), the answer was for the old one.
       if (c.pr && c.pr === screen && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
       await voice(r.say);
+      // The tutor has announced the reading; the app reads it aloud, then the tutor asks if it was understood.
+      if (e.kind === "practice_item" && screen?.stage === "reading" && c.pr === screen && screen.set) { await voice(screen.set.reading.text); fire({ kind: "practice_read" }); }
       if (e.kind === "practice_answer") advance(); // the tutor has explained the answer: on to the next exercise
       if (r.action === "end") finish();
       return true;
@@ -249,6 +252,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const tick = setInterval(() => setNow(Date.now()), 1000);
     return () => { clearInterval(tick); c.over = true; clearSilence(); void mic.current?.stop(); mic.current = null; camStop(); stopSpeaking(); };
   }, []);
+  // New lines, or a list just opened: show the newest at the bottom.
+  useEffect(() => { for (const el of [chat.current, transcript.current]) el?.scrollTo(0, el.scrollHeight); }, [msgs, drawer, captions]);
 
   const faceState: FaceState = thinking ? "thinking" : talking ? "talking" : "idle";
   const micLabel = t(micOn ? "tutor.micOff" : "tutor.micOn"), camLabel = t(camOn ? "tutor.camOff" : "tutor.camOn");
@@ -276,7 +281,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
           <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} scene={who} />
           <b className="call-name">{ch.name}</b>
           {last?.correction.trim() && <p className="call-fix small"><Icon name="spark" /> {last.correction}</p>}
-          {captions && <div className="call-transcript" lang={lang} aria-live="polite" ref={(el) => el?.scrollTo(0, el.scrollHeight)}>
+          {captions && <div className="call-transcript" lang={lang} aria-live="polite" ref={transcript}>
             {spoken.map((m, i) => m === lastTutor
               ? <button key={i} className="call-line" onClick={() => setShowTr((v) => !v)}><b>{ch.name}:</b> {m.text}{showTr && last?.translation && <small>{last.translation}</small>}</button>
               : <p key={i} className="call-line"><b>{m.from === "me" ? profile?.name : ch.name}:</b> {m.text}</p>)}
@@ -289,7 +294,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
           {profile && <b className="call-name">{profile.name}</b>}
         </section>
         {drawer && <section className="call-drawer" aria-label={t("tutor.message")}>
-          <div className="chat">
+          <div className="chat" ref={chat}>
             {typed.length ? typed.map((m, i) => <div key={i} className="bubble me" lang={lang}><span>{m.text}</span></div>)
               : <p className="small muted">{t("tutor.noMessages")}</p>}
           </div>

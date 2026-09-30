@@ -67,6 +67,7 @@ test("currentUnit: the first unit with an unfinished step, else the last", () =>
 test("describeEvent covers the practice events", () => {
   assert.match(describeEvent({ kind: "practice_opened" }), /meant to open it.*stop_practice/);
   assert.match(describeEvent({ kind: "practice_item" }), /without giving the answer/);
+  assert.match(describeEvent({ kind: "practice_read" }), /understood/);
   assert.match(describeEvent({ kind: "practice_answer", correct: false, given: "likes", expected: "like" }), /"likes".*wrong.*"like".*why it is wrong/);
   assert.match(describeEvent({ kind: "practice_answer", correct: true, given: "like", expected: "like" }), /correct.*why it is right/);
   assert.match(describeEvent({ kind: "practice_stuck" }), /hint.*never say the answer/);
