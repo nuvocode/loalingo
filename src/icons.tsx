@@ -31,6 +31,7 @@ const I = {
   roots:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--green,#12b886)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13V8"/><path d="M12 8c0-3 2-4.5 5-4.5 0 3-2 4.5-5 4.5Z"/><path d="M12 10.5c0-2.5-1.7-3.8-4.5-3.8 0 2.7 1.8 3.8 4.5 3.8Z"/><path d="M12 13c0 3-1 5-3 7.5M12 15.5c1 1.5 3 2.5 4 5M12 15l-5 1.5"/></svg>',
   greenhouse:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--green,#12b886)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5v-9L12 4l8.5 7.5v9Z"/><path d="M12 4v16.5M3.5 14.5h17M8 8v12.5M16 8v12.5"/></svg>',
   basket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 10a4.5 4.5 0 0 1 9 0"/><path d="M3 10h18l-1.7 9a2 2 0 0 1-2 1.6H6.7a2 2 0 0 1-2-1.6L3 10Z"/><path d="M9 10v10.5M15 10v10.5M3.8 14.5h16.4"/></svg>',
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/></svg>',
 } as const;
 
 export type IconName = keyof typeof I;

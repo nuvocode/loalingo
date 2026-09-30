@@ -30,14 +30,41 @@ const SCREENS: Record<Route, () => React.ReactNode> = {
   stories: Stories, roleplay: Roleplay, friends: Friends, notifications: Notifications, settings: Settings,
 };
 
-function NavBtn({ id, icon }: { id: Route; icon: IconName }) {
+function NavBtn({ id, icon, onGo }: { id: Route; icon: IconName; onGo?: () => void }) {
   const { route, go } = useApp();
   const { t } = useTranslation();
   const active = route === id;
   return (
-    <button className={`nav-item ${active ? "active" : ""}`} onClick={() => go(id)} aria-current={active ? "page" : "false"}>
+    <button className={`nav-item ${active ? "active" : ""}`} onClick={() => { go(id); onGo?.(); }} aria-current={active ? "page" : "false"}>
       <Icon name={icon} /><span>{t(`nav.${id}`)}</span>
     </button>
+  );
+}
+
+/** Phone bottom bar: the main tabs, then "…" opening the rest upwards. */
+function BottomNav() {
+  const { t } = useTranslation();
+  const { route } = useApp();
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+  const inMore = MORE.some((n) => n.id === route);
+  return (
+    <>
+      {open && <div className="more-backdrop" onClick={() => setOpen(false)} />}
+      {open && <div className="more-menu" id="more-menu">{MORE.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}</div>}
+      <nav className="bottom-nav" aria-label={t("nav.bottom")}>
+        {NAV.map((n) => <NavBtn key={n.id} {...n} onGo={() => setOpen(false)} />)}
+        <button className={`nav-item ${inMore || open ? "active" : ""}`} onClick={() => setOpen((o) => !o)}
+          aria-expanded={open} aria-controls="more-menu">
+          <Icon name="dots" /><span>{t("nav.more")}</span>
+        </button>
+      </nav>
+    </>
   );
 }
 
@@ -142,9 +169,7 @@ export default function App() {
           </div>
         </main>
       </div>
-      <nav className="bottom-nav" aria-label={t("nav.bottom")}>
-        {NAV.map((n) => <NavBtn key={n.id} {...n} />)}
-      </nav>
+      <BottomNav />
 
       {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
         : lessonId.startsWith("tutor:") ? (lessonId.slice(6) in CHARACTERS && <TutorCall key={lessonId} who={lessonId.slice(6) as CharacterId} />)
