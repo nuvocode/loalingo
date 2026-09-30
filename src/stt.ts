@@ -98,7 +98,7 @@ export async function listen(lang: string, on: { utterance: (text: string) => vo
     const all = concat(chunks);
     reset();
     transcribeSamples(all, ctx.sampleRate, lang).then(
-      (x) => { if (!stopped && x.trim()) on.utterance(x.trim()); },
+      (x) => { if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
       (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
     );
   };
