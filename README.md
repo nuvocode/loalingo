@@ -6,22 +6,36 @@
 
 ![Learning path](docs/screenshots/learn.jpg)
 
+| Live lesson | Practice together |
+| --- | --- |
+| ![Live lesson](docs/screenshots/live.jpg) | ![Practice together](docs/screenshots/practice.jpg) |
+
 | Lessons | Roleplay chat |
 | --- | --- |
 | ![Lesson](docs/screenshots/lesson.jpg) | ![Roleplay](docs/screenshots/roleplay.jpg) |
+
+| AI provider | Text to speech |
+| --- | --- |
+| ![AI provider](docs/screenshots/ai.jpg) | ![Text to speech](docs/screenshots/voice.jpg) |
 
 ## Features
 
 - **Structured course:** English A1 → B2, with 40+ steps per level and a checkpoint at the end of each level. Explanations are in Turkish.
 - **AI-generated lessons:** translate, fill in the blank, match, listen, word bank, error correction and more. Lessons adapt to your recent mistakes.
-- **Speaking:** speech recognition runs inside the app (whisper.cpp), with no extra service to install.
+- **Live lesson:** a video-call style lesson with an animated tutor who talks with you, with live captions. Open the practice panel to do exercises together while the tutor follows along.
+- **Speaking:** speech recognition runs inside the app (whisper.cpp), with no extra service to install. Deepgram is an optional cloud alternative, and **Try** lets you check it with your own voice.
+- **Natural voices:** besides the system voice, Piper (fast, local) and Kokoro (most natural, English only) run on your machine and are downloaded on first use.
 - **Stories and roleplay:** chat or talk with characters in real-life scenes, and get corrections as you go.
 - **Gamification:** streaks, XP, gems, hearts, daily quests, a local league, Match Madness and timed challenges.
-- **Private by default:** your progress stays in a local SQLite database, and API keys are kept in the macOS Keychain. Several profiles can share one computer, optionally with a PIN.
-- Daily reminder, light and dark themes, and an English or Turkish interface.
+- **Private by default:** your progress stays in a local SQLite database, and API keys are kept in the system keychain. Several profiles can share one computer, optionally with a PIN.
+- Daily reminder, light and dark themes, and an interface in English, Turkish, German, French or Spanish.
 - Automatic in-app updates.
 
-## Install (macOS, Apple silicon)
+## Install
+
+Downloads for macOS (Apple silicon and Intel), Windows and Linux are on the [Releases](https://github.com/ozerozdas/sprigo/releases/latest) page.
+
+On macOS:
 
 1. Download the latest `.dmg` from [Releases](https://github.com/ozerozdas/sprigo/releases/latest).
 2. Open it and drag **Sprigo** into **Applications**.
@@ -37,7 +51,7 @@ On first launch, Sprigo looks for a local model server:
 
 - **[Ollama](https://ollama.com/download)** (recommended): install and start it. If no model is installed yet, Sprigo offers to download `qwen3:8b` (about 5.2 GB) for you.
 - **[LM Studio](https://lmstudio.ai):** start its local server and load a model.
-- **Cloud:** you can also use OpenAI, Anthropic or Gemini with your own API key. Pick one in **Settings → AI provider**.
+- **Cloud:** you can also use OpenAI, Anthropic or Gemini with your own API key. Pick one in **Settings → AI provider**; each option has a short note on what it is good at.
 
 ## Development
 
@@ -55,7 +69,7 @@ Courses are plain YAML files in [`courses/`](courses/en.yml). For the architectu
 
 ### Releasing
 
-Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, commit, then push a tag:
+Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` (then `cargo update -p sprigo --offline` in `src-tauri` for the lock file), commit, then push a tag:
 
 ```bash
 git tag v0.1.2 && git push origin v0.1.2
