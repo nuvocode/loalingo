@@ -539,7 +539,7 @@
       },
       {
         "t": "One lesson, one more day",
-        "b": "Your root counter says {{count}}. Add one more?"
+        "b": "Your root count is {{count}}. Add one more?"
       }
     ],
     "evening": [

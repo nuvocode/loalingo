@@ -525,7 +525,7 @@
       },
       {
         "t": "Sprigo te echa de menos",
-        "b": "{{lang}} te extraña: tus palabras se sienten algo solas. ¿Te pasas?"
+        "b": "{{lang}}: tus palabras se sienten algo solas. ¿Te pasas?"
       },
       {
         "t": "¿Tienes cinco minutos?",
@@ -533,7 +533,7 @@
       },
       {
         "t": "Pasos pequeños, gran idioma",
-        "b": "{{lang}} de hoy: una sola lección ya cuenta."
+        "b": "Objetivo {{lang}}: hoy basta con una sola lección."
       },
       {
         "t": "Hora de gimnasia mental 🧠",
@@ -555,7 +555,7 @@
       },
       {
         "t": "Una lección, un día más",
-        "b": "Tu contador de raíces marca {{count}}. ¿Sumas uno más?"
+        "b": "Tu contador de raíces marca {{count}}. ¿Sumas uno?"
       }
     ],
     "evening": [

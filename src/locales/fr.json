@@ -517,15 +517,15 @@
     "general": [
       {
         "t": "Quel mot t'attend aujourd'hui ? 🌱",
-        "b": "{{lang}} ne s'apprend pas tout seul. Cinq minutes suffisent."
+        "b": "Au programme : {{lang}}. Cinq minutes suffisent."
       },
       {
         "t": "Une leçon le temps que le thé infuse ?",
         "b": "Leçon courte, grande différence. C'est parti !"
       },
       {
-        "t": "Sprigo s'ennuie de toi",
-        "b": "{{lang}} t'attend : tes mots se sentent un peu seuls. Tu passes ?"
+        "t": "Tu manques à Sprigo",
+        "b": "{{lang}} : tes mots se sentent un peu seuls. Tu passes ?"
       },
       {
         "t": "Tu as cinq minutes ?",
@@ -533,7 +533,7 @@
       },
       {
         "t": "Petits pas, grande langue",
-        "b": "{{lang}} du jour : une seule leçon compte déjà."
+        "b": "Objectif {{lang}} : une seule leçon aujourd'hui, et ça compte déjà."
       },
       {
         "t": "C'est l'heure de la gym cérébrale 🧠",
@@ -555,7 +555,7 @@
       },
       {
         "t": "Une leçon, un jour de plus",
-        "b": "Ton compteur de racines affiche {{count}}. On en ajoute un ?"
+        "b": "Ton compteur de racines affiche {{count}}. On ajoute un jour de plus ?"
       }
     ],
     "evening": [

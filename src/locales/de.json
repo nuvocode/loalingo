@@ -517,7 +517,7 @@
       },
       {
         "t": "Kleine Schritte, große Sprache",
-        "b": "Heute zählt schon eine einzige Lektion {{lang}}."
+        "b": "Heute zählt schon eine einzige {{lang}}-Lektion."
       },
       {
         "t": "Zeit fürs Gehirnjogging 🧠",
@@ -545,7 +545,7 @@
     "evening": [
       {
         "t": "Bald ist Mitternacht ⏰",
-        "b": "Wurzelzähler {{count}} – lass sie nicht austrocknen. Schnell eine Lektion?"
+        "b": "Wurzelzähler: {{count}}. Lass die Wurzeln nicht austrocknen – schnell eine Lektion?"
       },
       {
         "t": "Letzter Aufruf für heute",
