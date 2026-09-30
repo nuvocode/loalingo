@@ -11,3 +11,10 @@ export function resample(input: Float32Array, from: number, to = 16000): Float32
   }
   return out;
 }
+
+/** Map as a small most-recent-first cache: re-inserts `k` and drops the oldest past `max`. */
+export function remember<K, V>(m: Map<K, V>, k: K, v: V, max = 20) {
+  m.delete(k);
+  m.set(k, v);
+  if (m.size > max) m.delete(m.keys().next().value as K);
+}
