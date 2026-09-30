@@ -42,3 +42,12 @@ test("talk ids round-trip", () => {
 test("broken talk ids are null", () => {
   for (const bad of ["", "chat", "chat:mia", "chat:mia:nope", "chat:zed:checkIn", "talk:mia:checkIn", "chat:mia:free:", "chat:mia:free:  ", "chat:toString:x"]) assert.equal(parseTalkId(bad), null, bad);
 });
+
+test("every character has a valid, distinct face", () => {
+  const faces = ids.map((k) => CHARACTERS[k].face);
+  for (const [i, f] of faces.entries()) {
+    assert.ok(Number.isInteger(f.skin) && f.skin >= 0 && f.skin <= 4, ids[i]);
+    assert.ok(Number.isInteger(f.hairColor) && f.hairColor >= 0 && f.hairColor <= 5, ids[i]);
+  }
+  assert.equal(new Set(faces.map((f) => JSON.stringify(f))).size, faces.length);
+});

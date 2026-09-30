@@ -1,10 +1,19 @@
 // Roleplay cast (spec E). Pure data, no browser APIs: goals and personas are English prompt text, topic titles live in i18n as roleplay.topics.<char>.<topic>.
 export type Topic = { id: string; goal: string };
-export type Character = { name: string; gender: "f" | "m"; color: string; kokoroVoice: string; persona: string; topics: Topic[] };
+/** Which parts and colors make up a character's cartoon bust (spec K). Parts are drawn in src/face/parts.tsx. */
+export type FaceSpec = {
+  head: "round" | "oval" | "square"; ears: "small" | "big"; eyes: "round" | "almond" | "sleepy";
+  brows: "flat" | "arched" | "thick"; nose: "button" | "long" | "wide"; mouth: "small" | "wide" | "smile";
+  hair: "short" | "bun" | "long" | "curly" | "ponytail" | "bald"; facialHair: "none" | "beard" | "mustache";
+  outfit: "shirt" | "chef" | "coat" | "blazer" | "tshirt"; accessory: "none" | "glasses" | "chefHat" | "cap" | "earrings";
+  skin: number; hairColor: number; // SKIN 0–4, HAIR 0–5; brows and facial hair use the hair color
+};
+export type Character = { name: string; gender: "f" | "m"; color: string; kokoroVoice: string; persona: string; face: FaceSpec; topics: Topic[] };
 
 export const CHARACTERS = {
   mia: {
     name: "Mia", gender: "f", color: "var(--green)", kokoroVoice: "af_bella",
+    face: { head: "oval", ears: "small", eyes: "almond", brows: "arched", nose: "button", mouth: "smile", hair: "bun", facialHair: "none", outfit: "shirt", accessory: "earrings", skin: 1, hairColor: 2 },
     persona: "A hotel receptionist who is warm, polished and endlessly polite. She smiles through every request, offers small extras unprompted and always confirms details back to the guest.",
     topics: [
       { id: "checkIn", goal: "check in and ask for a room" },
@@ -16,6 +25,7 @@ export const CHARACTERS = {
   },
   kai: {
     name: "Kai", gender: "m", color: "var(--blue)", kokoroVoice: "am_puck",
+    face: { head: "round", ears: "big", eyes: "round", brows: "thick", nose: "wide", mouth: "wide", hair: "short", facialHair: "mustache", outfit: "chef", accessory: "chefHat", skin: 3, hairColor: 0 },
     persona: "A restaurant chef who is passionate, jokey and a little dramatic about food. He talks with his hands, loves to tease guests about their choices and cannot resist explaining how a dish is made.",
     topics: [
       { id: "order", goal: "ask the chef for a recommendation and order" },
@@ -26,6 +36,7 @@ export const CHARACTERS = {
   },
   nora: {
     name: "Nora", gender: "f", color: "var(--orange)", kokoroVoice: "af_nicole",
+    face: { head: "oval", ears: "small", eyes: "round", brows: "flat", nose: "long", mouth: "small", hair: "ponytail", facialHair: "none", outfit: "coat", accessory: "none", skin: 0, hairColor: 4 },
     persona: "A family doctor who is calm, gentle and precise. She asks one clear question at a time, never rushes the patient and explains everything in plain words.",
     topics: [
       { id: "symptoms", goal: "describe symptoms to the doctor and answer her questions" },
@@ -36,6 +47,7 @@ export const CHARACTERS = {
   },
   tom: {
     name: "Tom", gender: "m", color: "var(--gold-dark)", kokoroVoice: "bm_george",
+    face: { head: "square", ears: "big", eyes: "sleepy", brows: "thick", nose: "wide", mouth: "small", hair: "bald", facialHair: "beard", outfit: "tshirt", accessory: "none", skin: 2, hairColor: 5 },
     persona: "A landlord who is gruff, practical and a bit stingy, but fair in the end. He speaks in short blunt sentences, loves to talk about the neighbourhood and drives a hard bargain.",
     topics: [
       { id: "viewing", goal: "view a flat and ask about its rooms, neighbourhood and what is included" },
@@ -46,6 +58,7 @@ export const CHARACTERS = {
   },
   emma: {
     name: "Emma", gender: "f", color: "var(--red)", kokoroVoice: "bf_emma",
+    face: { head: "square", ears: "small", eyes: "almond", brows: "flat", nose: "long", mouth: "small", hair: "long", facialHair: "none", outfit: "blazer", accessory: "glasses", skin: 4, hairColor: 0 },
     persona: "A hiring manager who is sharp, brisk and businesslike. She wants concrete examples, asks tough follow-up questions and moves the interview along without small talk.",
     topics: [
       { id: "introduce", goal: "introduce yourself and say why you want this job" },
@@ -56,6 +69,7 @@ export const CHARACTERS = {
   },
   leo: {
     name: "Leo", gender: "m", color: "var(--green-dark)", kokoroVoice: "am_liam",
+    face: { head: "round", ears: "small", eyes: "round", brows: "arched", nose: "button", mouth: "smile", hair: "curly", facialHair: "none", outfit: "tshirt", accessory: "cap", skin: 2, hairColor: 3 },
     persona: "A tour guide who is cheerful, chatty and a real show-off about his city. He loves fun facts and stories, speaks in long enthusiastic sentences and keeps the group moving.",
     topics: [
       { id: "tour", goal: "join a city tour and ask the guide about the sights" },
