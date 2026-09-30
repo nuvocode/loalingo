@@ -35,7 +35,7 @@ export const CHARACTERS = {
     ],
   },
   nora: {
-    name: "Nora", gender: "f", color: "var(--orange)", kokoroVoice: "af_nicole",
+    name: "Nora", gender: "f", color: "var(--purple)", kokoroVoice: "af_nicole",
     face: { head: "oval", ears: "small", eyes: "round", brows: "flat", nose: "long", mouth: "small", hair: "ponytail", facialHair: "none", outfit: "coat", accessory: "none", skin: 0, hairColor: 4 },
     persona: "A family doctor who is calm, gentle and precise. She asks one clear question at a time, never rushes the patient and explains everything in plain words.",
     topics: [
