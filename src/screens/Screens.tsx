@@ -4,7 +4,7 @@ import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
 import { useSpeakBlock } from "../Mic";
-import { msLeft, rivalXp, PROMOTE, DEMOTE, TIERS } from "../league";
+import { msLeft, rivalXp, zones, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, today } from "../progress";
@@ -127,6 +127,7 @@ export function League() {
   const [, tick] = useState(0);
   useEffect(() => { const id = setInterval(() => tick((n) => n + 1), 60_000); return () => clearInterval(id); }, []); // rivals keep studying
   const { rows, name, left, last } = useLeague();
+  const { up, down } = zones(s.league?.tier ?? 0);
   const days = Math.floor(left / 86_400_000), hours = Math.floor((left % 86_400_000) / 3_600_000);
   return (
     <>
@@ -137,12 +138,12 @@ export function League() {
       <div className="card" style={{ marginTop: 14, textAlign: "center", padding: 28 }}>
         <TierRail tier={s.league?.tier ?? 0} />
         <h1 style={{ fontSize: 22, fontWeight: 900, marginTop: 8 }}>{t("league.title", { name })}</h1>
-        <p className="muted small">{t("league.rules", { up: PROMOTE, down: DEMOTE })}</p>
+        <p className="muted small">{t(!down ? "league.rulesSeed" : !up ? "league.rulesTop" : "league.rules", { up, down })}</p>
         <p style={{ marginTop: 8, fontWeight: 800, color: "var(--orange)" }}><Icon name="clock" /> {t("league.timeLeft", { days, hours })}</p>
       </div>
       <div className="card" style={{ marginTop: 14, padding: 8 }}>
         {rows.map((p, i) => (
-          <div className={`league-row ${p.me ? "me" : ""} ${i === PROMOTE - 1 ? "cut-up" : i === rows.length - DEMOTE - 1 ? "cut-down" : ""}`} key={p.n}>
+          <div className={`league-row ${p.me ? "me" : ""} ${up && i === up - 1 ? "cut-up" : down && i === rows.length - down - 1 ? "cut-down" : ""}`} key={p.n}>
             <span className={`league-rank ${i < 3 ? "top" : ""}`}>{i + 1}</span>
             <span className="avatar" style={{ background: p.c }} aria-hidden="true">{p.n[0]}</span>
             <span className="league-name">{p.n}{p.me ? t("league.youSuffix") : ""}</span>
@@ -359,7 +360,7 @@ export function Notifications() {
     s.lastActive === today()
       ? { icon: "roots", title: t("notifications.streakSafe"), desc: t("notifications.streakSafeDesc", { count: s.streak }) }
       : { icon: "roots", title: t(s.streak ? "notifications.streakRisk" : "notifications.streakStart"), desc: t(s.streak ? "notifications.streakRiskDesc" : "notifications.streakStartDesc", { count: s.streak }) },
-    { icon: "trophy", title: t("notifications.league", { rank, name }), desc: t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
+    { icon: "trophy", title: t("notifications.league", { rank, name }), desc: !zones(s.league?.tier ?? 0).up ? t("notifications.leagueTop", { count: DEMOTE }) : t(rank <= PROMOTE ? "notifications.leagueUp" : "notifications.leagueChase", { count: PROMOTE }) },
   ];
   if (last && last !== "stay") items.push({ icon: "trophy", title: t(last === "up" ? "league.promoted" : "league.demoted", { name }), desc: "" });
   if (ahead) items.push({ icon: "users", title: t("notifications.passed", { name: ahead.name }), desc: t("notifications.passedDesc", { name: ahead.name }) });

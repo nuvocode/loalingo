@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { NAMES, newLeague, rankOf, rivalXp, rollLeague, sessions, weekOf, type LeagueState, type Rival } from "./league.ts";
+import { NAMES, newLeague, rankOf, rivalXp, rollLeague, sessions, weekOf, zones, type LeagueState, type Rival } from "./league.ts";
 
 const W = "2026-09-28", start = new Date(2026, 8, 28).getTime(), DAY = 86_400_000;
 const who = { id: 1, lang: "tr" };
@@ -88,7 +88,13 @@ test("new week settles the league: top 3 up, bottom 3 down, idle stays out of pr
   assert.ok(rankOf(l, 0, new Date(2026, 9, 5).getTime()) > 7);
   const down = rollLeague(l, 0, "2026-10-05");
   assert.equal(down.league.tier, 2); assert.equal(down.league.last, "down");
-  assert.equal(rollLeague(newLeague(W, 0), 0, "2026-10-05").league.tier, 0, "no tier below Seed");
+  assert.deepEqual(zones(0), { up: 3, down: 0 });
+  assert.deepEqual(zones(4), { up: 3, down: 3 });
+  assert.deepEqual(zones(9), { up: 0, down: 3 });
+  const seed = rollLeague(newLeague(W, 0), 0, "2026-10-05").league;
+  assert.equal(seed.tier, 0); assert.equal(seed.last, "stay", "nobody drops out of Seed");
+  const top = rollLeague(newLeague(W, 9), 1e6, "2026-10-05").league;
+  assert.equal(top.tier, 9); assert.equal(top.last, "stay", "nobody moves up from the top league");
   assert.equal(rollLeague(null, 0, "2026-10-05").league.week, "2026-10-05");
 });
 

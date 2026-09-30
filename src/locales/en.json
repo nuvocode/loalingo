@@ -96,6 +96,8 @@
   "league": {
     "title": "{{name}} League",
     "rules": "The week ends Sunday 23:59. Top {{up}} move up, bottom {{down}} move down.",
+    "rulesSeed": "The week ends Sunday 23:59. Top {{up}} move up.",
+    "rulesTop": "The week ends Sunday 23:59. Bottom {{down}} move down.",
     "timeLeft": "{{days}} days {{hours}} hours left",
     "you": "You",
     "youSuffix": " (You)",
@@ -250,6 +252,7 @@
     "league": "You're #{{rank}} in the {{name}} League",
     "leagueUp": "You're in the promotion zone. Keep it up!",
     "leagueChase": "Reach the top {{count}} to move up this week.",
+    "leagueTop": "You're in the top league. Stay out of the bottom {{count}}.",
     "passed": "{{name}} is ahead of you",
     "passedDesc": "{{name}} earned more XP this week. Fight back!",
     "chest": "You have an unopened harvest basket",

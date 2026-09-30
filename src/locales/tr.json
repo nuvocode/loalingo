@@ -95,6 +95,8 @@
   "league": {
     "title": "{{name}} Ligi",
     "rules": "Hafta Pazar 23:59'da biter. İlk {{up}} yükselir, son {{down}} düşer.",
+    "rulesSeed": "Hafta Pazar 23:59'da biter. İlk {{up}} yükselir.",
+    "rulesTop": "Hafta Pazar 23:59'da biter. Son {{down}} düşer.",
     "timeLeft": "{{days}} gün {{hours}} saat kaldı",
     "you": "Sen",
     "youSuffix": " (Sen)",
@@ -247,6 +249,7 @@
     "league": "{{name}} Ligi'nde {{rank}}. sıradasın",
     "leagueUp": "Yükselme bölgesindesin. Böyle devam!",
     "leagueChase": "Bu hafta yükselmek için ilk {{count}}'e gir.",
+    "leagueTop": "En üst ligdesin. Düşmemek için son {{count}}'e kalma.",
     "passed": "{{name}} seni geçti",
     "passedDesc": "{{name}} bu hafta daha çok XP kazandı. Karşılık ver!",
     "chest": "Açılmamış bir hasat sepetin var",

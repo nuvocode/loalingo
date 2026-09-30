@@ -103,6 +103,8 @@
   "league": {
     "title": "Ligue {{name}}",
     "rules": "La semaine se termine dimanche à 23:59. Les {{up}} premiers montent, les {{down}} derniers descendent.",
+    "rulesSeed": "La semaine se termine dimanche à 23:59. Les {{up}} premiers montent.",
+    "rulesTop": "La semaine se termine dimanche à 23:59. Les {{down}} derniers descendent.",
     "timeLeft": "{{days}} j {{hours}} h restantes",
     "you": "Toi",
     "youSuffix": " (toi)",
@@ -264,6 +266,7 @@
     "league": "Tu es n°{{rank}} en ligue {{name}}",
     "leagueUp": "Tu es dans la zone de promotion. Continue !",
     "leagueChase": "Entre dans les {{count}} premiers pour monter cette semaine.",
+    "leagueTop": "Tu es dans la meilleure ligue. Reste hors des {{count}} derniers.",
     "passed": "{{name}} est passé devant toi",
     "passedDesc": "{{name}} a gagné plus d'XP cette semaine. Rattrape-le !",
     "chest": "Tu as un panier de récolte à ouvrir",

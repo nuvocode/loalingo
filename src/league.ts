@@ -7,6 +7,8 @@ export type LeagueState = { week: string; tier: number; rivals: Rival[]; last?: 
 
 export const TIERS = 10; // Seed … Forest (names: i18n league.tier0..9)
 export const PROMOTE = 3, DEMOTE = 3;
+/** How many move up / down from `tier`: nobody moves up from the top league, nobody drops out of Seed. */
+export const zones = (tier: number) => ({ up: tier < TIERS - 1 ? PROMOTE : 0, down: tier > 0 ? DEMOTE : 0 });
 /** 10 names per UI language; about half of a league comes from the learner's own. */
 export const NAMES: Record<string, string[]> = {
   tr: ["Aylin", "Mert", "Zeynep", "Kaan", "Elif", "Deniz", "Baran", "Selin", "Umut", "Ece"],
@@ -90,9 +92,9 @@ export function rollLeague(l: LeagueState | null, weekXp: number, day: string, w
   if (l.week === week) return legacy ? { league: newLeague(week, l.tier, l.last, who), weekXp } : { league: l, weekXp };
   if (legacy) return { league: newLeague(week, l.tier, "stay", who), weekXp: 0 };
   const rank = rankOf(l, weekXp, weekStartMs(l.week) + 7 * DAY_MS);
-  const last = weekXp > 0 && rank <= PROMOTE ? "up" : rank > l.rivals.length + 1 - DEMOTE ? "down" : "stay";
-  const tier = Math.min(TIERS - 1, Math.max(0, l.tier + (last === "up" ? 1 : last === "down" ? -1 : 0)));
-  return { league: newLeague(week, tier, last, who), weekXp: 0 };
+  const { up, down } = zones(l.tier);
+  const last = weekXp > 0 && rank <= up ? "up" : rank > l.rivals.length + 1 - down ? "down" : "stay";
+  return { league: newLeague(week, l.tier + (last === "up" ? 1 : last === "down" ? -1 : 0), last, who), weekXp: 0 };
 }
 
 export const msLeft = (l: LeagueState, now: number) => weekStartMs(l.week) + 7 * DAY_MS - now;
