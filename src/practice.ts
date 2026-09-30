@@ -144,7 +144,7 @@ export function describePractice(st: PracticeState | null, topics: Topic[]): str
       `On screen: ${itemText(it)}`,
       `Correct answer (never say it before the learner answers): ${expected(it)}`,
       st.last ? `The learner answered "${st.last.given}": ${st.last.correct ? "correct" : "wrong"}.`
-        : "The learner has not answered yet. If they say their answer aloud, put it in `answer` (the option's text, or the whole sentence for word tiles) and leave `say` empty: the app checks it and tells you the result.",
+        : "The learner has not answered yet. If they give an answer aloud or in the chat (\"I think it's like\", \"number 2\"), copy it into `answer` (the option's text or number, or the whole sentence for word tiles) and leave `say` empty: the app checks it and tells you the result. Never ask them to tap the screen instead.",
     ].filter(Boolean).join("\n");
   }
   if (st.stage === "reading") return `Stage: reading. On screen, the text "${set.reading.title}": ${set.reading.text}\nWhen the learner is ready for the questions, set \`answer\` to "next".`;

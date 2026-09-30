@@ -68,7 +68,7 @@ export function describeEvent(e: TutorEvent): string {
     case "silence": return `The learner has been silent for ${e.seconds} seconds.`;
     case "mic": return e.on ? "The learner turned their microphone on." : "The learner turned their microphone off; they can still type.";
     case "cam": return e.on ? "The learner turned their camera on." : "The learner turned their camera off.";
-    case "practice_opened": return "The learner opened the practice panel with its button. If you were not just talking about practising together, ask whether they meant to open it and use stop_practice if it was a mistake; otherwise ask which topic to practise.";
+    case "practice_opened": return "The learner opened the practice panel with its button. Check the last few messages: if neither of you mentioned practising or exercises, do not ask for a topic yet; ask whether they meant to open it, and use stop_practice if it was a mistake. Only if practising was just discussed, ask which topic to practise.";
     case "practice_item": return "A new practice step is on the screen. Introduce it briefly and read out any sentence the learner works with, without giving the answer. In the reading stage you have just read the text aloud: ask if the learner understood it and is ready for the questions.";
     case "practice_answer": return e.correct
       ? `The learner answered "${e.given}" on the screen, which is correct. Say briefly why it is right.`

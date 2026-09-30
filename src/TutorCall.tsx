@@ -102,7 +102,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
       setLast(r); setShowTr(false); setThinking(false);
       if (r.action === "start_practice") practiceOpen(false);
       if (r.action === "stop_practice") practiceClose();
-      if (c.pr && r.answer.trim()) answerField(r.answer.trim());
+      // `answer` only relays what the learner said; on app events the model sometimes invents a "next" and skips a step.
+      if (c.pr && r.answer.trim() && (e.kind === "user_said" || e.kind === "user_typed")) answerField(r.answer.trim());
       await voice(r.say);
       if (e.kind === "practice_answer") advance(); // the tutor has explained the answer: on to the next exercise
       if (r.action === "end") finish();

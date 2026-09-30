@@ -485,6 +485,6 @@ html[data-theme="dark"] .face .scene{filter:brightness(.6) saturate(.8)}
 .practice-fb.bad{color:var(--red)}
 .practice-actions{display:flex;gap:12px;justify-content:flex-end}
 @media (max-width:768px){
-  .call-grid.practice-open{grid-template-columns:1fr 1fr;grid-template-rows:1fr 40vh}
+  .call-grid.practice-open{grid-template-columns:1fr 1fr;grid-template-rows:1fr 30vh}
   .call-grid.practice-open .call-practice{grid-row:auto;grid-column:1 / 3}
 }
