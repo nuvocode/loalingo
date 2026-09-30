@@ -23,7 +23,7 @@
 
 ## Install (macOS, Apple silicon)
 
-1. Download the latest `.dmg` from [Releases](https://github.com/nuvocode/sprigo/releases/latest).
+1. Download the latest `.dmg` from [Releases](https://github.com/ozerozdas/sprigo/releases/latest).
 2. Open it and drag **Sprigo** into **Applications**.
 3. The app is not notarized yet, so macOS will block it the first time. Remove the quarantine flag once:
 

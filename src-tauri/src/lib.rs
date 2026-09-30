@@ -21,7 +21,7 @@ fn list_user_courses(app: tauri::AppHandle) -> Result<Vec<(String, String)>, Str
 
 /// API keys live in the OS keychain (DECISIONS A6), never in SQLite.
 fn secret_entry(key: &str) -> Result<keyring::Entry, String> {
-    keyring::Entry::new("com.nuvocode.sprigo", key).map_err(|e| e.to_string())
+    keyring::Entry::new("com.ozerozdas.sprigo", key).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
