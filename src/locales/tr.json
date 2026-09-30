@@ -463,7 +463,8 @@
     "title": "Sprigo {{version}} hazır",
     "install": "Güncelle ve yeniden başlat",
     "later": "Sonra",
-    "downloading": "İndiriliyor… %{{pct}}"
+    "downloading": "İndiriliyor… %{{pct}}",
+    "madeBy": "Geliştiren: Mehmet Özer Özdaş ·"
   },
   "voice": {
     "kokoroDesc": "Daha doğal bir ses. Bilgisayarının hızına göre cümle başına birkaç saniye sürebilir.",

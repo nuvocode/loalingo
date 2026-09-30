@@ -468,7 +468,8 @@
     "title": "Sprigo {{version}} is available",
     "install": "Update and restart",
     "later": "Later",
-    "downloading": "Downloading… {{pct}}%"
+    "downloading": "Downloading… {{pct}}%",
+    "madeBy": "Made by Mehmet Özer Özdaş ·"
   },
   "voice": {
     "kokoroDesc": "A more natural voice. It can take a few seconds per sentence, depending on your computer's speed.",

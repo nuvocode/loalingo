@@ -30,6 +30,7 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
 }
 
 const OLLAMA_DOWNLOAD = "https://ollama.com/download";
+const AUTHOR_URL = "https://mehmetozer.dev";
 const openLink = async (url: string) => isTauri ? (await import("@tauri-apps/plugin-opener")).openUrl(url) : window.open(url, "_blank");
 
 /** First run: finds Ollama / LM Studio on this Mac, or helps install Ollama and pull a model. */
@@ -273,6 +274,9 @@ export function Settings() {
 
       <h2 className="section-title">{t("update.section")}</h2>
       <VersionRow />
+      <p className="muted small" style={{ textAlign: "center", marginTop: 8 }}>
+        {t("update.madeBy")} <a href={AUTHOR_URL} onClick={(e) => { e.preventDefault(); void openLink(AUTHOR_URL); }}>mehmetozer.dev</a>
+      </p>
 
       <h2 className="section-title">{t("settings.account")}</h2>
       <div className="od-stack" style={gap("12px")}>

@@ -484,7 +484,8 @@
     "title": "Sprigo {{version}} está disponible",
     "install": "Actualizar y reiniciar",
     "later": "Más tarde",
-    "downloading": "Descargando… {{pct}}%"
+    "downloading": "Descargando… {{pct}}%",
+    "madeBy": "Desarrollado por Mehmet Özer Özdaş ·"
   },
   "voice": {
     "kokoroDesc": "Una voz más natural. Puede tardar unos segundos por frase, según la velocidad de tu equipo.",
