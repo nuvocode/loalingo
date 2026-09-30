@@ -320,14 +320,14 @@ export function Roleplay() {
     <>
       <h1 className="section-title">{t("roleplay.title")}</h1>
       <p className="muted" style={{ marginBottom: 18 }}>{t("roleplay.subtitle")}</p>
-      <div className="od-grid" style={{ "--od-cols": 1, "--od-gap": "14px" } as React.CSSProperties}>
+      <div className="rp-grid">
         {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
           const { name, color, face } = CHARACTERS[k];
           return (
-            <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={k}>
-              <Face spec={face} color={color} size={56} label={name} />
-              <span className="od-field od-fill"><b>{name}</b><span className="muted">{t(`roleplay.roles.${k}`)}</span></span>
-              <span className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties}>
+            <div className="card rp-card" key={k}>
+              <div className="rp-face"><Face spec={face} color={color} label={name} /></div>
+              <span className="od-field"><b>{name}</b><span className="muted">{t(`roleplay.roles.${k}`)}</span></span>
+              <span className="rp-actions">
                 <button className="btn btn-ghost" onClick={() => openSheet(<TopicSheet who={k} voice={false} />)}>{t("roleplay.chat")}</button>
                 <button className="btn btn-blue" onClick={() => speakBlock ? toast(t(speakBlock)) : openSheet(<TopicSheet who={k} voice />)}><Icon name="video" /> {t("roleplay.call")}</button>
               </span>
