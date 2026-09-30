@@ -568,6 +568,21 @@
     "corrections": "Corrections from this lesson",
     "transcriptOn": "Show transcript",
     "transcriptOff": "Hide transcript",
-    "noMessages": "No messages yet"
+    "noMessages": "No messages yet",
+    "practice": "Practice together",
+    "practiceClose": "Close practice",
+    "hint": "Hint",
+    "check": "Check",
+    "next": "Next",
+    "retry": "Try again",
+    "preparing": "Preparing the exercises…",
+    "practiceFailed": "The exercises could not be prepared.",
+    "stage": {
+      "topics": "Pick a topic",
+      "warmup": "Warm-up",
+      "reading": "Reading",
+      "comprehension": "Questions",
+      "discussion": "Discussion"
+    }
   }
 }

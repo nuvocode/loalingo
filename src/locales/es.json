@@ -584,6 +584,21 @@
     "corrections": "Correcciones de esta clase",
     "transcriptOn": "Mostrar transcripción",
     "transcriptOff": "Ocultar transcripción",
-    "noMessages": "Aún no hay mensajes"
+    "noMessages": "Aún no hay mensajes",
+    "practice": "Practicar juntos",
+    "practiceClose": "Cerrar práctica",
+    "hint": "Pista",
+    "check": "Comprobar",
+    "next": "Siguiente",
+    "retry": "Reintentar",
+    "preparing": "Preparando los ejercicios…",
+    "practiceFailed": "No se pudieron preparar los ejercicios.",
+    "stage": {
+      "topics": "Elige un tema",
+      "warmup": "Calentamiento",
+      "reading": "Lectura",
+      "comprehension": "Preguntas",
+      "discussion": "Debate"
+    }
   }
 }
