@@ -6,6 +6,7 @@
 
 - İsimler ağırlıklı karışık: rakiplerin yaklaşık yarısı kullanıcının arayüz dilinden.
 - Rakipler kullanıcıya tepki vermez. Haftanın akışı lig kurulurken belirlenir.
+- Tohum ligde (en alt) kimse düşmez, en üst ligde kimse yükselmez. Kural metni ve çizgiler buna göre değişir.
 - Oturumlar kaydedilmez, tohumdan hesaplanır. Kayıtta yalnız isim, renk, hedef ve tutku durur.
 
 ## Rakip modeli
