@@ -300,7 +300,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
-    if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })));
+    if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 

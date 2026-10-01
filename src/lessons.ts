@@ -261,14 +261,17 @@ export async function learnerFacts(profileId: number): Promise<string[]> {
   } catch (e) { console.error("memory", e); return []; }
 }
 
-/** Background work after a finished call or chat; never throws, a lost memory must not break the lesson. */
+/** Background work after a finished call or chat; resolves to the number of new facts (for a toast).
+ *  Never throws: a lost memory must not break the lesson. */
 export async function rememberSession(profileId: number, native: string, source: MemorySource, otherName: string, lines: { from: "me" | "other"; text: string }[]) {
   try {
-    if (!lines.some((l) => l.from === "me") || !(await memoryOn(profileId))) return;
+    if (!lines.some((l) => l.from === "me") || !(await memoryOn(profileId))) return 0;
     const saved = await listMemories(profileId);
     const raw = await generate(memorySchema, memorySystem(langEn(native)), memoryPrompt(saved, lines, otherName), undefined, looseMemory);
-    await applyMemoryOps(profileId, source, cleanOps(saved, raw));
-  } catch (e) { console.error("memory", e); }
+    const ops = cleanOps(saved, raw);
+    await applyMemoryOps(profileId, source, ops);
+    return ops.add.length;
+  } catch (e) { console.error("memory", e); return 0; }
 }
 
 // ---- Practice together (spec P): one call per unit, cached ----

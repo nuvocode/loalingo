@@ -158,6 +158,27 @@
     "achBook": "Bookworm",
     "achBookDesc": "Finish your first story"
   },
+  "memory": {
+    "title": "Sprigo knows you",
+    "empty": "Nothing yet. As you talk with a tutor or chat on your own topic, what Sprigo learns about you shows up here.",
+    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you.",
+    "hint": "Tap a line to correct it, or remove what shouldn't be kept.",
+    "kinds": {
+      "interest": "Interests",
+      "goal": "Goals and plans",
+      "background": "About you",
+      "learning": "Your learning"
+    },
+    "edit": "Edit",
+    "save": "Save",
+    "forget": "Forget: {{text}}",
+    "forgetOne": "Forget",
+    "forgetAll": "Forget everything",
+    "forgetAllSure": "Forget everything Sprigo knows about you?",
+    "cancel": "Cancel",
+    "saved_one": "Sprigo will remember {{count}} new thing about you (Profile)",
+    "saved_other": "Sprigo will remember {{count}} new things about you (Profile)"
+  },
   "stories": {
     "title": "Stories",
     "subtitle": "Short AI-written dialogues for each unit. Tap a line to hear it and see the translation.",
@@ -272,6 +293,8 @@
     "speakingDesc": "Exercises that use the microphone",
     "bargeIn": "Cut in on the tutor",
     "bargeInDesc": "Talk over the tutor in a live lesson to interrupt. Turn off if the tutor stops on their own because the mic hears the speakers.",
+    "memory": "Remember me",
+    "memoryDesc": "Sprigo keeps lasting things you tell your tutor (interests, plans, what you find hard) and uses them in lessons. Nothing leaves this device unless your AI provider is in the cloud.",
     "phone": "Use on your phone",
     "phoneDesc": "Opens Sprigo to your own devices through Tailscale; your data stays on this computer.",
     "phoneMissing": "Tailscale isn't installed on this computer.",

@@ -168,6 +168,28 @@
     "achBook": "Rat de bibliothèque",
     "achBookDesc": "Termine ta première histoire"
   },
+  "memory": {
+    "title": "Sprigo te connaît",
+    "empty": "Rien pour l'instant. Quand tu parles avec un tuteur ou discutes de ton propre sujet, ce que Sprigo apprend sur toi apparaît ici.",
+    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi.",
+    "hint": "Touche une ligne pour la corriger, ou retire ce qui ne doit pas être gardé.",
+    "kinds": {
+      "interest": "Centres d'intérêt",
+      "goal": "Objectifs et projets",
+      "background": "À propos de toi",
+      "learning": "Ton apprentissage"
+    },
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "forget": "Oublier : {{text}}",
+    "forgetOne": "Oublier",
+    "forgetAll": "Tout oublier",
+    "forgetAllSure": "Sprigo doit-il oublier tout ce qu'il sait sur toi ?",
+    "cancel": "Annuler",
+    "saved_one": "Sprigo retiendra {{count}} nouvelle chose sur toi (Profil)",
+    "saved_other": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)",
+    "saved_many": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)"
+  },
   "stories": {
     "title": "Histoires",
     "subtitle": "De courts dialogues écrits par l'IA pour chaque unité. Touche une ligne pour l'écouter et voir la traduction.",
@@ -286,6 +308,8 @@
     "speakingDesc": "Exercices qui utilisent le micro",
     "bargeIn": "Couper la parole au tuteur",
     "bargeInDesc": "En cours en direct, parle pendant que le tuteur parle pour l'interrompre. Désactive-le si le tuteur s'arrête tout seul parce que le micro capte les haut-parleurs.",
+    "memory": "Se souvenir de moi",
+    "memoryDesc": "Sprigo garde ce qui dure dans ce que tu racontes à ton tuteur (centres d'intérêt, projets, ce qui te pose problème) et s'en sert dans les leçons. Rien ne quitte cet appareil sauf si ton fournisseur d'IA est dans le cloud.",
     "phone": "Utiliser sur ton téléphone",
     "phoneDesc": "Ouvre Sprigo à tes propres appareils via Tailscale ; tes données restent sur cet ordinateur.",
     "phoneMissing": "Tailscale n'est pas installé sur cet ordinateur.",

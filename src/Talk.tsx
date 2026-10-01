@@ -224,7 +224,7 @@ export function Story({ unitId }: { unitId: string }) {
 
 export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: { id?: string; goal: string }; voice?: boolean }) {
   const { t } = useTranslation();
-  const { course, enrollment, profile, s, setS, gainXp } = useApp();
+  const { course, enrollment, profile, s, setS, gainXp, toast } = useApp();
   const ch = CHARACTERS[who];
   const lang = course?.iso ?? "en";
   const [voicing, setVoicing] = useState<number | null>(null); // AI message being spoken (or its voice being made)
@@ -276,7 +276,8 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     sfx("done");
     setResult({ xp, gems });
     // ponytail: only free-topic chats; in a scene the learner plays a role, so "I'm a doctor" is not about them
-    if (profile && topic.goal.startsWith(FREE_GOAL)) void rememberSession(profile.id, profile.native_lang, "chat", ch.name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })));
+    if (profile && topic.goal.startsWith(FREE_GOAL)) void rememberSession(profile.id, profile.native_lang, "chat", ch.name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const over = goal || mine >= CHAT_TURNS;
 

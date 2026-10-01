@@ -199,10 +199,19 @@ export async function listWords(enrollmentId: number) {
 
 // ---- Profile memory (SPR-22, src/memory.ts; per profile, shared by its courses) ----
 
-/** On unless the profile turned it off (device setting `memory.<id>` = "off"). */
-export const memoryOn = async (profileId: number) => (await getSetting(`memory.${profileId}`)) !== "off";
+/** The profile's own switch (Stats.memoryOn, on for new and older profiles). */
+export const memoryOn = async (profileId: number) => (await getProfile(profileId))?.stats.memoryOn ?? false;
 export async function listMemories(profileId: number) {
   return (await db()).select<Memory>("SELECT id, kind, text, source, hits, last_seen_at FROM memories WHERE profile_id = $1 ORDER BY id", [profileId]);
+}
+export async function updateMemory(id: number, text: string) {
+  await (await db()).execute("UPDATE memories SET text = $1, last_seen_at = CURRENT_TIMESTAMP WHERE id = $2", [text, id]);
+}
+export async function deleteMemory(id: number) {
+  await (await db()).execute("DELETE FROM memories WHERE id = $1", [id]);
+}
+export async function forgetMemories(profileId: number) {
+  await (await db()).execute("DELETE FROM memories WHERE profile_id = $1", [profileId]);
 }
 export async function markMemoriesUsed(ids: number[]) {
   if (ids.length) await (await db()).execute(`UPDATE memories SET hits = hits + 1 WHERE id IN (${ids.map((_, i) => `$${i + 1}`).join(", ")})`, ids);

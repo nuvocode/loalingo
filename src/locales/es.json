@@ -168,6 +168,28 @@
     "achBook": "Ratón de biblioteca",
     "achBookDesc": "Termina tu primera historia"
   },
+  "memory": {
+    "title": "Sprigo te conoce",
+    "empty": "Todavía nada. Cuando hables con un tutor o charles sobre tu propio tema, aquí aparecerá lo que Sprigo aprende de ti.",
+    "emptyOff": "La memoria está desactivada: Sprigo no guarda ni usa nada sobre ti.",
+    "hint": "Toca una línea para corregirla o quita lo que no deba guardarse.",
+    "kinds": {
+      "interest": "Intereses",
+      "goal": "Metas y planes",
+      "background": "Sobre ti",
+      "learning": "Tu aprendizaje"
+    },
+    "edit": "Editar",
+    "save": "Guardar",
+    "forget": "Olvidar: {{text}}",
+    "forgetOne": "Olvidar",
+    "forgetAll": "Olvidarlo todo",
+    "forgetAllSure": "¿Quieres que Sprigo olvide todo lo que sabe de ti?",
+    "cancel": "Cancelar",
+    "saved_one": "Sprigo recordará {{count}} cosa nueva sobre ti (Perfil)",
+    "saved_other": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)",
+    "saved_many": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)"
+  },
   "stories": {
     "title": "Historias",
     "subtitle": "Diálogos cortos escritos por IA para cada unidad. Toca una línea para oírla y ver la traducción.",
@@ -286,6 +308,8 @@
     "speakingDesc": "Ejercicios que usan el micrófono",
     "bargeIn": "Interrumpir al tutor",
     "bargeInDesc": "En la clase en vivo puedes hablar mientras el tutor habla para interrumpirlo. Desactívalo si el tutor se calla solo porque el micrófono oye los altavoces.",
+    "memory": "Recuérdame",
+    "memoryDesc": "Sprigo guarda lo duradero que le cuentas a tu tutor (intereses, planes, lo que te cuesta) y lo usa en las lecciones. Nada sale de este dispositivo salvo que tu proveedor de IA esté en la nube.",
     "phone": "Usar en tu móvil",
     "phoneDesc": "Abre Sprigo a tus propios dispositivos mediante Tailscale; tus datos se quedan en este ordenador.",
     "phoneMissing": "Tailscale no está instalado en este ordenador.",

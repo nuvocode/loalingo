@@ -15,7 +15,7 @@ import { Icon, type IconName } from "../icons";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
-function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onChange?: (on: boolean) => void }) {
+export function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onChange?: (on: boolean) => void }) {
   const { t } = useTranslation();
   // ponytail: rows without onChange are visual only, as in the design; wired when each feature lands.
   const [on, setOnState] = useState(initial);
