@@ -12,6 +12,7 @@ import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
+import { CoachCard } from "./Coach";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -248,9 +249,11 @@ export function Profile() {
   ];
   return (
     <>
-      <div className="od-row" style={{ "--od-gap": "16px", marginTop: 24 } as React.CSSProperties}>
+      <div className="od-row profile-head" style={{ "--od-gap": "16px", marginTop: 24 } as React.CSSProperties}>
         <span className="avatar" style={{ width: 72, height: 72, fontSize: 28, background: profile!.color }}>{profile!.name[0]}</span>
         <span className="od-field od-fill"><b style={{ fontSize: 22 }}>{profile!.name}</b><span className="muted small">{t("profile.since", { date: since })}</span></span>
+        {/* The top bar's garden button is easy to miss and isn't there on phones. */}
+        <button className="btn btn-ghost od-row od-nowrap profile-garden" style={{ "--od-gap": "8px" } as React.CSSProperties} onClick={() => go("garden")}><Icon name="roots" />{t("profile.garden")}</button>
       </div>
       <div className="od-grid" style={{ "--od-cols": 2, "--od-gap": "12px", marginTop: 18 } as React.CSSProperties}>
         {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--green)", () => go("garden"))}
@@ -258,7 +261,11 @@ export function Profile() {
         {stat(league.name, t("profile.currentLeague"), "var(--blue)")}
         {stat(t("profile.top3"), t("profile.bestLeague"), "var(--green-dark)")}
       </div>
-      <MemoryCard />
+      <h2 className="section-title">{t("profile.forYou")}</h2>
+      <div className="od-grid profile-cards" style={{ "--od-cols": 2, "--od-gap": "12px" } as React.CSSProperties}>
+        <CoachCard />
+        <MemoryCard />
+      </div>
       <h2 className="section-title">{t("profile.achievements")}</h2>
       <div className="od-stack" style={{ "--od-gap": "12px" } as React.CSSProperties}>
         {ach.map(([ic, key, cur, goal, col]) => {

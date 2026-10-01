@@ -267,7 +267,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
         },
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
         error: (x) => { toast(x.message); if (!c.running) armSilence(); },
-      }, profile?.native_lang);
+      }, s.speechOn ? profile?.native_lang : undefined); // voice analysis off: nothing measured, saved or adapted to
       if (c.over) return void m.stop();
       if (c.speaking) m.pause(s.bargeIn); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
