@@ -10,8 +10,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "node --test src/*.test.ts",
-    "fetch-model": "sh scripts/fetch-model.sh",
-    "release": "sh scripts/release.sh"
+    "fetch-model": "sh scripts/fetch-model.sh"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.68",
