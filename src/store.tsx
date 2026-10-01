@@ -9,6 +9,7 @@ import type { Enrollment, Profile, Stats } from "./db";
 import { rollDay, today } from "./progress";
 import { FutureSchemaError } from "./migrate";
 import { DataDirError, LockedError, startHeartbeat } from "./datadir";
+import { onHandoff } from "./companion";
 
 export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings" | "garden";
 const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings", "garden"];
@@ -36,7 +37,7 @@ async function loadCourses() {
 export const LAST_PROFILE = "last_profile";
 
 /** `detail`: the folder for "unreachable", the other device for "locked", the error message otherwise. */
-export type BootError = { kind: "future" | "failed" | "unreachable" | "locked"; detail: string };
+export type BootError = { kind: "future" | "failed" | "unreachable" | "locked" | "onPhone" | "onDesktop"; detail: string };
 const bootErrorOf = (e: unknown): BootError =>
   e instanceof DataDirError ? { kind: "unreachable", detail: e.dir }
   : e instanceof LockedError ? { kind: "locked", detail: e.device }
@@ -112,6 +113,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
+        onHandoff((to) => setBootError({ kind: to === "phone" ? "onPhone" : "onDesktop", detail: "" }));
         await db.openDb();
         if (db.isTauri) startHeartbeat((device) => setBootError({ kind: "locked", detail: device }));
         const cfg = await loadAiConfig();

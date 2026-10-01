@@ -76,6 +76,16 @@ function BootErrorScreen({ e }: { e: BootError }) {
   const [busy, setBusy] = useState(false);
   const act = (f: () => Promise<void> | void) => async () => { setBusy(true); try { await f(); } catch (x) { console.error(x); setBusy(false); } };
   // Data folder / lock (spec B): retrying is a reload, the boot sequence checks everything again.
+  // Phone companion: one device at a time; continuing here reloads, which takes the data back (src/companion.ts).
+  if (e.kind === "onPhone" || e.kind === "onDesktop") return (
+    <div className="boot-error" role="alert">
+      <div className="card od-stack" style={{ "--od-gap": "10px" } as React.CSSProperties}>
+        <h3>{t(`boot.${e.kind}Title`)}</h3>
+        <p className="muted">{t(`boot.${e.kind}Desc`)}</p>
+        <button className="btn btn-primary btn-block" onClick={() => location.reload()}>{t("boot.continueHere")}</button>
+      </div>
+    </div>
+  );
   const retry = <button className="btn btn-primary btn-block" disabled={busy} onClick={() => location.reload()}>{t("boot.retry")}</button>;
   if (e.kind === "unreachable" || e.kind === "locked") return (
     <div className="boot-error" role="alert">

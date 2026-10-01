@@ -4,7 +4,8 @@ import { useApp } from "../store";
 import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
 import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
-import { isTauri } from "../db";
+import { getSetting, isCompanion, isTauri, setSetting } from "../db";
+import { setCompanion, tailscaleStatus, type TailscaleStatus } from "../companion";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
@@ -25,6 +26,103 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
       <button className={`btn ${on ? "btn-primary" : "btn-ghost"}`} style={{ minWidth: 84 }} aria-pressed={on} onClick={() => setOn(!on)}>
         {t(on ? "settings.on" : "settings.off")}
       </button>
+    </div>
+  );
+}
+
+/** Desktop only: the phone companion server (docs/MOBILE.md). Needs Tailscale installed and signed in. */
+const TAILSCALE_DOWNLOAD = "https://tailscale.com/download";
+function PhoneRow() {
+  const { t } = useTranslation();
+  const { toast, openSheet } = useApp();
+  const [ts, setTs] = useState<TailscaleStatus | null>(null);
+  const [on, setOn] = useState(false);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { Promise.all([tailscaleStatus(), getSetting("companion")]).then(([s, v]) => { setTs(s); setOn(v === "on"); }); }, []);
+  // The learner opens or signs in to Tailscale in its own app, then comes back here.
+  useEffect(() => {
+    const check = () => tailscaleStatus().then(setTs);
+    window.addEventListener("focus", check);
+    return () => window.removeEventListener("focus", check);
+  }, []);
+  if (!ts) return null;
+  const ready = ts.installed && ts.running;
+  // Turning on (or the QR button) runs `tailscale serve` again: it's idempotent and returns the address to show.
+  const turn = async (v: boolean) => {
+    setBusy(true);
+    try {
+      const r = await setCompanion(v);
+      await setSetting("companion", v ? "on" : "off");
+      setOn(v);
+      if (r) openSheet(<PhoneQrSheet url={r[0]} qr={r[1]} />);
+    } catch (e) {
+      const link = String(e).match(/https:\/\/\S+/)?.[0];
+      link ? openSheet(<PhoneApproveSheet url={link} />) : toast(String(e));
+      tailscaleStatus().then(setTs); // a failure may mean Tailscale quit or signed out meanwhile
+    } finally { setBusy(false); }
+  };
+  const note = !ts.installed ? "settings.phoneMissing" : !ts.running ? "settings.phoneSignIn" : "settings.phoneDesc";
+  return (
+    <div className="card od-row" style={gap("12px")}>
+      <span className="od-field od-fill"><b>{t("settings.phone")}</b><span className="muted small">{t(note)}</span></span>
+      <button className="icon-btn" aria-label={t("settings.phoneAbout")} onClick={() => openSheet(<PhoneInfoSheet />)}><Icon name="info" /></button>
+      {on && ready && <button className="icon-btn" aria-label={t("settings.phoneShowQr")} disabled={busy} onClick={() => turn(true)}><Icon name="qr" /></button>}
+      {/* An unready Tailscale still lets the learner switch an old "on" off. */}
+      <button className={`btn ${on ? "btn-primary" : "btn-ghost"}`} style={{ minWidth: 84 }} aria-pressed={on} disabled={busy || (!ready && !on)} onClick={() => turn(!on)}>
+        {t(on ? "settings.on" : "settings.off")}
+      </button>
+    </div>
+  );
+}
+
+function PhoneInfoSheet() {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  return (
+    <div className="od-stack" style={gap("12px")}>
+      <h3>{t("settings.phone")}</h3>
+      <p className="muted">{t("settings.phoneDesc")}</p>
+      <ol className="od-stack small" style={{ ...gap("8px"), paddingLeft: 20 }}>
+        <li>{t("settings.phoneHow1")}</li>
+        <li>{t("settings.phoneHow2")}</li>
+        <li>{t("settings.phoneHow3")}</li>
+      </ol>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <button className="btn btn-blue btn-block" onClick={() => openLink(TAILSCALE_DOWNLOAD)}>{t("settings.phoneGetTailscale")}</button>
+        <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("settings.phoneOk")}</button>
+      </div>
+    </div>
+  );
+}
+
+function PhoneQrSheet({ url, qr }: { url: string; qr: string }) {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  return (
+    <div className="od-stack" style={{ ...gap("12px"), alignItems: "center", textAlign: "center" }}>
+      <h3>{t("settings.phoneScan")}</h3>
+      <p className="muted small">{t("settings.phoneScanDesc")}</p>
+      {/* SVG made by our own Rust side from the tailnet address; white behind it so dark mode still scans. */}
+      <div style={{ background: "#fff", padding: 8, borderRadius: 12, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: qr }} />
+      <code className="small" style={{ userSelect: "all", overflowWrap: "anywhere" }}>{url}</code>
+      <div className="od-stack sheet-actions" style={{ ...gap("8px"), alignSelf: "stretch" }}>
+        <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("settings.phoneOk")}</button>
+      </div>
+    </div>
+  );
+}
+
+function PhoneApproveSheet({ url }: { url: string }) {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  return (
+    <div className="od-stack" style={gap("12px")}>
+      <h3>{t("settings.phoneApprove")}</h3>
+      <p className="muted">{t("settings.phoneApproveDesc")}</p>
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <button className="btn btn-blue btn-block" onClick={() => openLink(url)}>{t("settings.phoneApproveOpen")}</button>
+        <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      </div>
     </div>
   );
 }
@@ -225,11 +323,12 @@ export function Settings() {
         <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
         <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
         <ToggleRow k="bargeIn" initial={s.bargeIn} onChange={(bargeIn) => setS((s) => ({ ...s, bargeIn }))} />
-        <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
+        {!isCompanion && <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
           setS((s) => ({ ...s, reminderOn }));
           if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
-        }} />
+        }} />}
         <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
+        {isCompanion && <TtsRow />}
       </div>
 
       <h2 className="section-title">{t("settings.appearance")}</h2>
@@ -252,9 +351,10 @@ export function Settings() {
         </div>
       </div>
 
-      <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
+      {/* Phone: AI, voice and data settings are the desktop's (shared database), so they stay there. */}
+      {!isCompanion && <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
         {t("settings.advanced")} <span aria-hidden="true">{advanced ? "▴" : "▾"}</span>
-      </button>
+      </button>}
       {advanced && (
         <>
           <h2 className="section-title">{t("settings.aiVoice")}</h2>
@@ -267,14 +367,15 @@ export function Settings() {
             </div>
             <TtsRow />
             <SttRow />
+            {isTauri && <PhoneRow />}
           </div>
 
           <DataSection />
         </>
       )}
 
-      <h2 className="section-title">{t("update.section")}</h2>
-      <VersionRow />
+      {!isCompanion && <><h2 className="section-title">{t("update.section")}</h2>
+      <VersionRow /></>}
       <p className="muted small" style={{ textAlign: "center", marginTop: 8 }}>
         {t("update.madeBy")} <a href={AUTHOR_URL} onClick={(e) => { e.preventDefault(); void openLink(AUTHOR_URL); }}>mehmetozer.dev</a>
       </p>
