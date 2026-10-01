@@ -29,6 +29,7 @@ type Call = {
   nudges: number; // silence events since the learner last said something
   fills: number; // fillers played, so each turn picks the next one
   running: boolean; over: boolean; opened: boolean; micOn: boolean; failed: TutorEvent | null;
+  cut: (() => void) | null; // stops the reply being spoken, when the learner talks over it (SPR-17)
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
 };
@@ -43,7 +44,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   usePrewarm(lang, ch.gender);
   useEffect(warmUp, []);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -91,7 +92,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (!line.trim() || c.over) return;
     let fired = false;
     const go = (at = performance.now()) => { if (!fired) { fired = true; started?.(at); } };
-    c.speaking = true; mic.current?.pause(); setTalking(true); // the mic would hear the tutor
+    c.speaking = true; mic.current?.pause(s.bargeIn); setTalking(true); // the mic would hear the tutor; with barge-in it only listens harder
     try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }, go); } catch { /* the caption still shows it */ }
     finally {
       go();
@@ -107,18 +108,22 @@ export function TutorCall({ who }: { who: CharacterId }) {
    *  waits for it to finish; it is not captioned and not part of the history. */
   const speaker = () => {
     const q: string[] = [];
-    let busy: Promise<void> | null = null, at = -1;
+    let busy: Promise<void> | null = null, at = -1, cut = false;
+    c.cut = () => {
+      cut = true; q.length = 0;
+      if (at >= 0) { c.hist = c.hist.map((m, i) => (i === at ? { ...m, cut: true } : m)); setMsgs(c.hist); }
+    };
     const caption = (piece: string, t: number) => {
       if (at < 0) { mark("audio", t); push({ from: "tutor", text: piece, via: "voice" }); at = c.hist.length - 1; setThinking(false); return; }
       c.hist = c.hist.map((m, i) => (i === at ? { ...m, text: `${m.text} ${piece}` } : m)); setMsgs(c.hist);
     };
     const drain = async () => {
-      while (q.length && !c.over) { const piece = q.splice(0).join(" "); await voice(piece, (t) => caption(piece, t)); }
+      while (q.length && !c.over && !cut) { const piece = q.splice(0).join(" "); await voice(piece, (t) => caption(piece, t)); }
       busy = null;
     };
     return {
-      add: (line: string) => { q.push(line); busy ??= drain(); },
-      filler: (line: string) => { if (!busy && at < 0) busy = voice(line).then(drain); },
+      add: (line: string) => { if (cut) return; q.push(line); busy ??= drain(); },
+      filler: (line: string) => { if (!busy && at < 0 && !cut) busy = voice(line).then(drain); },
       end: () => busy ?? Promise.resolve(),
     };
   };
@@ -169,7 +174,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       c.failed = e; setErr((x as Error).message); setThinking(false);
       return false;
     } finally {
-      clearTimeout(slow);
+      clearTimeout(slow); c.cut = null;
     }
   };
 
@@ -247,12 +252,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
     try {
       const m = await listen(lang, {
         utterance: (x) => input("user_said", x),
-        speech: clearSilence, // the learner started talking: no nudge mid-sentence
+        speech: () => {
+          clearSilence(); // the learner started talking: no nudge mid-sentence
+          if (c.speaking && s.bargeIn) { c.cut?.(); stopSpeaking(); } // ...over the tutor: the tutor stops (SPR-17)
+        },
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
         error: (x) => { toast(x.message); if (!c.running) armSilence(); },
       });
       if (c.over) return void m.stop();
-      if (c.speaking) m.pause(); // turned on mid-speech: the tutor's voice would be heard
+      if (c.speaking) m.pause(s.bargeIn); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
       if (announce) fire({ kind: "mic", on: true });
       else if (!c.running) armSilence();

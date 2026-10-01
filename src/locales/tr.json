@@ -262,6 +262,8 @@
     "soundDesc": "Doğru/yanlış geri bildirim sesleri",
     "speaking": "Konuşma egzersizleri",
     "speakingDesc": "Mikrofonlu alıştırmalar",
+    "bargeIn": "Tutor'un sözünü kesebilirim",
+    "bargeInDesc": "Canlı derste tutor konuşurken konuşarak araya girebilirsin. Mikrofon hoparlörü duyup tutor kendiliğinden susuyorsa kapat.",
     "reminder": "Hatırlatmalar",
     "reminderDesc": "Sprigo gün içinde birkaç kez seni derse çağırır; o gün çalıştıysan susar. Açıkken arka planda kalır.",
     "reduceMotion": "Hareket azaltma",

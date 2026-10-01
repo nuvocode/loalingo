@@ -224,6 +224,7 @@ export function Settings() {
         <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
         <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
         <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
+        <ToggleRow k="bargeIn" initial={s.bargeIn} onChange={(bargeIn) => setS((s) => ({ ...s, bargeIn }))} />
         <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
           setS((s) => ({ ...s, reminderOn }));
           if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));

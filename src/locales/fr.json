@@ -279,6 +279,8 @@
     "soundDesc": "Sons de bonne et de mauvaise réponse",
     "speaking": "Exercices oraux",
     "speakingDesc": "Exercices qui utilisent le micro",
+    "bargeIn": "Couper la parole au tuteur",
+    "bargeInDesc": "En cours en direct, parle pendant que le tuteur parle pour l'interrompre. Désactive-le si le tuteur s'arrête tout seul parce que le micro capte les haut-parleurs.",
     "reminder": "Rappels",
     "reminderDesc": "Sprigo te fait signe plusieurs fois par jour et se tait dès que tu as pratiqué. Quand il est activé, il reste en arrière-plan.",
     "reduceMotion": "Réduire les animations",

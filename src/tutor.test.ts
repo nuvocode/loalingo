@@ -105,3 +105,9 @@ test("filler takes turns in the course language and falls back to Hmm", () => {
   assert.equal(filler("pt-BR", 1), "Deixa ver…");
   assert.equal(filler("ja", 5), "Hmm…");
 });
+
+test("a tutor line the learner talked over is marked in the prompt", () => {
+  const p = tutorPrompt("Mia", [{ from: "tutor", text: "Today we talk about", via: "voice", cut: true }, { from: "me", text: "Wait", via: "voice" }], "", { kind: "user_said", text: "Wait" });
+  assert.ok(p.includes("Mia: Today we talk about (interrupted)"));
+  assert.ok(!p.includes("Wait (interrupted)"));
+});

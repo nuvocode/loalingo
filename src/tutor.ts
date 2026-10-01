@@ -21,7 +21,7 @@ export type TutorEvent =
   | { kind: "practice_stuck" }
   | { kind: "practice_done"; score: number; total: number };
 
-export type TutorMsg = { from: "tutor" | "me"; text: string; via: "voice" | "text" };
+export type TutorMsg = { from: "tutor" | "me"; text: string; via: "voice" | "text"; cut?: boolean }; // cut: the learner spoke over it (SPR-17)
 
 /** What the prompt needs; lessons.ts fills it from the character, the course and the current unit. */
 export type TutorCtx = { name: string; persona: string; target: string; native: string; level: string; unit: string; words: string[]; grammar: string[] };
@@ -58,6 +58,7 @@ export function tutorSystem(c: TutorCtx): string {
     `\`notes\`: your private lesson notes for the next turn, at most ${NOTES_MAX} characters: where the lesson is and what to do next.`,
     "`answer`: only when the practice screen notes ask for it (a spoken answer, a topic title, or \"next\"); otherwise \"\".",
     "Messages marked (typed) were written in the call chat, not spoken; answer them aloud as usual.",
+    "A line of yours marked (interrupted) was cut off by the learner: answer what they said; repeat only what they still need.",
     "Respond only with JSON matching the schema.",
   ].join("\n");
 }
@@ -82,7 +83,7 @@ export function describeEvent(e: TutorEvent): string {
 }
 
 export function tutorPrompt(name: string, history: TutorMsg[], notes: string, e: TutorEvent, screen = ""): string {
-  const lines = history.slice(-HISTORY_IN_PROMPT).map((m) => `${m.from === "tutor" ? name : "Learner"}${m.via === "text" ? " (typed)" : ""}: ${m.text}`);
+  const lines = history.slice(-HISTORY_IN_PROMPT).map((m) => `${m.from === "tutor" ? name : "Learner"}${m.via === "text" ? " (typed)" : ""}: ${m.text}${m.cut ? " (interrupted)" : ""}`);
   return [
     `Your notes: ${notes || "(none yet)"}`,
     `Conversation so far:\n${lines.join("\n") || "(nothing yet)"}`,
