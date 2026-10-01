@@ -6,7 +6,7 @@ import { useApp } from "../store";
 import { languages } from "../i18n";
 import * as db from "../db";
 import type { Profile } from "../db";
-import type { Course } from "../course";
+import { levelRange, type Course } from "../course";
 
 const COLORS = ["#12b886", "#4c6ef5", "#b07cf0", "#f4862a", "#e91e63", "#00b8a9", "#f5b014", "#5c6bc0"];
 // ponytail: fixed list of native languages the AI can translate into; extend when someone asks.
@@ -85,7 +85,7 @@ export function ProfileForm({ initial, onDone }: { initial?: Profile; onDone?: (
       {!initial && (
         <label className="od-field"><b>{t("profiles.course")}</b>
           <select className="select" value={courseIso} onChange={(e) => setCourseIso(e.target.value)}>
-            {courses.map((c) => <option key={c.iso} value={c.iso}>{c.flag} {langName(c.iso)}</option>)}
+            {courses.map((c) => <option key={c.iso} value={c.iso}>{c.flag} {langName(c.iso)} · {levelRange(c)}</option>)}
           </select>
           {!courses.length && <span className="small" style={{ color: "var(--red)" }}>{t("profiles.noCourses")}</span>}
         </label>
@@ -225,7 +225,7 @@ export function CourseSheet() {
       {others.length ? others.map((c) => (
         <button key={c.iso} className="card row-item" onClick={() => pick(c)}>
           <span style={{ fontSize: 28 }}><CourseFlag c={c} /></span>
-          <span className="od-field od-fill"><b>{langName(c.iso)}</b><span className="muted small">{c.native_name}</span></span>
+          <span className="od-field od-fill"><b>{langName(c.iso)}</b><span className="muted small">{c.native_name} · {levelRange(c)}</span></span>
           <span className="btn btn-ghost" style={{ pointerEvents: "none" }}>{t("profiles.start")}</span>
         </button>
       )) : <p className="muted small">{t("profiles.noMoreCourses")}</p>}

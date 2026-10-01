@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { parseCourse, buildPath } from "./course.ts";
+import { parseCourse, buildPath, levelRange } from "./course.ts";
 
 const en = readFileSync(new URL("../courses/en.yml", import.meta.url), "utf8");
 
@@ -57,4 +57,18 @@ test("broken YAML fails with file, path and reason", () => {
   bad(en.replace("type: match", "type: quiz"), /x\.yml:[\s\S]*levels\.A1\.units\[0\]\.steps\[0\]\.activities\[2\]\.type/);
   bad(en.replace("id: introduce-yourself", "id: basic-greetings"), /duplicate step id "basic-greetings"/);
   bad(en.replace("vocabulary: [one,", "vocab: [one,"), /vocab/);
+});
+
+// A1-only courses (es, fr, de, tr): same shape as en.yml's A1, so the path, chests and checkpoint work unchanged.
+for (const iso of ["es", "fr", "de", "tr"]) test(`courses/${iso}.yml is a valid A1 course: 10 units × 4 steps and a checkpoint`, () => {
+  const c = parseCourse(readFileSync(new URL(`../courses/${iso}.yml`, import.meta.url), "utf8"), `${iso}.yml`);
+  assert.equal(c.iso, iso);
+  assert.equal(levelRange(c), "A1");
+  const a1 = c.levels.A1!;
+  assert.deepEqual(a1.units.map((u) => u.steps.length), Array(10).fill(4));
+  assert.ok(a1.checkpoint && a1.units.every((u) => u.steps.every((st) => st.vocabulary.length + st.grammar.length > 0)));
+});
+
+test("level range: one level alone, several as first–last", () => {
+  assert.equal(levelRange(parseCourse(en, "en.yml")), "A1–C2");
 });
