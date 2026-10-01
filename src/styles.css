@@ -562,3 +562,11 @@ html[data-theme="dark"] .garden-hero{background:var(--btd)}
 .garden-fruit span.on{background:var(--fruit);border:none;color:#fff}
 @media(prefers-reduced-motion:no-preference){.garden-tree{animation:sway 6s ease-in-out infinite}}
 @keyframes sway{0%,100%{transform:translateX(-50%) rotate(-1deg)}50%{transform:translateX(-50%) rotate(1deg)}}
+
+/* ===== live frame (SPR-11): the biome frames the call, never covers it ===== */
+.call-grid{gap:6px;padding:6px;border-radius:20px;background:var(--bh,var(--surface))}
+.call-grid .call-pane{border-radius:14px}
+.lesson-footer:has(.call-bar){position:relative;overflow:hidden}
+.call-bar{position:relative;isolation:isolate}
+.call-bar::before{content:"";position:absolute;z-index:-1;left:50%;width:100vw;top:-16px;bottom:-16px;transform:translateX(-50%);pointer-events:none;opacity:.14;
+  background:var(--bh,transparent);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%}
