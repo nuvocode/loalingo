@@ -432,6 +432,7 @@
     "apiKeyDesc": "Wird im Schlüsselbund deines Systems gespeichert, nie in der App-Datenbank",
     "model": "Modell",
     "modelDesc": "Teste die Verbindung, um die verfügbaren Modelle aufzulisten",
+    "smallModel": "Modelle unter {{min}} können Lektionen mit falschen Antworten schreiben. Empfohlen wird ein Modell ab {{min}}.",
     "test": "Verbindung testen",
     "save": "Speichern",
     "connected": "Verbunden – {{count}} Modelle gefunden",

@@ -432,6 +432,7 @@
     "apiKeyDesc": "Stored in your system keychain, never in the app database",
     "model": "Model",
     "modelDesc": "Test the connection to list the available models",
+    "smallModel": "Models under {{min}} can write lessons with wrong answers. A model of {{min}} or more is recommended.",
     "test": "Test connection",
     "save": "Save",
     "connected": "Connected — {{count}} models found",

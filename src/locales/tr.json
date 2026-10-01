@@ -427,6 +427,7 @@
     "apiKeyDesc": "Uygulama veritabanında değil, sistem anahtarlığında saklanır",
     "model": "Model",
     "modelDesc": "Mevcut modelleri listelemek için bağlantıyı test et",
+    "smallModel": "{{min}} altındaki modeller derslerde yanlış cevaplar üretebilir. En az {{min}} bir model önerilir.",
     "test": "Bağlantıyı test et",
     "save": "Kaydet",
     "connected": "Bağlandı — {{count}} model bulundu",
