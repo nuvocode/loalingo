@@ -44,6 +44,14 @@ function PathLines() {
   );
 }
 
+// Pebble outline for lesson nodes (64×64): drawn twice for the 3D edge, once more as the current-lesson ring.
+const PEBBLE = "M33 3C48 4 61 14 61 31C61 48 49 61 31 61C15 61 3 50 3 33C3 16 16 2 33 3Z";
+const NodeShape = () => (
+  <svg className="node-shape" viewBox="0 0 64 64" aria-hidden="true">
+    <path className="sh" d={PEBBLE} /><path className="fc" d={PEBBLE} /><path className="ring" d={PEBBLE} />
+  </svg>
+);
+
 const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
   step: { done: "check", current: "star", locked: "lock" },
   chest: { done: "check", current: "basket", locked: "basket" },
@@ -91,7 +99,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
         {u.nodes.map((n, ni) => {
           const off = PATH_OFF[((u.index - 1) * 3 + ni) % PATH_OFF.length];
           const gold = n.kind === "step" && legendary.has(n.id);
-          const cls = n.kind === "step" ? `${n.state}${gold ? " legendary" : ""}` : `${n.kind === "chest" ? "chest" : "legendary"} ${n.state}`;
+          const cls = n.kind === "step" ? `${n.state}${gold ? " legendary" : ""}` : `${n.kind} ${n.state}`;
           const name = n.kind === "chest" ? t("learn.chest") : n.title;
           const onClick =
             n.state === "locked" ? undefined
@@ -101,6 +109,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
           return (
             <div className={`node ${cls}`} style={{ transform: `translateX(${off}px)` }} key={n.id}>
               <button className="node-btn" onClick={onClick} aria-label={name} aria-disabled={!onClick || undefined}>
+                <NodeShape />
                 <Icon name={gold ? "star" : ICON[n.kind][n.state]} />
               </button>
               {n.state === "current" && n.kind === "step" && <span className="start-tag">{t("learn.start")}</span>}
