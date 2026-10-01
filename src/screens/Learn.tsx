@@ -223,7 +223,7 @@ export function Learn() {
   useLayoutEffect(() => {
     const target = document.querySelector(".node.current") ?? document.querySelector(".node.locked") ?? [...document.querySelectorAll(".node")].pop();
     target?.scrollIntoView({ block: "center" });
-  }, [shownLevel]);
+  }, [enrollment?.id, shownLevel, course, done]); // also after a profile switch, the async course load and a finished lesson
   // First run (DECISIONS C6): offer setup once per launch; the banner stays until a provider is saved.
   useEffect(() => { if (!ai && !setupOffered) { setupOffered = true; openSheet(<AiSheet />); } }, [ai]);
   const setup = !ai && (
