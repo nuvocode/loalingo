@@ -31,7 +31,9 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
 }
 
 /** Desktop only: the phone companion server (docs/MOBILE.md). */
-const SERVE_CMD = "tailscale serve --bg --https=8443 http://127.0.0.1:1430";
+// The Mac app's CLI lives inside its bundle; a bare `tailscale` on PATH is often missing or broken there.
+const TAILSCALE = navigator.userAgent.includes("Mac") ? "/Applications/Tailscale.app/Contents/MacOS/Tailscale" : "tailscale";
+const SERVE_CMD = `${TAILSCALE} serve --bg --https=8443 http://127.0.0.1:1430`;
 function PhoneRow() {
   const { t } = useTranslation();
   const { toast } = useApp();
