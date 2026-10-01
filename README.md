@@ -20,15 +20,18 @@
 
 ## Features
 
-- **Structured course:** English A1 → B2, with 40+ steps per level and a checkpoint at the end of each level. Explanations are in Turkish.
-- **AI-generated lessons:** translate, fill in the blank, match, listen, word bank, error correction and more. Lessons adapt to your recent mistakes.
-- **Live lesson:** a video-call style lesson with an animated tutor who talks with you, with live captions. Open the practice panel to do exercises together while the tutor follows along.
-- **Speaking:** speech recognition runs inside the app (whisper.cpp), with no extra service to install. Deepgram is an optional cloud alternative, and **Try** lets you check it with your own voice.
+- **Structured course:** English A1 → C2, with 50+ steps per level, a harvest basket at the end of each unit and a checkpoint at the end of each level. Each unit has a guidebook, and a level test lets you skip ahead. Explanations are in Turkish.
+- **AI-generated lessons:** translate, fill in the blank, match, listen, word bank, error correction and more. Lessons adapt to your recent mistakes, and a harder Mastery version turns a finished lesson gold.
+- **Live lesson:** a video-call style lesson with one of six animated tutors who talks with you, with live captions. You can cut in while the tutor is speaking. Open the practice panel to do exercises together while the tutor follows along.
+- **Speaking:** speech recognition runs inside the app (whisper.cpp), with no extra service to install. Deepgram is an optional cloud alternative, and **Try it** lets you check it with your own voice.
 - **Natural voices:** besides the system voice, Piper (fast, local) and Kokoro (most natural, English only) run on your machine and are downloaded on first use.
-- **Stories and roleplay:** chat or talk with characters in real-life scenes, and get corrections as you go.
-- **Gamification:** streaks, XP, gems, hearts, daily quests, a local league, Match Madness and timed challenges.
-- **Private by default:** your progress stays in a local SQLite database, and API keys are kept in the system keychain. Several profiles can share one computer, optionally with a PIN.
-- Daily reminder, light and dark themes, and an interface in English, Turkish, German, French or Spanish.
+- **Stories and roleplay:** chat or call characters in real-life scenes, and get corrections as you go.
+- **Practice hub:** fix your mistakes, speaking and listening practice, your word list, Match Madness and a timed challenge.
+- **Your garden:** a tree that grows with your lessons, stays green while you keep your streak (days of roots) and grows a fruit for every level you pass. Each level has its own landscape, from meadow to summit.
+- **Gamification:** XP, coins, drops, daily quests, a shop, friends and a local league.
+- **Use it on your phone:** turn on **Settings → Use on your phone** and scan the code to open Sprigo in your phone's browser over [Tailscale](https://tailscale.com). Your data, speech recognition and Ollama stay on the computer.
+- **Private by default:** your progress stays in a local SQLite database with daily backups, and API keys are kept in the system keychain. You can move the data folder (for example to a synced folder), or export and import it. Several profiles can share one computer, optionally with a PIN.
+- Reminders, light and dark themes, and an interface in English, Turkish, German, French or Spanish.
 - Automatic in-app updates.
 
 ## Install
@@ -51,7 +54,7 @@ On first launch, Sprigo looks for a local model server:
 
 - **[Ollama](https://ollama.com/download)** (recommended): install and start it. If no model is installed yet, Sprigo offers to download `qwen3:8b` (about 5.2 GB) for you.
 - **[LM Studio](https://lmstudio.ai):** start its local server and load a model.
-- **Cloud:** you can also use OpenAI, Anthropic or Gemini with your own API key. Pick one in **Settings → AI provider**; each option has a short note on what it is good at.
+- **Cloud:** you can also use OpenAI, Anthropic or Gemini with your own API key. Pick one in **Settings → Advanced → AI provider**; each option has a short note on what it is good at.
 
 ## Development
 
