@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { CourseLevel } from "./course.ts";
-import { currentUnit, describeEvent, HISTORY_IN_PROMPT, isNoise, looseTutor, mergeInput, partialSay, sentences, silenceDelay, tutorPrompt, tutorSystem, type TutorMsg, type TutorReply } from "./tutor.ts";
+import { currentUnit, describeEvent, filler, HISTORY_IN_PROMPT, isNoise, looseTutor, mergeInput, partialSay, sentences, silenceDelay, tutorPrompt, tutorSystem, type TutorMsg, type TutorReply } from "./tutor.ts";
 
 const ctx = { name: "Mia", persona: "Cheerful barista.", target: "English", native: "Turkish", level: "A2", unit: "Food", words: ["apple", "bread"], grammar: ["I like + noun"] };
 
@@ -97,4 +97,11 @@ test("sentences keeps the unfinished tail until the reply is final", () => {
   assert.deepEqual(sentences("Hola! ¿Qué tal? Bien", true), ["Hola!", "¿Qué tal?", "Bien"]);
   assert.deepEqual(sentences('She said "yes." Then left.', true), ['She said "yes."', "Then left."]);
   assert.deepEqual(sentences("3.5 apples", false), []); // no space after the dot: not a sentence end
+});
+
+test("filler takes turns in the course language and falls back to Hmm", () => {
+  assert.notEqual(filler("es", 0), filler("es", 1));
+  assert.equal(filler("es", 3), filler("es", 0));
+  assert.equal(filler("pt-BR", 1), "Deixa ver…");
+  assert.equal(filler("ja", 5), "Hmm…");
 });

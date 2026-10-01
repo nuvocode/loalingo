@@ -1,7 +1,6 @@
 // Text-to-speech (spec D): system voices, local Piper (every course language) or local Kokoro (English only).
 // Device setting "tts": "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
 // and stream one sentence at a time, so the first sentence plays while the rest is made.
-import { mark } from "./latency";
 import { getSetting } from "./db";
 import { pickSystemVoice } from "./voices";
 import { mouthBright, mouthLevel, remember, zcr } from "./audio";
@@ -126,8 +125,8 @@ function systemVoices(): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
-let onStart: (() => void) | undefined; // the current speak's `started`
-const begun = (at?: number) => { mark("audio", at); const f = onStart; onStart = undefined; f?.(); };
+let onStart: ((at: number) => void) | undefined; // the current speak's `started`
+const begun = (at = performance.now()) => { const f = onStart; onStart = undefined; f?.(at); };
 
 async function system(text: string, lang: string, gender: "f" | "m" | undefined, mine: number, done: () => void) {
   const voices = await systemVoices();
@@ -194,8 +193,8 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
 }
 
 /** One voice at a time: a new call cuts the previous one. Resolves when this speech ends or is cut.
- *  Falls back to the system voice if the local engine fails before any audio. `started` runs when its audio begins. */
-export async function speak(text: string, lang: string, voice?: Voice, started?: () => void): Promise<void> {
+ *  Falls back to the system voice if the local engine fails before any audio. `started` gets the time its audio begins. */
+export async function speak(text: string, lang: string, voice?: Voice, started?: (at: number) => void): Promise<void> {
   stopSpeaking();
   onStart = started;
   const mine = seq;

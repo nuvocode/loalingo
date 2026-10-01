@@ -114,6 +114,16 @@ export const isNoise = (text: string) => !text.replace(/\[[^\]]*\]|\([^)]*\)/g, 
 export const currentUnit = (level: CourseLevel, done: Set<string>) =>
   level.units.find((u) => u.steps.some((s) => !done.has(s.id))) ?? level.units[level.units.length - 1];
 
+// ---- Fillers (SPR-16): a short sound while a slow reply is still on its way ----
+
+export const FILLER_MS = 1500; // first sentence usually comes in 0.5–0.9 s (SPR-14); a filler before that would only delay it
+const FILLERS: Record<string, string[]> = {
+  en: ["Hmm…", "Let me see…", "Okay…"], tr: ["Hmm…", "Bir bakayım…", "Peki…"], de: ["Hmm…", "Mal sehen…", "Also…"],
+  fr: ["Hmm…", "Voyons…", "Bon…"], es: ["Mmm…", "A ver…", "Bueno…"], it: ["Mmm…", "Vediamo…", "Allora…"], pt: ["Hmm…", "Deixa ver…", "Bem…"],
+};
+/** The n-th filler for the course language, in turn so the same one never plays twice in a row. */
+export const filler = (lang: string, n: number) => { const f = FILLERS[lang.split("-")[0]] ?? ["Hmm…"]; return f[n % f.length]; };
+
 // ---- Streaming (SPR-13): speak `say` sentence by sentence while the rest of the reply is still coming ----
 
 const ESC: Record<string, string> = { n: " ", t: " ", r: "", b: "", f: "", '"': '"', "\\": "\\", "/": "/" };

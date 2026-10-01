@@ -14,7 +14,7 @@ import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
 import { loadPractice, tutorTurn } from "./lessons";
 import { warmUp } from "./ai";
-import { NOTES_MAX, currentUnit, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
+import { FILLER_MS, NOTES_MAX, currentUnit, filler, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
 import * as db from "./db";
 import { PracticePanel } from "./PracticePanel";
@@ -27,6 +27,7 @@ const BONUS_MS = 5 * 60_000; // a call this long earns +20 XP
 type Call = {
   hist: TutorMsg[]; notes: string; last: TutorReply | null; queue: TutorEvent[]; fixes: string[];
   nudges: number; // silence events since the learner last said something
+  fills: number; // fillers played, so each turn picks the next one
   running: boolean; over: boolean; opened: boolean; micOn: boolean; failed: TutorEvent | null;
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
@@ -42,7 +43,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   usePrewarm(lang, ch.gender);
   useEffect(warmUp, []);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -85,11 +86,11 @@ export function TutorCall({ who }: { who: CharacterId }) {
     }, sec * 1000);
   };
 
-  /** `started` runs when the audio begins, or at the end if it never did. */
-  const voice = async (line: string, started?: () => void) => {
+  /** `started` gets the time the audio begins, or runs at the end if it never did. */
+  const voice = async (line: string, started?: (at: number) => void) => {
     if (!line.trim() || c.over) return;
     let fired = false;
-    const go = () => { if (!fired) { fired = true; started?.(); } };
+    const go = (at = performance.now()) => { if (!fired) { fired = true; started?.(at); } };
     c.speaking = true; mic.current?.pause(); setTalking(true); // the mic would hear the tutor
     try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }, go); } catch { /* the caption still shows it */ }
     finally {
@@ -102,19 +103,24 @@ export function TutorCall({ who }: { who: CharacterId }) {
   };
 
   /** Speaks a reply's sentences as they stream in (SPR-13): the first at once, the ones that came meanwhile as one piece.
-   *  The caption grows as each piece starts playing. */
+   *  The caption grows as each piece starts playing. A filler (SPR-16) plays only before the first sentence, and the reply
+   *  waits for it to finish; it is not captioned and not part of the history. */
   const speaker = () => {
     const q: string[] = [];
     let busy: Promise<void> | null = null, at = -1;
-    const caption = (piece: string) => {
-      if (at < 0) { push({ from: "tutor", text: piece, via: "voice" }); at = c.hist.length - 1; setThinking(false); return; }
+    const caption = (piece: string, t: number) => {
+      if (at < 0) { mark("audio", t); push({ from: "tutor", text: piece, via: "voice" }); at = c.hist.length - 1; setThinking(false); return; }
       c.hist = c.hist.map((m, i) => (i === at ? { ...m, text: `${m.text} ${piece}` } : m)); setMsgs(c.hist);
     };
     const drain = async () => {
-      while (q.length && !c.over) { const piece = q.splice(0).join(" "); await voice(piece, () => caption(piece)); }
+      while (q.length && !c.over) { const piece = q.splice(0).join(" "); await voice(piece, (t) => caption(piece, t)); }
       busy = null;
     };
-    return { add: (line: string) => { q.push(line); busy ??= drain(); }, end: () => busy ?? Promise.resolve() };
+    return {
+      add: (line: string) => { q.push(line); busy ??= drain(); },
+      filler: (line: string) => { if (!busy && at < 0) busy = voice(line).then(drain); },
+      end: () => busy ?? Promise.resolve(),
+    };
   };
 
   /** One event → one reply, spoken while it streams. False when the model call failed. */
@@ -130,8 +136,11 @@ export function TutorCall({ who }: { who: CharacterId }) {
       if (c.over) return false;
       const p = partialSay(raw), got = sentences(p.text, p.closed);
       for (; n < got.length; n++) { if (!n) mark("say"); sp.add(got[n]); }
+      if (n) clearTimeout(slow);
       return n > 0;
     };
+    const waiting = e.kind === "user_said" || e.kind === "user_typed" || e.kind === "practice_answer"; // the learner expects an answer
+    const slow = waiting ? setTimeout(() => sp.filler(filler(lang, c.fills++)), FILLER_MS) : undefined;
     try {
       mark("req");
       const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
@@ -159,6 +168,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     } catch (x) {
       c.failed = e; setErr((x as Error).message); setThinking(false);
       return false;
+    } finally {
+      clearTimeout(slow);
     }
   };
 
