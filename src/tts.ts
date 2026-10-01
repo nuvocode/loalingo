@@ -1,5 +1,5 @@
 // Text-to-speech (spec D): system voices, local Piper (every course language) or local Kokoro (English only).
-// Device setting "tts": "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
+// Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
 // and stream one sentence at a time, so the first sentence plays while the rest is made.
 import { getSetting, isCompanion } from "./db";
 import { pickSystemVoice } from "./voices";
@@ -11,10 +11,11 @@ type Engine = Exclude<TtsProvider, "system">;
 type Chunk = { audio: Float32Array; rate: number };
 type Msg = { type: string; id?: number; p?: number; message?: string; voice?: string } & Partial<Chunk>;
 
+// The phone shares the desktop's database but has its own voice: Kokoro runs out of memory in iOS Safari (docs/MOBILE.md §4).
+export const TTS_KEY = isCompanion ? "tts.phone" : "tts";
 export const ttsProvider = async (): Promise<TtsProvider> => {
-  if (isCompanion) return "system"; // phone: Kokoro and Piper run out of memory in iOS Safari (docs/MOBILE.md §4)
-  const v = await getSetting("tts");
-  return v === "kokoro" || v === "piper" ? v : "system";
+  const v = await getSetting(TTS_KEY);
+  return (v === "kokoro" && !isCompanion) || v === "piper" ? v : "system";
 };
 
 // ponytail: one voice per language and gender; Turkish has no female Piper voice, dfki is the closest

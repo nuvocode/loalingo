@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
-import { setSetting } from "../db";
-import { loadKokoro, loadPiper, speak, ttsProvider, type TtsProvider } from "../tts";
+import { isCompanion, setSetting } from "../db";
+import { loadKokoro, loadPiper, speak, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
 import { Icon } from "../icons";
 import { deepgramTranscribe, getDeepgramKey, listen, resetSttReady, setDeepgramKey, sttProvider, sttReady, type Listener, type SttProvider } from "../stt";
 import { isNoise } from "../tutor";
@@ -72,14 +72,14 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
       catch (e) { setErr(t("voice.loadFailed", { name: t(ttsName(next)), error: (e as Error).message })); setPct(null); return; }
       setPct(null);
     }
-    await setSetting("tts", next);
+    await setSetting(TTS_KEY, next);
     setV(next); onChange(next);
   };
   return (
     <div className="od-stack" style={sheet}>
       <h3 style={{ textAlign: "center" }}>{t("settings.tts")}</h3>
       <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.tts")}>
-        {TTS.map(({ p, bars, color }) => (
+        {TTS.filter(({ p }) => !(isCompanion && p === "kokoro")).map(({ p, bars, color }) => (
           <div key={p} className={`voice-option${v === p ? " on" : ""}`}>
             <button role="radio" aria-checked={v === p} disabled={pct !== null} onClick={() => pick(p)}>
               <Signal bars={bars} color={color} />

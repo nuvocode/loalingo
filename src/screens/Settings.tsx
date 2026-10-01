@@ -243,6 +243,7 @@ export function Settings() {
           if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
         }} />}
         <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
+        {isCompanion && <TtsRow />}
       </div>
 
       <h2 className="section-title">{t("settings.appearance")}</h2>

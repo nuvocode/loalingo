@@ -39,7 +39,7 @@ Telefon tarayıcısı ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:1
 - Çalışıyor: `tailscale serve` ile HTTPS, mikrofon izni ve VAD seviyesi, sistem sesi, `/ollama` aktarımı.
 - Telefonda sessiz mod açıkken tarayıcı sesi (sistem sesi, Piper, Kokoro) susar; kurulum talimatına eklenecek.
 - Kokoro: `RangeError: Out of memory` (iOS WASM bellek sınırı). Telefonda kapsam dışı.
-- Piper: sesi yok, sebebi kesinleşmedi (sessiz mod ya da aynı bellek sınırı). v1'de telefonda sistem sesi; masaüstünde üretilen ses sonraki iş.
+- Piper: sessiz mod kapalıyken telefonda çalışıyor (ilk sessizlik sessiz moddandı). Telefonun kendi ses seçimi var (`tts.phone`): sistem sesi ya da Piper.
 - Spike'ta giderilenler: Vite `127.0.0.1`'e bağlanır; uzun pencereler ekrana sığar; `.ts.net`'ten açılınca Ollama varsayılanı `/ollama`; konuşma deneme penceresi tanıyıcı olmadan da mikrofonu açar.
 
 ## 5. Kapsam dışı
