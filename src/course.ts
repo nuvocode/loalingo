@@ -80,11 +80,10 @@ export const levelsOf = (c: Course) => CEFR.filter((l) => c.levels[l]);
 
 export type NodeState = "done" | "current" | "locked";
 export type PathNode = { id: string; kind: "step" | "chest" | "checkpoint"; title: string; state: NodeState };
-export type PathUnit = { id: string; index: number; title: string; theme: "" | "alt" | "alt2"; nodes: PathNode[] };
+export type PathUnit = { id: string; index: number; title: string; nodes: PathNode[] };
 
 export const chestId = (unitId: string) => `${unitId}:chest`;
 export const checkpointId = (level: Cefr) => `${level}:checkpoint`;
-const THEMES = ["", "alt", "alt2"] as const;
 
 /** `done` = step/chest ids from step_progress. Steps unlock in order; a chest opens once its unit is done. */
 export function buildPath(level: CourseLevel, lv: Cefr, done: Set<string>): { units: PathUnit[]; remaining: number } {
@@ -98,7 +97,7 @@ export function buildPath(level: CourseLevel, lv: Cefr, done: Set<string>): { un
     });
     const unitDone = nodes.every((n) => n.state === "done");
     nodes.push({ id: chestId(u.id), kind: "chest", title: "", state: done.has(chestId(u.id)) ? "done" : unitDone ? "current" : "locked" });
-    return { id: u.id, index: i + 1, title: u.title, theme: THEMES[i % 3], nodes };
+    return { id: u.id, index: i + 1, title: u.title, nodes };
   });
   if (level.checkpoint) {
     const id = checkpointId(lv);

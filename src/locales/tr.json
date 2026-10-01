@@ -609,5 +609,32 @@
       "comprehension": "Sorular",
       "discussion": "Tartışma"
     }
+  },
+  "biome": {
+    "meadow": "Çayır",
+    "grove": "Koru",
+    "forest": "Orman",
+    "foothills": "Dağ eteği",
+    "mountain": "Dağ",
+    "summit": "Zirve"
+  },
+  "garden": {
+    "title": "Bahçen",
+    "open": "Bahçeni aç",
+    "close": "Bahçeyi kapat",
+    "stage0": "Tohum",
+    "stage1": "Filiz",
+    "stage2": "Fidan",
+    "stage3": "Genç ağaç",
+    "stage4": "Olgun ağaç",
+    "next_one": "{{stage}} için {{count}} ders kaldı",
+    "next_other": "{{stage}} için {{count}} ders kaldı",
+    "grown": "Ağacın tamamen büyüdü.",
+    "streakOk": "Yaprakların yeşil. Kök salmaya devam et.",
+    "streakDry": "Köklerin kurudu, yapraklar sarardı. Bir ders bitir, yeniden yeşersin.",
+    "streakNew": "İlk dersini bitir, tohumun filizlensin.",
+    "fruit": "Meyveler",
+    "fruitDesc": "Geçtiğin her seviye sınavı bir meyve verir.",
+    "toShop": "Mağaza"
   }
 }

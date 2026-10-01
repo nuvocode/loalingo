@@ -10,8 +10,8 @@ import { rollDay, today } from "./progress";
 import { FutureSchemaError } from "./migrate";
 import { DataDirError, LockedError, startHeartbeat } from "./datadir";
 
-export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings";
-const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings"];
+export type Route = "learn" | "practice" | "league" | "shop" | "profile" | "stories" | "roleplay" | "friends" | "notifications" | "settings" | "garden";
+const ROUTES: Route[] = ["learn", "practice", "league", "shop", "profile", "stories", "roleplay", "friends", "notifications", "settings", "garden"];
 const readRoute = (): Route => {
   const r = location.hash.slice(1) as Route;
   return ROUTES.includes(r) ? r : "learn";

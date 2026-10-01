@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
+import { biomeVars } from "./biomes";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
@@ -282,7 +283,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else {
     body = err ? <Failed msg={err} retry={retry} quit={quit} /> : (
-      <div className={`call-grid${pr ? " practice-open" : ""}`}>
+      <div className={`call-grid${pr ? " practice-open" : ""}`} style={enrollment ? biomeVars(enrollment.level) : undefined}>
         {pr && <PracticePanel pr={pr} topics={topics} loading={prLoading} error={prErr} lang={lang}
           onTopic={(tp) => void chooseTopic(tp)} onAnswer={submit} onNext={advance} onHint={() => fire({ kind: "practice_stuck" })}
           onRetry={retryTopic} onClose={practiceClose} />}
@@ -314,7 +315,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       </div>
     );
     footer = (
-      <div className="call-bar">
+      <div className="call-bar" style={enrollment ? biomeVars(enrollment.level) : undefined}>
         <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-expanded={drawer} aria-label={t("tutor.message")} title={t("tutor.message")}><Icon name="chat" /></button>
         <button className={`call-btn${captions ? " on" : ""}`} onClick={() => setCaptions((v) => !v)} aria-pressed={captions} aria-label={capLabel} title={capLabel}><Icon name="captions" /></button>
         <button className={`call-btn${pr ? " on" : ""}`} onClick={() => (pr ? practiceClose() : practiceOpen(true))} aria-pressed={!!pr} aria-label={prLabel} title={prLabel}><Icon name="book" /></button>

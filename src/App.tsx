@@ -13,6 +13,7 @@ import { Chat, Story } from "./Talk";
 import { TutorCall } from "./TutorCall";
 import { CHARACTERS, parseTalkId, type CharacterId } from "./characters";
 import { Learn } from "./screens/Learn";
+import { Garden } from "./screens/Garden";
 import { Settings } from "./screens/Settings";
 import { Avatar, ProfileGate, useLangName } from "./screens/Profiles";
 import { Practice, League, Shop, Profile, Stories, Roleplay, Friends, Notifications, LiveButton } from "./screens/Screens";
@@ -28,6 +29,7 @@ const MORE: { id: Route; icon: IconName }[] = [
 const SCREENS: Record<Route, () => React.ReactNode> = {
   learn: Learn, practice: Practice, league: League, shop: Shop, profile: Profile,
   stories: Stories, roleplay: Roleplay, friends: Friends, notifications: Notifications, settings: Settings,
+  garden: Garden,
 };
 
 function NavBtn({ id, icon, onGo }: { id: Route; icon: IconName; onGo?: () => void }) {

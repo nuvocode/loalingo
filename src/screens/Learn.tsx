@@ -7,6 +7,7 @@ import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guid
 import { speak } from "../tts";
 import { AiSheet } from "./Settings";
 import { LiveButton } from "./Screens";
+import { BIOMES, biomeScene, biomeVars } from "../biomes";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -44,6 +45,14 @@ function PathLines() {
   );
 }
 
+// Pebble outline for lesson nodes (64×64): drawn twice for the 3D edge, once more as the current-lesson ring.
+const PEBBLE = "M33 3C48 4 61 14 61 31C61 48 49 61 31 61C15 61 3 50 3 33C3 16 16 2 33 3Z";
+const NodeShape = () => (
+  <svg className="node-shape" viewBox="0 0 64 64" aria-hidden="true">
+    <path className="sh" d={PEBBLE} /><path className="fc" d={PEBBLE} /><path className="ring" d={PEBBLE} />
+  </svg>
+);
+
 const ICON: Record<PathNode["kind"], Record<PathNode["state"], IconName>> = {
   step: { done: "check", current: "star", locked: "lock" },
   chest: { done: "check", current: "basket", locked: "basket" },
@@ -79,8 +88,8 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
     </>);
   };
   return (
-    <section aria-label={u.title}>
-      <div className={`unit-head ${u.theme}`}>
+    <section className="unit" aria-label={u.title}>
+      <div className="unit-head">
         <div className="uh-row">
           <div><span className="uh-kicker">{t("learn.kicker", { level, unit: u.index })}</span><h2>{u.title}</h2></div>
           <button className="guidebook" onClick={() => openSheet(<GuideSheet unitId={u.id} level={level} />)}><Icon name="book" /><span>{t("learn.guidebook")}</span></button>
@@ -91,7 +100,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
         {u.nodes.map((n, ni) => {
           const off = PATH_OFF[((u.index - 1) * 3 + ni) % PATH_OFF.length];
           const gold = n.kind === "step" && legendary.has(n.id);
-          const cls = n.kind === "step" ? `${n.state}${gold ? " legendary" : ""}` : `${n.kind === "chest" ? "chest" : "legendary"} ${n.state}`;
+          const cls = n.kind === "step" ? `${n.state}${gold ? " legendary" : ""}` : `${n.kind} ${n.state}`;
           const name = n.kind === "chest" ? t("learn.chest") : n.title;
           const onClick =
             n.state === "locked" ? undefined
@@ -101,6 +110,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
           return (
             <div className={`node ${cls}`} style={{ transform: `translateX(${off}px)` }} key={n.id}>
               <button className="node-btn" onClick={onClick} aria-label={name} aria-disabled={!onClick || undefined}>
+                <NodeShape />
                 <Icon name={gold ? "star" : ICON[n.kind][n.state]} />
               </button>
               {n.state === "current" && n.kind === "step" && <span className="start-tag">{t("learn.start")}</span>}
@@ -171,8 +181,9 @@ function LevelSheet() {
           if (i > cur) return toast(t("learn.finishFirst", { level: enrollment!.level }));
           setViewLevel(l); closeSheet();
         }}>
+          <span className="biome-thumb" dangerouslySetInnerHTML={{ __html: biomeScene(l, 80) }} />
           <span className="od-field od-fill"><b>{l} · {course!.levels[l]!.title}</b>
-            <span className="muted small">{t(i < cur ? "learn.levelDone" : i === cur ? "learn.levelCurrent" : "learn.levelLocked")}</span></span>
+            <span className="muted small">{t(`biome.${BIOMES[l].id}`)} · {t(i < cur ? "learn.levelDone" : i === cur ? "learn.levelCurrent" : "learn.levelLocked")}</span></span>
           <Icon name={i < cur ? "check" : i === cur ? "star" : "lock"} />
         </button>
       ))}
@@ -196,7 +207,8 @@ function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number
   const title = remaining === 0 ? t("learn.checkpointNext", { level: next ?? level })
     : next ? t("learn.lessonsLeft", { count: remaining, level: next }) : t("learn.lessonsLeftFinish", { count: remaining, level });
   return (
-    <div className="card" style={{ margin: "8px 0 24px", textAlign: "center" }}>
+    <div className="card level-card">
+      <div className="biome-band" dangerouslySetInnerHTML={{ __html: biomeScene(level, 70) }} />
       <h3 style={{ fontWeight: 900, fontSize: 18 }}>{title}</h3>
       <div className="progress-track" style={{ margin: "12px 0 14px" }}><div className="progress-fill green" style={{ width: `${((total - remaining) / total) * 100}%` }} /></div>
       {hasExam && remaining > 0 && <button className="btn btn-ghost btn-block" onClick={() => start(`${level}:test`)}>{t("learn.skipLevel", { level })}</button>}
@@ -209,6 +221,12 @@ let setupOffered = false;
 export function Learn() {
   const { t } = useTranslation();
   const { course, enrollment, done, viewLevel, openSheet, courseErrors, ai } = useApp();
+  const shownLevel = viewLevel ?? enrollment?.level;
+  // The path grows upward, so open on the lesson to do next instead of the page top.
+  useLayoutEffect(() => {
+    const target = document.querySelector(".node.current") ?? document.querySelector(".node.locked") ?? [...document.querySelectorAll(".node")].pop();
+    target?.scrollIntoView({ block: "center" });
+  }, [enrollment?.id, shownLevel, course, done]); // also after a profile switch, the async course load and a finished lesson
   // First run (DECISIONS C6): offer setup once per launch; the banner stays until a provider is saved.
   useEffect(() => { if (!ai && !setupOffered) { setupOffered = true; openSheet(<AiSheet />); } }, [ai]);
   const setup = !ai && (
@@ -234,8 +252,11 @@ export function Learn() {
       <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => openSheet(<LevelSheet />)} aria-haspopup="dialog">
         {level} · {course.levels[level]!.title} ▾
       </button>
-      {units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}
       {level === enrollment.level && <LevelCard level={level} remaining={remaining} total={total} />}
+      <div className="path-stack" style={biomeVars(level)}>
+        <div className="biome-ground" dangerouslySetInnerHTML={{ __html: biomeScene(level, 140) }} />
+        {units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}
+      </div>
     </>
   );
 }

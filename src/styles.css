@@ -33,28 +33,33 @@
 /* /OD-LAYOUT-PRIMITIVES v1 */
 
 :root{
-  --green:#12b886; --green-dark:#0c8f68; --green-bright:#8ce9c6;
-  --blue:#4c6ef5; --blue-dark:#3b5bdb; --sky:#e7ecff;
-  --gold:#f5b014; --gold-dark:#d4930b;
-  --red:#f0565c; --red-dark:#d63c42;
-  --purple:#b07cf0; --orange:#f4862a;
-  --text:#2f3437; --text-muted:#6b7075; --text-faint:#a9adb1;
-  --border:#e3e5e8; --bg:#fff; --surface:#f6f7f9; --card:#fff;
-  --purple-dark:#8b57d1; --on-accent:#fff; --locked-shadow:#d3d6db;
-  --green-tint:#e3f8ef; --green-tint-border:#a8e3cb;
-  --red-tint:#ffe3e3; --red-tint-border:#f5b3b3;
-  --gold-tint:#fff3d6; --purple-tint:#f1e8fd;
-  --scrim:rgba(0,0,0,.4);
+  --green:#4f8a3c; --green-dark:#3a6a2b; --green-bright:#b5dc8a;
+  --blue:#3d7a99; --blue-dark:#2d627d; --sky:#e3eef0;
+  --gold:#e0a526; --gold-dark:#b98318;
+  --red:#c4553f; --red-dark:#9f402d;
+  --purple:#8a5a8c; --orange:#cf7a4c;
+  --bark:#8a6242; --bark-dark:#6b4a30;
+  --leaf:#6aa84f; --leaf-dark:#4a8a3a; --leaf-dry:#d9b24a; --leaf-dry-dark:#b48a2c; --soil:#a07a55; --fruit:#d9503c;
+  --text:#2e2a24; --text-muted:#6b6357; --text-faint:#a59d8f;
+  --border:#e5ddcc; --bg:#fbf8f1; --surface:#f3eee2; --card:#fffdf8;
+  --purple-dark:#6c4270; --on-accent:#fff; --locked-shadow:#d3cab6;
+  --green-tint:#e8f1dc; --green-tint-border:#bcd6a0;
+  --red-tint:#f8e3dc; --red-tint-border:#e9b6a6;
+  --gold-tint:#fbefd2; --purple-tint:#f0e5ef;
+  --scrim:rgba(30,25,15,.45);
   --r:12px;
   --sidebar-w:240px; --rail-w:340px; --center-w:640px;
 }
 html[data-theme="dark"]{
-  --bg:#15181e; --surface:#22262e; --card:#1b1f26; --text:#eceff1;
-  --text-muted:#9aa1ab; --text-faint:#626874;
-  --border:#2c313a; --sky:#1f2a4a; --locked-shadow:#1a1d23;
-  --green-tint:#173a2e; --green-tint-border:#245a45;
-  --red-tint:#3f1d1d; --red-tint-border:#6a2a2a;
-  --gold-tint:#3a3116; --purple-tint:#33224a;
+  --bg:#161a13; --surface:#21271d; --card:#1b2018; --text:#ece7da;
+  --text-muted:#a7a18f; --text-faint:#6c6858;
+  --border:#2f3629; --sky:#1e2c30; --locked-shadow:#151912;
+  --green:#5e9a48; --green-dark:#406f31; --green-bright:#a9d27c;
+  --bark:#7a5a3e; --bark-dark:#5a412b;
+  --leaf:#5e9a48; --leaf-dark:#3f7330; --leaf-dry:#c29b3c; --leaf-dry-dark:#93732a; --soil:#6e5640;
+  --green-tint:#223220; --green-tint-border:#3a5530;
+  --red-tint:#3b211b; --red-tint-border:#673428;
+  --gold-tint:#3a3018; --purple-tint:#33243a;
   --scrim:rgba(0,0,0,.6);
   color-scheme:dark;
 }
@@ -113,6 +118,7 @@ svg{display:block}
 .stat-strip{display:flex;gap:18px}
 .stat-chip{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px}
 .stat-chip svg{width:22px;height:22px}
+.stat-chip svg.tree{width:34px;height:34px;margin:-6px -2px}
 
 /* ===== chunky buttons ===== */
 .btn{
@@ -138,9 +144,26 @@ svg{display:block}
 .btn-block{width:100%}
 
 /* ===== Learn path ===== */
+/* Bottom-up path: unit 1 sits at the bottom and each unit's header is pinned under its lessons. DOM order stays ascending. */
+.path-stack,.path-stack > .unit,.path{flex-direction:column-reverse}
+.path-stack,.path-stack > .unit{display:flex}
+/* Biome (src/biomes.ts): tint behind the path, ground scene under unit 1, unit heads in the biome colour. */
+.path-stack{background:var(--bt);border-radius:20px;overflow:clip;padding:0 12px}
+html[data-theme="dark"] .path-stack{background:var(--btd)}
+.biome-ground{margin:0 -12px;line-height:0}
+.biome-ground svg,.biome-band svg,.biome-thumb svg{display:block;width:100%;height:100%}
+html[data-theme="dark"] .biome-scene{filter:brightness(.62) saturate(.85)}
+html[data-theme="dark"] .biome-scene .sky{fill:transparent}
+.unit-head{background:var(--bh,var(--green));box-shadow:0 4px 0 var(--bhd,var(--green-dark))}
+.unit-head::after{content:"";position:absolute;right:0;bottom:0;width:160px;height:44px;pointer-events:none;opacity:.18;
+  background:#fff;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 44'%3E%3Cpath d='M0 44V30Q34 8 70 26T160 14V44Z'/%3E%3C/svg%3E") center/100% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 44'%3E%3Cpath d='M0 44V30Q34 8 70 26T160 14V44Z'/%3E%3C/svg%3E") center/100% 100%}
+.unit-head .uh-row{position:relative;z-index:1}
+.level-card{margin:8px 0 24px;text-align:center;padding-top:0;overflow:hidden}
+.biome-band{height:70px;margin:0 -16px 14px}
+.biome-thumb{flex:none;width:56px;height:40px;border-radius:10px;overflow:hidden}
 .unit-head{
-  position:sticky;top:0;z-index:5;
-  background:var(--green);color:#fff;border-radius:16px;padding:18px 20px;margin:24px 0 8px;
+  position:sticky;bottom:12px;z-index:5;overflow:hidden;
+  background:var(--green);color:#fff;border-radius:16px;padding:18px 20px;margin:8px 0 24px;
   box-shadow:0 4px 0 var(--green-dark);
 }
 .unit-head .uh-kicker{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:.85}
@@ -151,34 +174,37 @@ svg{display:block}
   border:2px solid rgba(255,255,255,.35);border-radius:var(--r);padding:8px 14px;
   font-weight:800;font-size:13px;color:#fff;min-height:44px;
 }
-.unit-head.alt{background:var(--purple);box-shadow:0 4px 0 var(--purple-dark)}
-.unit-head.alt2{background:var(--blue);box-shadow:0 4px 0 var(--blue-dark)}
 
-.path{position:relative;display:flex;flex-direction:column;align-items:center;padding:16px 0 32px;gap:22px}
+.path{position:relative;display:flex;align-items:center;padding:16px 0;gap:22px}
 .path-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .path .node{position:relative;z-index:1}
 .node{position:relative;display:flex;flex-direction:column;align-items:center}
+/* Pebble node: the shape is an inline SVG (shadow, face, current ring) so the 3D edge follows the outline. */
 .node-btn{
-  width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.18);transition:transform .15s ease;
-  border:4px solid var(--bg);outline:4px solid transparent;
+  position:relative;width:64px;height:64px;display:flex;align-items:center;justify-content:center;
+  color:var(--on-accent);transition:transform .15s ease;--fc:var(--green);--sh:var(--green-dark);
 }
-.node-btn svg{width:28px;height:28px}
+.node-shape{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.node-shape .sh{fill:var(--sh);transform:translateY(5px)}
+.node-shape .fc{fill:var(--fc)}
+.node-shape .ring{fill:none;stroke:var(--green-bright);stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center}
+.node-btn .ic{position:relative;margin-top:-2px}
+.node-btn .ic svg{width:28px;height:28px}
 .node-btn:hover{transform:scale(1.06)}
 .node-btn:active{transform:translateY(2px)}
-.node.done .node-btn{background:var(--green)}
-.node.done.legendary .node-btn{background:var(--gold)}
-.node.current .node-btn{background:var(--green);outline-color:var(--green-bright);animation:pulse 2s infinite}
-.node.locked .node-btn{background:var(--border);color:var(--text-faint);cursor:not-allowed;box-shadow:0 5px 0 var(--locked-shadow)}
-.node.chest .node-btn{background:var(--gold)}
+.node.done.legendary .node-btn,.node.chest .node-btn{--fc:var(--gold);--sh:var(--gold-dark);color:var(--text)}
+.node.checkpoint .node-btn{--fc:var(--bark);--sh:var(--bark-dark)}
+.node.current .node-shape .ring{opacity:1;animation:ring 2s ease-in-out infinite}
+.node.locked .node-btn{--fc:var(--border);--sh:var(--locked-shadow);color:var(--text-faint);cursor:not-allowed}
 .start-tag{
   position:absolute;top:-30px;background:var(--card);border:2px solid var(--border);border-radius:10px;
-  padding:3px 10px;font-size:12px;font-weight:900;color:var(--green);letter-spacing:1px;text-transform:uppercase;
+  padding:3px 10px;font-size:12px;font-weight:900;color:var(--green-dark);letter-spacing:1px;text-transform:uppercase;
   animation:bob 1.6s ease-in-out infinite;white-space:nowrap;
 }
 .node-label{font-size:13px;font-weight:800;color:var(--text-muted);margin-top:6px;text-align:center;max-width:110px}
 .node.locked .node-label{color:var(--text-faint)}
 @keyframes pulse{0%,100%{outline-width:4px}50%{outline-width:8px}}
+@keyframes ring{0%,100%{transform:scale(1.04)}50%{transform:scale(1.12)}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
 /* ===== cards / lists ===== */
@@ -337,6 +363,7 @@ svg{display:block}
   .more-menu{position:fixed;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:51;min-width:210px;display:flex;flex-direction:column;gap:2px;padding:8px;border:2px solid var(--border);border-radius:var(--r);background:var(--card);box-shadow:0 8px 30px rgb(0 0 0 / .2);animation:more-up .15s ease-out}
   @keyframes more-up{from{opacity:0;transform:translateY(8px)}}
   .center{padding-bottom:140px}
+  .unit-head{bottom:calc(76px + env(safe-area-inset-bottom))}
   .ex-title{font-size:20px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -352,7 +379,7 @@ svg{display:block}
 .chest-box svg{width:48px;height:48px}
 .result-badge svg{width:60px;height:60px}
 .result-stat{display:flex;flex-direction:column} /* design bug: label and value were inline spans */
-.path-lines path{stroke:var(--border)}
+.path-lines path{stroke:var(--text-faint);opacity:.55}
 .soon-banner{display:flex;align-items:center;gap:12px;margin-top:24px;border:2px dashed var(--border);border-radius:16px;padding:12px 16px;background:var(--surface)}
 .soon-banner b{font-weight:900}
 .soon-tag{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--blue);background:var(--sky);border-radius:8px;padding:2px 8px}
@@ -369,8 +396,6 @@ svg{display:block}
 .menu-item:hover,.menu-item:focus-visible{background:var(--surface)}
 .menu-item.danger{color:var(--red)}
 .course-chip{border:2px solid var(--border);border-radius:12px;padding:2px 8px;font-size:18px}
-/* First node is the current one: leave room for its start tag under the sticky unit header. */
-.path:has(> .node:nth-child(2) .start-tag){padding-top:24px}
 /* The tag sits 30px above its node and covered the previous node's label: make room for it. */
 .path > .node:has(.start-tag){margin-top:24px}
 .gen-pulse{animation:bob 1.2s ease-in-out infinite}
@@ -516,3 +541,32 @@ html[data-theme="dark"] .face .scene{filter:brightness(.6) saturate(.8)}
 .stt-heard p{margin:0 0 6px;color:var(--text)}
 .stt-heard p.muted{color:var(--text-muted)}
 .sheet-actions .btn{display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ===== garden (SPR-10) ===== */
+.garden{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
+.garden-hero{position:relative;height:min(58vh,480px);max-width:760px;margin:0 auto;border-radius:0 0 24px 24px;overflow:hidden;background:var(--bt)}
+html[data-theme="dark"] .garden-hero{background:var(--btd)}
+.garden-scene{position:absolute;inset:0;line-height:0}
+.garden-scene svg{display:block;width:100%;height:100%}
+.garden-tree{position:absolute;left:50%;bottom:6%;height:var(--th);transform:translateX(-50%);transform-origin:50% 100%}
+.garden-tree svg{display:block;height:100%;width:auto}
+.garden-top{position:absolute;inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.garden-top h2{font-size:22px;font-weight:900;color:var(--text)}
+.garden-top .icon-btn{background:var(--card);color:var(--text-muted);box-shadow:0 2px 0 var(--border)}
+.garden-cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));max-width:760px;margin:16px auto 0;padding:0 16px 32px}
+.garden-cards .card{padding:14px 16px}
+.garden-cards h3{font-size:17px;font-weight:900;margin-bottom:4px}
+.garden-cards .ic svg{width:32px;height:32px}
+.garden-fruit{display:flex;gap:6px;margin:6px 0}
+.garden-fruit span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:900;border:2px dashed var(--border);color:var(--text-faint)}
+.garden-fruit span.on{background:var(--fruit);border:none;color:#fff}
+@media(prefers-reduced-motion:no-preference){.garden-tree{animation:sway 6s ease-in-out infinite}}
+@keyframes sway{0%,100%{transform:translateX(-50%) rotate(-1deg)}50%{transform:translateX(-50%) rotate(1deg)}}
+
+/* ===== live frame (SPR-11): the biome frames the call, never covers it ===== */
+.call-grid{gap:6px;padding:6px;border-radius:20px;background:var(--bh,var(--surface))}
+.call-grid .call-pane{border-radius:14px}
+.lesson-footer:has(.call-bar){position:relative;overflow:hidden}
+.call-bar{position:relative;isolation:isolate}
+.call-bar::before{content:"";position:absolute;z-index:-1;left:50%;width:100vw;top:-16px;bottom:-16px;transform:translateX(-50%);pointer-events:none;opacity:.14;
+  background:var(--bh,transparent);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%}
