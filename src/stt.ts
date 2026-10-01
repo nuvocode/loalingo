@@ -2,7 +2,7 @@
 import { mark } from "./latency";
 import { invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
-import { isTauri, getSetting } from "./db";
+import { isTauri, isCompanion, getSetting } from "./db";
 import { VAD, VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
 import { wav16 } from "./wav";
 
@@ -33,7 +33,7 @@ let ready: Promise<boolean> | undefined;
 /** Speaking available? Deepgram: key present. Whisper: model present in this build (always false in the browser preview). */
 export const sttReady = () => (ready ??= (async () => {
   if ((await sttProvider()) === "deepgram") return !!(await getDeepgramKey().catch(() => null));
-  return isTauri ? invoke<boolean>("stt_ready").catch(() => false) : false;
+  return isTauri ? invoke<boolean>("stt_ready").catch(() => false) : isCompanion;
 })());
 /** Call after the provider or the key changes. */
 export const resetSttReady = () => { ready = undefined; };
@@ -72,6 +72,11 @@ export type Recording = Awaited<ReturnType<typeof startRecording>>;
 async function transcribeSamples(all: Float32Array, rate: number, lang: string): Promise<string> {
   if (all.length < rate * 0.3) return "";
   if ((await sttProvider()) === "deepgram") return deepgramTranscribe(wav16(resample(all, rate)), lang);
+  if (isCompanion) { // phone: the desktop's whisper (src-tauri/src/companion.rs), raw f32 samples
+    const r = await fetch(`/transcribe?lang=${encodeURIComponent(lang)}`, { method: "POST", headers: { "X-Sprigo": "1" }, body: resample(all, rate) as BodyInit });
+    if (!r.ok) throw new Error(await r.text());
+    return r.text();
+  }
   // ponytail: samples go over IPC as JSON numbers (~1 MB for 15 s); raw bytes if it ever feels slow
   return invoke<string>("transcribe", { samples: Array.from(resample(all, rate)), lang });
 }

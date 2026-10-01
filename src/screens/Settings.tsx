@@ -4,7 +4,7 @@ import { useApp } from "../store";
 import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
 import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
-import { getSetting, isTauri, setSetting } from "../db";
+import { getSetting, isCompanion, isTauri, setSetting } from "../db";
 import { setCompanion } from "../companion";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
@@ -238,10 +238,10 @@ export function Settings() {
         <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
         <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
         <ToggleRow k="bargeIn" initial={s.bargeIn} onChange={(bargeIn) => setS((s) => ({ ...s, bargeIn }))} />
-        <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
+        {!isCompanion && <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
           setS((s) => ({ ...s, reminderOn }));
           if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
-        }} />
+        }} />}
         <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
       </div>
 
@@ -265,9 +265,10 @@ export function Settings() {
         </div>
       </div>
 
-      <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
+      {/* Phone: AI, voice and data settings are the desktop's (shared database), so they stay there. */}
+      {!isCompanion && <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
         {t("settings.advanced")} <span aria-hidden="true">{advanced ? "▴" : "▾"}</span>
-      </button>
+      </button>}
       {advanced && (
         <>
           <h2 className="section-title">{t("settings.aiVoice")}</h2>
@@ -287,8 +288,8 @@ export function Settings() {
         </>
       )}
 
-      <h2 className="section-title">{t("update.section")}</h2>
-      <VersionRow />
+      {!isCompanion && <><h2 className="section-title">{t("update.section")}</h2>
+      <VersionRow /></>}
       <p className="muted small" style={{ textAlign: "center", marginTop: 8 }}>
         {t("update.madeBy")} <a href={AUTHOR_URL} onClick={(e) => { e.preventDefault(); void openLink(AUTHOR_URL); }}>mehmetozer.dev</a>
       </p>

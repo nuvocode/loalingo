@@ -23,6 +23,8 @@ export type AiConfig = { provider: ProviderId; baseURL: string; model: string };
 // Tauri's HTTP plugin sidesteps CORS for local servers and cloud APIs; the dev browser preview uses window.fetch.
 const http = (isTauri ? tauriFetch : window.fetch.bind(window)) as typeof fetch;
 const trim = (u: string) => u.replace(/\/+$/, "");
+// The saved config is the desktop's (shared database), so on the phone its localhost address means the proxy.
+const baseOf = (c: AiConfig) => trim(isCompanion && c.provider === "ollama" ? PROVIDERS.ollama.baseURL : c.baseURL || PROVIDERS[c.provider].baseURL);
 
 export async function loadAiConfig(): Promise<AiConfig | null> {
   const v = await getSetting("ai");
@@ -45,7 +47,7 @@ export async function setKey(p: ProviderId, value: string | null) {
 // ---- Models ----
 
 function model(c: AiConfig, key: string | null): LanguageModel {
-  const baseURL = trim(c.baseURL || PROVIDERS[c.provider].baseURL);
+  const baseURL = baseOf(c);
   const apiKey = key ?? "";
   switch (c.provider) {
     // Ollama and LM Studio both speak the OpenAI chat API with json_schema structured output.
@@ -59,7 +61,7 @@ function model(c: AiConfig, key: string | null): LanguageModel {
 
 /** Model ids offered by the provider; throws with the server's message when unreachable/unauthorized. */
 export async function listModels(c: AiConfig, key: string | null): Promise<string[]> {
-  const base = trim(c.baseURL || PROVIDERS[c.provider].baseURL);
+  const base = baseOf(c);
   const get = async (url: string, headers: Record<string, string> = {}) => {
     const r = await http(url, { headers });
     if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
@@ -85,7 +87,7 @@ let active: { cfg: AiConfig; key: string | null } | null = null;
 /** Loads a local Ollama model before a live call so the first turn is not a cold start (SPR-14). Cloud models answer at once. */
 export function warmUp() {
   if (active?.cfg.provider !== "ollama") return;
-  const base = trim(active.cfg.baseURL || PROVIDERS.ollama.baseURL);
+  const base = baseOf(active.cfg);
   http(`${base}/api/generate`, { method: "POST", body: JSON.stringify({ model: active.cfg.model, keep_alive: "10m" }) }).catch(() => {});
 }
 export async function activateConfig(cfg: AiConfig | null) {
