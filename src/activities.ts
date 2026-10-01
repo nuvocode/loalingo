@@ -21,7 +21,7 @@ const choice = (guide: string, extra: Record<string, z.ZodType>, map: (g: any) =
   guide,
   schema: z.object({ prompt: s, ...extra, options, answer_index: idx }),
   toItem: (g) => {
-    if (g.answer_index >= g.options.length || new Set(g.options).size !== g.options.length) return null;
+    if (g.answer_index >= g.options.length || new Set(g.options).size !== g.options.length || givesAway(g.prompt, g.options, g.answer_index)) return null;
     const m = map(g);
     return { kind: "choice", prompt: g.prompt, context: m.context ?? "", big: !!m.big, listen: m.listen ?? "", ...shuffleAnswer(g.options, g.answer_index) };
   },
@@ -190,6 +190,13 @@ export function listenItems(words: PracticeWord[], prompt: string, n = 6): Item[
     const options = shuffle([w.word, ...shuffle(words.filter((o) => o.word !== w.word)).slice(0, 3).map((o) => o.word)]);
     return { kind: "choice", prompt, context: "", big: false, listen: w.word, options, answer: options.indexOf(w.word) };
   });
+}
+
+/** The question names the correct option and no other ('"evening" means which word?' → evening): nothing left to answer. */
+export function givesAway(prompt: string, options: string[], answer: number) {
+  const n = (x: string) => normalize(x).replace(/'/g, " ").replace(/\s+/g, " ").trim(); // quotes around the word too
+  const p = ` ${n(prompt)} `, has = (o: string) => !!n(o) && p.includes(` ${n(o)} `);
+  return has(options[answer]) && !options.some((o, i) => i !== answer && has(o));
 }
 
 // ---- helpers ----

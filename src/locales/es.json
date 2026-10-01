@@ -707,7 +707,9 @@
       "reading": "Lectura",
       "comprehension": "Preguntas",
       "discussion": "Debate"
-    }
+    },
+    "hideMessages": "Ocultar mensajes",
+    "send": "Enviar"
   },
   "biome": {
     "meadow": "Pradera",

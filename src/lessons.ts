@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { generate, generatePlain, generateStream } from "./ai";
 import { applyMemoryOps, enrollmentProfile, getCached, listMemories, listMistakes, markMemoriesUsed, memoryOn, putCached } from "./db";
-import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
+import { REGISTRY, givesAway, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
@@ -86,7 +86,7 @@ export function loadLesson(enrollmentId: number, c: LessonContext, fresh = false
   if (!fresh && inflight.has(k)) return inflight.get(k)!;
   const p = (async () => {
     const cached = fresh ? null : await getCached<Item[]>(enrollmentId, c.step.id);
-    if (cached) return cached;
+    if (cached) return cached.filter((it) => it.kind !== "choice" || !givesAway(it.prompt, it.options, it.answer)); // cached before the check
     const mistakes = (await listMistakes<Item>(enrollmentId, MISTAKES_IN_PROMPT)).map((m) => mistakeLine(m.item)).filter((x): x is string => !!x);
     const pid = await enrollmentProfile(enrollmentId);
     const items = await generateItems(c, mistakes, pid === null ? [] : await learnerFacts(pid));

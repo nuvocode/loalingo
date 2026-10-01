@@ -689,7 +689,9 @@
       "reading": "Lesen",
       "comprehension": "Fragen",
       "discussion": "Diskussion"
-    }
+    },
+    "hideMessages": "Nachrichten ausblenden",
+    "send": "Senden"
   },
   "biome": {
     "meadow": "Wiese",
