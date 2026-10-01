@@ -1,5 +1,5 @@
 // Stories and roleplay chat (Faz 4). Same overlay chrome as lessons; the design only has the list screens.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
@@ -8,7 +8,7 @@ import { prewarm, speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
-import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
+import { chatTurn, learnerFacts, loadStory, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 import { inField, keyAction, type KeyState } from "./keys";
 
@@ -224,7 +224,7 @@ export function Story({ unitId }: { unitId: string }) {
 
 export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: { id?: string; goal: string }; voice?: boolean }) {
   const { t } = useTranslation();
-  const { course, enrollment, profile, s, setS, gainXp } = useApp();
+  const { course, enrollment, profile, s, setS, gainXp, toast } = useApp();
   const ch = CHARACTERS[who];
   const lang = course?.iso ?? "en";
   const [voicing, setVoicing] = useState<number | null>(null); // AI message being spoken (or its voice being made)
@@ -234,6 +234,7 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
   };
   usePrewarm(lang, ch.gender);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
+  const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per chat
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState("");
   const [text, setText] = useState("");
@@ -249,7 +250,7 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     if (!course || !enrollment || !profile) return;
     setBusy(true); setErr("");
     try {
-      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang }, who, topic, history);
+      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history);
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
       say(r.reply, fixed.length);
@@ -274,6 +275,9 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     gainXp(xp);
     sfx("done");
     setResult({ xp, gems });
+    // ponytail: only free-topic chats; in a scene the learner plays a role, so "I'm a doctor" is not about them
+    if (profile && topic.goal.startsWith(FREE_GOAL)) void rememberSession(profile.id, profile.native_lang, "chat", ch.name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const over = goal || mine >= CHAT_TURNS;
 

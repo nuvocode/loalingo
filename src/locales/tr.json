@@ -156,6 +156,27 @@
     "achBook": "Kitap kurdu",
     "achBookDesc": "İlk hikâyeni bitir"
   },
+  "memory": {
+    "title": "Sprigo seni tanıyor",
+    "empty": "Henüz bir şey yok. Bir tutor'la ya da kendi konunda sohbet ettikçe Sprigo'nun seninle ilgili öğrendikleri burada görünür.",
+    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor.",
+    "hint": "Düzeltmek için bir satıra dokun, saklanmaması gerekeni sil.",
+    "kinds": {
+      "interest": "İlgi alanları",
+      "goal": "Hedefler ve planlar",
+      "background": "Hakkında",
+      "learning": "Öğrenme"
+    },
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "forget": "Unut: {{text}}",
+    "forgetOne": "Unut",
+    "forgetAll": "Hepsini unut",
+    "forgetAllSure": "Sprigo seninle ilgili her şeyi unutsun mu?",
+    "cancel": "Vazgeç",
+    "saved_one": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)",
+    "saved_other": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)"
+  },
   "stories": {
     "title": "Hikâyeler",
     "subtitle": "Her ünite için yapay zekânın yazdığı kısa diyaloglar. Bir satıra dokun: sesini duy, çevirisini gör.",
@@ -269,6 +290,8 @@
     "speakingDesc": "Mikrofonlu alıştırmalar",
     "bargeIn": "Tutor'un sözünü kesebilirim",
     "bargeInDesc": "Canlı derste tutor konuşurken konuşarak araya girebilirsin. Mikrofon hoparlörü duyup tutor kendiliğinden susuyorsa kapat.",
+    "memory": "Beni hatırla",
+    "memoryDesc": "Sprigo, tutor'una anlattığın kalıcı şeyleri (ilgi alanların, planların, zorlandığın konular) saklar ve derslerde kullanır. Yapay zekâ sağlayıcın bulutta değilse hiçbir şey bu cihazdan çıkmaz.",
     "phone": "Telefonda kullan",
     "phoneDesc": "Sprigo'yu Tailscale üzerinden kendi cihazlarına açar; verilerin bu bilgisayarda kalır.",
     "phoneMissing": "Bu bilgisayarda Tailscale kurulu değil.",

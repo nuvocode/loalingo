@@ -12,7 +12,7 @@ import { listen, sttReady, type Listener } from "./stt";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
-import { loadPractice, tutorTurn } from "./lessons";
+import { learnerFacts, loadPractice, rememberSession, tutorTurn } from "./lessons";
 import { warmUp } from "./ai";
 import { FILLER_MS, NOTES_MAX, currentUnit, filler, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
@@ -43,6 +43,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang, ch.gender);
   useEffect(warmUp, []);
+  const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per call
 
   const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
@@ -147,8 +148,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const waiting = e.kind === "user_said" || e.kind === "user_typed" || e.kind === "practice_answer"; // the learner expects an answer
     const slow = waiting ? setTimeout(() => sp.filler(filler(lang, c.fills++)), FILLER_MS) : undefined;
     try {
+      const facts = await about;
       mark("req");
-      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
+      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang, about: facts }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
       mark("llm");
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
@@ -298,6 +300,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
+    if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 
