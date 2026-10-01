@@ -4,7 +4,8 @@ import { useApp } from "../store";
 import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
 import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
-import { isTauri } from "../db";
+import { getSetting, isTauri, setSetting } from "../db";
+import { setCompanion } from "../companion";
 import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
@@ -27,6 +28,18 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
       </button>
     </div>
   );
+}
+
+/** Desktop only: the phone companion server (docs/MOBILE.md). */
+function PhoneRow() {
+  const { toast } = useApp();
+  const [on, setOn] = useState<boolean | null>(null);
+  useEffect(() => { getSetting("companion").then((v) => setOn(v === "on")); }, []);
+  if (on === null) return null;
+  return <ToggleRow k="phone" initial={on} onChange={async (v) => {
+    try { await setCompanion(v); await setSetting("companion", v ? "on" : "off"); }
+    catch (e) { toast(String(e)); }
+  }} />;
 }
 
 const OLLAMA_DOWNLOAD = "https://ollama.com/download";
@@ -267,6 +280,7 @@ export function Settings() {
             </div>
             <TtsRow />
             <SttRow />
+            {isTauri && <PhoneRow />}
           </div>
 
           <DataSection />

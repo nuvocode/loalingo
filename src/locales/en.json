@@ -267,6 +267,8 @@
     "speakingDesc": "Exercises that use the microphone",
     "bargeIn": "Cut in on the tutor",
     "bargeInDesc": "Talk over the tutor in a live lesson to interrupt. Turn off if the tutor stops on their own because the mic hears the speakers.",
+    "phone": "Use on your phone",
+    "phoneDesc": "Opens Sprigo to your own devices through Tailscale; your data stays on this computer.",
     "reminder": "Reminders",
     "reminderDesc": "Sprigo nudges you a few times a day and goes quiet once you've practiced. While on, it stays in the background.",
     "reduceMotion": "Reduce motion",

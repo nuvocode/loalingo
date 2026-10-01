@@ -10,6 +10,7 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
+import { remoteDb, serveCompanion } from "./companion";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
@@ -26,11 +27,15 @@ async function browserDb(): Promise<Db> {
 
 let dbP: Promise<Db> | null = null;
 export const isTauri = "__TAURI_INTERNALS__" in window;
+/** Opened from a phone through `tailscale serve` (docs/MOBILE.md): data, whisper and Ollama are the desktop's. */
+export const isCompanion = !isTauri && location.hostname.endsWith(".ts.net");
 function db() {
   return (dbP ??= (async () => {
+    if (isCompanion) return remoteDb(); // the desktop already migrated it
     const d = await (isTauri ? openTauriDb() : import.meta.env.DEV ? browserDb() : Promise.reject(new Error("Sprigo needs the Tauri shell")));
     await runMigrations(d, MIGRATIONS, isTauri ? (v) => snapshot(d, `pre-v${v}-${Date.now()}.db`).then(() => {}) : undefined);
     if (isTauri) await dailyBackup(d).catch((e) => console.error("daily backup", e));
+    if (isTauri) void serveCompanion(d).catch((e) => console.error("companion", e));
     return d;
   })());
 }

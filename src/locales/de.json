@@ -267,6 +267,8 @@
     "speakingDesc": "Übungen, die das Mikrofon nutzen",
     "bargeIn": "Den Tutor unterbrechen",
     "bargeInDesc": "Im Live-Unterricht kannst du einfach dazwischenreden. Schalte es aus, wenn der Tutor von selbst verstummt, weil das Mikrofon die Lautsprecher hört.",
+    "phone": "Auf dem Handy nutzen",
+    "phoneDesc": "Öffnet Sprigo über Tailscale für deine eigenen Geräte; deine Daten bleiben auf diesem Computer.",
     "reminder": "Erinnerungen",
     "reminderDesc": "Sprigo erinnert dich ein paarmal am Tag und ist still, sobald du geübt hast. Wenn aktiv, läuft es im Hintergrund.",
     "reduceMotion": "Bewegung reduzieren",

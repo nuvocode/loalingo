@@ -7,14 +7,12 @@ import { createGoogle } from "@ai-sdk/google";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { invoke } from "@tauri-apps/api/core";
 import { z } from "zod";
-import { isTauri, getSetting, setSetting } from "./db";
+import { isTauri, isCompanion, getSetting, setSetting } from "./db";
 import { retry } from "./retry";
 
 export type ProviderId = "ollama" | "lmstudio" | "openai" | "anthropic" | "gemini";
-// Opened from a phone through `tailscale serve` (docs/MOBILE.md): Ollama is the desktop's, proxied same-origin under /ollama.
-const onPhone = !isTauri && location.hostname.endsWith(".ts.net");
 export const PROVIDERS: Record<ProviderId, { label: string; baseURL: string; needsKey: boolean }> = {
-  ollama: { label: "Ollama", baseURL: onPhone ? `${location.origin}/ollama` : "http://localhost:11434", needsKey: false },
+  ollama: { label: "Ollama", baseURL: isCompanion ? `${location.origin}/ollama` : "http://localhost:11434", needsKey: false },
   lmstudio: { label: "LM Studio", baseURL: "http://localhost:1234/v1", needsKey: false },
   openai: { label: "OpenAI", baseURL: "https://api.openai.com/v1", needsKey: true },
   anthropic: { label: "Anthropic", baseURL: "https://api.anthropic.com/v1", needsKey: true },
