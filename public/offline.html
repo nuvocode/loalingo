@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Sprigo</title>
+<style>
+  :root { --bg:#fbf8f1; --text:#2e2a24; --muted:#6b6357; --green:#5e9a48; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161a13; --text:#ece7da; --muted:#a7a18f; } }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,sans-serif; text-align:center;
+    padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left)); box-sizing:border-box; }
+  main { max-width:360px; }
+  img { width:88px; height:88px; border-radius:22px; }
+  h1 { font-size:22px; margin:20px 0 8px; }
+  ol { text-align:left; color:var(--muted); line-height:1.5; padding-left:20px; margin:0 0 24px; }
+  button { font:inherit; font-weight:800; font-size:16px; color:#fff; background:var(--green); border:0; border-radius:14px; padding:14px 28px; width:100%; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/apple-touch-icon.png" alt="" />
+  <h1 id="t"></h1>
+  <ol id="s"></ol>
+  <button id="b" onclick="location.reload()"></button>
+</main>
+<script>
+  // The app's own language choice (src/i18n.ts keeps it in localStorage), else the phone's.
+  const T = {
+    en: ["Sprigo isn't reachable", ["Open Sprigo on your computer.", "In Settings, turn on “Use on your phone”.", "Make sure Tailscale is connected on this phone."], "Try again"],
+    tr: ["Sprigo'ya ulaşılamıyor", ["Bilgisayarında Sprigo'yu aç.", "Ayarlar'da “Telefonda kullan”ı aç.", "Bu telefonda Tailscale'in bağlı olduğundan emin ol."], "Tekrar dene"],
+    de: ["Sprigo ist nicht erreichbar", ["Öffne Sprigo auf deinem Computer.", "Schalte in den Einstellungen „Auf dem Handy nutzen“ ein.", "Prüfe, ob Tailscale auf diesem Handy verbunden ist."], "Erneut versuchen"],
+    fr: ["Sprigo est injoignable", ["Ouvre Sprigo sur ton ordinateur.", "Dans les Réglages, active « Utiliser sur ton téléphone ».", "Vérifie que Tailscale est connecté sur ce téléphone."], "Réessayer"],
+    es: ["No se puede conectar con Sprigo", ["Abre Sprigo en tu ordenador.", "En Ajustes, activa «Usar en tu móvil».", "Comprueba que Tailscale está conectado en este móvil."], "Reintentar"],
+  };
+  let lang = "";
+  try { lang = localStorage.getItem("sprigo.uiLang") || ""; } catch {}
+  const [title, steps, retry] = T[(lang || navigator.language).slice(0, 2)] || T.en;
+  document.getElementById("t").textContent = title;
+  document.getElementById("s").innerHTML = steps.map((x) => "<li>" + x + "</li>").join("");
+  document.getElementById("b").textContent = retry;
+  // Coming back to the app or onto the network is the usual moment it works again.
+  addEventListener("online", () => location.reload());
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) location.reload(); });
+</script>
+</body>
+</html>
