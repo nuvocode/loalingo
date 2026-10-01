@@ -9,6 +9,7 @@ import { nudgeDue, nudgeMessage } from "./nudge";
 import { keepInBackground, notify } from "./notify";
 import { takeOver, resetDataDir } from "./datadir";
 import { findUpdate, UpdateSheet } from "./Update";
+import type { Update } from "@tauri-apps/plugin-updater";
 import { Chat, Story } from "./Talk";
 import { TutorCall } from "./TutorCall";
 import { CHARACTERS, parseTalkId, type CharacterId } from "./characters";
@@ -101,12 +102,20 @@ function BootErrorScreen({ e }: { e: BootError }) {
     </div>
   );
   const future = e.kind === "future";
+  return <FutureOrFailed e={e} future={future} />;
+}
+
+function FutureOrFailed({ e, future }: { e: BootError; future: boolean }) {
+  const { t } = useTranslation();
+  const [update, setUpdate] = useState<Update | null>(null);
+  useEffect(() => { if (future) findUpdate().then(setUpdate); }, [future]);
   return (
     <div className="boot-error" role="alert">
       <div className="card">
         <h3>{t(future ? "boot.newerTitle" : "boot.failedTitle")}</h3>
         <p className="muted">{t(future ? "boot.newerDesc" : "boot.failedDesc")}</p>
         {!future && <pre className="boot-detail">{e.detail}</pre>}
+        {update && <UpdateSheet update={update} inline />}
       </div>
     </div>
   );

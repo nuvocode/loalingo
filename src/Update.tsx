@@ -12,7 +12,8 @@ export async function findUpdate(): Promise<Update | null> {
   catch (e) { console.warn("update check", e); return null; }
 }
 
-export function UpdateSheet({ update }: { update: Update }) {
+/** In a sheet, or inline on the "data is from a newer version" boot screen, where there is nothing to go back to. */
+export function UpdateSheet({ update, inline }: { update: Update; inline?: boolean }) {
   const { t } = useTranslation();
   const { closeSheet } = useApp();
   const [pct, setPct] = useState<number | null>(null);
@@ -38,7 +39,7 @@ export function UpdateSheet({ update }: { update: Update }) {
       </>}
       {err && <p className="small" role="alert" style={{ color: "var(--red)", overflowWrap: "anywhere" }}>{err}</p>}
       <button className="btn btn-primary btn-block" disabled={pct !== null} onClick={install}>{t("update.install")}</button>
-      <button className="btn btn-ghost btn-block" disabled={pct !== null} onClick={closeSheet}>{t("update.later")}</button>
+      {!inline && <button className="btn btn-ghost btn-block" disabled={pct !== null} onClick={closeSheet}>{t("update.later")}</button>}
     </div>
   );
 }
