@@ -1,6 +1,6 @@
 # Telefondan Sprigo (companion mode)
 
-**Durum:** Plan onaylandı (2026-10-01) · **Epic:** SPR-4 · **Branch:** `feature/mobile-companion` → `test`
+**Durum:** Plan onaylandı, spike bitti (2026-10-01) · **Epic:** SPR-4 · **Branch:** `feature/mobile-companion` → `test`
 
 Masaüstü uygulama sunucu olur; telefon tarayıcısı ekran, mikrofon ve hoparlör olur. Veri, whisper ve Ollama masaüstünde kalır.
 
@@ -34,7 +34,15 @@ Telefon tarayıcısı ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:P
 | 3 | Arayüz companion modu: uzak veritabanı, STT, Ollama; masaüstüne özel ekranlar gizli | Telefonda canlı ders uçtan uca çalışır |
 | 4 | Masaüstü "telefonda" ekranı + Ayarlar'da kurulum talimatı (`tailscale serve` komutu, adres) | İki cihaz aynı anda veriyi bozmaz |
 
-## 4. Kapsam dışı
+## 4. Spike sonucu (SPR-18, iPhone Safari)
+
+- Çalışıyor: `tailscale serve` ile HTTPS, mikrofon izni ve VAD seviyesi, sistem sesi, `/ollama` aktarımı.
+- Telefonda sessiz mod açıkken tarayıcı sesi (sistem sesi, Piper, Kokoro) susar; kurulum talimatına eklenecek.
+- Kokoro: `RangeError: Out of memory` (iOS WASM bellek sınırı). Telefonda kapsam dışı.
+- Piper: sesi yok, sebebi kesinleşmedi (sessiz mod ya da aynı bellek sınırı). v1'de telefonda sistem sesi; masaüstünde üretilen ses sonraki iş.
+- Spike'ta giderilenler: Vite `127.0.0.1`'e bağlanır; uzun pencereler ekrana sığar; `.ts.net`'ten açılınca Ollama varsayılanı `/ollama`; konuşma deneme penceresi tanıyıcı olmadan da mikrofonu açar.
+
+## 5. Kapsam dışı
 
 - Public URL (Cloudflare tunnel), QR eşleştirme, token.
 - Native mobil uygulama (Tauri iOS/Android).
