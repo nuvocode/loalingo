@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LONG_PAUSE_MS, nativeCount, speechMetrics, summarize } from "./speech.ts";
+import { LONG_PAUSE_MS, STATE_HINTS, baselineOf, learnerState, nativeCount, nextHint, speechMetrics, summarize, type Baseline, type LearnerState, type Utterance } from "./speech.ts";
 
 const RATE = 16000;
 /** `parts`: [ms, loud?] stretches of a 0.1 or silent signal. */
@@ -48,4 +48,39 @@ test("session summary averages what was said and sums the counts", () => {
   assert.deepEqual({ ...s, pauseRatio: +s.pauseRatio.toFixed(2), level: +s.level.toFixed(2) },
     { utterances: 2, silences: 2, latencyMs: 1000, wpm: 80, pauseRatio: 0.3, longPauses: 1, level: 0.2, fillers: 3, words: 8, nativeWords: 1, speechMs: 3000 });
   assert.equal(summarize([], 0).latencyMs, null);
+});
+
+const U = (o: Partial<Utterance>): Utterance => ({ latencyMs: 1000, speechMs: 4000, words: 8, wpm: 120, pauseRatio: 0.2, longPauses: 0, level: 0.1, fillers: 0, nativeWords: 0, ...o });
+const BASE: Baseline = { latencyMs: 1000, wpm: 120, pauseRatio: 0.2, words: 8 };
+
+test("learner state, relative to the learner's own baseline", () => {
+  const rows: [string, Utterance[], Baseline | null, LearnerState][] = [
+    ["like usual", [U({}), U({}), U({})], BASE, "neutral"],
+    ["one answer is not a trend", [U({ words: 1 })], BASE, "neutral"],
+    ["slow to answer", [U({ latencyMs: 3000 }), U({ latencyMs: 2800 })], BASE, "hesitant"],
+    ["short answers", [U({ words: 2 }), U({ words: 3 }), U({ words: 3 })], BASE, "hesitant"],
+    ["slow and broken", [U({ wpm: 60, pauseRatio: 0.5 }), U({ wpm: 70, pauseRatio: 0.45 })], BASE, "struggling"],
+    ["fast, few pauses, long answers", [U({ wpm: 150, pauseRatio: 0.1, words: 12 }), U({ wpm: 140, pauseRatio: 0.12, words: 10 })], BASE, "flowing"],
+    ["native words win, even with no baseline", [U({ words: 4, nativeWords: 2 }), U({ words: 4, nativeWords: 1 })], null, "l1_fallback"],
+    ["no baseline yet", [U({ latencyMs: 5000 }), U({ latencyMs: 5000 })], null, "neutral"],
+    ["only the last 3 count", [U({ words: 1 }), U({ words: 1 }), U({}), U({}), U({})], BASE, "neutral"],
+    ["empty answers are skipped", [U({ words: 2 }), U({ words: 0 }), U({ words: 2 })], BASE, "hesitant"],
+    ["a near-silent usual doesn't make any pause look like struggle", [U({ wpm: 80, pauseRatio: 0.06 }), U({ wpm: 80, pauseRatio: 0.06 })], { ...BASE, pauseRatio: 0 }, "neutral"],
+  ];
+  for (const [name, us, base, want] of rows) assert.equal(learnerState(us, base), want, name);
+});
+
+test("in-call baseline needs a few answers", () => {
+  assert.equal(baselineOf([U({}), U({ words: 0 }), U({})]), null);
+  const b = baselineOf([U({}), U({ latencyMs: null }), U({ wpm: 90 })])!;
+  assert.deepEqual({ ...b, pauseRatio: +b.pauseRatio.toFixed(2) }, { latencyMs: 1000, wpm: 110, pauseRatio: 0.2, words: 8 });
+});
+
+test("hint only on a change or every 3rd turn the state holds", () => {
+  let prev = { state: "neutral" as LearnerState, turns: 0 };
+  const got = (["neutral", "hesitant", "hesitant", "hesitant", "hesitant", "flowing", "neutral"] as LearnerState[]).map((st) => {
+    const r = nextHint(prev, st); prev = r.prev; return r.hint ? st : "-";
+  });
+  assert.deepEqual(got, ["-", "hesitant", "-", "-", "hesitant", "flowing", "-"]);
+  assert.ok(STATE_HINTS.hesitant.includes("sentence starter"));
 });

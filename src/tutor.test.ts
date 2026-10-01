@@ -119,3 +119,10 @@ test("a tutor line the learner talked over is marked in the prompt", () => {
   assert.ok(p.includes("Mia: Today we talk about (interrupted)"));
   assert.ok(!p.includes("Wait (interrupted)"));
 });
+
+test("a coach note goes in before the event, only when there is one", () => {
+  const e = { kind: "user_said" as const, text: "yes" };
+  assert.ok(!tutorPrompt("Mia", [], "", e).includes("Coach note"));
+  const p = tutorPrompt("Mia", [], "", e, "", "Learner seems hesitant.");
+  assert.ok(p.indexOf("Coach note") < p.indexOf("Event:") && p.includes("never mention it): Learner seems hesitant."));
+});

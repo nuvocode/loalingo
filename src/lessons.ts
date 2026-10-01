@@ -238,14 +238,14 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
 // ---- Tutor call (spec T): the tutor's reply to one event ----
 
 /** With `onText` the reply streams (SPR-13); see generateStream. */
-export function tutorTurn(c: Base & { about?: string[] }, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
+export function tutorTurn(c: Base & { about?: string[]; coach?: string }, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
   onText?: (raw: string) => boolean) {
   const ch = CHARACTERS[who];
   const system = tutorSystem({
     name: ch.name, persona: ch.persona, target: c.course.name, native: langEn(c.native), level: c.level,
     unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit), about: c.about ?? [],
   });
-  const prompt = tutorPrompt(ch.name, history, notes, event, screen);
+  const prompt = tutorPrompt(ch.name, history, notes, event, screen, c.coach);
   return onText ? generateStream(tutorSchema, system, prompt, onText, looseTutor) : generate(tutorSchema, system, prompt, undefined, looseTutor);
 }
 

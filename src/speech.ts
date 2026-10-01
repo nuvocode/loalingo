@@ -86,3 +86,50 @@ export function summarize(us: Utterance[], silences: number): SpeechSummary {
     longPauses: sum("longPauses"), fillers: sum("fillers"), words: sum("words"), nativeWords: sum("nativeWords"), speechMs: sum("speechMs"),
   };
 }
+
+// ---- Live adaptation (SPR-26): the learner's last few answers against their own usual, one hint line for the tutor ----
+
+export type LearnerState = "hesitant" | "flowing" | "struggling" | "l1_fallback" | "neutral";
+/** The learner's usual: per answer, from their recent calls (db.speechBaseline) or from earlier in this call. */
+export type Baseline = { latencyMs: number | null; wpm: number; pauseRatio: number; words: number };
+export const RECENT = 3;
+
+const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+/** Baseline from earlier answers in this call, for a learner with no past calls yet. */
+export function baselineOf(us: Utterance[]): Baseline | null {
+  const said = us.filter((u) => u.words > 0);
+  return said.length < RECENT ? null : averages(said);
+}
+function averages(said: Utterance[]): Baseline {
+  const lat = said.flatMap((u) => (u.latencyMs === null ? [] : [u.latencyMs]));
+  return { latencyMs: lat.length ? mean(lat) : null, wpm: mean(said.map((u) => u.wpm)), pauseRatio: mean(said.map((u) => u.pauseRatio)), words: mean(said.map((u) => u.words)) };
+}
+
+/** Rule-based, relative to the learner's own baseline, never a fixed bar: everyone's pace differs.
+ *  ponytail: ratios (0.7, 1.4, 1.5, 0.6, 1.1) are first guesses; tune from speech_sessions once there are real calls. */
+export function learnerState(us: Utterance[], base: Baseline | null): LearnerState {
+  const recent = us.filter((u) => u.words > 0).slice(-RECENT);
+  if (recent.length < 2) return "neutral";
+  const words = recent.reduce((n, u) => n + u.words, 0), native = recent.reduce((n, u) => n + u.nativeWords, 0);
+  if (native / words >= 0.25) return "l1_fallback"; // needs no baseline
+  if (!base) return "neutral";
+  const r = averages(recent);
+  const pr = Math.max(base.pauseRatio, 0.05); // a near-zero usual would make any pause look huge
+  if (r.wpm < 0.7 * base.wpm && r.pauseRatio > 1.4 * pr) return "struggling";
+  if ((r.latencyMs !== null && base.latencyMs !== null && r.latencyMs > 1.5 * base.latencyMs + 300) || r.words < 0.6 * base.words) return "hesitant";
+  if (r.wpm > 1.1 * base.wpm && r.pauseRatio < 0.9 * pr && r.words >= base.words) return "flowing";
+  return "neutral";
+}
+
+export const STATE_HINTS: Record<Exclude<LearnerState, "neutral">, string> = {
+  hesitant: "Learner seems hesitant (slow to answer, short answers). For the next few turns: ask short yes/no or either/or questions, end with a sentence starter in quotes they can finish (e.g. 'I usually…'), praise the attempt, skip small corrections.",
+  struggling: "Learner is struggling (slow, broken sentences). For the next few turns: use simpler, shorter sentences, ask one small question at a time and give a model sentence in quotes they can copy.",
+  l1_fallback: "Learner keeps switching to their own language. Give them the words they reached for in the target language, keep your turn short and ask them to say it again in the target language.",
+  flowing: "Learner is speaking freely. Ask a more open, slightly harder follow-up (why, how, what if) and let them talk; correct only real mistakes.",
+};
+
+/** The hint for this turn, if any: only when the state changes or every 3rd turn it holds, so the prompt doesn't repeat it each time. */
+export function nextHint(prev: { state: LearnerState; turns: number }, state: LearnerState): { hint: string; prev: { state: LearnerState; turns: number } } {
+  const turns = state === prev.state ? prev.turns + 1 : 0;
+  return { hint: state !== "neutral" && turns % 3 === 0 ? STATE_HINTS[state] : "", prev: { state, turns } };
+}
