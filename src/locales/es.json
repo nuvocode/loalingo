@@ -448,6 +448,7 @@
     "apiKeyDesc": "Se guarda en el llavero del sistema, nunca en la base de datos de la app",
     "model": "Modelo",
     "modelDesc": "Prueba la conexión para ver los modelos disponibles",
+    "smallModel": "Los modelos de menos de {{min}} pueden crear lecciones con respuestas incorrectas. Se recomienda un modelo de {{min}} o más.",
     "test": "Probar conexión",
     "save": "Guardar",
     "connected": "Conectado: {{count}} modelos encontrados",

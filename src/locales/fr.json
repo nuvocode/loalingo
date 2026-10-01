@@ -448,6 +448,7 @@
     "apiKeyDesc": "Stockée dans le trousseau de ton système, jamais dans la base de données de l'app",
     "model": "Modèle",
     "modelDesc": "Teste la connexion pour lister les modèles disponibles",
+    "smallModel": "Les modèles de moins de {{min}} peuvent écrire des leçons avec de mauvaises réponses. Un modèle d'au moins {{min}} est recommandé.",
     "test": "Tester la connexion",
     "save": "Enregistrer",
     "connected": "Connecté — {{count}} modèles trouvés",
