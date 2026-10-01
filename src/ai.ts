@@ -76,10 +76,18 @@ export async function listModels(c: AiConfig, key: string | null): Promise<strin
 }
 
 // Thinking models (e.g. glm on Ollama) otherwise reason for minutes; exercises need little. Measured: 185 s → 7 s.
+// Not "none" (Ollama's think:false): glm-5.3-flash:cloud then writes its reasoning into the reply itself (SPR-14, 213 tokens vs 44).
 // ponytail: local providers only; cloud models keep their default until measured per provider.
 const reasoning = (c: AiConfig) => c.provider === "ollama" || c.provider === "lmstudio" ? "low" as const : undefined;
 
 let active: { cfg: AiConfig; key: string | null } | null = null;
+
+/** Loads a local Ollama model before a live call so the first turn is not a cold start (SPR-14). Cloud models answer at once. */
+export function warmUp() {
+  if (active?.cfg.provider !== "ollama") return;
+  const base = trim(active.cfg.baseURL || PROVIDERS.ollama.baseURL);
+  http(`${base}/api/generate`, { method: "POST", body: JSON.stringify({ model: active.cfg.model, keep_alive: "10m" }) }).catch(() => {});
+}
 export async function activateConfig(cfg: AiConfig | null) {
   active = cfg && { cfg, key: await getKey(cfg.provider) };
 }

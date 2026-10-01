@@ -13,6 +13,7 @@ import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
 import { loadPractice, tutorTurn } from "./lessons";
+import { warmUp } from "./ai";
 import { NOTES_MAX, currentUnit, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
 import * as db from "./db";
@@ -39,6 +40,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const levelDef = course && enrollment ? course.levels[enrollment.level] : undefined;
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang, ch.gender);
+  useEffect(warmUp, []);
 
   const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
