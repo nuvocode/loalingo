@@ -6,7 +6,7 @@ import { tutorSystem, tutorPrompt, tutorSchema, partialSay, sentences, type Tuto
 
 const BASE = process.env.OLLAMA ?? "http://localhost:11434", TURNS = +(process.env.TURNS ?? 5);
 const ctx = { name: "Lily", persona: "Dry, sarcastic teen who secretly cares.", target: "English", native: "Turkish", level: "A2",
-  unit: "Daily routines", words: ["wake up", "breakfast", "usually", "commute", "weekend"], grammar: ["present simple", "adverbs of frequency"] };
+  unit: "Daily routines", words: ["wake up", "breakfast", "usually", "commute", "weekend"], grammar: ["present simple", "adverbs of frequency"], about: [] as string[] };
 const said = ["Hi! I am fine, thanks. I am little tired today.", "I usually wake up at seven o'clock.", "I go to work with metro, it take forty minutes.",
   "On weekend I sleep late and I meet my friends.", "Yes, I have been to London one time."];
 const schema = z.toJSONSchema(tutorSchema);
