@@ -84,12 +84,14 @@ export function describeEvent(e: TutorEvent): string {
   }
 }
 
-export function tutorPrompt(name: string, history: TutorMsg[], notes: string, e: TutorEvent, screen = ""): string {
+/** `coach`: a hint from how the learner sounds (SPR-26, src/speech.ts), only on the turns it is new or due again. */
+export function tutorPrompt(name: string, history: TutorMsg[], notes: string, e: TutorEvent, screen = "", coach = ""): string {
   const lines = history.slice(-HISTORY_IN_PROMPT).map((m) => `${m.from === "tutor" ? name : "Learner"}${m.via === "text" ? " (typed)" : ""}: ${m.text}${m.cut ? " (interrupted)" : ""}`);
   return [
     `Your notes: ${notes || "(none yet)"}`,
     `Conversation so far:\n${lines.join("\n") || "(nothing yet)"}`,
     screen ? `Practice screen:\n${screen}` : "",
+    coach ? `Coach note (from how the learner sounds; act on it quietly, never mention it): ${coach}` : "",
     `Event: ${describeEvent(e)}`,
     `Choose your action and write ${name}'s turn.`,
   ].filter(Boolean).join("\n\n");

@@ -10,7 +10,7 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
-import type { SpeechSummary } from "./speech";
+import type { Baseline, SpeechSummary } from "./speech";
 import { remoteDb, serveCompanion } from "./companion";
 import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
@@ -239,6 +239,15 @@ export async function saveSpeechSession(profileId: number, enrollmentId: number 
     `INSERT INTO speech_sessions(profile_id, enrollment_id, mode, utterances, silences, latency_ms, wpm, pause_ratio, long_pauses, level, fillers, words, native_words, speech_ms)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
     [profileId, enrollmentId, mode, x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs]);
+}
+
+/** The learner's usual per answer over their last 10 voice calls (SPR-26); null before they have said a few things. */
+export async function speechBaseline(profileId: number): Promise<Baseline | null> {
+  const [r] = await (await db()).select<Baseline & { n: number | null }>(
+    `SELECT SUM(utterances) AS n, AVG(latency_ms) AS latencyMs, SUM(wpm * utterances) * 1.0 / SUM(utterances) AS wpm,
+       SUM(pause_ratio * utterances) / SUM(utterances) AS pauseRatio, SUM(words) * 1.0 / SUM(utterances) AS words
+     FROM (SELECT * FROM speech_sessions WHERE profile_id = $1 AND utterances > 0 ORDER BY id DESC LIMIT 10)`, [profileId]);
+  return r && (r.n ?? 0) >= 3 ? { latencyMs: r.latencyMs, wpm: r.wpm, pauseRatio: r.pauseRatio, words: r.words } : null;
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----

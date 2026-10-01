@@ -9,7 +9,7 @@ import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
-import { summarize, type Utterance } from "./speech";
+import { RECENT, baselineOf, learnerState, nextHint, summarize, type LearnerState, type Utterance } from "./speech";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
@@ -34,6 +34,7 @@ type Call = {
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
   speech: Utterance[]; silences: number; // speech signals and silence nudges, saved as one row at the end (SPR-25)
+  mood: { state: LearnerState; turns: number }; // the learner's state at the last turn, so its hint isn't repeated every turn (SPR-26)
 };
 
 export function TutorCall({ who }: { who: CharacterId }) {
@@ -46,8 +47,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
   usePrewarm(lang, ch.gender);
   useEffect(warmUp, []);
   const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per call
+  const usual = useMemo(() => (profile ? db.speechBaseline(profile.id).catch(() => null) : Promise.resolve(null)), [profile?.id]);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0, speech: [], silences: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0, speech: [], silences: 0, mood: { state: "neutral", turns: 0 } }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -151,8 +153,11 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const slow = waiting ? setTimeout(() => sp.filler(filler(lang, c.fills++)), FILLER_MS) : undefined;
     try {
       const facts = await about;
+      const said = c.speech.filter((u) => u.words > 0);
+      const mood = nextHint(c.mood, learnerState(said, (await usual) ?? baselineOf(said.slice(0, -RECENT))));
+      c.mood = mood.prev;
       mark("req");
-      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang, about: facts }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
+      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang, about: facts, coach: mood.hint }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
       mark("llm");
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
