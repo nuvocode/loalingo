@@ -13,7 +13,12 @@
     "lockedDesc": "Cierra Sprigo allí y vuelve a intentarlo. Si tomas el control, los cambios que ese dispositivo aún no haya guardado podrían perderse.",
     "retry": "Reintentar",
     "takeOver": "Tomar el control",
-    "useDefault": "Usar la carpeta predeterminada"
+    "useDefault": "Usar la carpeta predeterminada",
+    "onPhoneTitle": "Sigue en tu móvil",
+    "onPhoneDesc": "Sprigo está abierto en tu móvil, así que esta ventana espera para proteger tu progreso. Vuelve aquí cuando quieras.",
+    "onDesktopTitle": "Sigue en tu ordenador",
+    "onDesktopDesc": "Sprigo se abrió en tu ordenador, así que esta pantalla espera para proteger tu progreso.",
+    "continueHere": "Continuar aquí"
   },
   "nav": {
     "live": "Clase en vivo",
@@ -283,6 +288,9 @@
     "bargeInDesc": "En la clase en vivo puedes hablar mientras el tutor habla para interrumpirlo. Desactívalo si el tutor se calla solo porque el micrófono oye los altavoces.",
     "phone": "Usar en tu móvil",
     "phoneDesc": "Abre Sprigo a tus propios dispositivos a través de Tailscale; tus datos se quedan en este ordenador.",
+    "phoneHow1": "Instala Tailscale en este ordenador y en tu móvil, e inicia sesión con la misma cuenta.",
+    "phoneHow2": "Ejecuta esto en Terminal; muestra tu dirección:",
+    "phoneHow3": "Abre esa dirección en tu móvil. En iPhone, desactiva el modo silencio para oír al tutor.",
     "reminder": "Recordatorios",
     "reminderDesc": "Sprigo te avisa varias veces al día y se calla cuando ya has practicado. Mientras esté activado, sigue en segundo plano.",
     "reduceMotion": "Reducir movimiento",

@@ -31,15 +31,25 @@ function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onCh
 }
 
 /** Desktop only: the phone companion server (docs/MOBILE.md). */
+const SERVE_CMD = "tailscale serve --bg --https=8443 http://127.0.0.1:1430";
 function PhoneRow() {
+  const { t } = useTranslation();
   const { toast } = useApp();
   const [on, setOn] = useState<boolean | null>(null);
   useEffect(() => { getSetting("companion").then((v) => setOn(v === "on")); }, []);
   if (on === null) return null;
-  return <ToggleRow k="phone" initial={on} onChange={async (v) => {
-    try { await setCompanion(v); await setSetting("companion", v ? "on" : "off"); }
-    catch (e) { toast(String(e)); }
-  }} />;
+  return <>
+    <ToggleRow k="phone" initial={on} onChange={async (v) => {
+      try { await setCompanion(v); await setSetting("companion", v ? "on" : "off"); setOn(v); }
+      catch (e) { toast(String(e)); }
+    }} />
+    {on && <div className="card od-stack small" style={gap("8px")}>
+      <span>1. {t("settings.phoneHow1")}</span>
+      <span>2. {t("settings.phoneHow2")}</span>
+      <pre className="boot-detail" style={{ userSelect: "all" }}>{SERVE_CMD}</pre>
+      <span>3. {t("settings.phoneHow3")}</span>
+    </div>}
+  </>;
 }
 
 const OLLAMA_DOWNLOAD = "https://ollama.com/download";

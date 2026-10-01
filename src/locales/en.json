@@ -13,7 +13,12 @@
     "lockedDesc": "Close Sprigo there, then try again. If you take over, changes that device hasn't saved yet may be lost.",
     "retry": "Try again",
     "takeOver": "Take over",
-    "useDefault": "Use the default folder"
+    "useDefault": "Use the default folder",
+    "onPhoneTitle": "Continuing on your phone",
+    "onPhoneDesc": "Sprigo is open on your phone, so this window waits to keep your progress safe. Come back here whenever you like.",
+    "onDesktopTitle": "Continuing on your computer",
+    "onDesktopDesc": "Sprigo was picked up on your computer, so this screen waits to keep your progress safe.",
+    "continueHere": "Continue here"
   },
   "nav": {
     "live": "Live lesson",
@@ -269,6 +274,9 @@
     "bargeInDesc": "Talk over the tutor in a live lesson to interrupt. Turn off if the tutor stops on their own because the mic hears the speakers.",
     "phone": "Use on your phone",
     "phoneDesc": "Opens Sprigo to your own devices through Tailscale; your data stays on this computer.",
+    "phoneHow1": "Install Tailscale on this computer and on your phone, and sign in with the same account.",
+    "phoneHow2": "Run this in Terminal; it prints your address:",
+    "phoneHow3": "Open that address on your phone. On iPhone, turn silent mode off to hear the tutor.",
     "reminder": "Reminders",
     "reminderDesc": "Sprigo nudges you a few times a day and goes quiet once you've practiced. While on, it stays in the background.",
     "reduceMotion": "Reduce motion",

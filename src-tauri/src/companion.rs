@@ -113,7 +113,7 @@ fn sql(app: &tauri::AppHandle, req: &mut Request) -> Res {
         let id = NEXT.fetch_add(1, Ordering::Relaxed);
         let (tx, rx) = mpsc::channel();
         PENDING.lock().map_err(|e| e.to_string())?.insert(id, tx);
-        let sent = app.emit_to("main", "companion-sql", serde_json::json!({ "id": id, "kind": q["kind"], "sql": q["sql"], "args": q["args"] }));
+        let sent = app.emit_to("main", "companion-sql", serde_json::json!({ "id": id, "kind": q["kind"], "sql": q["sql"], "args": q["args"], "take": q["take"] }));
         let got = sent.map_err(|e| e.to_string()).and_then(|_| rx.recv_timeout(SQL_TIMEOUT).map_err(|_| "The desktop app did not answer".to_string()));
         PENDING.lock().map_err(|e| e.to_string())?.remove(&id);
         got?

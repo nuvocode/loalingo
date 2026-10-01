@@ -13,7 +13,12 @@
     "lockedDesc": "Ferme Sprigo là-bas, puis réessaie. Si tu reprends la main, les modifications pas encore enregistrées sur cet appareil risquent d'être perdues.",
     "retry": "Réessayer",
     "takeOver": "Reprendre",
-    "useDefault": "Utiliser le dossier par défaut"
+    "useDefault": "Utiliser le dossier par défaut",
+    "onPhoneTitle": "Ça continue sur ton téléphone",
+    "onPhoneDesc": "Sprigo est ouvert sur ton téléphone, donc cette fenêtre attend pour protéger ta progression. Reviens ici quand tu veux.",
+    "onDesktopTitle": "Ça continue sur ton ordinateur",
+    "onDesktopDesc": "Sprigo a été ouvert sur ton ordinateur, donc cet écran attend pour protéger ta progression.",
+    "continueHere": "Continuer ici"
   },
   "nav": {
     "live": "Cours en direct",
@@ -283,6 +288,9 @@
     "bargeInDesc": "En cours en direct, parle pendant que le tuteur parle pour l'interrompre. Désactive-le si le tuteur s'arrête tout seul parce que le micro capte les haut-parleurs.",
     "phone": "Utiliser sur ton téléphone",
     "phoneDesc": "Ouvre Sprigo à tes propres appareils via Tailscale ; tes données restent sur cet ordinateur.",
+    "phoneHow1": "Installe Tailscale sur cet ordinateur et sur ton téléphone, et connecte-toi avec le même compte.",
+    "phoneHow2": "Lance ceci dans le Terminal ; il affiche ton adresse :",
+    "phoneHow3": "Ouvre cette adresse sur ton téléphone. Sur iPhone, désactive le mode silencieux pour entendre le tuteur.",
     "reminder": "Rappels",
     "reminderDesc": "Sprigo te fait signe plusieurs fois par jour et se tait dès que tu as pratiqué. Quand il est activé, il reste en arrière-plan.",
     "reduceMotion": "Réduire les animations",

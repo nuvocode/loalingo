@@ -13,7 +13,12 @@
     "lockedDesc": "Orada Sprigo'yu kapat, sonra tekrar dene. Devralırsan o cihazın henüz kaydetmediği değişiklikler kaybolabilir.",
     "retry": "Tekrar dene",
     "takeOver": "Devral",
-    "useDefault": "Varsayılan klasörü kullan"
+    "useDefault": "Varsayılan klasörü kullan",
+    "onPhoneTitle": "Telefonda devam ediyor",
+    "onPhoneDesc": "Sprigo telefonunda açık; ilerlemen bozulmasın diye bu pencere bekliyor. İstediğin zaman buradan devam edebilirsin.",
+    "onDesktopTitle": "Bilgisayarda devam ediyor",
+    "onDesktopDesc": "Sprigo bilgisayarında açıldı; ilerlemen bozulmasın diye bu ekran bekliyor.",
+    "continueHere": "Burada devam et"
   },
   "nav": {
     "live": "Canlı ders",
@@ -266,6 +271,9 @@
     "bargeInDesc": "Canlı derste tutor konuşurken konuşarak araya girebilirsin. Mikrofon hoparlörü duyup tutor kendiliğinden susuyorsa kapat.",
     "phone": "Telefonda kullan",
     "phoneDesc": "Sprigo'yu Tailscale üzerinden kendi cihazlarına açar; verilerin bu bilgisayarda kalır.",
+    "phoneHow1": "Tailscale'i bu bilgisayara ve telefonuna kur, ikisinde de aynı hesapla giriş yap.",
+    "phoneHow2": "Bunu Terminal'de çalıştır; adresini yazar:",
+    "phoneHow3": "O adresi telefonunda aç. iPhone'da tutor'u duymak için sessiz modu kapat.",
     "reminder": "Hatırlatmalar",
     "reminderDesc": "Sprigo gün içinde birkaç kez seni derse çağırır; o gün çalıştıysan susar. Açıkken arka planda kalır.",
     "reduceMotion": "Hareket azaltma",
