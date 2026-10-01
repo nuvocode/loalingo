@@ -29,10 +29,16 @@ export async function serveCompanion(d: SqlDb) {
   if (on?.value === "on") await setCompanion(true).catch((e) => console.error("companion", e));
 }
 
-/** Settings → "Use on phone". Returns the local address `tailscale serve` should point at. */
+export type TailscaleStatus = { installed: boolean; running: boolean; host: string | null };
+export async function tailscaleStatus() {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<TailscaleStatus>("companion_status");
+}
+
+/** Settings → "Use on phone". On: the phone's address and its QR code (SVG). */
 export async function setCompanion(on: boolean) {
   const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<string>("companion_set", { on });
+  return invoke<[url: string, qr: string] | null>("companion_set", { on });
 }
 
 /** Phone: the desktop's database through /sql. Opening it takes the data over from the desktop. */

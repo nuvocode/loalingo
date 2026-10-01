@@ -22,13 +22,83 @@ static SERVER: Mutex<Option<Arc<Server>>> = Mutex::new(None);
 static PENDING: LazyLock<Mutex<HashMap<u64, mpsc::Sender<Reply>>>> = LazyLock::new(Default::default);
 static NEXT: AtomicU64 = AtomicU64::new(1);
 
-/// Starts or stops the server (Settings → "Use on phone"). Returns the local address it listens on.
-#[tauri::command]
-pub fn companion_set(app: tauri::AppHandle, on: bool) -> Result<String, String> {
+/// Tailscale on this machine: installed (its CLI runs), signed in, and this machine's tailnet name.
+#[derive(serde::Serialize)]
+pub struct Status {
+    installed: bool,
+    running: bool,
+    host: Option<String>,
+}
+
+const SERVE_PORT: &str = "--https=8443"; // 443 is often taken by the learner's own serve rules; never touch it
+const SERVE_WAIT: Duration = Duration::from_secs(10);
+
+// The Mac app's CLI lives inside its bundle; a bare `tailscale` on PATH is often missing or broken there.
+fn tailscale() -> std::process::Command {
+    const MAC: &str = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
+    std::process::Command::new(if std::path::Path::new(MAC).exists() { MAC } else { "tailscale" })
+}
+
+#[tauri::command(async)]
+pub fn companion_status() -> Status {
+    let Ok(out) = tailscale().args(["status", "--json"]).output() else {
+        return Status { installed: false, running: false, host: None };
+    };
+    // Signed out or the app quit: the JSON is missing or says NeedsLogin/Stopped.
+    let j: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap_or_default();
+    let host = j["Self"]["DNSName"].as_str().map(|h| h.trim_end_matches('.').to_string()).filter(|h| !h.is_empty());
+    Status { installed: true, running: j["BackendState"] == "Running" && host.is_some(), host }
+}
+
+/// Runs a `tailscale serve` command. A tailnet that hasn't allowed Serve yet prints an approval link and waits
+/// for it, so after a while the command is stopped and its output (with the link) becomes the error.
+fn serve(args: &[&str]) -> Result<(), String> {
+    use std::process::Stdio;
+    let mut child = tailscale().arg("serve").args(args).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().map_err(|e| e.to_string())?;
+    let start = std::time::Instant::now();
+    let done = loop {
+        if let Some(st) = child.try_wait().map_err(|e| e.to_string())? {
+            break Some(st);
+        }
+        if start.elapsed() > SERVE_WAIT {
+            let _ = child.kill();
+            let _ = child.wait();
+            break None;
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    };
+    let mut msg = String::new();
+    let _ = child.stdout.take().map(|mut o| o.read_to_string(&mut msg));
+    let _ = child.stderr.take().map(|mut e| e.read_to_string(&mut msg));
+    match done {
+        Some(st) if st.success() => Ok(()),
+        _ => Err(msg.trim().to_string()),
+    }
+}
+
+/// Settings → "Use on phone": starts the server and points `tailscale serve` at it (or takes both down).
+/// On: the phone's address and its QR code as SVG.
+#[tauri::command(async)]
+pub fn companion_set(app: tauri::AppHandle, on: bool) -> Result<Option<(String, String)>, String> {
+    run_server(app, on)?;
+    let local = format!("http://127.0.0.1:{PORT}");
+    if !on {
+        let _ = serve(&[SERVE_PORT, "off"]); // already gone or Tailscale removed: nothing to undo
+        return Ok(None);
+    }
+    serve(&["--bg", SERVE_PORT, &local])?;
+    let host = companion_status().host.ok_or("Tailscale is not signed in")?;
+    let url = format!("https://{host}:8443");
+    let qr = qrcode::QrCode::new(&url).map_err(|e| e.to_string())?;
+    let svg = qr.render::<qrcode::render::svg::Color>().min_dimensions(220, 220).quiet_zone(true).build();
+    Ok(Some((url, svg)))
+}
+
+fn run_server(app: tauri::AppHandle, on: bool) -> Result<(), String> {
     let mut slot = SERVER.lock().map_err(|e| e.to_string())?;
     // Already running: a webview reload asks again, and rebinding the port before the old socket closes fails.
     if on == slot.is_some() {
-        return Ok(format!("http://127.0.0.1:{PORT}"));
+        return Ok(());
     }
     if let Some(s) = slot.take() {
         s.unblock();
@@ -44,7 +114,7 @@ pub fn companion_set(app: tauri::AppHandle, on: bool) -> Result<String, String> 
         });
         *slot = Some(server);
     }
-    Ok(format!("http://127.0.0.1:{PORT}"))
+    Ok(())
 }
 
 /// The webview's answer to one `companion-sql` event.
