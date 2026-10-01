@@ -171,6 +171,18 @@ html[data-theme="dark"] .biome-scene .sky{fill:transparent}
 }
 .unit-head .uh-kicker{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:.85}
 .unit-head h2{font-size:22px;font-weight:900}
+/* Units not reached yet: faded, so the way ahead reads as "later". */
+.unit.later .unit-head,.unit.later .path{opacity:.5;filter:saturate(.35)}
+.unit-skip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;border-radius:99px;background:rgb(0 0 0 / .18);color:inherit;font:inherit;font-size:13px;font-weight:800}
+.unit-skip:hover{background:rgb(0 0 0 / .28)}
+.unit-skip svg{width:16px;height:16px}
+.scroll-btns{position:fixed;right:max(16px,calc(50vw - 640px));bottom:24px;z-index:20;display:flex;flex-direction:column;gap:10px}
+.scroll-btn{width:48px;height:48px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--blue);border:2px solid var(--border);box-shadow:0 3px 0 var(--border)}
+.scroll-btn > :first-child{transform:rotate(180deg)}
+.scroll-btn.here{color:var(--gold-dark)}
+.scroll-btn.here > :first-child{transform:none}
+.scroll-btn[data-tip]:hover::after{left:auto;right:calc(100% + 8px);bottom:50%;transform:translateY(50%)}
+@media (max-width:767px){.scroll-btns{bottom:96px}}
 .unit-head .uh-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .unit-head .guidebook{
   display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);

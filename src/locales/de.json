@@ -71,7 +71,10 @@
     "guideLoading": "Dein Lernführer wird geschrieben…",
     "guideLoadingDesc": "Die KI ergänzt Übersetzungen, Beispiele und Grammatikhinweise. Das dauert ein paar Sekunden, nur beim ersten Mal.",
     "legendTicket_one": "{{count}} Ticket",
-    "legendTicket_other": "{{count}} Tickets"
+    "legendTicket_other": "{{count}} Tickets",
+    "skipUnit": "Einheit per Test überspringen ({{score}} %)",
+    "toTop": "Nach oben",
+    "toHere": "Zu meiner Lektion"
   },
   "practice": {
     "title": "Übungsbereich",
@@ -438,7 +441,8 @@
     "speakSub": "Tippe auf das Mikrofon und sprich den Satz.",
     "heard": "Gehört: „{{text}}“",
     "heardNothing": "Das habe ich nicht verstanden – versuche es etwas lauter.",
-    "cantSpeak": "Sprechen gerade nicht möglich"
+    "cantSpeak": "Sprechen gerade nicht möglich",
+    "unitPassed": "Einheit bestanden!"
   },
   "profiles": {
     "saved": "Profil gespeichert",

@@ -74,7 +74,10 @@
     "guideLoadingDesc": "La IA está añadiendo traducciones, ejemplos y notas de gramática. Tarda unos segundos, solo la primera vez.",
     "legendTicket_one": "{{count}} entrada",
     "legendTicket_many": "{{count}} entradas",
-    "legendTicket_other": "{{count}} entradas"
+    "legendTicket_other": "{{count}} entradas",
+    "skipUnit": "Supera la unidad con un test ({{score}} %)",
+    "toTop": "Arriba del todo",
+    "toHere": "Volver a mi lección"
   },
   "practice": {
     "title": "Centro de práctica",
@@ -456,7 +459,8 @@
     "speakSub": "Toca el micrófono y di la frase.",
     "heard": "Se oyó: “{{text}}”",
     "heardNothing": "No te he entendido: inténtalo de nuevo un poco más alto.",
-    "cantSpeak": "No puedo hablar ahora"
+    "cantSpeak": "No puedo hablar ahora",
+    "unitPassed": "¡Unidad superada!"
   },
   "profiles": {
     "saved": "Perfil guardado",

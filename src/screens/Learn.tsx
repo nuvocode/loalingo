@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../icons";
 import { useApp } from "../store";
 import { useStartLesson } from "../Lesson";
-import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
+import { LEGEND_PASS, LEGEND_PRICE, UNIT_TEST_PASS, loadGuide, unitGrammar, unitWords, type Guide } from "../lessons";
 import { speak } from "../tts";
 import { AiSheet } from "./Settings";
 import { LiveButton } from "./Screens";
@@ -87,13 +87,16 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
       <button className="btn btn-primary btn-block" onClick={closeSheet}>{t("sheet.great")}</button>
     </>);
   };
+  const here = u.nodes.some((n) => n.kind === "step" && n.state === "current"); // the unit being worked on
+  const later = u.nodes.every((n) => n.state === "locked");
   return (
-    <section className="unit" aria-label={u.title}>
+    <section className={`unit${later ? " later" : ""}`} aria-label={u.title}>
       <div className="unit-head">
         <div className="uh-row">
           <div><span className="uh-kicker">{t("learn.kicker", { level, unit: u.index })}</span><h2>{u.title}</h2></div>
           <button className="guidebook" onClick={() => openSheet(<GuideSheet unitId={u.id} level={level} />)}><Icon name="book" /><span>{t("learn.guidebook")}</span></button>
         </div>
+        {here && <button className="unit-skip" onClick={() => start(`unit-test:${u.id}`)}><Icon name="bolt" />{t("learn.skipUnit", { score: UNIT_TEST_PASS })}</button>}
       </div>
       <div className="path">
         <PathLines />
@@ -216,6 +219,27 @@ function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number
   );
 }
 
+/** Floating "to the top" and "back to my lesson" buttons, each shown only when it would move the page. */
+function ScrollButtons() {
+  const { t } = useTranslation();
+  const [st, setSt] = useState({ top: false, here: false });
+  useEffect(() => {
+    const check = () => {
+      const r = document.querySelector(".node.current")?.getBoundingClientRect();
+      setSt({ top: scrollY > innerHeight / 2, here: !!r && (r.bottom < 0 || r.top > innerHeight) });
+    };
+    check();
+    addEventListener("scroll", check, { passive: true }); addEventListener("resize", check);
+    return () => { removeEventListener("scroll", check); removeEventListener("resize", check); };
+  }, []);
+  const toTop = () => scrollTo({ top: 0, behavior: "smooth" });
+  const toHere = () => document.querySelector(".node.current")?.scrollIntoView({ block: "center", behavior: "smooth" });
+  return <div className="scroll-btns">
+    {st.top && <button className="scroll-btn" onClick={toTop} aria-label={t("learn.toTop")} data-tip={t("learn.toTop")}><Icon name="down" /></button>}
+    {st.here && <button className="scroll-btn here" onClick={toHere} aria-label={t("learn.toHere")} data-tip={t("learn.toHere")}><Icon name="star" /></button>}
+  </div>;
+}
+
 let setupOffered = false;
 
 export function Learn() {
@@ -257,6 +281,7 @@ export function Learn() {
         <div className="biome-ground" dangerouslySetInnerHTML={{ __html: biomeScene(level, 140) }} />
         {units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}
       </div>
+      <ScrollButtons />
     </>
   );
 }

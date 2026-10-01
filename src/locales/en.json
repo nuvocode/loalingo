@@ -71,7 +71,10 @@
     "guideLoading": "Writing your guidebook…",
     "guideLoadingDesc": "The AI is adding translations, examples and grammar notes. This takes a few seconds, only the first time.",
     "legendTicket_one": "{{count}} ticket",
-    "legendTicket_other": "{{count}} tickets"
+    "legendTicket_other": "{{count}} tickets",
+    "skipUnit": "Pass this unit with a test (%{{score}})",
+    "toTop": "To the top",
+    "toHere": "Back to my lesson"
   },
   "practice": {
     "title": "Practice Hub",
@@ -438,7 +441,8 @@
     "speakSub": "Tap the microphone and say the sentence.",
     "heard": "Heard: “{{text}}”",
     "heardNothing": "Didn't catch that — try again a little louder.",
-    "cantSpeak": "Can't speak now"
+    "cantSpeak": "Can't speak now",
+    "unitPassed": "Unit passed!"
   },
   "profiles": {
     "saved": "Profile saved",

@@ -54,7 +54,7 @@ type Ctx = {
   createProfile: (p: db.NewProfile, courseIso: string) => Promise<void>;
   updateProfile: (patch: Parameters<typeof db.updateProfile>[1]) => Promise<void>;
   switchCourse: (iso: string) => Promise<void>;
-  completeStep: (stepId: string, xp: number) => Promise<void>;
+  completeStep: (stepId: string | string[], xp: number) => Promise<void>;
   gainXp: (xp: number) => Promise<void>;
   /** Mastery lesson passed: the (done) step turns gold. */
   markLegendary: (stepId: string) => Promise<void>;
@@ -177,9 +177,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     },
     completeStep: async (stepId, xp) => {
       if (!enrollment) return;
-      await db.markDone(enrollment.id, stepId);
+      const ids = [stepId].flat(); // several when a unit test is passed
+      for (const id of ids) await db.markDone(enrollment.id, id);
       if (xp) await db.addXp(enrollment.id, xp);
-      setDone((d) => new Set(d).add(stepId));
+      setDone((d) => new Set([...d, ...ids]));
       setEnrollments((es) => es.map((e) => e.id === enrollment.id ? { ...e, xp: e.xp + xp } : e));
     },
     gainXp: async (xp) => {

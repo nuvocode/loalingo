@@ -17,6 +17,13 @@ export const legendStep = (id: string) => id.startsWith("legend:") ? id.slice(7)
 export const LEGEND_PASS = 80; // % needed to turn the step gold
 export const LEGEND_PRICE = 100; // gems per attempt, or one shop ticket
 
+/** `unit-test:<unit>`: a test over one unit; passing it marks the unit's lessons done, like the level test does for a level. */
+export const unitTestOf = (id: string) => id.startsWith("unit-test:") ? id.slice(10) : undefined;
+export const UNIT_TEST_PASS = 80;
+const UNIT_TEST: CourseLevel["units"][number]["steps"][number]["activities"] = [ // ponytail: one mix for every unit; per-unit YAML tests if a course needs them
+  { type: "multiple_choice", count: 3 }, { type: "fill_blank", count: 2 }, { type: "word_bank", count: 2 }, { type: "translate", count: 2 }, { type: "listen_select", count: 1 },
+];
+
 /** Finds a step and its surroundings in the course tree; exams get a synthetic step covering the whole level. */
 export function stepContext(course: Course, stepId: string, native: string): LessonContext | null {
   const legend = legendStep(stepId);
@@ -46,9 +53,20 @@ export function stepContext(course: Course, stepId: string, native: string): Les
       },
     };
   }
+  const ut = unitTestOf(stepId);
   for (const level of levelsOf(course)) {
     const levelDef = course.levels[level]!;
     for (const u of levelDef.units) {
+      if (ut === u.id) return {
+        course, level, levelDef, unitTitle: u.title, native,
+        step: {
+          id: stepId, title: u.title,
+          description: `Unit test covering all of this unit: mix every lesson's words and grammar, do not focus on one.`,
+          vocabulary: [...new Set(u.steps.flatMap((s) => s.vocabulary))],
+          grammar: [...new Map(u.steps.flatMap((s) => s.grammar).map((g) => [g.pattern, g])).values()],
+          activities: UNIT_TEST,
+        },
+      };
       const step = u.steps.find((s) => s.id === stepId);
       if (step) return { course, level, levelDef, unitTitle: u.title, step, native };
     }
