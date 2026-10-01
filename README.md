@@ -56,6 +56,54 @@ On first launch, Sprigo looks for a local model server:
 - **[LM Studio](https://lmstudio.ai):** start its local server and load a model.
 - **Cloud:** you can also use OpenAI, Anthropic or Gemini with your own API key. Pick one in **Settings → Advanced → AI provider**; each option has a short note on what it is good at.
 
+## Architecture
+
+Sprigo is a [Tauri 2](https://tauri.app) app: a React + TypeScript interface in the system webview, with a small Rust core for the things a webview can't do. Everything runs on the learner's machine. The only network calls are to an AI or speech service the learner picks themselves.
+
+```mermaid
+flowchart LR
+  subgraph App["Sprigo (Tauri)"]
+    UI["React UI<br/>lessons · live call · practice"]
+    TTS["Piper / Kokoro<br/>ONNX in Web Workers"]
+    Rust["Rust core<br/>whisper.cpp · keychain · data folder · phone server"]
+    DB[("SQLite<br/>+ daily backups")]
+    UI <--> TTS
+    UI <-- "commands" --> Rust
+    UI <--> DB
+  end
+  UI -- "HTTP, streamed" --> LLM["Ollama / LM Studio<br/>(or OpenAI, Anthropic, Gemini)"]
+  Phone["Phone browser"] -- "Tailscale" --> Rust
+  Courses["courses/*.yml"] --> UI
+```
+
+### Voice turn in a live lesson
+
+1. **Listen:** the microphone stays in the webview. A small voice-activity detector ([`audio.ts`](src/audio.ts)) cuts out each utterance (it waits for 800 ms of silence) and hands 16 kHz samples to Rust.
+2. **Transcribe:** [whisper.cpp](https://github.com/ggerganov/whisper.cpp) (via `whisper-rs`, using the Metal GPU on macOS) turns speech into text with a bundled 57 MB model. No separate service to install. Deepgram is optional.
+3. **Think:** the model is kept warm (`keep_alive`), and the reply is streamed through the [Vercel AI SDK](https://ai-sdk.dev). The tutor answers in JSON, and [`tutor.ts`](src/tutor.ts) reads the spoken text out of the partial JSON while it is still arriving.
+4. **Speak:** each finished sentence goes straight to the voice engine, so the first sentence plays while the model is still writing the rest. Piper and Kokoro run as ONNX models in Web Workers and are downloaded on first use.
+5. **Barge-in:** while the tutor speaks, the mic keeps listening at a higher threshold. If the learner talks over the tutor, playback stops, the line is marked as interrupted, and the next prompt tells the model what was cut off.
+
+[`latency.ts`](src/latency.ts) times each step of a turn (speech end → transcript → first sentence → first sound). To see it, set `localStorage.latency = "1"`.
+
+### Lessons and content
+
+- **Courses are data:** each course is a YAML file validated with Zod ([`course.ts`](src/course.ts)). It names the steps and activity types; the AI writes the actual exercises. Users can drop their own course files into the app data folder.
+- **Generation:** one structured call per lesson step, with a schema-checked JSON reply. If that fails, it falls back to one call per activity. Results are cached in SQLite, so a lesson is generated once. Recent mistakes are fed back into the prompt.
+- **Providers:** local servers (Ollama, LM Studio) and cloud APIs share one interface. Requests go through Tauri's HTTP plugin, which avoids CORS issues with local servers.
+
+### Data and privacy
+
+- **Storage:** SQLite (`tauri-plugin-sql`) with versioned migrations, a daily backup and a lock file, so two devices never write to a synced data folder at the same time.
+- **Secrets:** API keys live in the OS keychain (macOS Keychain, Windows Credential Manager, Secret Service), never in the database.
+- **Phone companion:** the Rust core runs a small HTTP server on `127.0.0.1` and publishes it to the learner's own devices with `tailscale serve`. The phone gets the same UI. Its SQL is sent back to the desktop webview, so the database keeps a single writer, and speech recognition and Ollama run on the desktop. Only one device holds the data at a time.
+
+### Build and release
+
+Pure logic (activities, course parsing, migrations, the league, timing and more) is written without imports from Vite or Tauri, so `node --test` runs it directly. CI builds macOS (Apple silicon and Intel), Windows and Linux on every tagged release and publishes signed updates for the in-app updater.
+
+Design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md) (in Turkish).
+
 ## Development
 
 Requires Node.js with pnpm, Rust, and the [Tauri prerequisites](https://tauri.app/start/prerequisites/).
