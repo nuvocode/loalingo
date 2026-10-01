@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanOps, evictIds, looseMemory, MEMORY_MAX, MEMORY_TEXT_MAX, memoryPrompt, memorySystem, type Memory } from "./memory.ts";
+import { cleanOps, evictIds, looseMemory, MEMORY_IN_PROMPT, MEMORY_MAX, pickMemories, MEMORY_TEXT_MAX, memoryPrompt, memorySystem, type Memory } from "./memory.ts";
 
 const saved: Memory[] = [
   { id: 1, kind: "interest", text: "Prefers DC to Marvel.", source: "tutor", hits: 0, last_seen_at: "2026-09-01" },
@@ -53,4 +53,11 @@ test("eviction keeps MEMORY_MAX, dropping least used then least recently seen", 
   assert.deepEqual(evictIds(saved), []);
   const many = Array.from({ length: MEMORY_MAX + 2 }, (_, i) => ({ id: i + 1, hits: i < 3 ? 0 : 5, last_seen_at: `2026-09-${String(10 - i).padStart(2, "0")}` }));
   assert.deepEqual(evictIds(many), [3, 2]); // ids 1–3 unused; 3 and 2 seen longest ago
+});
+
+test("prompts get the most recently added or refined facts", () => {
+  const all = Array.from({ length: MEMORY_IN_PROMPT + 3 }, (_, i): Memory => ({ ...saved[0], id: i + 1, last_seen_at: i === 0 ? "2026-09-30" : "2026-09-01" }));
+  const ids = pickMemories(all).map((m) => m.id);
+  assert.equal(ids.length, MEMORY_IN_PROMPT);
+  assert.deepEqual(ids.slice(0, 3), [1, 13, 12]); // refined latest first, then newest by id
 });

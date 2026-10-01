@@ -204,6 +204,13 @@ export const memoryOn = async (profileId: number) => (await getSetting(`memory.$
 export async function listMemories(profileId: number) {
   return (await db()).select<Memory>("SELECT id, kind, text, source, hits, last_seen_at FROM memories WHERE profile_id = $1 ORDER BY id", [profileId]);
 }
+export async function markMemoriesUsed(ids: number[]) {
+  if (ids.length) await (await db()).execute(`UPDATE memories SET hits = hits + 1 WHERE id IN (${ids.map((_, i) => `$${i + 1}`).join(", ")})`, ids);
+}
+export async function enrollmentProfile(enrollmentId: number) {
+  const r = await (await db()).select<{ profile_id: number }>("SELECT profile_id FROM enrollments WHERE id = $1", [enrollmentId]);
+  return r[0]?.profile_id ?? null;
+}
 /** Applies cleaned ops (cleanOps), then drops the least used past MEMORY_MAX. */
 export async function applyMemoryOps(profileId: number, source: MemorySource, ops: MemoryOps) {
   const d = await db();

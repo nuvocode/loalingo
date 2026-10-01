@@ -3,11 +3,19 @@ import assert from "node:assert/strict";
 import type { CourseLevel } from "./course.ts";
 import { currentUnit, describeEvent, filler, HISTORY_IN_PROMPT, isNoise, looseTutor, mergeInput, partialSay, sentences, silenceDelay, tutorPrompt, tutorSystem, type TutorMsg, type TutorReply } from "./tutor.ts";
 
-const ctx = { name: "Mia", persona: "Cheerful barista.", target: "English", native: "Turkish", level: "A2", unit: "Food", words: ["apple", "bread"], grammar: ["I like + noun"] };
+const ctx = { name: "Mia", persona: "Cheerful barista.", target: "English", native: "Turkish", level: "A2", unit: "Food", words: ["apple", "bread"], grammar: ["I like + noun"], about: [] as string[] };
 
 test("system prompt carries level, languages, unit material and every action", () => {
   const p = tutorSystem(ctx);
   for (const s of ["A2", "English", "Turkish", "Food", "apple, bread", "I like + noun", "speak", "wait", "check_in", "end", "start_practice", "stop_practice", "never give away", "Have you ever", "Cheerful barista."]) assert.ok(p.includes(s), s);
+});
+
+test("system prompt carries what is known about the learner, and nothing when there is none", () => {
+  assert.ok(!tutorSystem(ctx).includes("earlier lessons"));
+  const p = tutorSystem({ ...ctx, about: ["Prefers DC to Marvel.", "Moving to Madrid in March."] });
+  assert.ok(p.includes("earlier lessons: Prefers DC to Marvel. Moving to Madrid in March."));
+  assert.ok(p.includes("in the warm-up, ask about one thing you know"));
+  assert.ok(!tutorSystem(ctx).includes("You remember this learner"));
 });
 
 test("prompt has the notes, only the latest history and the event", () => {

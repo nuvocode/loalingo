@@ -48,6 +48,13 @@ test("recent mistakes reach the lesson prompt as one line each", async () => {
   assert.ok(!lessonPrompt(c, []).includes("got these wrong"));
 });
 
+test("what is known about the learner reaches the lesson prompt only when there is some", async () => {
+  const { lessonPrompt } = await import("./activities.ts");
+  const c = { unitTitle: "U", step: { title: "S", vocabulary: [], grammar: [] } } as any;
+  assert.ok(lessonPrompt(c, [], [], ["Prefers DC to Marvel."]).includes("About the learner: Prefers DC to Marvel."));
+  assert.ok(!lessonPrompt(c, []).includes("About the learner"));
+});
+
 test("word rush boards have 5 distinct pairs and need 5 words", async () => {
   const { madnessItems } = await import("./activities.ts");
   const words = Array.from({ length: 12 }, (_, i) => ({ word: `w${i}`, translation: `t${i}`, strength: 1 }));

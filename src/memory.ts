@@ -8,6 +8,7 @@ export type MemorySource = "tutor" | "chat";
 export type Memory = { id: number; kind: MemoryKind; text: string; source: MemorySource; hits: number; last_seen_at: string };
 
 export const MEMORY_MAX = 50; // per profile; past it the least used go (see evictIds)
+export const MEMORY_IN_PROMPT = 10; // ponytail: newest only; pick by relevance to the unit if prompts need sharper focus
 export const MEMORY_TEXT_MAX = 120;
 
 // All fields required so OpenAI's strict mode accepts it; empty arrays mean "nothing to change".
@@ -71,6 +72,10 @@ export function cleanOps(saved: Memory[], raw: z.infer<typeof looseMemory>): Mem
   });
   return { add, update, forget };
 }
+
+/** The facts a prompt gets: the most recently added or refined. */
+export const pickMemories = (all: Memory[]) =>
+  [...all].sort((a, b) => b.last_seen_at.localeCompare(a.last_seen_at) || b.id - a.id).slice(0, MEMORY_IN_PROMPT);
 
 /** Ids to drop so at most MEMORY_MAX stay: least used first, then least recently seen. */
 export function evictIds(all: Pick<Memory, "id" | "hits" | "last_seen_at">[]): number[] {

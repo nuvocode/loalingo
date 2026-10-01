@@ -118,7 +118,7 @@ export function mistakeLine(it: Item): string | null {
   return null;
 }
 
-export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes: string[] = []) {
+export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes: string[] = [], about: string[] = []) {
   const st = c.step;
   return [
     `Unit: ${c.unitTitle}`, `Step: ${st.title}${st.description ? ` — ${st.description}` : ""}`,
@@ -128,6 +128,7 @@ export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes:
     ...acts.map((a) => `- ${a.key}: ${a.count} × ${a.type}. ${REGISTRY[a.type]!.guide}${Object.keys(a.hints).length ? ` Hints: ${JSON.stringify(a.hints)}` : ""}`),
     mistakes.length ? `\nThe learner recently got these wrong (exercise → correct answer):\n${mistakes.map((m) => `- ${m}`).join("\n")}\n` +
       "Where it fits this step's topic, reuse 1–2 of these words or patterns in new exercises. Do not copy them, and stay on the step's topic." : "",
+    about.length ? `\nAbout the learner: ${about.join(" ")}\nWhere it fits naturally, set a few example sentences in their world (their interests, plans, life). Stay on the step's topic and vocabulary.` : "",
   ].filter((l) => l !== "").join("\n");
 }
 
