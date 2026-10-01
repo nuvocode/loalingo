@@ -126,6 +126,9 @@ function systemVoices(): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
+let onStart: (() => void) | undefined; // the current speak's `started`
+const begun = (at?: number) => { mark("audio", at); const f = onStart; onStart = undefined; f?.(); };
+
 async function system(text: string, lang: string, gender: "f" | "m" | undefined, mine: number, done: () => void) {
   const voices = await systemVoices();
   if (mine !== seq) return; // cut while waiting
@@ -134,7 +137,7 @@ async function system(text: string, lang: string, gender: "f" | "m" | undefined,
   const { voice, pitch } = pickSystemVoice(voices, lang, gender);
   if (voice) u.voice = voice;
   u.pitch = pitch;
-  u.onstart = () => mark("audio");
+  u.onstart = () => begun();
   u.onend = u.onerror = done;
   speechSynthesis.speak(u);
 }
@@ -157,7 +160,7 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
     const at = Math.max(ctx.currentTime, next);
     next = at + buf.duration;
     left++;
-    if (first) { first = false; mark("audio", performance.now() + (at - ctx.currentTime) * 1000); }
+    if (first) { first = false; begun(performance.now() + (at - ctx.currentTime) * 1000); }
     src.onended = () => { if (--left === 0 && !streaming) done(); };
     sources.push(src);
     src.start(at);
@@ -191,9 +194,10 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
 }
 
 /** One voice at a time: a new call cuts the previous one. Resolves when this speech ends or is cut.
- *  Falls back to the system voice if the local engine fails before any audio. */
-export async function speak(text: string, lang: string, voice?: Voice): Promise<void> {
+ *  Falls back to the system voice if the local engine fails before any audio. `started` runs when its audio begins. */
+export async function speak(text: string, lang: string, voice?: Voice, started?: () => void): Promise<void> {
   stopSpeaking();
+  onStart = started;
   const mine = seq;
   let done!: () => void;
   const over = new Promise<void>((ok) => { done = ok; });

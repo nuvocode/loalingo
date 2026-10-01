@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { CourseLevel } from "./course.ts";
-import { currentUnit, describeEvent, HISTORY_IN_PROMPT, isNoise, looseTutor, mergeInput, silenceDelay, tutorPrompt, tutorSystem, type TutorMsg, type TutorReply } from "./tutor.ts";
+import { currentUnit, describeEvent, HISTORY_IN_PROMPT, isNoise, looseTutor, mergeInput, partialSay, sentences, silenceDelay, tutorPrompt, tutorSystem, type TutorMsg, type TutorReply } from "./tutor.ts";
 
 const ctx = { name: "Mia", persona: "Cheerful barista.", target: "English", native: "Turkish", level: "A2", unit: "Food", words: ["apple", "bread"], grammar: ["I like + noun"] };
 
@@ -82,4 +82,19 @@ test("prompt shows the practice screen only when there is one", () => {
 test("loose reply keeps a spoken practice answer", () => {
   assert.equal(looseTutor.parse({ action: "speak", say: "", answer: "likes" }).answer, "likes");
   assert.equal(looseTutor.parse({ action: "start_practice", say: "Let's practise!" }).action, "start_practice");
+});
+
+test("partialSay reads the say string as it streams, escapes included", () => {
+  assert.deepEqual(partialSay('```json\n{"say": "Hi! I\'m Mia. Say \\"hola\\"'), { text: 'Hi! I\'m Mia. Say "hola"', closed: false });
+  assert.deepEqual(partialSay('{"say":"Caf\\u00e9.","action":"speak"}'), { text: "Café.", closed: true });
+  assert.deepEqual(partialSay('{"say":"Caf\\u00'), { text: "Caf", closed: false }); // half an escape waits
+  assert.deepEqual(partialSay('{"say":"a\\'), { text: "a", closed: false });
+  assert.deepEqual(partialSay('{"act'), { text: "", closed: false });
+});
+
+test("sentences keeps the unfinished tail until the reply is final", () => {
+  assert.deepEqual(sentences("Hola! ¿Qué tal? Bien", false), ["Hola!", "¿Qué tal?"]);
+  assert.deepEqual(sentences("Hola! ¿Qué tal? Bien", true), ["Hola!", "¿Qué tal?", "Bien"]);
+  assert.deepEqual(sentences('She said "yes." Then left.', true), ['She said "yes."', "Then left."]);
+  assert.deepEqual(sentences("3.5 apples", false), []); // no space after the dot: not a sentence end
 });

@@ -26,10 +26,11 @@ export type TutorMsg = { from: "tutor" | "me"; text: string; via: "voice" | "tex
 /** What the prompt needs; lessons.ts fills it from the character, the course and the current unit. */
 export type TutorCtx = { name: string; persona: string; target: string; native: string; level: string; unit: string; words: string[]; grammar: string[] };
 
-export const tutorSchema = z.object({ action: z.enum(TUTOR_ACTIONS), say: z.string(), translation: z.string(), correction: z.string(), notes: z.string(), answer: z.string() });
+// `say` first: models write fields in schema order, so the first sentence streams out before the rest (SPR-13).
+export const tutorSchema = z.object({ say: z.string(), action: z.enum(TUTOR_ACTIONS), translation: z.string(), correction: z.string(), notes: z.string(), answer: z.string() });
 // Small models drop or misspell fields: a broken action means "keep talking", missing text means nothing to show.
 export const looseTutor = z.object({
-  action: z.enum(TUTOR_ACTIONS).catch("speak"), say: z.string().catch(""), translation: z.string().catch(""),
+  say: z.string().catch(""), action: z.enum(TUTOR_ACTIONS).catch("speak"), translation: z.string().catch(""),
   correction: z.string().catch(""), notes: z.string().catch(""), answer: z.string().catch(""),
 });
 export type TutorReply = z.infer<typeof tutorSchema>;
@@ -112,3 +113,39 @@ export const isNoise = (text: string) => !text.replace(/\[[^\]]*\]|\([^)]*\)/g, 
 /** The unit the learner is on: the first one with an unfinished step, else the last. */
 export const currentUnit = (level: CourseLevel, done: Set<string>) =>
   level.units.find((u) => u.steps.some((s) => !done.has(s.id))) ?? level.units[level.units.length - 1];
+
+// ---- Streaming (SPR-13): speak `say` sentence by sentence while the rest of the reply is still coming ----
+
+const ESC: Record<string, string> = { n: " ", t: " ", r: "", b: "", f: "", '"': '"', "\\": "\\", "/": "/" };
+
+/** The `say` value so far in a streamed (possibly fenced, unfinished) JSON reply; `closed` once its closing quote arrived. */
+export function partialSay(raw: string): { text: string; closed: boolean } {
+  const m = /"say"\s*:\s*"/.exec(raw);
+  if (!m) return { text: "", closed: false };
+  let out = "";
+  for (let i = m.index + m[0].length; i < raw.length; i++) {
+    const ch = raw[i];
+    if (ch === '"') return { text: out, closed: true };
+    if (ch !== "\\") { out += ch; continue; }
+    const n = raw[i + 1];
+    if (n === undefined) break; // escape cut in half: wait for the next chunk
+    if (n === "u") {
+      const hex = raw.slice(i + 2, i + 6);
+      if (hex.length < 4) break;
+      out += String.fromCharCode(parseInt(hex, 16)); i += 5; continue;
+    }
+    out += ESC[n] ?? n; i++;
+  }
+  return { text: out, closed: false };
+}
+
+/** Whole sentences in `text` (end mark + space); the unfinished tail counts only when `final`.
+ *  ponytail: "Mr. Smith" splits in two; the pieces are still spoken back to back. */
+export function sentences(text: string, final: boolean): string[] {
+  const out: string[] = [];
+  const re = /[.!?…]+["'”’)\]]*\s+/g;
+  let start = 0;
+  for (let m; (m = re.exec(text)); start = m.index + m[0].length) out.push(text.slice(start, m.index + m[0].length).trim());
+  if (final && text.slice(start).trim()) out.push(text.slice(start).trim());
+  return out.filter(Boolean);
+}
