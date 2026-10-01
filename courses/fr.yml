@@ -1,0 +1,554 @@
+# French course. Hierarchy: levels (CEFR) > units > steps > activities.
+# Activities name only a type (+ optional count and hints like scenario/goal); the AI writes the content
+# from the step's title, description, vocabulary, grammar and the level. Types: see src/course.ts.
+name: French
+native_name: Français
+iso: fr
+flag: 🇫🇷
+
+levels:
+  A1:
+    title: Beginner
+    description: >
+      Understand and use familiar everyday expressions and very basic phrases.
+
+    units:
+      - id: greetings
+        title: Greetings & Introductions
+        description: Meet people and introduce yourself.
+        icon: 👋
+        steps:
+          - id: basic-greetings
+            title: Basic Greetings
+            description: Common ways to greet people.
+            vocabulary: [bonjour, salut, bonsoir, "au revoir", "bonne nuit", "à bientôt", le matin, le soir]
+            grammar:
+              - pattern: "Bonjour, madame !"
+              - pattern: "Salut, à bientôt !"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: introduce-yourself
+            title: Introduce Yourself
+            description: Tell someone your name and ask theirs.
+            vocabulary: ["je m'appelle", le nom, le prénom, enchanté, enchantée, "et toi ?"]
+            grammar:
+              - pattern: "Je m'appelle {name}."
+              - pattern: "Comment tu t'appelles ?"
+              - pattern: "Enchanté !"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_someone
+                goal: Greet the person, introduce yourself and ask their name.
+          - id: tu-or-vous
+            title: "How Are You? (Tu or Vous)"
+            description: Ask how someone is, informally with tu and politely with vous.
+            vocabulary: [tu, vous, monsieur, madame, "ça va", bien, "très bien", fatigué, merci]
+            grammar:
+              - pattern: "Ça va ? — Ça va bien, merci. Et toi ?"
+              - pattern: "Comment allez-vous ?"
+              - pattern: "Je vais bien, merci. Et vous ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: neighbour_and_friend
+                goal: Ask a friend how they are with tu, then greet an older neighbour politely with vous.
+          - id: polite-words
+            title: Please & Thank You
+            description: Be polite in everyday situations.
+            vocabulary: ["s'il te plaît", "s'il vous plaît", merci, pardon, "excusez-moi", "de rien", désolé]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+
+      - id: numbers-colors
+        title: Numbers & Colors
+        description: Count, say your age and name colors.
+        icon: 🔢
+        steps:
+          - id: numbers-1-10
+            title: Numbers 1–10
+            vocabulary: [un, deux, trois, quatre, cinq, six, sept, huit, neuf, dix]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: listen_type }
+          - id: numbers-11-100
+            title: Numbers 11–100
+            vocabulary: [onze, douze, treize, seize, vingt, trente, cinquante, soixante-dix, quatre-vingts, cent]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: match }
+          - id: avoir-age
+            title: "How Old Are You? (Avoir)"
+            description: Use avoir to say your age.
+            vocabulary: [avoir, "j'ai", "tu as", "il a", "elle a", "l'âge", les ans]
+            grammar:
+              - pattern: "J'ai {number} ans."
+              - pattern: "Tu as quel âge ?"
+              - pattern: "Mon frère a {number} ans."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: colors
+            title: Basic Colors
+            description: Colors come after the noun and agree with it.
+            vocabulary: [rouge, bleu, vert, jaune, noir, blanc, orange, marron]
+            grammar:
+              - pattern: "Le sac est noir."
+              - pattern: "J'ai une voiture blanche."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank }
+              - { type: listen_select }
+
+      - id: people-family
+        title: Family & People
+        description: Talk about your family and describe people.
+        icon: 👨‍👩‍👧
+        steps:
+          - id: family-members
+            title: Family Members
+            vocabulary: [la mère, le père, la sœur, le frère, le fils, la fille, les parents, la famille]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: possessives
+            title: "Mon, Ma, Mes"
+            description: Possessives agree with the thing owned, not the owner.
+            vocabulary: [mon, ma, mes, ton, ta, tes, son, sa, ses, notre, votre]
+            grammar:
+              - pattern: "C'est mon frère."
+              - pattern: "Sa mère s'appelle {name}."
+              - pattern: "Ce sont mes parents."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: etre-describing
+            title: "Describing People (Être)"
+            description: Use être with adjectives that agree with the person.
+            vocabulary: [être, grand, petit, jeune, sympa, content, les cheveux, les yeux]
+            grammar:
+              - pattern: "Elle est grande."
+              - pattern: "Nous sommes contents."
+              - pattern: "Il a les yeux marron."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: articles-gender
+            title: "Pets & Animals (Un, Une, Le, La)"
+            description: Every noun is masculine or feminine; learn it with its article.
+            vocabulary: [le chien, le chat, "l'oiseau", le poisson, le cheval, la souris, un, une, les]
+            grammar:
+              - pattern: "J'ai un chien et une souris."
+              - pattern: "Le chat est noir."
+              - pattern: "Tu as un animal ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+
+      - id: food-drink
+        title: Food & Drink
+        description: Order at a café and talk about what you like.
+        icon: 🍎
+        steps:
+          - id: food-basics
+            title: Food Basics
+            vocabulary: [le pain, la pomme, "l'œuf", le fromage, le riz, le poulet, la soupe, la salade]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: partitive-drinks
+            title: "Drinks (Du, De la, Des)"
+            description: Use the partitive for an unspecified amount of food or drink.
+            vocabulary: ["l'eau", le café, le thé, le lait, "le jus d'orange", le verre, la tasse]
+            grammar:
+              - pattern: "Je bois du café."
+              - pattern: "Tu veux de l'eau ?"
+              - pattern: "Je mange de la soupe et des fruits."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: likes-dislikes
+            title: "J'aime, Je n'aime pas"
+            description: Aimer, adorer and détester take le, la, les.
+            vocabulary: [aimer, adorer, détester, préférer, délicieux, beaucoup]
+            grammar:
+              - pattern: "J'aime le café."
+              - pattern: "Je n'aime pas le lait."
+              - pattern: "Tu aimes le thé ?"
+              - pattern: "J'adore le chocolat, mais je déteste les épinards."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate, count: 2 }
+          - id: at-the-cafe
+            title: At the Café
+            vocabulary: [la carte, commander, "l'addition", le prix, combien, "je voudrais", le croissant]
+            grammar:
+              - pattern: "Je voudrais un café, s'il vous plaît."
+              - pattern: "C'est combien ?"
+              - pattern: "L'addition, s'il vous plaît."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: ordering_at_a_cafe
+                goal: Order a drink and a snack, then ask for the bill.
+
+      - id: daily-routine
+        title: Daily Routine
+        description: Time, days and what you do every day.
+        icon: ⏰
+        steps:
+          - id: telling-time
+            title: Telling the Time
+            vocabulary: ["l'heure", "et demie", "et quart", "moins le quart", midi, minuit]
+            grammar:
+              - pattern: "Quelle heure est-il ?"
+              - pattern: "Il est sept heures et demie."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: listen_type, count: 2 }
+          - id: days-of-week
+            title: Days of the Week
+            vocabulary: [lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche, le week-end, "aujourd'hui", demain]
+            grammar:
+              - pattern: "Aujourd'hui, c'est lundi."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: pronominal-verbs
+            title: "My Morning (Je me lève)"
+            description: Daily routine with pronominal verbs.
+            vocabulary: [se réveiller, se lever, se doucher, "s'habiller", le petit-déjeuner, tôt, tard]
+            grammar:
+              - pattern: "Je me lève à sept heures."
+              - pattern: "Elle se douche le matin."
+              - pattern: "Tu te réveilles tôt ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: image_select }
+              - { type: translate }
+          - id: er-verbs-negation
+            title: "Every Day (-er Verbs & Ne…Pas)"
+            description: Present tense of regular -er verbs and saying what you don't do.
+            vocabulary: [travailler, parler, manger, regarder, toujours, souvent, parfois, "tous les jours"]
+            grammar:
+              - pattern: "Je travaille tous les jours."
+              - pattern: "Nous parlons français."
+              - pattern: "Il ne mange pas de viande."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: home
+        title: At Home
+        description: Rooms, furniture and where things are.
+        icon: 🏠
+        steps:
+          - id: rooms
+            title: Rooms
+            vocabulary: [la maison, "l'appartement", la cuisine, la chambre, la salle de bain, le salon, le jardin]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: furniture
+            title: Furniture
+            vocabulary: [la table, la chaise, le lit, le canapé, la porte, la fenêtre, la lampe]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: image_select }
+              - { type: listen_type }
+          - id: il-y-a
+            title: "There Is / There Are (Il y a)"
+            description: One phrase for both singular and plural; pas de in the negative.
+            vocabulary: ["il y a", "il n'y a pas de", des, "beaucoup de"]
+            grammar:
+              - pattern: "Il y a un canapé dans le salon."
+              - pattern: "Il y a deux chaises."
+              - pattern: "Est-ce qu'il y a un jardin ?"
+              - pattern: "Il n'y a pas de garage."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: prepositions-of-place
+            title: "Dans, Sur, Sous"
+            vocabulary: [dans, sur, sous, "à côté de", derrière, devant]
+            grammar:
+              - pattern: "Le chat est sous la table."
+              - pattern: "La lampe est à côté du lit."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+
+      - id: around-town
+        title: Around Town
+        description: Places, directions, transport and shopping.
+        icon: 🏙️
+        steps:
+          - id: places-in-town
+            title: Places in Town
+            vocabulary: [la banque, le supermarché, la gare, "l'hôpital", le parc, "l'école", le musée, la pharmacie]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: directions
+            title: Asking for Directions
+            vocabulary: ["à gauche", "à droite", "tout droit", près, loin, le coin, la rue]
+            grammar:
+              - pattern: "Où est la gare ?"
+              - pattern: "Tournez à gauche au coin de la rue."
+              - pattern: "C'est loin ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: lost_tourist
+                goal: Ask a local how to get to the museum.
+          - id: aller-transport
+            title: "Getting Around (Aller)"
+            description: Conjugate aller and use à, au, en with places and transport.
+            vocabulary: [aller, le bus, le train, le taxi, le vélo, la voiture, le billet, "à pied"]
+            grammar:
+              - pattern: "Je vais au travail en bus."
+              - pattern: "Nous allons à la gare à pied."
+              - pattern: "Tu vas où ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: shopping
+            title: Shopping
+            vocabulary: [acheter, le magasin, "pas cher", cher, la taille, "l'argent", payer]
+            grammar:
+              - pattern: "Je peux payer par carte ?"
+              - pattern: "C'est trop cher."
+              - pattern: "Vous avez la taille M ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: clothes_shop
+                goal: Ask for a different size and pay.
+
+      - id: free-time
+        title: Free Time
+        description: Hobbies, sports and what you can do.
+        icon: ⚽
+        steps:
+          - id: hobbies
+            title: Hobbies
+            vocabulary: [lire, la musique, le film, cuisiner, danser, peindre, voyager]
+            grammar:
+              - pattern: "J'aime lire et voyager."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: sports
+            title: Sports
+            vocabulary: [le football, le tennis, nager, courir, jouer, "l'équipe", le match]
+            grammar:
+              - pattern: "Je joue au football le samedi."
+              - pattern: "Elle fait du vélo."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: pouvoir-infinitive
+            title: "I Can (Pouvoir + Infinitive)"
+            description: Pouvoir and savoir followed by an infinitive.
+            vocabulary: [pouvoir, savoir, bien, "un peu", conduire, venir]
+            grammar:
+              - pattern: "Je peux venir ce soir."
+              - pattern: "Elle ne peut pas conduire."
+              - pattern: "Tu sais nager ?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: futur-proche
+            title: "Weekend Plans (Je vais + Infinitive)"
+            description: Talk about plans with the near future.
+            vocabulary: [libre, occupé, ensemble, inviter, "ce week-end", "on va"]
+            grammar:
+              - pattern: "Samedi, je vais aller au cinéma."
+              - pattern: "On va au restaurant ?"
+              - pattern: "Tu es libre dimanche ?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: making_plans
+                goal: Invite a friend to do something on the weekend and agree on a time.
+
+      - id: weather-clothes
+        title: Weather & Clothes
+        description: Seasons, the weather and what people are wearing.
+        icon: ☀️
+        steps:
+          - id: weather
+            title: The Weather
+            vocabulary: ["il fait beau", "il fait chaud", "il fait froid", "il pleut", "il neige", "il y a du vent", le soleil, le nuage]
+            grammar:
+              - pattern: "Quel temps fait-il ?"
+              - pattern: "Il fait beau aujourd'hui."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: listen_select }
+          - id: seasons-months
+            title: Seasons & Months
+            vocabulary: [le printemps, "l'été", "l'automne", "l'hiver", janvier, juin, décembre, le mois]
+            grammar:
+              - pattern: "En été, il fait chaud."
+              - pattern: "Mon anniversaire est en juin."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: clothes
+            title: Clothes
+            vocabulary: [la chemise, le pantalon, la robe, les chaussures, la veste, le chapeau, porter]
+            grammar:
+              - pattern: "Je porte une veste bleue."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: translate }
+          - id: en-train-de
+            title: "Right Now (Être en train de)"
+            description: French uses the simple present or être en train de for what is happening now.
+            vocabulary: [maintenant, "en ce moment", "être en train de", faire]
+            grammar:
+              - pattern: "Je suis en train de manger."
+              - pattern: "Il pleut en ce moment."
+              - pattern: "Qu'est-ce que tu fais ?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: yesterday
+        title: Yesterday
+        description: Talk about the past.
+        icon: 📅
+        steps:
+          - id: passe-compose-avoir
+            title: "What I Did (Passé Composé with Avoir)"
+            description: Avoir + past participle of -er verbs.
+            vocabulary: [hier, "hier soir", "la semaine dernière", "j'ai mangé", "j'ai regardé", "j'ai travaillé"]
+            grammar:
+              - pattern: "Hier soir, j'ai regardé un film."
+              - pattern: "Elle n'a pas travaillé vendredi."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: passe-compose-irregular
+            title: Irregular Past Participles
+            description: Common verbs with irregular past participles.
+            vocabulary: [fait, vu, pris, bu, lu, eu]
+            grammar:
+              - pattern: "J'ai fait les courses."
+              - pattern: "Tu as vu le match ?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: passe-compose-etre
+            title: "Where I Went (Passé Composé with Être)"
+            description: Movement verbs take être and agree with the subject.
+            vocabulary: [aller, venir, partir, arriver, rester, rentrer]
+            grammar:
+              - pattern: "Je suis allé au parc."
+              - pattern: "Elle est allée à Paris."
+              - pattern: "Nous sommes rentrés tard."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+          - id: last-weekend
+            title: My Last Weekend
+            vocabulary: [le week-end, sympa, ennuyeux, "d'abord", ensuite, après]
+            grammar:
+              - pattern: "C'était génial !"
+              - pattern: "D'abord, j'ai mangé, ensuite je suis sorti."
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: monday_morning_chat
+                goal: Tell a colleague what you did last weekend and ask about theirs.
+
+    checkpoint:
+      title: A1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }

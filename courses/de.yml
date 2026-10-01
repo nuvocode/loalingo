@@ -1,0 +1,570 @@
+# German course. Hierarchy: levels (CEFR) > units > steps > activities.
+# Activities name only a type (+ optional count and hints like scenario/goal); the AI writes the content
+# from the step's title, description, vocabulary, grammar and the level. Types: see src/course.ts.
+name: German
+native_name: Deutsch
+iso: de
+flag: 🇩🇪
+
+levels:
+  A1:
+    title: Beginner
+    description: >
+      Understand and use familiar everyday expressions and very basic phrases.
+
+    units:
+      - id: greetings
+        title: Greetings & Introductions
+        description: Meet people and introduce yourself.
+        icon: 👋
+        steps:
+          - id: basic-greetings
+            title: Basic Greetings
+            description: Common ways to greet people and say goodbye.
+            vocabulary: [Hallo, "Guten Morgen", "Guten Tag", "Guten Abend", "Gute Nacht", Tschüss, "Auf Wiedersehen"]
+            grammar:
+              - pattern: "Guten Morgen!"
+              - pattern: "Auf Wiedersehen!"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: introduce-yourself
+            title: Introduce Yourself
+            description: Tell someone your name and where you are from, and ask theirs.
+            vocabulary: [heißen, "der Name", kommen, aus, wohnen, "Freut mich"]
+            grammar:
+              - pattern: "Ich heiße {name}."
+              - pattern: "Wie heißt du?"
+              - pattern: "Ich komme aus Deutschland."
+              - pattern: "Freut mich."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_someone
+                goal: Greet the person, introduce yourself and ask their name and where they are from.
+          - id: du-or-sie
+            title: Du or Sie?
+            description: Ask how someone is, informally with du and politely with Sie.
+            vocabulary: [du, Sie, gut, "sehr gut", "nicht so gut", müde, danke, "Herr", "Frau"]
+            grammar:
+              - pattern: "Wie geht's? – Gut, danke. Und dir?"
+              - pattern: "Wie geht es Ihnen, Frau {name}?"
+              - pattern: "Woher kommen Sie?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: friend_on_the_street
+                goal: Ask a friend how they are using du, then greet their teacher politely using Sie.
+          - id: polite-words
+            title: Please & Thank You
+            description: Be polite in everyday situations.
+            vocabulary: [bitte, danke, "vielen Dank", "Entschuldigung", "Bitte schön", "Kein Problem"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+
+      - id: numbers-colors
+        title: Numbers & Colors
+        description: Count, say your age and name colors.
+        icon: 🔢
+        steps:
+          - id: numbers-1-10
+            title: Numbers 1–10
+            vocabulary: [eins, zwei, drei, vier, fünf, sechs, sieben, acht, neun, zehn]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: listen_type }
+          - id: numbers-11-100
+            title: Numbers 11–100
+            description: The units come before the tens (einundzwanzig = one-and-twenty).
+            vocabulary: [elf, zwölf, dreizehn, zwanzig, einundzwanzig, dreißig, fünfzig, hundert]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: match }
+          - id: how-old
+            title: How Old Are You? (sein)
+            description: Say your age with the verb sein (to be).
+            vocabulary: [alt, "das Alter", "das Jahr", "die Jahre", bin, bist, ist, sind]
+            grammar:
+              - pattern: "Ich bin {number} Jahre alt."
+              - pattern: "Wie alt bist du?"
+              - pattern: "Wir sind Freunde."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: colors
+            title: Basic Colors
+            vocabulary: [rot, blau, grün, gelb, schwarz, weiß, orange, braun]
+            grammar:
+              - pattern: "Das Auto ist rot."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank }
+              - { type: listen_select }
+
+      - id: people-family
+        title: Family & People
+        description: Talk about your family and describe people.
+        icon: 👨‍👩‍👧
+        steps:
+          - id: family-members
+            title: Family Members
+            description: Name your family members and say "this is my...".
+            vocabulary: ["die Mutter", "der Vater", "die Schwester", "der Bruder", "der Sohn", "die Tochter", "die Eltern", "die Familie"]
+            grammar:
+              - pattern: "Das ist mein Vater."
+              - pattern: "Das ist meine Schwester."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: der-die-das
+            title: Der, Die, Das & Ein, Eine
+            description: Every noun has a gender; learn the article with the noun.
+            vocabulary: [der, die, das, ein, eine, "der Mann", "die Frau", "das Kind", "die Kinder"]
+            grammar:
+              - pattern: "Der Mann ist groß. Die Frau ist jung. Das Kind ist klein."
+              - pattern: "Das ist ein Mann. Das ist eine Frau."
+              - pattern: "ein Kind, zwei Kinder"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: describing-people
+            title: Describing People
+            description: Describe people with sein and haben.
+            vocabulary: [groß, klein, jung, alt, glücklich, freundlich, "die Haare", "die Augen"]
+            grammar:
+              - pattern: "Sie ist groß."
+              - pattern: "Er hat blaue Augen."
+              - pattern: "Hast du Geschwister?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: pets
+            title: Pets & Animals
+            description: "haben + accusative: der becomes einen."
+            vocabulary: ["der Hund", "die Katze", "der Vogel", "der Fisch", "das Pferd", "das Haustier", haben]
+            grammar:
+              - pattern: "Ich habe einen Hund."
+              - pattern: "Sie hat eine Katze."
+              - pattern: "Hast du ein Haustier?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+
+      - id: food-drink
+        title: Food & Drink
+        description: Order at a café and talk about what you like.
+        icon: 🍎
+        steps:
+          - id: food-basics
+            title: Food Basics
+            description: Food words with their article and common plurals.
+            vocabulary: ["das Brot", "der Apfel", "das Ei", "der Käse", "der Reis", "das Hähnchen", "die Suppe", "der Salat"]
+            grammar:
+              - pattern: "ein Apfel, zwei Äpfel"
+              - pattern: "ein Ei, drei Eier"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: drinks
+            title: Drinks
+            vocabulary: ["das Wasser", "der Kaffee", "der Tee", "die Milch", "der Saft", "das Glas", "die Tasse"]
+            grammar:
+              - pattern: "Eine Tasse Tee, bitte."
+              - pattern: "Ein Glas Wasser, bitte."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: likes-dislikes
+            title: Gern & Nicht Gern
+            description: Say what you like with a verb + gern, and what you like less with nicht gern.
+            vocabulary: [gern, "nicht gern", mögen, "das Lieblingsessen", lecker, essen, trinken]
+            grammar:
+              - pattern: "Ich trinke gern Kaffee."
+              - pattern: "Ich esse nicht gern Fisch."
+              - pattern: "Trinkst du gern Tee?"
+              - pattern: "Ich mag Käse."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate, count: 2 }
+          - id: at-the-cafe
+            title: At the Café
+            description: "Order with möchten + accusative: einen Kaffee, eine Cola, ein Wasser."
+            vocabulary: ["die Speisekarte", bestellen, "die Rechnung", "der Preis", "Was kostet", möchten, "der Kuchen"]
+            grammar:
+              - pattern: "Ich möchte einen Kaffee, bitte."
+              - pattern: "Was kostet das?"
+              - pattern: "Die Rechnung, bitte."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: ordering_at_a_cafe
+                goal: Order a drink and a piece of cake, then ask for the bill.
+
+      - id: daily-routine
+        title: Daily Routine
+        description: Time, days and what you do every day.
+        icon: ⏰
+        steps:
+          - id: telling-time
+            title: Telling the Time
+            description: Note that "halb acht" means 7:30 (half to eight).
+            vocabulary: [Uhr, halb, Viertel, nach, vor, "die Zeit"]
+            grammar:
+              - pattern: "Wie spät ist es?"
+              - pattern: "Es ist halb acht."
+              - pattern: "Es ist Viertel nach drei."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: listen_type, count: 2 }
+          - id: days-of-week
+            title: Days of the Week
+            vocabulary: ["der Montag", "der Dienstag", "der Mittwoch", "der Donnerstag", "der Freitag", "der Samstag", "der Sonntag", "das Wochenende", heute, morgen]
+            grammar:
+              - pattern: "Heute ist Montag."
+              - pattern: "Am Sonntag habe ich frei."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: present-tense
+            title: Every Day (Present Tense)
+            description: Conjugate regular verbs and keep the verb in second position.
+            vocabulary: [arbeiten, wohnen, lernen, machen, immer, oft, manchmal, nie, "jeden Tag"]
+            grammar:
+              - pattern: "Ich arbeite jeden Tag."
+              - pattern: "Sie wohnt in Berlin."
+              - pattern: "Am Montag arbeite ich."
+              - pattern: "Was machst du heute?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: morning-routine
+            title: My Morning (Separable Verbs)
+            description: Separable verbs split; the prefix goes to the end of the sentence.
+            vocabulary: [aufstehen, aufwachen, duschen, frühstücken, anfangen, "zur Arbeit gehen", "zur Schule gehen"]
+            grammar:
+              - pattern: "Ich stehe um 7 Uhr auf."
+              - pattern: "Wann stehst du auf?"
+              - pattern: "Der Kurs fängt um 9 Uhr an."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: image_select }
+              - { type: translate }
+
+      - id: home
+        title: At Home
+        description: Rooms, furniture and where things are.
+        icon: 🏠
+        steps:
+          - id: rooms
+            title: Rooms
+            vocabulary: ["das Haus", "die Wohnung", "die Küche", "das Schlafzimmer", "das Badezimmer", "das Wohnzimmer", "der Garten"]
+            grammar:
+              - pattern: "Meine Wohnung hat drei Zimmer."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: furniture
+            title: Furniture
+            vocabulary: ["der Tisch", "der Stuhl", "das Bett", "das Sofa", "die Tür", "das Fenster", "die Lampe"]
+            grammar:
+              - pattern: "Der Tisch ist neu."
+              - pattern: "ein Stuhl, vier Stühle"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: image_select }
+              - { type: listen_type }
+          - id: es-gibt
+            title: Es gibt & Kein
+            description: "Say what there is with es gibt + accusative; negate nouns with kein, everything else with nicht."
+            vocabulary: ["es gibt", kein, keine, keinen, nicht, viele]
+            grammar:
+              - pattern: "Es gibt ein Sofa im Wohnzimmer."
+              - pattern: "Gibt es einen Garten?"
+              - pattern: "Nein, es gibt keinen Garten."
+              - pattern: "Die Küche ist nicht groß."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: prepositions-of-place
+            title: In, Auf, Unter
+            description: Say where things are (learn the phrases as chunks).
+            vocabulary: ["in", auf, unter, neben, hinter, vor]
+            grammar:
+              - pattern: "Die Katze ist unter dem Tisch."
+              - pattern: "Das Buch liegt auf dem Bett."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+
+      - id: around-town
+        title: Around Town
+        description: Places, directions, transport and shopping.
+        icon: 🏙️
+        steps:
+          - id: places-in-town
+            title: Places in Town
+            vocabulary: ["die Bank", "der Supermarkt", "der Bahnhof", "das Krankenhaus", "der Park", "die Schule", "das Museum", "die Apotheke"]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: directions
+            title: Asking for Directions
+            vocabulary: [links, rechts, geradeaus, nah, weit, "die Ecke", "die Straße"]
+            grammar:
+              - pattern: "Entschuldigung, wo ist der Bahnhof?"
+              - pattern: "Gehen Sie an der Ecke links."
+              - pattern: "Ist das weit?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: lost_tourist
+                goal: Politely (with Sie) ask a local how to get to the museum.
+          - id: transport
+            title: Getting Around
+            vocabulary: ["der Bus", "der Zug", "das Taxi", "das Fahrrad", "das Auto", "die Fahrkarte", fahren, "zu Fuß"]
+            grammar:
+              - pattern: "Ich fahre mit dem Bus zur Arbeit."
+              - pattern: "Ich gehe zu Fuß."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: shopping
+            title: Shopping
+            vocabulary: [kaufen, "das Geschäft", billig, teuer, "die Größe", "das Geld", bezahlen]
+            grammar:
+              - pattern: "Kann ich mit Karte bezahlen?"
+              - pattern: "Das ist zu teuer."
+              - pattern: "Haben Sie das in Größe M?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: clothes_shop
+                goal: Ask for a different size and pay by card.
+
+      - id: free-time
+        title: Free Time
+        description: Hobbies, sports and what you can do.
+        icon: ⚽
+        steps:
+          - id: hobbies
+            title: Hobbies
+            vocabulary: [lesen, "die Musik", "der Film", kochen, tanzen, malen, reisen, "das Hobby"]
+            grammar:
+              - pattern: "Mein Hobby ist Lesen."
+              - pattern: "Ich höre gern Musik."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: sports
+            title: Sports
+            vocabulary: ["der Fußball", "das Tennis", schwimmen, laufen, spielen, "die Mannschaft", "das Spiel"]
+            grammar:
+              - pattern: "Am Samstag spiele ich Fußball."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: can-ability
+            title: Können & Möchten
+            description: With a modal verb, the second verb goes to the end in its infinitive form.
+            vocabulary: [können, kann, kannst, möchten, gut, "ein bisschen"]
+            grammar:
+              - pattern: "Ich kann schwimmen."
+              - pattern: "Sie kann nicht Auto fahren."
+              - pattern: "Kannst du kochen?"
+              - pattern: "Ich möchte ins Kino gehen."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: weekend-plans
+            title: Weekend Plans
+            vocabulary: [frei, "keine Zeit", zusammen, einladen, "das Kino", Lust]
+            grammar:
+              - pattern: "Hast du am Sonntag Zeit?"
+              - pattern: "Wollen wir ins Kino gehen?"
+              - pattern: "Hast du Lust?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: making_plans
+                goal: Invite a friend to do something on the weekend and agree on a time.
+
+      - id: weather-clothes
+        title: Weather & Clothes
+        description: Seasons, the weather and what people are wearing.
+        icon: ☀️
+        steps:
+          - id: weather
+            title: The Weather
+            vocabulary: [sonnig, regnerisch, bewölkt, windig, kalt, heiß, warm, "der Schnee"]
+            grammar:
+              - pattern: "Heute ist es sonnig."
+              - pattern: "Es regnet."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: listen_select }
+          - id: seasons-months
+            title: Seasons & Months
+            vocabulary: ["der Frühling", "der Sommer", "der Herbst", "der Winter", "der Januar", "der Juni", "der Dezember", "der Monat"]
+            grammar:
+              - pattern: "Im Winter ist es kalt."
+              - pattern: "Mein Geburtstag ist im Juni."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: clothes
+            title: Clothes
+            vocabulary: ["das Hemd", "die Hose", "das Kleid", "die Schuhe", "die Jacke", "der Hut", "der Pullover"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: translate }
+          - id: right-now-gerade
+            title: Right Now (gerade + Present)
+            description: German has no continuous tense; use the present tense with gerade or jetzt.
+            vocabulary: [jetzt, gerade, tragen, trägt, machen]
+            grammar:
+              - pattern: "Ich trage gerade eine Jacke."
+              - pattern: "Er trägt einen Pullover."
+              - pattern: "Es regnet gerade."
+              - pattern: "Was machst du gerade?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: yesterday
+        title: Yesterday
+        description: Talk about the past.
+        icon: 📅
+        steps:
+          - id: war-hatte
+            title: War & Hatte
+            description: The past of sein and haben.
+            vocabulary: [war, warst, waren, hatte, hattest, gestern, "gestern Abend", vor]
+            grammar:
+              - pattern: "Ich war gestern zu Hause."
+              - pattern: "Warst du müde?"
+              - pattern: "Wir hatten keine Zeit."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: perfekt-haben
+            title: Perfekt with Haben
+            description: "haben + past participle (ge-...-t); the participle goes to the end."
+            vocabulary: [gearbeitet, gespielt, gemacht, gekocht, gekauft, besucht, gegessen, gesehen]
+            grammar:
+              - pattern: "Ich habe Fußball gespielt."
+              - pattern: "Sie hat am Freitag nicht gearbeitet."
+              - pattern: "Hast du den Film gesehen?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: perfekt-sein
+            title: Perfekt with Sein
+            description: Verbs of movement and change use sein in the Perfekt.
+            vocabulary: [gefahren, gegangen, gekommen, geflogen, aufgestanden, geblieben]
+            grammar:
+              - pattern: "Ich bin nach Berlin gefahren."
+              - pattern: "Wir sind in den Park gegangen."
+              - pattern: "Bist du zu Hause geblieben?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+          - id: last-weekend
+            title: My Last Weekend
+            vocabulary: ["das Wochenende", toll, langweilig, zuerst, dann, danach]
+            grammar:
+              - pattern: "Am Wochenende habe ich meine Eltern besucht."
+              - pattern: "Zuerst habe ich gefrühstückt, dann bin ich in die Stadt gefahren."
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: monday_morning_chat
+                goal: Tell a colleague what you did last weekend and ask about theirs.
+
+    checkpoint:
+      title: A1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }
