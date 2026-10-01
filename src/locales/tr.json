@@ -609,5 +609,13 @@
       "comprehension": "Sorular",
       "discussion": "Tartışma"
     }
+  },
+  "biome": {
+    "meadow": "Çayır",
+    "grove": "Koru",
+    "forest": "Orman",
+    "foothills": "Dağ eteği",
+    "mountain": "Dağ",
+    "summit": "Zirve"
   }
 }

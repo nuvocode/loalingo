@@ -630,5 +630,13 @@
       "comprehension": "Questions",
       "discussion": "Discussion"
     }
+  },
+  "biome": {
+    "meadow": "Prairie",
+    "grove": "Bosquet",
+    "forest": "Forêt",
+    "foothills": "Piémont",
+    "mountain": "Montagne",
+    "summit": "Sommet"
   }
 }

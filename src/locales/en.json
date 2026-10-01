@@ -614,5 +614,13 @@
       "comprehension": "Questions",
       "discussion": "Discussion"
     }
+  },
+  "biome": {
+    "meadow": "Meadow",
+    "grove": "Grove",
+    "forest": "Forest",
+    "foothills": "Foothills",
+    "mountain": "Mountain",
+    "summit": "Summit"
   }
 }

@@ -614,5 +614,13 @@
       "comprehension": "Fragen",
       "discussion": "Diskussion"
     }
+  },
+  "biome": {
+    "meadow": "Wiese",
+    "grove": "Hain",
+    "forest": "Wald",
+    "foothills": "Vorgebirge",
+    "mountain": "Gebirge",
+    "summit": "Gipfel"
   }
 }

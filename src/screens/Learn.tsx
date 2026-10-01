@@ -7,6 +7,7 @@ import { LEGEND_PASS, LEGEND_PRICE, loadGuide, unitGrammar, unitWords, type Guid
 import { speak } from "../tts";
 import { AiSheet } from "./Settings";
 import { LiveButton } from "./Screens";
+import { BIOMES, biomeScene, biomeVars } from "../biomes";
 import { buildPath, checkpointId, levelsOf, type Cefr, type PathNode, type PathUnit } from "../course";
 
 const CHEST_GEMS = 20;
@@ -88,7 +89,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
   };
   return (
     <section className="unit" aria-label={u.title}>
-      <div className={`unit-head ${u.theme}`}>
+      <div className="unit-head">
         <div className="uh-row">
           <div><span className="uh-kicker">{t("learn.kicker", { level, unit: u.index })}</span><h2>{u.title}</h2></div>
           <button className="guidebook" onClick={() => openSheet(<GuideSheet unitId={u.id} level={level} />)}><Icon name="book" /><span>{t("learn.guidebook")}</span></button>
@@ -180,8 +181,9 @@ function LevelSheet() {
           if (i > cur) return toast(t("learn.finishFirst", { level: enrollment!.level }));
           setViewLevel(l); closeSheet();
         }}>
+          <span className="biome-thumb" dangerouslySetInnerHTML={{ __html: biomeScene(l, 80) }} />
           <span className="od-field od-fill"><b>{l} · {course!.levels[l]!.title}</b>
-            <span className="muted small">{t(i < cur ? "learn.levelDone" : i === cur ? "learn.levelCurrent" : "learn.levelLocked")}</span></span>
+            <span className="muted small">{t(`biome.${BIOMES[l].id}`)} · {t(i < cur ? "learn.levelDone" : i === cur ? "learn.levelCurrent" : "learn.levelLocked")}</span></span>
           <Icon name={i < cur ? "check" : i === cur ? "star" : "lock"} />
         </button>
       ))}
@@ -205,7 +207,8 @@ function LevelCard({ level, remaining, total }: { level: Cefr; remaining: number
   const title = remaining === 0 ? t("learn.checkpointNext", { level: next ?? level })
     : next ? t("learn.lessonsLeft", { count: remaining, level: next }) : t("learn.lessonsLeftFinish", { count: remaining, level });
   return (
-    <div className="card" style={{ margin: "8px 0 24px", textAlign: "center" }}>
+    <div className="card level-card">
+      <div className="biome-band" dangerouslySetInnerHTML={{ __html: biomeScene(level, 70) }} />
       <h3 style={{ fontWeight: 900, fontSize: 18 }}>{title}</h3>
       <div className="progress-track" style={{ margin: "12px 0 14px" }}><div className="progress-fill green" style={{ width: `${((total - remaining) / total) * 100}%` }} /></div>
       {hasExam && remaining > 0 && <button className="btn btn-ghost btn-block" onClick={() => start(`${level}:test`)}>{t("learn.skipLevel", { level })}</button>}
@@ -250,7 +253,10 @@ export function Learn() {
         {level} · {course.levels[level]!.title} ▾
       </button>
       {level === enrollment.level && <LevelCard level={level} remaining={remaining} total={total} />}
-      <div className="path-stack">{units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}</div>
+      <div className="path-stack" style={biomeVars(level)}>
+        <div className="biome-ground" dangerouslySetInnerHTML={{ __html: biomeScene(level, 140) }} />
+        {units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}
+      </div>
     </>
   );
 }

@@ -630,5 +630,13 @@
       "comprehension": "Preguntas",
       "discussion": "Debate"
     }
+  },
+  "biome": {
+    "meadow": "Pradera",
+    "grove": "Arboleda",
+    "forest": "Bosque",
+    "foothills": "Faldas",
+    "mountain": "Montaña",
+    "summit": "Cumbre"
   }
 }
