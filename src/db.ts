@@ -10,7 +10,7 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
-import type { Baseline, SpeechSummary } from "./speech";
+import type { Baseline, SessionRow, SpeechSummary } from "./speech";
 import { remoteDb, serveCompanion } from "./companion";
 import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
@@ -241,6 +241,11 @@ export async function saveSpeechSession(profileId: number, enrollmentId: number 
     [profileId, enrollmentId, mode, x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs]);
 }
 
+/** The last 10 voice calls, oldest first, for the profile's coaching card (SPR-27). */
+export async function listSpeechSessions(profileId: number): Promise<SessionRow[]> {
+  return (await (await db()).select<SessionRow>(
+    "SELECT utterances, latency_ms, wpm, long_pauses, words, native_words FROM speech_sessions WHERE profile_id = $1 ORDER BY id DESC LIMIT 10", [profileId])).reverse();
+}
 /** The learner's usual per answer over their last 10 voice calls (SPR-26); null before they have said a few things. */
 export async function speechBaseline(profileId: number): Promise<Baseline | null> {
   const [r] = await (await db()).select<Baseline & { n: number | null }>(

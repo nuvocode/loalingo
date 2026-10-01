@@ -133,3 +133,40 @@ export function nextHint(prev: { state: LearnerState; turns: number }, state: Le
   const turns = state === prev.state ? prev.turns + 1 : 0;
   return { hint: state !== "neutral" && turns % 3 === 0 ? STATE_HINTS[state] : "", prev: { state, turns } };
 }
+
+// ---- Coaching card (SPR-27): trends over recent calls as plain sentences and one thing to try; templates, no model ----
+
+export type SessionRow = { utterances: number; latency_ms: number | null; wpm: number; long_pauses: number; words: number; native_words: number };
+export type Trend = { k: "latency" | "words" | "wpm" | "pauses" | "native"; from: number; to: number };
+export type Tip = "native" | "short" | "pauses" | "stretch";
+export const COACH_MIN = 3;
+
+// Per answer, `better` = which direction is progress.
+const TRENDS: { k: Trend["k"]; better: 1 | -1; of: (r: SessionRow) => number | null }[] = [
+  { k: "latency", better: -1, of: (r) => (r.latency_ms === null ? null : r.latency_ms / 1000) },
+  { k: "words", better: 1, of: (r) => r.words / r.utterances },
+  { k: "wpm", better: 1, of: (r) => r.wpm },
+  { k: "pauses", better: -1, of: (r) => r.long_pauses / r.utterances },
+  { k: "native", better: -1, of: (r) => (r.words ? (100 * r.native_words) / r.words : 0) }, // percent
+];
+
+/** Older half vs newer half of the calls (oldest first): up to 2 improvements of 10% or more, biggest first, and one tip
+ *  from the newer half. null under COACH_MIN calls. ponytail: halves, not a regression; enough for ~10 calls. */
+export function coach(rows: SessionRow[]): { trends: Trend[]; tip: Tip } | null {
+  const said = rows.filter((r) => r.utterances > 0);
+  if (said.length < COACH_MIN) return null;
+  const half = Math.floor(said.length / 2), old = said.slice(0, half), now = said.slice(-half);
+  const avg = (rs: SessionRow[], of: (r: SessionRow) => number | null) => {
+    const xs = rs.flatMap((r) => { const x = of(r); return x === null ? [] : [x]; });
+    return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+  };
+  const trends = TRENDS.flatMap(({ k, better, of }) => {
+    const from = avg(old, of), to = avg(now, of);
+    if (from === null || to === null || !from) return [];
+    const gain = (better * (to - from)) / from;
+    return gain >= 0.1 ? [{ k, from, to, gain }] : [];
+  }).sort((a, b) => b.gain - a.gain).slice(0, 2).map(({ k, from, to }) => ({ k, from, to }));
+  const n = (of: (r: SessionRow) => number | null) => avg(now, of) ?? 0;
+  const tip: Tip = n(TRENDS[4].of) >= 15 ? "native" : n(TRENDS[1].of) < 5 ? "short" : n(TRENDS[3].of) >= 0.5 ? "pauses" : "stretch";
+  return { trends, tip };
+}

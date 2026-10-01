@@ -190,6 +190,27 @@
     "saved_other": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)",
     "saved_many": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)"
   },
+  "coach": {
+    "title": "Tu forma de hablar",
+    "off": "El análisis de voz está desactivado. Actívalo en Ajustes > Avanzado para ver cómo cambia tu forma de hablar.",
+    "empty": "Después de algunas lecciones habladas con un tutor, verás aquí tu progreso.",
+    "steady": "Tu forma de hablar se ha mantenido estable en tus últimas llamadas.",
+    "trend": {
+      "latency": "Respondes más rápido: {{from}} s → {{to}} s antes de empezar a hablar.",
+      "words": "Tus respuestas son más largas: {{from}} → {{to}} palabras de media.",
+      "wpm": "Hablas con más fluidez: {{from}} → {{to}} palabras por minuto.",
+      "pauses": "Menos pausas largas: {{from}} → {{to}} por respuesta.",
+      "native": "Cambias menos a tu idioma: {{from}} % → {{to}} % de tus palabras."
+    },
+    "tryThis": "Prueba esto:",
+    "tip": {
+      "native": "Cuando no te salga una palabra, pregunta a tu tutor cómo se dice en lugar de cambiar de idioma.",
+      "short": "Ten una charla libre de 2 minutos con un tutor y da una razón en cada respuesta.",
+      "pauses": "Cuando necesites tiempo para pensar, usa en el idioma que aprendes una frase como «déjame pensar…» en lugar de quedarte en silencio.",
+      "stretch": "Estás listo para más: pide a tu tutor que debata un tema contigo y defiende tu opinión."
+    },
+    "start": "Iniciar llamada"
+  },
   "stories": {
     "title": "Historias",
     "subtitle": "Diálogos cortos escritos por IA para cada unidad. Toca una línea para oírla y ver la traducción.",
@@ -310,6 +331,8 @@
     "bargeInDesc": "En la clase en vivo puedes hablar mientras el tutor habla para interrumpirlo. Desactívalo si el tutor se calla solo porque el micrófono oye los altavoces.",
     "memory": "Recuérdame",
     "memoryDesc": "Sprigo guarda lo duradero que le cuentas a tu tutor (intereses, planes, lo que te cuesta) y lo usa en las lecciones. Nada sale de este dispositivo salvo que tu proveedor de IA esté en la nube.",
+    "speech": "Análisis de voz",
+    "speechDesc": "Mide el ritmo y los tiempos mientras hablas con un tutor (qué tan rápido respondes, pausas, longitud de las frases) para adaptar la lección y mostrar tu progreso. No se graba el audio.",
     "phone": "Usar en tu móvil",
     "phoneDesc": "Abre Sprigo a tus propios dispositivos mediante Tailscale; tus datos se quedan en este ordenador.",
     "phoneMissing": "Tailscale no está instalado en este ordenador.",

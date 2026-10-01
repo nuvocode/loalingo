@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LONG_PAUSE_MS, STATE_HINTS, baselineOf, learnerState, nativeCount, nextHint, speechMetrics, summarize, type Baseline, type LearnerState, type Utterance } from "./speech.ts";
+import { LONG_PAUSE_MS, STATE_HINTS, coach, type SessionRow, baselineOf, learnerState, nativeCount, nextHint, speechMetrics, summarize, type Baseline, type LearnerState, type Utterance } from "./speech.ts";
 
 const RATE = 16000;
 /** `parts`: [ms, loud?] stretches of a 0.1 or silent signal. */
@@ -83,4 +83,28 @@ test("hint only on a change or every 3rd turn the state holds", () => {
   });
   assert.deepEqual(got, ["-", "hesitant", "-", "-", "hesitant", "flowing", "-"]);
   assert.ok(STATE_HINTS.hesitant.includes("sentence starter"));
+});
+
+const row = (o: Partial<SessionRow>): SessionRow => ({ utterances: 10, latency_ms: 2000, wpm: 100, long_pauses: 2, words: 80, native_words: 0, ...o });
+
+test("coach: needs a few calls, then shows the biggest improvements and a tip from the latest calls", () => {
+  assert.equal(coach([row({}), row({}), row({ utterances: 0 })]), null);
+  const c = coach([
+    row({ latency_ms: 4100, words: 40 }), row({ latency_ms: 4000, words: 40 }),
+    row({ latency_ms: 3000, words: 50 }), // the odd middle one is in neither half
+    row({ latency_ms: 2300, words: 70, wpm: 105 }), row({ latency_ms: 2300, words: 70, wpm: 105 }),
+  ])!;
+  assert.deepEqual(c.trends.map((x) => x.k), ["words", "latency"]); // +75%, −44%; wpm +5% is under the bar
+  assert.equal(c.trends[0].from, 4); assert.equal(c.trends[0].to, 7);
+  assert.ok(Math.abs(c.trends[1].from - 4.05) < 1e-9);
+  assert.equal(c.tip, "stretch");
+});
+
+test("coach: no progress means no trends; the tip follows the weakest spot", () => {
+  const same = (o: Partial<SessionRow>) => coach([row(o), row(o), row(o)])!;
+  assert.deepEqual(same({}).trends, []);
+  assert.equal(same({ native_words: 20 }).tip, "native");
+  assert.equal(same({ words: 30 }).tip, "short");
+  assert.equal(same({ long_pauses: 6 }).tip, "pauses");
+  assert.deepEqual(coach([row({ latency_ms: null }), row({}), row({})])!.trends, []); // a call with no latency doesn't break it
 });

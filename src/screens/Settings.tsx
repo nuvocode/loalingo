@@ -367,6 +367,7 @@ export function Settings() {
             </div>
             <TtsRow />
             <SttRow />
+            <ToggleRow k="speech" initial={s.speechOn} onChange={(speechOn) => setS((s) => ({ ...s, speechOn }))} />
             {isTauri && <PhoneRow />}
           </div>
 

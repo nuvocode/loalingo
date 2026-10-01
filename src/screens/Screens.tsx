@@ -12,6 +12,7 @@ import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
+import { CoachCard } from "./Coach";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -258,6 +259,7 @@ export function Profile() {
         {stat(league.name, t("profile.currentLeague"), "var(--blue)")}
         {stat(t("profile.top3"), t("profile.bestLeague"), "var(--green-dark)")}
       </div>
+      <CoachCard />
       <MemoryCard />
       <h2 className="section-title">{t("profile.achievements")}</h2>
       <div className="od-stack" style={{ "--od-gap": "12px" } as React.CSSProperties}>

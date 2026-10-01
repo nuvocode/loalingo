@@ -179,6 +179,27 @@
     "saved_one": "Sprigo will remember {{count}} new thing about you (Profile)",
     "saved_other": "Sprigo will remember {{count}} new things about you (Profile)"
   },
+  "coach": {
+    "title": "Your speaking",
+    "off": "Voice analysis is off. Turn it on in Settings > Advanced to see how your speaking changes.",
+    "empty": "After a few spoken lessons with a tutor, you'll see your progress here.",
+    "steady": "Your speaking has stayed steady over your last calls.",
+    "trend": {
+      "latency": "You answer faster: {{from}} s → {{to}} s before you start speaking.",
+      "words": "Your answers are getting longer: {{from}} → {{to}} words on average.",
+      "wpm": "You speak more fluently: {{from}} → {{to}} words a minute.",
+      "pauses": "Fewer long pauses: {{from}} → {{to}} per answer.",
+      "native": "You switch to your own language less: {{from}}% → {{to}}% of your words."
+    },
+    "tryThis": "Try this:",
+    "tip": {
+      "native": "When a word won't come, ask your tutor how to say it instead of switching languages.",
+      "short": "Have a 2-minute free chat with a tutor and give a reason in each answer.",
+      "pauses": "When you need time to think, use a phrase like \"let me think…\" in the language you're learning instead of going silent.",
+      "stretch": "You're ready for more: ask your tutor to discuss a topic and defend your opinion."
+    },
+    "start": "Start a call"
+  },
   "stories": {
     "title": "Stories",
     "subtitle": "Short AI-written dialogues for each unit. Tap a line to hear it and see the translation.",
@@ -295,6 +316,8 @@
     "bargeInDesc": "Talk over the tutor in a live lesson to interrupt. Turn off if the tutor stops on their own because the mic hears the speakers.",
     "memory": "Remember me",
     "memoryDesc": "Sprigo keeps lasting things you tell your tutor (interests, plans, what you find hard) and uses them in lessons. Nothing leaves this device unless your AI provider is in the cloud.",
+    "speech": "Voice analysis",
+    "speechDesc": "Measures timing and pace while you talk to a tutor (how fast you answer, pauses, sentence length) to adjust the lesson and show your progress. No audio is recorded.",
     "phone": "Use on your phone",
     "phoneDesc": "Opens Sprigo to your own devices through Tailscale; your data stays on this computer.",
     "phoneMissing": "Tailscale isn't installed on this computer.",
