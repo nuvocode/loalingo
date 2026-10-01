@@ -69,6 +69,8 @@ Courses are plain YAML files in [`courses/`](courses/en.yml). For the architectu
 
 ### Releasing
 
+The full branch → test → master → release flow is in [docs/RELEASE.md](docs/RELEASE.md).
+
 Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` (then `cargo update -p sprigo --offline` in `src-tauri` for the lock file), commit, then push a tag:
 
 ```bash
