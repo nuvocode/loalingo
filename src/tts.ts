@@ -1,6 +1,7 @@
 // Text-to-speech (spec D): system voices, local Piper (every course language) or local Kokoro (English only).
 // Device setting "tts": "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
 // and stream one sentence at a time, so the first sentence plays while the rest is made.
+import { mark } from "./latency";
 import { getSetting } from "./db";
 import { pickSystemVoice } from "./voices";
 import { mouthBright, mouthLevel, remember, zcr } from "./audio";
@@ -133,6 +134,7 @@ async function system(text: string, lang: string, gender: "f" | "m" | undefined,
   const { voice, pitch } = pickSystemVoice(voices, lang, gender);
   if (voice) u.voice = voice;
   u.pitch = pitch;
+  u.onstart = () => mark("audio");
   u.onend = u.onerror = done;
   speechSynthesis.speak(u);
 }
@@ -144,7 +146,7 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
   await ctx.resume();
   if (mine !== seq) return; // cut while waiting; `next` belongs to the newer speak now
   next = 0;
-  let left = 0, streaming = true;
+  let left = 0, streaming = true, first = true;
   const play = (c: Chunk) => {
     if (mine !== seq) return;
     const buf = ctx.createBuffer(1, c.audio.length, c.rate);
@@ -155,6 +157,7 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
     const at = Math.max(ctx.currentTime, next);
     next = at + buf.duration;
     left++;
+    if (first) { first = false; mark("audio", performance.now() + (at - ctx.currentTime) * 1000); }
     src.onended = () => { if (--left === 0 && !streaming) done(); };
     sources.push(src);
     src.start(at);

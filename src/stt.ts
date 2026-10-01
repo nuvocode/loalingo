@@ -1,4 +1,5 @@
 // Speech-to-text (DECISIONS D2): microphone in the webview, bundled whisper.cpp in Rust (src-tauri/src/lib.rs).
+import { mark } from "./latency";
 import { invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { isTauri, getSetting } from "./db";
@@ -96,10 +97,11 @@ export async function listen(lang: string, on: { utterance: (text: string) => vo
     if (v.speaking || e === "end") chunks.push(d);
     else { pre.push(d); if (pre.length > 3) pre.shift(); } // ~250 ms before the detector fired, so the first syllable is kept
     if (e !== "end") return;
+    mark("vad");
     const all = concat(chunks);
     reset();
     transcribeSamples(all, ctx.sampleRate, lang).then(
-      (x) => { if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
+      (x) => { mark("stt"); if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
       (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
     );
   };

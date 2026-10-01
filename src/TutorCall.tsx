@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { biomeVars } from "./biomes";
+import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
@@ -102,7 +103,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const screen = c.pr; // what the learner was looking at when they spoke
     setThinking(true); setErr("");
     try {
+      mark("req");
       const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics));
+      mark("llm");
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
       if (r.correction.trim()) c.fixes.push(r.correction.trim());
