@@ -36,5 +36,4 @@ o yüzden bütün build'ler CI'da. Lokal/Docker build yok (aşağıda neden).
 - Build'leri iki yerden üretmek `latest.json`'ı birleştirmeyi elle yapmayı gerektirir; tek kaynak daha güvenli.
 
 Repo private olursa (macOS dakikası 10x, Windows 2x ücretli) macOS build'lerini bu Mac'e almak yeniden
-değerlendirilir. `pnpm release` (scripts/release.sh) yalnızca Apple silicon için `latest.json` üretir;
-CI release'inin üstüne yüklenirse diğer platformların güncellemesini bozar, acil durum dışında kullanılmaz.
+değerlendirilir.
