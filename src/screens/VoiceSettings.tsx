@@ -176,7 +176,8 @@ function SttTrySheet({ provider, onBack }: { provider: SttProvider; onBack: () =
   useEffect(() => {
     let mic: Listener | undefined, gone = false;
     (async () => {
-      if (!(await sttReady())) throw new Error(t(provider === "deepgram" ? "voice.noKey" : "voice.whisperMissing"));
+      // No recognizer still opens the mic, so the level bar shows the mic itself works.
+      if (!(await sttReady())) setErr(t(provider === "deepgram" ? "voice.noKey" : "voice.whisperMissing"));
       const l = await listen(lang, {
         level: setLevel,
         speech: () => setSpeaking(true),
