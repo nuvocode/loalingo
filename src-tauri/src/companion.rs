@@ -34,9 +34,13 @@ const SERVE_PORT: &str = "--https=8443"; // 443 is often taken by the learner's 
 const SERVE_WAIT: Duration = Duration::from_secs(10);
 
 // The Mac app's CLI lives inside its bundle; a bare `tailscale` on PATH is often missing or broken there.
+// That binary is also the GUI: started from another app (no terminal) it tries to open the GUI and fails
+// with "CLIError error 3" unless told to act as the CLI.
 fn tailscale() -> std::process::Command {
     const MAC: &str = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
-    std::process::Command::new(if std::path::Path::new(MAC).exists() { MAC } else { "tailscale" })
+    let mut c = std::process::Command::new(if std::path::Path::new(MAC).exists() { MAC } else { "tailscale" });
+    c.env("TAILSCALE_BE_CLI", "1");
+    c
 }
 
 #[tauri::command(async)]
