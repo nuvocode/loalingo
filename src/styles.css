@@ -421,6 +421,10 @@ button.bubble:hover{border-color:var(--blue)}
 
 /* Guidebook sheet (DECISIONS B8; not in the design) */
 .sheet:has(.guide){max-width:620px;text-align:left}
+.sheet:has(.sheet-wide){max-width:560px;text-align:left}
+.summary-card{text-align:left;align-content:start;cursor:pointer;font:inherit;color:inherit}
+.summary-card:hover{border-color:var(--blue)}
+@media (max-width:560px){.profile-cards{grid-template-columns:1fr}}
 .guide h3{text-align:center}
 .guide h4{font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 8px}
 .guide-words{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}

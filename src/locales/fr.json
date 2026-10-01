@@ -166,7 +166,8 @@
     "achFast": "Éclair",
     "achFastDesc": "Gagne 50 XP en une journée",
     "achBook": "Rat de bibliothèque",
-    "achBookDesc": "Termine ta première histoire"
+    "achBookDesc": "Termine ta première histoire",
+    "details": "Détails"
   },
   "memory": {
     "title": "Sprigo te connaît",
@@ -188,7 +189,11 @@
     "cancel": "Annuler",
     "saved_one": "Sprigo retiendra {{count}} nouvelle chose sur toi (Profil)",
     "saved_other": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)",
-    "saved_many": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)"
+    "saved_many": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)",
+    "count_one": "Sprigo sait {{count}} chose sur toi",
+    "count_many": "Sprigo sait {{count}} choses sur toi",
+    "count_other": "Sprigo sait {{count}} choses sur toi",
+    "none": "Rien pour l'instant"
   },
   "coach": {
     "title": "Ton expression orale",
@@ -408,7 +413,8 @@
     "quitTitle": "Quitter la leçon ?",
     "quitDesc": "Tu perdras ta progression dans cette leçon.",
     "quit": "Quitter",
-    "keepGoing": "Continuer"
+    "keepGoing": "Continuer",
+    "close": "Fermer"
   },
   "lesson": {
     "dialog": "Leçon",

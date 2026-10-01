@@ -154,7 +154,8 @@
     "achFast": "Hızlı",
     "achFastDesc": "Bir günde 50 XP kazan",
     "achBook": "Kitap kurdu",
-    "achBookDesc": "İlk hikâyeni bitir"
+    "achBookDesc": "İlk hikâyeni bitir",
+    "details": "Ayrıntılar"
   },
   "memory": {
     "title": "Sprigo seni tanıyor",
@@ -175,7 +176,10 @@
     "forgetAllSure": "Sprigo seninle ilgili her şeyi unutsun mu?",
     "cancel": "Vazgeç",
     "saved_one": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)",
-    "saved_other": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)"
+    "saved_other": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)",
+    "count_one": "Sprigo seninle ilgili {{count}} şey biliyor",
+    "count_other": "Sprigo seninle ilgili {{count}} şey biliyor",
+    "none": "Henüz bir şey yok"
   },
   "coach": {
     "title": "Konuşman",
@@ -386,7 +390,8 @@
     "quitTitle": "Dersi bırak?",
     "quitDesc": "Bu dersteki ilerlemen kaybolacak.",
     "quit": "Bırak",
-    "keepGoing": "Devam et"
+    "keepGoing": "Devam et",
+    "close": "Kapat"
   },
   "lesson": {
     "dialog": "Ders",

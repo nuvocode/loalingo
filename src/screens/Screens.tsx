@@ -259,8 +259,10 @@ export function Profile() {
         {stat(league.name, t("profile.currentLeague"), "var(--blue)")}
         {stat(t("profile.top3"), t("profile.bestLeague"), "var(--green-dark)")}
       </div>
-      <CoachCard />
-      <MemoryCard />
+      <div className="od-grid profile-cards" style={{ "--od-cols": 2, "--od-gap": "12px", marginTop: 12 } as React.CSSProperties}>
+        <CoachCard />
+        <MemoryCard />
+      </div>
       <h2 className="section-title">{t("profile.achievements")}</h2>
       <div className="od-stack" style={{ "--od-gap": "12px" } as React.CSSProperties}>
         {ach.map(([ic, key, cur, goal, col]) => {

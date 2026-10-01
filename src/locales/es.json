@@ -166,7 +166,8 @@
     "achFast": "Veloz",
     "achFastDesc": "Consigue 50 XP en un día",
     "achBook": "Ratón de biblioteca",
-    "achBookDesc": "Termina tu primera historia"
+    "achBookDesc": "Termina tu primera historia",
+    "details": "Detalles"
   },
   "memory": {
     "title": "Sprigo te conoce",
@@ -188,7 +189,11 @@
     "cancel": "Cancelar",
     "saved_one": "Sprigo recordará {{count}} cosa nueva sobre ti (Perfil)",
     "saved_other": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)",
-    "saved_many": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)"
+    "saved_many": "Sprigo recordará {{count}} cosas nuevas sobre ti (Perfil)",
+    "count_one": "Sprigo sabe {{count}} cosa sobre ti",
+    "count_many": "Sprigo sabe {{count}} cosas sobre ti",
+    "count_other": "Sprigo sabe {{count}} cosas sobre ti",
+    "none": "Nada todavía"
   },
   "coach": {
     "title": "Tu forma de hablar",
@@ -408,7 +413,8 @@
     "quitTitle": "¿Salir de la lección?",
     "quitDesc": "Perderás tu progreso en esta lección.",
     "quit": "Salir",
-    "keepGoing": "Seguir aprendiendo"
+    "keepGoing": "Seguir aprendiendo",
+    "close": "Cerrar"
   },
   "lesson": {
     "dialog": "Lección",

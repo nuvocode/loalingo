@@ -156,7 +156,8 @@
     "achFast": "Speedy",
     "achFastDesc": "Earn 50 XP in a day",
     "achBook": "Bookworm",
-    "achBookDesc": "Finish your first story"
+    "achBookDesc": "Finish your first story",
+    "details": "Details"
   },
   "memory": {
     "title": "Sprigo knows you",
@@ -177,7 +178,10 @@
     "forgetAllSure": "Forget everything Sprigo knows about you?",
     "cancel": "Cancel",
     "saved_one": "Sprigo will remember {{count}} new thing about you (Profile)",
-    "saved_other": "Sprigo will remember {{count}} new things about you (Profile)"
+    "saved_other": "Sprigo will remember {{count}} new things about you (Profile)",
+    "count_one": "Sprigo knows {{count}} thing about you",
+    "count_other": "Sprigo knows {{count}} things about you",
+    "none": "Nothing yet"
   },
   "coach": {
     "title": "Your speaking",
@@ -391,7 +395,8 @@
     "quitTitle": "Quit the lesson?",
     "quitDesc": "You'll lose your progress in this lesson.",
     "quit": "Quit",
-    "keepGoing": "Keep learning"
+    "keepGoing": "Keep learning",
+    "close": "Close"
   },
   "lesson": {
     "dialog": "Lesson",

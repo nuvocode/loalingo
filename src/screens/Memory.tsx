@@ -1,4 +1,5 @@
-// Profile memory card (SPR-24): what Sprigo remembers about the learner, with a switch, editing and forgetting.
+// Profile memory (SPR-24): what Sprigo remembers about the learner, with a switch, editing and forgetting.
+// A summary card on the profile; the details open in a sheet.
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../icons";
@@ -6,12 +7,23 @@ import { useApp } from "../store";
 import * as db from "../db";
 import { MEMORY_KINDS, MEMORY_TEXT_MAX, type Memory } from "../memory";
 import { ToggleRow } from "./Settings";
+import { SummaryCard } from "./Coach";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export function MemoryCard() {
   const { t } = useTranslation();
-  const { profile, s, setS } = useApp();
+  const { profile, s, sheet, openSheet } = useApp();
+  const [n, setN] = useState<number | null>(null);
+  useEffect(() => { if (!sheet) db.listMemories(profile!.id).then((m) => setN(m.length)); }, [profile!.id, !sheet]); // fresh after the sheet closes
+  if (n === null) return null;
+  const line = !s.memoryOn ? t("settings.off") : n ? t("memory.count", { count: n }) : t("memory.none");
+  return <SummaryCard icon="spark" color="var(--gold-dark)" title={t("memory.title")} line={line} onOpen={() => openSheet(<MemorySheet />)} />;
+}
+
+function MemorySheet() {
+  const { t } = useTranslation();
+  const { profile, s, setS, closeSheet } = useApp();
   const [items, setItems] = useState<Memory[]>([]);
   const [editing, setEditing] = useState<{ id: number; text: string } | null>(null);
   const [sure, setSure] = useState(false); // "forget all" asks once more
@@ -28,8 +40,8 @@ export function MemoryCard() {
   const forgetAll = async () => { await db.forgetMemories(profile!.id); setSure(false); reload(); };
 
   return (
-    <>
-      <h2 className="section-title">{t("memory.title")}</h2>
+    <div className="sheet-wide">
+      <h3>{t("memory.title")}</h3>
       <div className="od-stack" style={gap("12px")}>
         <ToggleRow k="memory" initial={s.memoryOn} onChange={(memoryOn) => setS((s) => ({ ...s, memoryOn }))} />
         {!items.length
@@ -62,7 +74,8 @@ export function MemoryCard() {
                   </div>
                 : <button className="btn btn-ghost" onClick={() => setSure(true)}>{t("memory.forgetAll")}</button>}
             </div>}
+        <button className="btn btn-ghost" onClick={closeSheet}>{t("sheet.close")}</button>
       </div>
-    </>
+    </div>
   );
 }
