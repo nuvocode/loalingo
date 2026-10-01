@@ -39,6 +39,7 @@
   --red:#c4553f; --red-dark:#9f402d;
   --purple:#8a5a8c; --orange:#cf7a4c;
   --bark:#8a6242; --bark-dark:#6b4a30;
+  --leaf:#6aa84f; --leaf-dark:#4a8a3a; --leaf-dry:#d9b24a; --leaf-dry-dark:#b48a2c; --soil:#a07a55; --fruit:#d9503c;
   --text:#2e2a24; --text-muted:#6b6357; --text-faint:#a59d8f;
   --border:#e5ddcc; --bg:#fbf8f1; --surface:#f3eee2; --card:#fffdf8;
   --purple-dark:#6c4270; --on-accent:#fff; --locked-shadow:#d3cab6;
@@ -55,6 +56,7 @@ html[data-theme="dark"]{
   --border:#2f3629; --sky:#1e2c30; --locked-shadow:#151912;
   --green:#5e9a48; --green-dark:#406f31; --green-bright:#a9d27c;
   --bark:#7a5a3e; --bark-dark:#5a412b;
+  --leaf:#5e9a48; --leaf-dark:#3f7330; --leaf-dry:#c29b3c; --leaf-dry-dark:#93732a; --soil:#6e5640;
   --green-tint:#223220; --green-tint-border:#3a5530;
   --red-tint:#3b211b; --red-tint-border:#673428;
   --gold-tint:#3a3018; --purple-tint:#33243a;
@@ -116,6 +118,7 @@ svg{display:block}
 .stat-strip{display:flex;gap:18px}
 .stat-chip{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px}
 .stat-chip svg{width:22px;height:22px}
+.stat-chip svg.tree{width:34px;height:34px;margin:-6px -2px}
 
 /* ===== chunky buttons ===== */
 .btn{
