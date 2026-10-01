@@ -8,14 +8,14 @@ Masaüstü uygulama sunucu olur; telefon tarayıcısı ekran, mikrofon ve hoparl
 
 1. **Arayüz zaten tarayıcıda çalışıyor.** Dev modda veritabanı sql.js ile (`src/db.ts` `browserDb`), AI `window.fetch` ile (`src/ai.ts`), STT Deepgram ile tarayıcıda çalışır. Ayrı bir PWA katmanı gerekmez; Tauri'ye bağlı yalnızca üç nokta var: veritabanı, `transcribe`, Ollama adresi.
 2. **Ses akışı yok.** VAD tarayıcıda çalışır (`src/stt.ts` `listen`); masaüstüne giden şey cümle bitince tek seferlik ses örnekleridir. WebSocket gerekmez, tek POST yeter.
-3. **Rust tarafı hazır.** `tauri_plugin_sql::DbInstances` uygulamanın açık havuzunu verir (aynı veritabanı, aynı bağlantı). Gömülü arayüz dosyaları `app.asset_resolver()` ile servis edilir.
+3. **Rust tarafı küçük.** SQL masaüstü webview'ine köprülenir (`companion-sql` olayı → `companion_reply`); aynı bağlantı, aynı yazıcı, migration'lar yerinde. Gömülü arayüz dosyaları `app.asset_resolver()` ile, `tauri dev`'de Vite'tan servis edilir.
 
 ## 2. Mimari
 
 ```
-Telefon tarayıcısı ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:PORT (Sprigo masaüstü)
+Telefon tarayıcısı ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:1430 (Sprigo masaüstü)
                                                   ├─ GET  /*          gömülü arayüz
-                                                  ├─ POST /sql        execute / select, aynı havuz
+                                                  ├─ POST /sql        execute / select, webview üzerinden
                                                   ├─ POST /transcribe whisper (f32 örnekler)
                                                   └─ /ollama/*        → yapılandırılmış Ollama adresi
 ```
