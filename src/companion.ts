@@ -41,10 +41,19 @@ export async function setCompanion(on: boolean) {
   return invoke<[url: string, qr: string] | null>("companion_set", { on });
 }
 
+/** Phone: registers public/sw.js, which shows an offline page when the desktop can't be reached. */
+export function registerOfflinePage() {
+  navigator.serviceWorker?.register("/sw.js").catch((e) => console.error("sw", e));
+}
+
 /** Phone: the desktop's database through /sql. Opening it takes the data over from the desktop. */
 export function remoteDb(): SqlDb {
   const post = async (kind: "select" | "execute", sql: string, args: unknown[] = [], take = false) => {
-    const r = await fetch("/sql", { method: "POST", headers: { "Content-Type": "application/json", "X-Sprigo": "1" }, body: JSON.stringify({ kind, sql, args, take }) });
+    // The desktop went away mid-session (no network, or 502-504 from Tailscale): reloading lets public/sw.js
+    // show the "open Sprigo on your computer" page.
+    const gone = () => { location.reload(); return new Promise<never>(() => {}); };
+    const r = await fetch("/sql", { method: "POST", headers: { "Content-Type": "application/json", "X-Sprigo": "1" }, body: JSON.stringify({ kind, sql, args, take }) }).catch(gone);
+    if (r.status >= 502 && r.status <= 504) return gone();
     if (r.ok) return r.json();
     const msg = await r.text();
     if (msg === TAKEN) handOff("desktop");
