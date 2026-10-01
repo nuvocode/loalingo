@@ -279,6 +279,8 @@
     "soundDesc": "Sonidos de acierto y error",
     "speaking": "Ejercicios orales",
     "speakingDesc": "Ejercicios que usan el micrófono",
+    "bargeIn": "Interrumpir al tutor",
+    "bargeInDesc": "En la clase en vivo puedes hablar mientras el tutor habla para interrumpirlo. Desactívalo si el tutor se calla solo porque el micrófono oye los altavoces.",
     "reminder": "Recordatorios",
     "reminderDesc": "Sprigo te avisa varias veces al día y se calla cuando ya has practicado. Mientras esté activado, sigue en segundo plano.",
     "reduceMotion": "Reducir movimiento",

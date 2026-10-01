@@ -1,8 +1,9 @@
 // Speech-to-text (DECISIONS D2): microphone in the webview, bundled whisper.cpp in Rust (src-tauri/src/lib.rs).
+import { mark } from "./latency";
 import { invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { isTauri, getSetting } from "./db";
-import { VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
+import { VAD, VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
 import { wav16 } from "./wav";
 
 export type SttProvider = "whisper" | "deepgram";
@@ -75,7 +76,10 @@ async function transcribeSamples(all: Float32Array, rate: number, lang: string):
   return invoke<string>("transcribe", { samples: Array.from(resample(all, rate)), lang });
 }
 
-export type Listener = { pause(): void; resume(): void; stop(): Promise<void> };
+/** `pause(true)`: the tutor is talking but the learner may cut in (SPR-17); only clearly louder, longer speech counts. */
+export type Listener = { pause(bargeIn?: boolean): void; resume(): void; stop(): Promise<void> };
+// ponytail: 3× threshold, 300 ms start, guessed; raise if the tutor's own voice through the speakers still cuts her off
+const STRICT = { ...VAD, threshold: VAD.threshold * 3, startMs: 300 };
 
 /** Hands-free listening (tutor call, spec T): the voice detector cuts the mic stream into utterances and each one is transcribed. */
 export async function listen(lang: string, on: { utterance: (text: string) => void; speech?: () => void; level?: (rms: number) => void; error?: (e: Error) => void }): Promise<Listener> {
@@ -84,30 +88,31 @@ export async function listen(lang: string, on: { utterance: (text: string) => vo
   void ctx.resume(); // created after an await, so it may start suspended
   const src = ctx.createMediaStreamSource(stream);
   const proc = ctx.createScriptProcessor(4096, 1, 1); // ponytail: same deprecated node as startRecording
-  let v = VAD_IDLE, e: VadEvent, paused = false, stopped = false, pre: Float32Array[] = [], chunks: Float32Array[] = [];
+  let v = VAD_IDLE, e: VadEvent, paused = false, strict = false, stopped = false, pre: Float32Array[] = [], chunks: Float32Array[] = [];
   const reset = () => { v = VAD_IDLE; pre = []; chunks = []; };
   proc.onaudioprocess = (ev) => {
     if (paused) return;
     const d = new Float32Array(ev.inputBuffer.getChannelData(0));
     const r = rms(d);
     on.level?.(r);
-    [v, e] = vadStep(v, r, (d.length / ctx.sampleRate) * 1000);
+    [v, e] = vadStep(v, r, (d.length / ctx.sampleRate) * 1000, strict ? STRICT : VAD);
     if (e === "start") { chunks = [...pre]; on.speech?.(); }
     if (v.speaking || e === "end") chunks.push(d);
     else { pre.push(d); if (pre.length > 3) pre.shift(); } // ~250 ms before the detector fired, so the first syllable is kept
     if (e !== "end") return;
+    mark("vad");
     const all = concat(chunks);
     reset();
     transcribeSamples(all, ctx.sampleRate, lang).then(
-      (x) => { if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
+      (x) => { mark("stt"); if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
       (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
     );
   };
   src.connect(proc);
   proc.connect(ctx.destination);
   return {
-    pause() { paused = true; reset(); on.level?.(0); },
-    resume() { paused = false; },
+    pause(bargeIn = false) { if (bargeIn) { strict = true; return; } paused = true; reset(); on.level?.(0); },
+    resume() { paused = strict = false; },
     async stop() {
       if (stopped) return;
       stopped = paused = true;

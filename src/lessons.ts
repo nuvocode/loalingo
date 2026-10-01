@@ -1,6 +1,6 @@
 // Lesson generation (DECISIONS C2, C3): cache → one call for the whole step → per-activity fallback.
 import { z } from "zod";
-import { generate, generatePlain } from "./ai";
+import { generate, generatePlain, generateStream } from "./ai";
 import { getCached, listMistakes, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
@@ -234,13 +234,16 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
 
 // ---- Tutor call (spec T): the tutor's reply to one event ----
 
-export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "") {
+/** With `onText` the reply streams (SPR-13); see generateStream. */
+export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
+  onText?: (raw: string) => boolean) {
   const ch = CHARACTERS[who];
   const system = tutorSystem({
     name: ch.name, persona: ch.persona, target: c.course.name, native: langEn(c.native), level: c.level,
     unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit),
   });
-  return generate(tutorSchema, system, tutorPrompt(ch.name, history, notes, event, screen), undefined, looseTutor);
+  const prompt = tutorPrompt(ch.name, history, notes, event, screen);
+  return onText ? generateStream(tutorSchema, system, prompt, onText, looseTutor) : generate(tutorSchema, system, prompt, undefined, looseTutor);
 }
 
 // ---- Practice together (spec P): one call per unit, cached ----

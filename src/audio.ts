@@ -39,8 +39,10 @@ export function mouthBright(prev: number, rate: number, dt: number): number {
   return prev + (target - prev) * (1 - Math.exp(-dt / 0.08));
 }
 
-/** Voice detector knobs (tutor call). RMS is after the browser's noise suppression; raise `threshold` if a noisy room keeps triggering it. */
-export const VAD = { threshold: 0.015, startMs: 150, endMs: 1200, maxMs: 15000 };
+/** Voice detector knobs (tutor call). RMS is after the browser's noise suppression; raise `threshold` if a noisy room keeps triggering it.
+ *  `endMs` is added to every turn's wait (SPR-15: 1200 → 800). ponytail: one value; a "wait for me: short/normal/long"
+ *  setting if learners who pause mid-sentence get cut off. */
+export const VAD = { threshold: 0.015, startMs: 150, endMs: 800, maxMs: 15000 };
 export type Vad = { speaking: boolean; voiced: number; quiet: number; length: number };
 export type VadEvent = "start" | "end" | null;
 export const VAD_IDLE: Vad = { speaking: false, voiced: 0, quiet: 0, length: 0 };

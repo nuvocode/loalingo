@@ -265,6 +265,8 @@
     "soundDesc": "Töne für richtige und falsche Antworten",
     "speaking": "Sprechübungen",
     "speakingDesc": "Übungen, die das Mikrofon nutzen",
+    "bargeIn": "Den Tutor unterbrechen",
+    "bargeInDesc": "Im Live-Unterricht kannst du einfach dazwischenreden. Schalte es aus, wenn der Tutor von selbst verstummt, weil das Mikrofon die Lautsprecher hört.",
     "reminder": "Erinnerungen",
     "reminderDesc": "Sprigo erinnert dich ein paarmal am Tag und ist still, sobald du geübt hast. Wenn aktiv, läuft es im Hintergrund.",
     "reduceMotion": "Bewegung reduzieren",

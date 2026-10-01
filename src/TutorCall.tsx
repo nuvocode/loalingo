@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { biomeVars } from "./biomes";
+import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
@@ -12,7 +13,8 @@ import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
 import { loadPractice, tutorTurn } from "./lessons";
-import { NOTES_MAX, currentUnit, isNoise, mergeInput, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
+import { warmUp } from "./ai";
+import { FILLER_MS, NOTES_MAX, currentUnit, filler, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
 import * as db from "./db";
 import { PracticePanel } from "./PracticePanel";
@@ -25,7 +27,9 @@ const BONUS_MS = 5 * 60_000; // a call this long earns +20 XP
 type Call = {
   hist: TutorMsg[]; notes: string; last: TutorReply | null; queue: TutorEvent[]; fixes: string[];
   nudges: number; // silence events since the learner last said something
+  fills: number; // fillers played, so each turn picks the next one
   running: boolean; over: boolean; opened: boolean; micOn: boolean; failed: TutorEvent | null;
+  cut: (() => void) | null; // stops the reply being spoken, when the learner talks over it (SPR-17)
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
 };
@@ -38,8 +42,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const levelDef = course && enrollment ? course.levels[enrollment.level] : undefined;
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang, ch.gender);
+  useEffect(warmUp, []);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, running: false, over: false, opened: false, micOn: false, failed: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -82,11 +87,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
     }, sec * 1000);
   };
 
-  const voice = async (line: string) => {
+  /** `started` gets the time the audio begins, or runs at the end if it never did. */
+  const voice = async (line: string, started?: (at: number) => void) => {
     if (!line.trim() || c.over) return;
-    c.speaking = true; mic.current?.pause(); setTalking(true); // the mic would hear the tutor
-    try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }); } catch { /* the caption still shows it */ }
+    let fired = false;
+    const go = (at = performance.now()) => { if (!fired) { fired = true; started?.(at); } };
+    c.speaking = true; mic.current?.pause(s.bargeIn); setTalking(true); // the mic would hear the tutor; with barge-in it only listens harder
+    try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }, go); } catch { /* the caption still shows it */ }
     finally {
+      go();
       c.speaking = false; setTalking(false);
       // The speakers are still ringing out when playback ends: resumed at once, the mic heard the tutor's last words
       // as the learner's (a second "hello"). ponytail: fixed 400 ms, measure the output latency if a headset still echoes.
@@ -94,19 +103,57 @@ export function TutorCall({ who }: { who: CharacterId }) {
     }
   };
 
-  /** One event → one reply, spoken. False when the model call failed. */
+  /** Speaks a reply's sentences as they stream in (SPR-13): the first at once, the ones that came meanwhile as one piece.
+   *  The caption grows as each piece starts playing. A filler (SPR-16) plays only before the first sentence, and the reply
+   *  waits for it to finish; it is not captioned and not part of the history. */
+  const speaker = () => {
+    const q: string[] = [];
+    let busy: Promise<void> | null = null, at = -1, cut = false;
+    c.cut = () => {
+      cut = true; q.length = 0;
+      if (at >= 0) { c.hist = c.hist.map((m, i) => (i === at ? { ...m, cut: true } : m)); setMsgs(c.hist); }
+    };
+    const caption = (piece: string, t: number) => {
+      if (at < 0) { mark("audio", t); push({ from: "tutor", text: piece, via: "voice" }); at = c.hist.length - 1; setThinking(false); return; }
+      c.hist = c.hist.map((m, i) => (i === at ? { ...m, text: `${m.text} ${piece}` } : m)); setMsgs(c.hist);
+    };
+    const drain = async () => {
+      while (q.length && !c.over && !cut) { const piece = q.splice(0).join(" "); await voice(piece, (t) => caption(piece, t)); }
+      busy = null;
+    };
+    return {
+      add: (line: string) => { if (cut) return; q.push(line); busy ??= drain(); },
+      filler: (line: string) => { if (!busy && at < 0 && !cut) busy = voice(line).then(drain); },
+      end: () => busy ?? Promise.resolve(),
+    };
+  };
+
+  /** One event → one reply, spoken while it streams. False when the model call failed. */
   const step = async (e: TutorEvent) => {
     if (!course || !enrollment || !profile || !unit) return false;
     if (e.kind.startsWith("practice_") && e.kind !== "practice_done" && !c.pr) return true; // the panel was closed meanwhile
     if (e.kind === "practice_read" && c.pr?.stage !== "reading") return true; // the learner moved on before the text was read
     const screen = c.pr; // what the learner was looking at when they spoke
     setThinking(true); setErr("");
+    const sp = speaker();
+    let n = 0; // sentences handed to the speaker
+    const onText = (raw: string) => {
+      if (c.over) return false;
+      const p = partialSay(raw), got = sentences(p.text, p.closed);
+      for (; n < got.length; n++) { if (!n) mark("say"); sp.add(got[n]); }
+      if (n) clearTimeout(slow);
+      return n > 0;
+    };
+    const waiting = e.kind === "user_said" || e.kind === "user_typed" || e.kind === "practice_answer"; // the learner expects an answer
+    const slow = waiting ? setTimeout(() => sp.filler(filler(lang, c.fills++)), FILLER_MS) : undefined;
     try {
-      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics));
+      mark("req");
+      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
+      mark("llm");
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
       if (r.correction.trim()) c.fixes.push(r.correction.trim());
-      if (r.say.trim()) push({ from: "tutor", text: r.say.trim(), via: "voice" });
+      sentences(r.say, true).slice(n).forEach(sp.add); // the tail, or all of it if `say` came last
       setLast(r); setShowTr(false); setThinking(false);
       if (r.action === "start_practice") practiceOpen(false);
       if (r.action === "stop_practice") practiceClose();
@@ -115,7 +162,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
       const a = c.pr && c.pr === screen && (e.kind === "user_said" || e.kind === "user_typed") ? r.answer.trim() : "";
       const moveOn = a.toLowerCase() === "next";
       if (a && !moveOn) answerField(a);
-      await voice(r.say);
+      await sp.end();
       if (moveOn && c.pr === screen) answerField(a); // after the tutor has closed the step, not while it is still talking about it
       // The tutor has announced the reading; the app reads it aloud, then the tutor asks if it was understood.
       if (e.kind === "practice_item" && screen?.stage === "reading" && c.pr === screen && screen.set) { await voice(screen.set.reading.text); fire({ kind: "practice_read" }); }
@@ -126,6 +173,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     } catch (x) {
       c.failed = e; setErr((x as Error).message); setThinking(false);
       return false;
+    } finally {
+      clearTimeout(slow); c.cut = null;
     }
   };
 
@@ -203,12 +252,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
     try {
       const m = await listen(lang, {
         utterance: (x) => input("user_said", x),
-        speech: clearSilence, // the learner started talking: no nudge mid-sentence
+        speech: () => {
+          clearSilence(); // the learner started talking: no nudge mid-sentence
+          if (c.speaking && s.bargeIn) { c.cut?.(); stopSpeaking(); } // ...over the tutor: the tutor stops (SPR-17)
+        },
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
         error: (x) => { toast(x.message); if (!c.running) armSilence(); },
       });
       if (c.over) return void m.stop();
-      if (c.speaking) m.pause(); // turned on mid-speech: the tutor's voice would be heard
+      if (c.speaking) m.pause(s.bargeIn); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
       if (announce) fire({ kind: "mic", on: true });
       else if (!c.running) armSilence();

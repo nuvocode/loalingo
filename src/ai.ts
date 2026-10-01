@@ -1,5 +1,5 @@
 // AI providers (DECISIONS C1). Config is device-wide (E6): device_settings "ai" + API key in the OS keychain.
-import { generateText, NoObjectGeneratedError, Output, type LanguageModel } from "ai";
+import { generateText, NoObjectGeneratedError, Output, streamText, type LanguageModel } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
@@ -76,10 +76,18 @@ export async function listModels(c: AiConfig, key: string | null): Promise<strin
 }
 
 // Thinking models (e.g. glm on Ollama) otherwise reason for minutes; exercises need little. Measured: 185 s → 7 s.
+// Not "none" (Ollama's think:false): glm-5.3-flash:cloud then writes its reasoning into the reply itself (SPR-14, 213 tokens vs 44).
 // ponytail: local providers only; cloud models keep their default until measured per provider.
 const reasoning = (c: AiConfig) => c.provider === "ollama" || c.provider === "lmstudio" ? "low" as const : undefined;
 
 let active: { cfg: AiConfig; key: string | null } | null = null;
+
+/** Loads a local Ollama model before a live call so the first turn is not a cold start (SPR-14). Cloud models answer at once. */
+export function warmUp() {
+  if (active?.cfg.provider !== "ollama") return;
+  const base = trim(active.cfg.baseURL || PROVIDERS.ollama.baseURL);
+  http(`${base}/api/generate`, { method: "POST", body: JSON.stringify({ model: active.cfg.model, keep_alive: "10m" }) }).catch(() => {});
+}
 export async function activateConfig(cfg: AiConfig | null) {
   active = cfg && { cfg, key: await getKey(cfg.provider) };
 }
@@ -113,6 +121,33 @@ export async function generate<S extends z.ZodType>(schema: S, system: string, p
   // Models sometimes drop a field or break the JSON; ask again. Network, auth and timeouts fail at once.
   // ponytail: fixed 3 tries; per-provider setting if a slow model makes this too long
   return retry(once, badReply);
+}
+
+/** `generate`, streamed (SPR-13): `onText` sees the raw reply as it grows and returns true once it acted on it
+ *  (e.g. started speaking). After that a broken reply is not asked again: `loose` fills what it can from `{}`. */
+export async function generateStream<S extends z.ZodType>(schema: S, system: string, prompt: string, onText: (raw: string) => boolean,
+  loose: z.ZodType = schema, cfg = active): Promise<z.infer<S>> {
+  if (!cfg) throw new Error("AI provider is not set up");
+  system += `\n\nJSON schema of the reply:\n${JSON.stringify(z.toJSONSchema(schema))}`;
+  let used = false;
+  const once = async () => {
+    let failed: unknown, text = "";
+    const r = streamText({
+      model: model(cfg.cfg, cfg.key), reasoning: reasoning(cfg.cfg), system, prompt, maxRetries: 1,
+      output: Output.object({ schema }),
+      abortSignal: AbortSignal.timeout(180_000),
+      onError: ({ error }) => { failed = error; },
+    });
+    for await (const d of r.textStream) { text += d; if (onText(text)) used = true; }
+    if (failed) throw failed;
+    try {
+      return (await r.output) as z.infer<S>;
+    } catch {
+      try { return loose.parse(extractJson(text)) as z.infer<S>; }
+      catch (e) { if (used) return loose.parse({}) as z.infer<S>; throw e; } // already speaking: keep going, don't ask again
+    }
+  };
+  return retry(once, (e) => !used && badReply(e));
 }
 
 const badReply = (e: unknown) => NoObjectGeneratedError.isInstance(e) || e instanceof z.ZodError || e instanceof SyntaxError ||
