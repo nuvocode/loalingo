@@ -26,6 +26,10 @@ static NEXT: AtomicU64 = AtomicU64::new(1);
 #[tauri::command]
 pub fn companion_set(app: tauri::AppHandle, on: bool) -> Result<String, String> {
     let mut slot = SERVER.lock().map_err(|e| e.to_string())?;
+    // Already running: a webview reload asks again, and rebinding the port before the old socket closes fails.
+    if on == slot.is_some() {
+        return Ok(format!("http://127.0.0.1:{PORT}"));
+    }
     if let Some(s) = slot.take() {
         s.unblock();
     }
