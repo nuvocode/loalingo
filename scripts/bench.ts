@@ -12,7 +12,7 @@ const said = ["Hi! I am fine, thanks. I am little tired today.", "I usually wake
 const schema = z.toJSONSchema(tutorSchema);
 const system = tutorSystem(ctx) + `\n\nJSON schema of the reply:\n${JSON.stringify(schema)}`;
 // Same rule as `reasoning` in src/ai.ts.
-const effort = (m: string) => process.env.EFFORT ?? (/cloud$/.test(m) ? "low" : "none");
+const effort = (m: string) => process.env.EFFORT ?? (m.startsWith("glm-5.3-flash") ? "low" : "none");
 
 type Turn = { say?: number; total: number; tokens: number; reply: string };
 
