@@ -230,15 +230,18 @@ export function Shop() {
 
 export function Profile() {
   const { t, i18n } = useTranslation();
-  const { s, xp, profile, done } = useApp();
+  const { s, xp, profile, done, go } = useApp();
   const league = useLeague();
   const since = new Date(profile!.created_at.replace(" ", "T") + "Z").toLocaleDateString(i18n.language, { month: "long", year: "numeric" });
-  const stat = (v: React.ReactNode, k: string, c: string) => (
-    <div className="card od-stat" style={{ "--od-gap": "2px", textAlign: "center", padding: 14 } as React.CSSProperties}>
-      <span style={{ fontSize: 22, fontWeight: 900, color: c }} className="od-nowrap">{v}</span>
-      <span className="muted small" style={{ fontWeight: 700 }}>{k}</span>
-    </div>
-  );
+  const stat = (v: React.ReactNode, k: string, c: string, onClick?: () => void) => {
+    const Tag = onClick ? "button" : "div";
+    return (
+      <Tag className="card od-stat" onClick={onClick} title={onClick && t("garden.open")} style={{ "--od-gap": "2px", textAlign: "center", padding: 14 } as React.CSSProperties}>
+        <span style={{ fontSize: 22, fontWeight: 900, color: c }} className="od-nowrap">{v}</span>
+        <span className="muted small" style={{ fontWeight: 700 }}>{k}</span>
+      </Tag>
+    );
+  };
   const ach: [IconName, string, number, number, string][] = [
     ["roots", "achFire", s.bestStreak, 7, "var(--green)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", [...done].filter((d) => d.startsWith("story:")).length, 1, "var(--blue)"],
   ];
@@ -249,7 +252,7 @@ export function Profile() {
         <span className="od-field od-fill"><b style={{ fontSize: 22 }}>{profile!.name}</b><span className="muted small">{t("profile.since", { date: since })}</span></span>
       </div>
       <div className="od-grid" style={{ "--od-cols": 2, "--od-gap": "12px", marginTop: 18 } as React.CSSProperties}>
-        {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--green)")}
+        {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--green)", () => go("garden"))}
         {stat(xp, t("profile.totalXp"), "var(--gold-dark)")}
         {stat(league.name, t("profile.currentLeague"), "var(--blue)")}
         {stat(t("profile.top3"), t("profile.bestLeague"), "var(--green-dark)")}

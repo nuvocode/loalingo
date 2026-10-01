@@ -27,9 +27,10 @@ export function Rail() {
     <>
       <div className="rail-card"><div className="stat-strip" style={{ justifyContent: "space-between" }}>
         {course && <button className="stat-chip course-chip" onClick={() => openSheet(<CourseSheet />)} aria-label={t("profiles.switchCourse")}><CourseFlag c={course} /></button>}
-        <span className="stat-chip" style={{ color: tree.dry ? "var(--gold-dark)" : "var(--green)" }} title={t("profile.streakDays", { count: s.streak })}>
+        <button className="stat-chip" style={{ color: tree.dry ? "var(--gold-dark)" : "var(--green)" }} onClick={() => go("garden")}
+          aria-label={`${t("garden.open")} · ${t("profile.streakDays", { count: s.streak })}`}>
           <span style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: treeSvg(tree, true) }} />{s.streak}
-        </span>
+        </button>
         <span className="stat-chip" style={{ color: "var(--gold-dark)" }}><Icon name="gem" />{s.gems}</span>
         {s.heartsOn && <span className="stat-chip" style={{ color: "var(--blue)" }}><Icon name="drop" />{s.hearts}</span>}
       </div></div>

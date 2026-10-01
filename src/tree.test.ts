@@ -14,7 +14,7 @@ test("finished lessons pick the growth stage; chests, stories and checkpoints do
 });
 
 test("a broken streak dries the leaves but keeps the stage; a new user is not dry", () => {
-  assert.deepEqual(treeState(lessons(40), 0, "2026-09-20"), { stage: 3, dry: true, fruit: 0 });
+  assert.deepEqual(treeState(lessons(40), 0, "2026-09-20"), { stage: 3, dry: true, fruit: 0, lessons: 40 });
   assert.equal(treeState([], 0, null).dry, false);
 });
 

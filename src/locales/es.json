@@ -638,5 +638,25 @@
     "foothills": "Faldas",
     "mountain": "Montaña",
     "summit": "Cumbre"
+  },
+  "garden": {
+    "title": "Tu jardín",
+    "open": "Abrir tu jardín",
+    "close": "Cerrar el jardín",
+    "stage0": "Semilla",
+    "stage1": "Brote",
+    "stage2": "Plantón",
+    "stage3": "Árbol joven",
+    "stage4": "Árbol adulto",
+    "next_one": "{{count}} lección más para: {{stage}}",
+    "next_other": "{{count}} lecciones más para: {{stage}}",
+    "next_many": "{{count}} lecciones más para: {{stage}}",
+    "grown": "Tu árbol ya está crecido.",
+    "streakOk": "Las hojas están verdes. Sigue echando raíces.",
+    "streakDry": "Tus raíces se secaron y las hojas amarillearon. Termina una lección para que reverdezcan.",
+    "streakNew": "Termina tu primera lección y la semilla brotará.",
+    "fruit": "Frutos",
+    "fruitDesc": "Cada prueba de nivel que superas hace crecer un fruto.",
+    "toShop": "Tienda"
   }
 }

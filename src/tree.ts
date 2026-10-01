@@ -1,7 +1,7 @@
 // The streak tree (SPR-9): progress grows it, the streak colours it, checkpoints hang fruit on it.
 // Drawn as an SVG string like src/icons.tsx and src/biomes.ts; shapes come from docs/design/nature.html.
 
-export type TreeState = { stage: 0 | 1 | 2 | 3 | 4; dry: boolean; fruit: number };
+export type TreeState = { stage: 0 | 1 | 2 | 3 | 4; dry: boolean; fruit: number; lessons: number };
 
 /** Finished lessons needed for each stage: seed, sprout, sapling, young tree, mature tree (~5 lessons a unit). */
 export const STAGE_LESSONS = [0, 1, 10, 40, 100] as const;
@@ -14,13 +14,13 @@ export function treeState(done: Iterable<string>, streak: number, lastActive: st
     else if (!id.endsWith(":chest") && !id.startsWith("story:")) lessons++; // chests are optional, stories are extras
   }
   const stage = (STAGE_LESSONS.filter((n) => lessons >= n).length - 1) as TreeState["stage"];
-  return { stage, dry: streak === 0 && lastActive !== null, fruit };
+  return { stage, dry: streak === 0 && lastActive !== null, fruit, lessons };
 }
 
 /** Per-stage crop so a small plant still fills a small icon; the full 200×220 canvas shows growth at large sizes. */
 const FIT = ["64 166 72 50", "52 140 96 76", "36 96 128 120", "20 40 160 176", "0 18 200 198"];
 
-export function treeSvg({ stage, dry, fruit }: TreeState, fit = false): string {
+export function treeSvg({ stage, dry, fruit }: Omit<TreeState, "lessons">, fit = false): string {
   const L = dry ? "var(--leaf-dry)" : "var(--leaf)", LD = dry ? "var(--leaf-dry-dark)" : "var(--leaf-dark)";
   const leaf = (x: number, y: number, rx: number, ry: number, a: number) =>
     `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${L}" transform="rotate(${a} ${x} ${y})"/>`;

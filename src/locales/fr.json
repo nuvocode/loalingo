@@ -638,5 +638,25 @@
     "foothills": "Piémont",
     "mountain": "Montagne",
     "summit": "Sommet"
+  },
+  "garden": {
+    "title": "Ton jardin",
+    "open": "Ouvrir ton jardin",
+    "close": "Fermer le jardin",
+    "stage0": "Graine",
+    "stage1": "Pousse",
+    "stage2": "Jeune plant",
+    "stage3": "Jeune arbre",
+    "stage4": "Arbre adulte",
+    "next_one": "Encore {{count}} leçon avant : {{stage}}",
+    "next_other": "Encore {{count}} leçons avant : {{stage}}",
+    "next_many": "Encore {{count}} leçons avant : {{stage}}",
+    "grown": "Ton arbre a fini de grandir.",
+    "streakOk": "Les feuilles sont vertes. Continue à faire pousser tes racines.",
+    "streakDry": "Tes racines ont séché et les feuilles ont jauni. Termine une leçon pour les faire reverdir.",
+    "streakNew": "Termine ta première leçon et la graine germera.",
+    "fruit": "Fruits",
+    "fruitDesc": "Chaque test de niveau réussi fait pousser un fruit.",
+    "toShop": "Boutique"
   }
 }

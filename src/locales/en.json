@@ -622,5 +622,24 @@
     "foothills": "Foothills",
     "mountain": "Mountain",
     "summit": "Summit"
+  },
+  "garden": {
+    "title": "Your garden",
+    "open": "Open your garden",
+    "close": "Close garden",
+    "stage0": "Seed",
+    "stage1": "Sprout",
+    "stage2": "Sapling",
+    "stage3": "Young tree",
+    "stage4": "Grown tree",
+    "next_one": "{{count}} more lesson to {{stage}}",
+    "next_other": "{{count}} more lessons to {{stage}}",
+    "grown": "Your tree is fully grown.",
+    "streakOk": "The leaves are green. Keep your roots growing.",
+    "streakDry": "Your roots dried out and the leaves turned yellow. Finish a lesson to make them green again.",
+    "streakNew": "Finish your first lesson and the seed sprouts.",
+    "fruit": "Fruit",
+    "fruitDesc": "Each level checkpoint you pass grows one fruit.",
+    "toShop": "Shop"
   }
 }

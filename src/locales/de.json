@@ -622,5 +622,24 @@
     "foothills": "Vorgebirge",
     "mountain": "Gebirge",
     "summit": "Gipfel"
+  },
+  "garden": {
+    "title": "Dein Garten",
+    "open": "Garten öffnen",
+    "close": "Garten schließen",
+    "stage0": "Samen",
+    "stage1": "Keimling",
+    "stage2": "Setzling",
+    "stage3": "Junger Baum",
+    "stage4": "Ausgewachsener Baum",
+    "next_one": "Noch {{count}} Lektion bis {{stage}}",
+    "next_other": "Noch {{count}} Lektionen bis {{stage}}",
+    "grown": "Dein Baum ist ausgewachsen.",
+    "streakOk": "Die Blätter sind grün. Lass deine Wurzeln weiterwachsen.",
+    "streakDry": "Deine Wurzeln sind vertrocknet, die Blätter sind gelb. Schließ eine Lektion ab, dann werden sie wieder grün.",
+    "streakNew": "Schließ deine erste Lektion ab, dann keimt der Samen.",
+    "fruit": "Früchte",
+    "fruitDesc": "Jeder bestandene Level-Test lässt eine Frucht wachsen.",
+    "toShop": "Shop"
   }
 }
