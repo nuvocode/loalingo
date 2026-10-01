@@ -5,6 +5,7 @@ import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { isTauri, isCompanion, getSetting } from "./db";
 import { VAD, VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
 import { wav16 } from "./wav";
+import { speechMetrics, type Utterance } from "./speech";
 
 export type SttProvider = "whisper" | "deepgram";
 export const sttProvider = async (): Promise<SttProvider> => ((await getSetting("stt")) === "deepgram" ? "deepgram" : "whisper");
@@ -86,14 +87,18 @@ export type Listener = { pause(bargeIn?: boolean): void; resume(): void; stop():
 // ponytail: 3× threshold, 300 ms start, guessed; raise if the tutor's own voice through the speakers still cuts her off
 const STRICT = { ...VAD, threshold: VAD.threshold * 3, startMs: 300 };
 
-/** Hands-free listening (tutor call, spec T): the voice detector cuts the mic stream into utterances and each one is transcribed. */
-export async function listen(lang: string, on: { utterance: (text: string) => void; speech?: () => void; level?: (rms: number) => void; error?: (e: Error) => void }): Promise<Listener> {
+/** Hands-free listening (tutor call, spec T): the voice detector cuts the mic stream into utterances and each one is transcribed.
+ *  With `native` each utterance also gets its speech signals (SPR-25), measured here so the phone companion gets them too. */
+export async function listen(lang: string, on: { utterance: (text: string, m?: Utterance) => void; speech?: () => void; level?: (rms: number) => void; error?: (e: Error) => void }, native?: string): Promise<Listener> {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
   const ctx = new AudioContext();
   void ctx.resume(); // created after an await, so it may start suspended
   const src = ctx.createMediaStreamSource(stream);
   const proc = ctx.createScriptProcessor(4096, 1, 1); // ponytail: same deprecated node as startRecording
   let v = VAD_IDLE, e: VadEvent, paused = false, strict = false, stopped = false, pre: Float32Array[] = [], chunks: Float32Array[] = [];
+  // When the mic re-opened after the tutor spoke; the first utterance after it gets the reply latency.
+  // ponytail: measured from resume(), which TutorCall delays 400 ms past the tutor's last word, so it reads ~400 ms short.
+  let armed: number | null = null, latency: number | null = null;
   const reset = () => { v = VAD_IDLE; pre = []; chunks = []; };
   proc.onaudioprocess = (ev) => {
     if (paused) return;
@@ -101,23 +106,26 @@ export async function listen(lang: string, on: { utterance: (text: string) => vo
     const r = rms(d);
     on.level?.(r);
     [v, e] = vadStep(v, r, (d.length / ctx.sampleRate) * 1000, strict ? STRICT : VAD);
-    if (e === "start") { chunks = [...pre]; on.speech?.(); }
+    if (e === "start") {
+      chunks = [...pre]; on.speech?.();
+      latency = armed === null ? null : Math.max(0, performance.now() - armed - VAD.startMs); armed = null;
+    }
     if (v.speaking || e === "end") chunks.push(d);
     else { pre.push(d); if (pre.length > 3) pre.shift(); } // ~250 ms before the detector fired, so the first syllable is kept
     if (e !== "end") return;
     mark("vad");
-    const all = concat(chunks);
+    const all = concat(chunks), rate = ctx.sampleRate, timing = { latencyMs: latency };
     reset();
-    transcribeSamples(all, ctx.sampleRate, lang).then(
-      (x) => { mark("stt"); if (!stopped) on.utterance(x.trim()); }, // empty too: the caller re-arms its silence timer
+    transcribeSamples(all, rate, lang).then(
+      (x) => { mark("stt"); if (!stopped) on.utterance(x.trim(), native ? speechMetrics(all, rate, x, timing, native, lang) : undefined); }, // empty too: the caller re-arms its silence timer
       (x) => { if (!stopped) on.error?.(x instanceof Error ? x : new Error(String(x))); }, // Tauri invoke rejects with strings
     );
   };
   src.connect(proc);
   proc.connect(ctx.destination);
   return {
-    pause(bargeIn = false) { if (bargeIn) { strict = true; return; } paused = true; reset(); on.level?.(0); },
-    resume() { paused = strict = false; },
+    pause(bargeIn = false) { armed = null; if (bargeIn) { strict = true; return; } paused = true; reset(); on.level?.(0); },
+    resume() { paused = strict = false; armed = performance.now(); },
     async stop() {
       if (stopped) return;
       stopped = paused = true;

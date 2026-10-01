@@ -36,4 +36,16 @@ CREATE TABLE memories(
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE INDEX memories_profile ON memories(profile_id)`,
   },
+  {
+    v: 3, // SPR-25: speech signals, one summary row per voice session (src/speech.ts); no audio is kept
+    sql: `
+CREATE TABLE speech_sessions(
+  id INTEGER PRIMARY KEY, profile_id INTEGER NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  enrollment_id INTEGER REFERENCES enrollments(id) ON DELETE SET NULL, mode TEXT NOT NULL,
+  utterances INTEGER NOT NULL, silences INTEGER NOT NULL, latency_ms INTEGER, wpm INTEGER NOT NULL,
+  pause_ratio REAL NOT NULL, long_pauses INTEGER NOT NULL, level REAL NOT NULL, fillers INTEGER NOT NULL,
+  words INTEGER NOT NULL, native_words INTEGER NOT NULL, speech_ms INTEGER NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX speech_sessions_profile ON speech_sessions(profile_id)`,
+  },
 ];

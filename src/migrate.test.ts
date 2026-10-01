@@ -10,7 +10,7 @@ const fresh = () => wrapSqlJs(new SQL.Database());
 const tables = async (db: ReturnType<typeof fresh>) =>
   (await db.select<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")).map((r) => r.name);
 
-const TABLES = ["content_cache", "device_settings", "enrollments", "memories", "mistakes", "profiles", "step_progress", "words"];
+const TABLES = ["content_cache", "device_settings", "enrollments", "memories", "mistakes", "profiles", "speech_sessions", "step_progress", "words"];
 
 test("empty database migrates to the latest version", async () => {
   const db = fresh();

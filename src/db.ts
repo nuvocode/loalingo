@@ -10,6 +10,7 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
+import type { SpeechSummary } from "./speech";
 import { remoteDb, serveCompanion } from "./companion";
 import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
@@ -23,7 +24,9 @@ async function browserDb(): Promise<Db> {
   const KEY = "sprigo.devdb";
   const saved = localStorage.getItem(KEY);
   const db = new SQL.Database(saved ? Uint8Array.from(atob(saved), (c) => c.charCodeAt(0)) : undefined);
-  return wrapSqlJs(db, () => localStorage.setItem(KEY, btoa(String.fromCharCode(...db.export()))));
+  // Chunked: spreading the whole export into fromCharCode overflows the stack once the database passes ~100 KB.
+  const b64 = (u: Uint8Array) => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+  return wrapSqlJs(db, () => localStorage.setItem(KEY, b64(db.export())));
 }
 
 let dbP: Promise<Db> | null = null;
@@ -227,6 +230,15 @@ export async function applyMemoryOps(profileId: number, source: MemorySource, op
   for (const u of ops.update) await d.execute("UPDATE memories SET text = $1, last_seen_at = CURRENT_TIMESTAMP WHERE id = $2 AND profile_id = $3", [u.text, u.id, profileId]);
   for (const a of ops.add) await d.execute("INSERT INTO memories(profile_id, kind, text, source) VALUES ($1, $2, $3, $4)", [profileId, a.kind, a.text, source]);
   for (const id of evictIds(await listMemories(profileId))) await d.execute("DELETE FROM memories WHERE id = $1", [id]);
+}
+
+// ---- Speech signals (SPR-25, src/speech.ts) ----
+
+export async function saveSpeechSession(profileId: number, enrollmentId: number | null, mode: "tutor", x: SpeechSummary) {
+  await (await db()).execute(
+    `INSERT INTO speech_sessions(profile_id, enrollment_id, mode, utterances, silences, latency_ms, wpm, pause_ratio, long_pauses, level, fillers, words, native_words, speech_ms)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+    [profileId, enrollmentId, mode, x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs]);
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----
