@@ -252,6 +252,8 @@ export function Profile() {
       <div className="od-row" style={{ "--od-gap": "16px", marginTop: 24 } as React.CSSProperties}>
         <span className="avatar" style={{ width: 72, height: 72, fontSize: 28, background: profile!.color }}>{profile!.name[0]}</span>
         <span className="od-field od-fill"><b style={{ fontSize: 22 }}>{profile!.name}</b><span className="muted small">{t("profile.since", { date: since })}</span></span>
+        {/* The top bar's garden button is easy to miss and isn't there on phones. */}
+        <button className="btn btn-ghost od-row od-nowrap" style={{ "--od-gap": "8px" } as React.CSSProperties} onClick={() => go("garden")}><Icon name="roots" />{t("profile.garden")}</button>
       </div>
       <div className="od-grid" style={{ "--od-cols": 2, "--od-gap": "12px", marginTop: 18 } as React.CSSProperties}>
         {stat(t("profile.streakDays", { count: s.streak }), t("profile.streak"), "var(--green)", () => go("garden"))}

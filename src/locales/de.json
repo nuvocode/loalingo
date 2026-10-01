@@ -143,6 +143,7 @@
   },
   "profile": {
     "since": "Lernt seit {{date}}",
+    "garden": "Mein Garten",
     "streakDays_one": "{{count}} Tag",
     "streakDays_other": "{{count}} Tage",
     "streak": "Wurzeltage",

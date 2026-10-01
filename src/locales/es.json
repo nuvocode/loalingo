@@ -152,6 +152,7 @@
   },
   "profile": {
     "since": "Aprendiendo desde {{date}}",
+    "garden": "Mi jardín",
     "streakDays_one": "{{count}} día",
     "streakDays_many": "{{count}} días",
     "streakDays_other": "{{count}} días",

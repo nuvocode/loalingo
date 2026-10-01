@@ -142,6 +142,7 @@
   },
   "profile": {
     "since": "{{date}} tarihinden beri öğreniyor",
+    "garden": "Bahçem",
     "streakDays": "{{count}} gün",
     "streak": "Kök salma süresi",
     "totalXp": "Toplam XP",
