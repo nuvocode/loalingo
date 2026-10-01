@@ -39,6 +39,12 @@ function PhoneRow() {
   const [on, setOn] = useState(false);
   const [busy, setBusy] = useState(false);
   useEffect(() => { Promise.all([tailscaleStatus(), getSetting("companion")]).then(([s, v]) => { setTs(s); setOn(v === "on"); }); }, []);
+  // The learner opens or signs in to Tailscale in its own app, then comes back here.
+  useEffect(() => {
+    const check = () => tailscaleStatus().then(setTs);
+    window.addEventListener("focus", check);
+    return () => window.removeEventListener("focus", check);
+  }, []);
   if (!ts) return null;
   const ready = ts.installed && ts.running;
   // Turning on (or the QR button) runs `tailscale serve` again: it's idempotent and returns the address to show.
