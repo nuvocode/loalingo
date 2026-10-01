@@ -87,7 +87,7 @@ function UnitSection({ u, level }: { u: PathUnit; level: Cefr }) {
     </>);
   };
   return (
-    <section aria-label={u.title}>
+    <section className="unit" aria-label={u.title}>
       <div className={`unit-head ${u.theme}`}>
         <div className="uh-row">
           <div><span className="uh-kicker">{t("learn.kicker", { level, unit: u.index })}</span><h2>{u.title}</h2></div>
@@ -218,6 +218,12 @@ let setupOffered = false;
 export function Learn() {
   const { t } = useTranslation();
   const { course, enrollment, done, viewLevel, openSheet, courseErrors, ai } = useApp();
+  const shownLevel = viewLevel ?? enrollment?.level;
+  // The path grows upward, so open on the lesson to do next instead of the page top.
+  useLayoutEffect(() => {
+    const target = document.querySelector(".node.current") ?? document.querySelector(".node.locked") ?? [...document.querySelectorAll(".node")].pop();
+    target?.scrollIntoView({ block: "center" });
+  }, [shownLevel]);
   // First run (DECISIONS C6): offer setup once per launch; the banner stays until a provider is saved.
   useEffect(() => { if (!ai && !setupOffered) { setupOffered = true; openSheet(<AiSheet />); } }, [ai]);
   const setup = !ai && (
@@ -243,8 +249,8 @@ export function Learn() {
       <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => openSheet(<LevelSheet />)} aria-haspopup="dialog">
         {level} · {course.levels[level]!.title} ▾
       </button>
-      {units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}
       {level === enrollment.level && <LevelCard level={level} remaining={remaining} total={total} />}
+      <div className="path-stack">{units.map((u) => <UnitSection u={u} level={level} key={u.id} />)}</div>
     </>
   );
 }
