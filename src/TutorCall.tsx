@@ -9,6 +9,7 @@ import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
+import { summarize, type Utterance } from "./speech";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
@@ -32,6 +33,7 @@ type Call = {
   cut: (() => void) | null; // stops the reply being spoken, when the learner talks over it (SPR-17)
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
+  speech: Utterance[]; silences: number; // speech signals and silence nudges, saved as one row at the end (SPR-25)
 };
 
 export function TutorCall({ who }: { who: CharacterId }) {
@@ -45,7 +47,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   useEffect(warmUp, []);
   const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per call
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0, speech: [], silences: 0 }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -82,7 +84,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     clearSilence();
     const sec = c.micOn && !c.over && !c.failed ? silenceDelay(c.last, c.nudges) : null;
     if (sec) silence.current = setTimeout(() => {
-      c.nudges++;
+      c.nudges++; c.silences++;
       const stuck = !!c.pr && !!currentItem(c.pr) && !c.pr.last;
       fire(stuck ? { kind: "practice_stuck" } : { kind: "silence", seconds: sec });
     }, sec * 1000);
@@ -253,14 +255,14 @@ export function TutorCall({ who }: { who: CharacterId }) {
     c.micStarting = true;
     try {
       const m = await listen(lang, {
-        utterance: (x) => input("user_said", x),
+        utterance: (x, m) => { if (m) c.speech.push(m); input("user_said", x); },
         speech: () => {
           clearSilence(); // the learner started talking: no nudge mid-sentence
           if (c.speaking && s.bargeIn) { c.cut?.(); stopSpeaking(); } // ...over the tutor: the tutor stops (SPR-17)
         },
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
         error: (x) => { toast(x.message); if (!c.running) armSilence(); },
-      });
+      }, profile?.native_lang);
       if (c.over) return void m.stop();
       if (c.speaking) m.pause(s.bargeIn); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
@@ -300,6 +302,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
+    if (profile && c.speech.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, "tutor", summarize(c.speech, c.silences)).catch(() => {});
     if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
       .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
