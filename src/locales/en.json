@@ -690,7 +690,9 @@
       "reading": "Reading",
       "comprehension": "Questions",
       "discussion": "Discussion"
-    }
+    },
+    "hideMessages": "Hide messages",
+    "send": "Send"
   },
   "biome": {
     "meadow": "Meadow",

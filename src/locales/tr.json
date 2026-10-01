@@ -685,7 +685,9 @@
       "reading": "Okuma",
       "comprehension": "Sorular",
       "discussion": "Tartışma"
-    }
+    },
+    "hideMessages": "Mesajları gizle",
+    "send": "Gönder"
   },
   "biome": {
     "meadow": "Çayır",

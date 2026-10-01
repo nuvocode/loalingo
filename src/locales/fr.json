@@ -708,7 +708,9 @@
       "reading": "Lecture",
       "comprehension": "Questions",
       "discussion": "Discussion"
-    }
+    },
+    "hideMessages": "Masquer les messages",
+    "send": "Envoyer"
   },
   "biome": {
     "meadow": "Prairie",

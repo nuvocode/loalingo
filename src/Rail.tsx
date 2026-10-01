@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
-import { DAILY_XP_GOAL } from "./progress";
 import { treeState, treeSvg } from "./tree";
 import { useLeague } from "./screens/Screens";
 import { CourseFlag, CourseSheet } from "./screens/Profiles";
@@ -13,7 +12,7 @@ export function Rail() {
   const { s, setS, go, openSheet, closeSheet, course, done } = useApp();
   const tree = treeState(done, s.streak, s.lastActive);
   const league = useLeague();
-  const pct = Math.min((s.todayXp / DAILY_XP_GOAL) * 100, 100);
+  const pct = s.quests.reduce((a, q) => a + Math.min(q.cur / q.goal, 1), 0) / (s.quests.length || 1) * 100; // each quest weighs the same
 
   const openChest = () => {
     setS((s) => ({ ...s, chests: s.chests - 1, gems: s.gems + 50 }));

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { hideAnswer, matchesAnswer, plannedActivities, lessonSchema, toItems } from "./activities.ts";
+import { REGISTRY, givesAway, hideAnswer, matchesAnswer, plannedActivities, lessonSchema, toItems } from "./activities.ts";
 
 test("answer check ignores case, punctuation and curly quotes; accepts variants", () => {
   const item = { answer: "I'm fine, thank you.", accepted: ["I am fine, thanks"] };
@@ -77,4 +77,12 @@ test("hideAnswer keeps only the meaning of a word-tile prompt", () => {
   assert.equal(hideAnswer(`'${a}' (Dün parkta futbol oynadılar.)`, a), "Dün parkta futbol oynadılar.");
   assert.equal(hideAnswer(`Dün parkta futbol oynadılar: "they played football in the park yesterday"`, a), "Dün parkta futbol oynadılar");
   assert.equal(hideAnswer("Dün parkta futbol oynadılar.", a), "Dün parkta futbol oynadılar.");
+});
+
+test("a choice question that names its own answer is dropped", () => {
+  const opts = ["morning", "afternoon", "night", "evening"];
+  assert.equal(givesAway('"evening" İngilizcede hangi kelimeye karşılık gelir?', opts, 3), true);
+  assert.equal(givesAway('"Akşam" İngilizcede hangisidir?', opts, 3), false);
+  assert.equal(givesAway("Which is right: morning or evening?", opts, 3), false); // both named: still a real choice
+  assert.equal(REGISTRY.word_select!.toItem({ prompt: "'evening' means?", options: opts, answer_index: 3 }), null);
 });
