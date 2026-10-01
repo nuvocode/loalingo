@@ -11,6 +11,7 @@ import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
 import { remoteDb, serveCompanion } from "./companion";
+import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
@@ -194,6 +195,22 @@ export async function nudgeWord(enrollmentId: number, word: string, delta: numbe
 }
 export async function listWords(enrollmentId: number) {
   return (await db()).select<Word>("SELECT word, translation, strength FROM words WHERE enrollment_id = $1 ORDER BY updated_at DESC, word", [enrollmentId]);
+}
+
+// ---- Profile memory (SPR-22, src/memory.ts; per profile, shared by its courses) ----
+
+/** On unless the profile turned it off (device setting `memory.<id>` = "off"). */
+export const memoryOn = async (profileId: number) => (await getSetting(`memory.${profileId}`)) !== "off";
+export async function listMemories(profileId: number) {
+  return (await db()).select<Memory>("SELECT id, kind, text, source, hits, last_seen_at FROM memories WHERE profile_id = $1 ORDER BY id", [profileId]);
+}
+/** Applies cleaned ops (cleanOps), then drops the least used past MEMORY_MAX. */
+export async function applyMemoryOps(profileId: number, source: MemorySource, ops: MemoryOps) {
+  const d = await db();
+  for (const id of ops.forget) await d.execute("DELETE FROM memories WHERE id = $1 AND profile_id = $2", [id, profileId]);
+  for (const u of ops.update) await d.execute("UPDATE memories SET text = $1, last_seen_at = CURRENT_TIMESTAMP WHERE id = $2 AND profile_id = $3", [u.text, u.id, profileId]);
+  for (const a of ops.add) await d.execute("INSERT INTO memories(profile_id, kind, text, source) VALUES ($1, $2, $3, $4)", [profileId, a.kind, a.text, source]);
+  for (const id of evictIds(await listMemories(profileId))) await d.execute("DELETE FROM memories WHERE id = $1", [id]);
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----

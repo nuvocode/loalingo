@@ -1,11 +1,12 @@
 // Lesson generation (DECISIONS C2, C3): cache → one call for the whole step → per-activity fallback.
 import { z } from "zod";
 import { generate, generatePlain, generateStream } from "./ai";
-import { getCached, listMistakes, putCached } from "./db";
+import { applyMemoryOps, getCached, listMemories, listMistakes, memoryOn, putCached } from "./db";
 import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
+import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -244,6 +245,18 @@ export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorM
   });
   const prompt = tutorPrompt(ch.name, history, notes, event, screen);
   return onText ? generateStream(tutorSchema, system, prompt, onText, looseTutor) : generate(tutorSchema, system, prompt, undefined, looseTutor);
+}
+
+// ---- Profile memory (SPR-22): after a conversation, keep what is worth knowing about the learner ----
+
+/** Background work after a finished call or chat; never throws, a lost memory must not break the lesson. */
+export async function rememberSession(profileId: number, native: string, source: MemorySource, otherName: string, lines: { from: "me" | "other"; text: string }[]) {
+  try {
+    if (!lines.some((l) => l.from === "me") || !(await memoryOn(profileId))) return;
+    const saved = await listMemories(profileId);
+    const raw = await generate(memorySchema, memorySystem(langEn(native)), memoryPrompt(saved, lines, otherName), undefined, looseMemory);
+    await applyMemoryOps(profileId, source, cleanOps(saved, raw));
+  } catch (e) { console.error("memory", e); }
 }
 
 // ---- Practice together (spec P): one call per unit, cached ----

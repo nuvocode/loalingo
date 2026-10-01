@@ -8,7 +8,7 @@ import { prewarm, speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
-import { chatTurn, loadStory, type ChatMsg, type Story as StoryData } from "./lessons";
+import { chatTurn, loadStory, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 import { inField, keyAction, type KeyState } from "./keys";
 
@@ -274,6 +274,8 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     gainXp(xp);
     sfx("done");
     setResult({ xp, gems });
+    // ponytail: only free-topic chats; in a scene the learner plays a role, so "I'm a doctor" is not about them
+    if (profile && topic.goal.startsWith(FREE_GOAL)) void rememberSession(profile.id, profile.native_lang, "chat", ch.name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })));
   };
   const over = goal || mine >= CHAT_TURNS;
 

@@ -12,7 +12,7 @@ import { listen, sttReady, type Listener } from "./stt";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
-import { loadPractice, tutorTurn } from "./lessons";
+import { loadPractice, rememberSession, tutorTurn } from "./lessons";
 import { warmUp } from "./ai";
 import { FILLER_MS, NOTES_MAX, currentUnit, filler, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
@@ -298,6 +298,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
+    if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })));
   };
   const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 
