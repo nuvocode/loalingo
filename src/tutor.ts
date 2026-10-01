@@ -24,7 +24,7 @@ export type TutorEvent =
 export type TutorMsg = { from: "tutor" | "me"; text: string; via: "voice" | "text"; cut?: boolean }; // cut: the learner spoke over it (SPR-17)
 
 /** What the prompt needs; lessons.ts fills it from the character, the course and the current unit. */
-export type TutorCtx = { name: string; persona: string; target: string; native: string; level: string; unit: string; words: string[]; grammar: string[] };
+export type TutorCtx = { name: string; persona: string; target: string; native: string; level: string; unit: string; words: string[]; grammar: string[]; about: string[] };
 
 // `say` first: models write fields in schema order, so the first sentence streams out before the rest (SPR-13).
 export const tutorSchema = z.object({ say: z.string(), action: z.enum(TUTOR_ACTIONS), translation: z.string(), correction: z.string(), notes: z.string(), answer: z.string() });
@@ -43,8 +43,10 @@ export function tutorSystem(c: TutorCtx): string {
   return [
     `You are ${c.name}, a friendly online ${c.target} tutor giving a live one-to-one video lesson inside a language-learning app. The learner is a native ${c.native} speaker at CEFR level ${c.level}.`,
     `Your personality: ${c.persona} Keep your manner, but in this call you are the learner's tutor, not at your usual job.`,
+    c.about.length ? `What you know about the learner from earlier lessons: ${c.about.join(" ")}` : "",
     `Lesson material, the learner's current unit "${c.unit}". Words: ${c.words.join(", ") || "(none)"}. Grammar: ${c.grammar.join(" | ") || "(none)"}.`,
     `Run the lesson like a real tutor: a short warm-up chat, then bring in a topic from the unit and practise its words and grammar with small questions, one step per turn. Then ask a real-life question about the topic ("Have you ever…?"); after the learner answers, ask them to ask you the same question and answer it yourself. If the learner brings up their own topic, follow it and weave the unit in where it fits.`,
+    c.about.length ? "You remember this learner: in the warm-up, ask about one thing you know about them, and set the unit's examples in their world (their interests, plans, life) where it fits. Mention one thing at a time, never list what you know or say you keep notes." : "",
     "Each turn you get one event and choose one action:",
     "- speak: say the next thing in the lesson.",
     `- wait: the learner needs a moment (e.g. "my mic isn't working, one sec"); say a very short OK and wait.`,
@@ -60,7 +62,7 @@ export function tutorSystem(c: TutorCtx): string {
     "Messages marked (typed) were written in the call chat, not spoken; answer them aloud as usual.",
     "A line of yours marked (interrupted) was cut off by the learner: answer what they said; repeat only what they still need.",
     "Respond only with JSON matching the schema.",
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 export function describeEvent(e: TutorEvent): string {
@@ -82,12 +84,14 @@ export function describeEvent(e: TutorEvent): string {
   }
 }
 
-export function tutorPrompt(name: string, history: TutorMsg[], notes: string, e: TutorEvent, screen = ""): string {
+/** `coach`: a hint from how the learner sounds (SPR-26, src/speech.ts), only on the turns it is new or due again. */
+export function tutorPrompt(name: string, history: TutorMsg[], notes: string, e: TutorEvent, screen = "", coach = ""): string {
   const lines = history.slice(-HISTORY_IN_PROMPT).map((m) => `${m.from === "tutor" ? name : "Learner"}${m.via === "text" ? " (typed)" : ""}: ${m.text}${m.cut ? " (interrupted)" : ""}`);
   return [
     `Your notes: ${notes || "(none yet)"}`,
     `Conversation so far:\n${lines.join("\n") || "(nothing yet)"}`,
     screen ? `Practice screen:\n${screen}` : "",
+    coach ? `Coach note (from how the learner sounds; act on it quietly, never mention it): ${coach}` : "",
     `Event: ${describeEvent(e)}`,
     `Choose your action and write ${name}'s turn.`,
   ].filter(Boolean).join("\n\n");

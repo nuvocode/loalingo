@@ -1,0 +1,563 @@
+# Spanish course. Hierarchy: levels (CEFR) > units > steps > activities.
+# Activities name only a type (+ optional count and hints like scenario/goal); the AI writes the content
+# from the step's title, description, vocabulary, grammar and the level. Types: see src/course.ts.
+name: Spanish
+native_name: Español
+iso: es
+flag: 🇪🇸
+
+levels:
+  A1:
+    title: Beginner
+    description: >
+      Understand and use familiar everyday expressions and very basic phrases.
+
+    units:
+      - id: greetings
+        title: Greetings & Introductions
+        description: Meet people and introduce yourself.
+        icon: 👋
+        steps:
+          - id: basic-greetings
+            title: Basic Greetings
+            description: Common ways to greet people.
+            vocabulary: [hola, adiós, "buenos días", "buenas tardes", "buenas noches", "hasta luego", "hasta mañana"]
+            grammar:
+              - pattern: "¡Buenos días!"
+              - pattern: "¡Hola! ¿Qué tal?"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: introduce-yourself
+            title: Introduce Yourself
+            description: Tell someone your name, where you are from and ask theirs.
+            vocabulary: [llamarse, "el nombre", soy, "mucho gusto", encantado, encantada, "de dónde"]
+            grammar:
+              - pattern: "Me llamo {name}."
+              - pattern: "¿Cómo te llamas?"
+              - pattern: "Soy de México."
+              - pattern: "Mucho gusto."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_someone
+                goal: Greet the person, introduce yourself, say where you are from and ask their name.
+          - id: how-are-you
+            title: How Are You?
+            description: Ask and answer how someone is, using estar.
+            vocabulary: [bien, mal, "muy bien", regular, cansado, cansada, gracias, "¿y tú?"]
+            grammar:
+              - pattern: "¿Cómo estás?"
+              - pattern: "Estoy bien, gracias. ¿Y tú?"
+              - pattern: "Estoy un poco cansado."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: friend_on_the_street
+          - id: polite-words
+            title: Please & Thank You
+            description: Be polite in everyday situations.
+            vocabulary: ["por favor", gracias, "de nada", "lo siento", perdón, "con permiso"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+
+      - id: numbers-colors
+        title: Numbers & Colors
+        description: Count, say your age and name colors.
+        icon: 🔢
+        steps:
+          - id: numbers-1-10
+            title: Numbers 1–10
+            vocabulary: [uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: listen_type }
+          - id: numbers-11-100
+            title: Numbers 11–100
+            vocabulary: [once, doce, quince, dieciséis, veinte, veintiuno, treinta, "treinta y uno", cincuenta, cien]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: match }
+          - id: how-old
+            title: How Old Are You?
+            description: Say your age with tener.
+            vocabulary: [tener, tengo, tienes, tiene, "el año", "los años"]
+            grammar:
+              - pattern: "Tengo {number} años."
+              - pattern: "¿Cuántos años tienes?"
+              - pattern: "Mi hermano tiene {number} años."
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: colors
+            title: Basic Colors
+            description: Colors and how they agree with the noun.
+            vocabulary: [rojo, azul, verde, amarillo, negro, blanco, naranja, marrón, "el color"]
+            grammar:
+              - pattern: "El coche es rojo."
+              - pattern: "La casa es blanca."
+              - pattern: "¿De qué color es?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank }
+              - { type: listen_select }
+
+      - id: people-family
+        title: Family & People
+        description: Talk about your family and describe people.
+        icon: 👨‍👩‍👧
+        steps:
+          - id: family-members
+            title: Family Members
+            vocabulary: ["la madre", "el padre", "la hermana", "el hermano", "el hijo", "la hija", "los padres", "la familia"]
+            grammar:
+              - pattern: "Mi madre se llama {name}."
+              - pattern: "¿Tienes hermanos?"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: gender-articles
+            title: El, La, Un, Una
+            description: Masculine and feminine nouns, articles and plurals.
+            vocabulary: [el, la, los, las, un, una, unos, unas, "el chico", "la chica"]
+            grammar:
+              - pattern: "Es un chico. Es una chica."
+              - pattern: "el libro → los libros"
+              - pattern: "la mesa → las mesas"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: ser-estar
+            title: Ser & Estar
+            description: Describe what people are like (ser) and how they are now (estar).
+            vocabulary: [alto, bajo, joven, simpático, contento, cansado, "el pelo", "los ojos"]
+            grammar:
+              - pattern: "Ella es alta y simpática."
+              - pattern: "Hoy él está cansado."
+              - pattern: "Tiene los ojos marrones."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: error_correct }
+          - id: pets
+            title: Pets & Animals
+            vocabulary: ["el perro", "el gato", "el pájaro", "el pez", "el caballo", "la mascota"]
+            grammar:
+              - pattern: "Tengo un perro."
+              - pattern: "¿Tienes mascota?"
+              - pattern: "Mi gato es negro."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+
+      - id: food-drink
+        title: Food & Drink
+        description: Order at a café and talk about what you like.
+        icon: 🍎
+        steps:
+          - id: food-basics
+            title: Food Basics
+            vocabulary: ["el pan", "la manzana", "el huevo", "el queso", "el arroz", "el pollo", "la sopa", "la ensalada"]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: drinks
+            title: Drinks
+            vocabulary: ["el agua", "el café", "el té", "la leche", "el zumo", "el vaso", "la taza"]
+            grammar:
+              - pattern: "Un té, por favor."
+              - pattern: "Un vaso de agua, por favor."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: gustar
+            title: Me Gusta, No Me Gusta
+            description: Say what you like with gustar (me gusta / me gustan).
+            vocabulary: [gustar, encantar, "me gusta", "me gustan", favorito, rico]
+            grammar:
+              - pattern: "Me gusta el café."
+              - pattern: "No me gustan las manzanas."
+              - pattern: "¿Te gusta el té?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate, count: 2 }
+          - id: at-the-cafe
+            title: At the Café
+            description: Order with querer and ask for the bill.
+            vocabulary: ["la carta", pedir, "la cuenta", "el precio", "cuánto", querer]
+            grammar:
+              - pattern: "Quiero un café con leche, por favor."
+              - pattern: "¿Cuánto es?"
+              - pattern: "La cuenta, por favor."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: ordering_at_a_cafe
+                goal: Order a drink and a snack, then ask for the bill.
+
+      - id: daily-routine
+        title: Daily Routine
+        description: Time, days and what you do every day.
+        icon: ⏰
+        steps:
+          - id: telling-time
+            title: Telling the Time
+            vocabulary: ["la hora", "y media", "y cuarto", "menos cuarto", "en punto", "es la una", "son las"]
+            grammar:
+              - pattern: "¿Qué hora es?"
+              - pattern: "Son las siete y media."
+              - pattern: "Es la una en punto."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: listen_type, count: 2 }
+          - id: days-of-week
+            title: Days of the Week
+            vocabulary: [lunes, martes, miércoles, jueves, viernes, sábado, domingo, "el fin de semana", hoy, mañana]
+            grammar:
+              - pattern: "Hoy es lunes."
+              - pattern: "Los sábados no trabajo."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: reflexive-routine
+            title: My Morning (Reflexive Verbs)
+            description: Talk about your morning with me levanto, me ducho…
+            vocabulary: [despertarse, levantarse, ducharse, vestirse, "el desayuno", desayunar]
+            grammar:
+              - pattern: "Me levanto a las siete."
+              - pattern: "Me ducho y desayuno."
+              - pattern: "¿A qué hora te levantas?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: image_select }
+              - { type: translate }
+          - id: present-regular
+            title: Every Day (Present -ar, -er, -ir)
+            description: Regular verbs in the present tense.
+            vocabulary: [trabajar, comer, vivir, siempre, normalmente, "a veces", nunca, "todos los días"]
+            grammar:
+              - pattern: "Trabajo todos los días."
+              - pattern: "Ella come en casa."
+              - pattern: "Vivimos en Madrid."
+              - pattern: "Él nunca bebe café."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: home
+        title: At Home
+        description: Rooms, furniture and where things are.
+        icon: 🏠
+        steps:
+          - id: rooms
+            title: Rooms
+            vocabulary: ["la casa", "el piso", "la cocina", "el dormitorio", "el baño", "el salón", "el jardín"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: furniture
+            title: Furniture
+            vocabulary: ["la mesa", "la silla", "la cama", "el sofá", "la puerta", "la ventana", "la lámpara"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: image_select }
+              - { type: listen_type }
+          - id: hay
+            title: There Is / There Are (Hay)
+            description: Say what there is in a place with hay.
+            vocabulary: [hay, "no hay", muchos, muchas, pocos, "¿cuántos?"]
+            grammar:
+              - pattern: "Hay un sofá en el salón."
+              - pattern: "Hay dos sillas."
+              - pattern: "¿Hay jardín?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: prepositions-of-place
+            title: Where Is It? (Estar + Place)
+            description: Use estar with en, encima de, debajo de… to say where things are.
+            vocabulary: [en, "encima de", "debajo de", "al lado de", "detrás de", "delante de"]
+            grammar:
+              - pattern: "El gato está debajo de la mesa."
+              - pattern: "¿Dónde están las llaves?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+
+      - id: around-town
+        title: Around Town
+        description: Places, directions, transport and shopping.
+        icon: 🏙️
+        steps:
+          - id: places-in-town
+            title: Places in Town
+            vocabulary: ["el banco", "el supermercado", "la estación", "el hospital", "el parque", "el colegio", "el museo", "la farmacia"]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: directions
+            title: Asking for Directions
+            vocabulary: [izquierda, derecha, "todo recto", cerca, lejos, "la esquina", "la calle"]
+            grammar:
+              - pattern: "Perdón, ¿dónde está la estación?"
+              - pattern: "Gira a la izquierda en la esquina."
+              - pattern: "Está cerca."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: lost_tourist
+                goal: Ask a local how to get to the museum.
+          - id: transport
+            title: Getting Around
+            description: Go places with ir a / al and en + transport.
+            vocabulary: ["el autobús", "el tren", "el taxi", "la bici", "el coche", "el billete", "a pie"]
+            grammar:
+              - pattern: "Voy al trabajo en autobús."
+              - pattern: "Voy a la estación a pie."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: shopping
+            title: Shopping
+            description: Ask prices and pay, using poder + infinitive.
+            vocabulary: [comprar, "la tienda", barato, caro, "la talla", "el dinero", pagar]
+            grammar:
+              - pattern: "¿Puedo pagar con tarjeta?"
+              - pattern: "¿Cuánto cuesta?"
+              - pattern: "Es demasiado caro."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: clothes_shop
+                goal: Ask for a different size and pay.
+
+      - id: free-time
+        title: Free Time
+        description: Hobbies, sports and what you can do.
+        icon: ⚽
+        steps:
+          - id: hobbies
+            title: Hobbies
+            vocabulary: [leer, "la música", "la película", cocinar, bailar, pintar, viajar]
+            grammar:
+              - pattern: "Me gusta leer."
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: sports
+            title: Sports
+            vocabulary: ["el fútbol", "el tenis", nadar, correr, jugar, "el equipo", "el partido"]
+            grammar:
+              - pattern: "Juego al fútbol los sábados."
+              - pattern: "¿Juegas al tenis?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: saber-poder
+            title: I Can (Saber & Poder)
+            description: Say what you know how to do (saber) and what you can do (poder).
+            vocabulary: [saber, poder, sé, puedo, bien, "un poco"]
+            grammar:
+              - pattern: "Sé nadar."
+              - pattern: "Ella no sabe conducir."
+              - pattern: "¿Puedes venir hoy?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: weekend-plans
+            title: Weekend Plans
+            description: Make plans with ir a + infinitive and invite with querer.
+            vocabulary: [libre, ocupado, juntos, invitar, "ir a", "el cine"]
+            grammar:
+              - pattern: "Voy a ver una película."
+              - pattern: "¿Quieres ir al cine?"
+              - pattern: "¿Estás libre el domingo?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: making_plans
+                goal: Invite a friend to do something on the weekend and agree on a time.
+
+      - id: weather-clothes
+        title: Weather & Clothes
+        description: Seasons, the weather and what people are wearing.
+        icon: ☀️
+        steps:
+          - id: weather
+            title: The Weather
+            description: Talk about the weather with hace, está and hay.
+            vocabulary: ["hace sol", "hace frío", "hace calor", "hace viento", llueve, nieva, "está nublado"]
+            grammar:
+              - pattern: "Hoy hace sol."
+              - pattern: "¿Qué tiempo hace?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: listen_select }
+          - id: seasons-months
+            title: Seasons & Months
+            vocabulary: ["la primavera", "el verano", "el otoño", "el invierno", enero, junio, diciembre, "el mes"]
+            grammar:
+              - pattern: "En verano hace calor."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: clothes
+            title: Clothes
+            vocabulary: ["la camisa", "los pantalones", "el vestido", "los zapatos", "la chaqueta", "el sombrero", llevar]
+            grammar:
+              - pattern: "Llevo una chaqueta azul."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: translate }
+          - id: estar-gerundio
+            title: Right Now (Estar + Gerundio)
+            description: Say what is happening at the moment.
+            vocabulary: [ahora, "en este momento", llevando, haciendo, lloviendo, comiendo]
+            grammar:
+              - pattern: "Estoy hablando por teléfono."
+              - pattern: "Está lloviendo."
+              - pattern: "¿Qué estás haciendo?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: yesterday
+        title: Yesterday
+        description: Talk about the past.
+        icon: 📅
+        steps:
+          - id: past-regular
+            title: Past Tense (-ar Verbs)
+            description: The preterite of regular -ar verbs and past time words.
+            vocabulary: [ayer, anoche, "la semana pasada", hablé, trabajé, compré, visité, cociné]
+            grammar:
+              - pattern: "Ayer trabajé en casa."
+              - pattern: "¿Hablaste con tu madre?"
+              - pattern: "No compré nada."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: past-regular-er-ir
+            title: Past Tense (-er, -ir Verbs)
+            description: The preterite of regular -er and -ir verbs.
+            vocabulary: [comí, bebí, salí, escribí, viví, "hace dos días"]
+            grammar:
+              - pattern: "Anoche comí pescado."
+              - pattern: "¿Saliste el sábado?"
+              - pattern: "Ella no bebió café."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: past-irregular
+            title: Past Tense (Irregular)
+            description: Common irregular preterites like fui, hice and tuve.
+            vocabulary: [fui, fuiste, fue, hice, hiciste, tuve, vi]
+            grammar:
+              - pattern: "Fuimos al parque."
+              - pattern: "¿Qué hiciste ayer?"
+              - pattern: "¿Viste el partido?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+          - id: last-weekend
+            title: My Last Weekend
+            vocabulary: ["el fin de semana pasado", divertido, aburrido, primero, luego, después]
+            grammar:
+              - pattern: "Primero fui al mercado y luego comí con mi familia."
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: monday_morning_chat
+                goal: Tell a colleague what you did last weekend and ask about theirs.
+
+    checkpoint:
+      title: A1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }

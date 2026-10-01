@@ -71,7 +71,10 @@
     "guideLoading": "Rehberin hazırlanıyor…",
     "guideLoadingDesc": "Yapay zekâ çevirileri, örnek cümleleri ve gramer notlarını ekliyor. Sadece ilk seferde birkaç saniye sürer.",
     "legendTicket_one": "{{count}} bilet",
-    "legendTicket_other": "{{count}} bilet"
+    "legendTicket_other": "{{count}} bilet",
+    "skipUnit": "Üniteyi testle geç (%{{score}})",
+    "toTop": "En yukarı",
+    "toHere": "Kaldığım yere"
   },
   "practice": {
     "title": "Pratik Merkezi",
@@ -142,19 +145,67 @@
   },
   "profile": {
     "since": "{{date}} tarihinden beri öğreniyor",
+    "garden": "Bahçem",
     "streakDays": "{{count}} gün",
     "streak": "Kök salma süresi",
     "totalXp": "Toplam XP",
     "currentLeague": "Mevcut lig",
     "bestLeague": "En iyi lig sonucu",
     "top3": "İlk 3",
+    "forYou": "Sana özel",
     "achievements": "Başarımlar",
     "achFire": "Derin kökler",
     "achFireDesc": "7 gün üst üste kök sal",
     "achFast": "Hızlı",
     "achFastDesc": "Bir günde 50 XP kazan",
     "achBook": "Kitap kurdu",
-    "achBookDesc": "İlk hikâyeni bitir"
+    "achBookDesc": "İlk hikâyeni bitir",
+    "details": "Ayrıntılar"
+  },
+  "memory": {
+    "title": "Sprigo seni tanıyor",
+    "empty": "Henüz bir şey yok. Bir tutor'la ya da kendi konunda sohbet ettikçe Sprigo'nun seninle ilgili öğrendikleri burada görünür.",
+    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor.",
+    "hint": "Düzeltmek için bir satıra dokun, saklanmaması gerekeni sil.",
+    "kinds": {
+      "interest": "İlgi alanları",
+      "goal": "Hedefler ve planlar",
+      "background": "Hakkında",
+      "learning": "Öğrenme"
+    },
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "forget": "Unut: {{text}}",
+    "forgetOne": "Unut",
+    "forgetAll": "Hepsini unut",
+    "forgetAllSure": "Sprigo seninle ilgili her şeyi unutsun mu?",
+    "cancel": "Vazgeç",
+    "saved_one": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)",
+    "saved_other": "Sprigo seninle ilgili {{count}} yeni şey hatırlayacak (Profil)",
+    "count_one": "Sprigo seninle ilgili {{count}} şey biliyor",
+    "count_other": "Sprigo seninle ilgili {{count}} şey biliyor",
+    "none": "Henüz bir şey yok"
+  },
+  "coach": {
+    "title": "Konuşman",
+    "off": "Ses analizi kapalı. Konuşmanın nasıl değiştiğini görmek için Ayarlar > Gelişmiş'ten aç.",
+    "empty": "Birkaç konuşmalı dersten sonra burada ilerlemeni göreceksin.",
+    "steady": "Son görüşmelerinde konuşman istikrarlı.",
+    "trend": {
+      "latency": "Daha hızlı cevap veriyorsun: konuşmaya başlaman {{from}} sn → {{to}} sn.",
+      "words": "Cevapların uzuyor: ortalama {{from}} → {{to}} kelime.",
+      "wpm": "Daha akıcı konuşuyorsun: dakikada {{from}} → {{to}} kelime.",
+      "pauses": "Uzun duraklamaların azaldı: cevap başına {{from}} → {{to}}.",
+      "native": "Ana diline daha az geçiyorsun: kelimelerinin %{{from}} → %{{to}} kadarı."
+    },
+    "tryThis": "Bunu dene:",
+    "tip": {
+      "native": "Bir kelime aklına gelmediğinde dil değiştirmek yerine tutor'una nasıl söylendiğini sor.",
+      "short": "Bir tutor'la 2 dakikalık serbest konuşma yap ve her cevabına bir sebep ekle.",
+      "pauses": "Düşünmek için zamana ihtiyacın olduğunda susmak yerine öğrendiğin dilde \"bir düşüneyim…\" gibi bir kalıp kullan.",
+      "stretch": "Daha fazlasına hazırsın: tutor'undan bir konuyu tartışmasını iste ve fikrini savun."
+    },
+    "start": "Görüşme başlat"
   },
   "stories": {
     "title": "Hikâyeler",
@@ -269,6 +320,10 @@
     "speakingDesc": "Mikrofonlu alıştırmalar",
     "bargeIn": "Tutor'un sözünü kesebilirim",
     "bargeInDesc": "Canlı derste tutor konuşurken konuşarak araya girebilirsin. Mikrofon hoparlörü duyup tutor kendiliğinden susuyorsa kapat.",
+    "memory": "Beni hatırla",
+    "memoryDesc": "Sprigo, tutor'una anlattığın kalıcı şeyleri (ilgi alanların, planların, zorlandığın konular) saklar ve derslerde kullanır. Yapay zekâ sağlayıcın bulutta değilse hiçbir şey bu cihazdan çıkmaz.",
+    "speech": "Ses analizi",
+    "speechDesc": "Bir tutor'la konuşurken zamanlamayı ve tempoyu ölçer (ne kadar hızlı cevap verdiğin, duraklamalar, cümle uzunluğu); dersi buna göre ayarlar ve ilerlemeni gösterir. Ses kaydedilmez.",
     "phone": "Telefonda kullan",
     "phoneDesc": "Sprigo'yu Tailscale üzerinden kendi cihazlarına açar; verilerin bu bilgisayarda kalır.",
     "phoneMissing": "Bu bilgisayarda Tailscale kurulu değil.",
@@ -340,7 +395,8 @@
     "quitTitle": "Dersi bırak?",
     "quitDesc": "Bu dersteki ilerlemen kaybolacak.",
     "quit": "Bırak",
-    "keepGoing": "Devam et"
+    "keepGoing": "Devam et",
+    "close": "Kapat"
   },
   "lesson": {
     "dialog": "Ders",
@@ -380,7 +436,8 @@
     "speakSub": "Mikrofon düğmesine bas ve cümleyi söyle.",
     "heard": "Duyulan: “{{text}}”",
     "heardNothing": "Anlaşılmadı — biraz daha yüksek sesle tekrar dene.",
-    "cantSpeak": "Şu an konuşamam"
+    "cantSpeak": "Şu an konuşamam",
+    "unitPassed": "Ünite geçildi!"
   },
   "profiles": {
     "saved": "Profil kaydedildi",
@@ -427,6 +484,7 @@
     "apiKeyDesc": "Uygulama veritabanında değil, sistem anahtarlığında saklanır",
     "model": "Model",
     "modelDesc": "Mevcut modelleri listelemek için bağlantıyı test et",
+    "smallModel": "{{min}} altındaki modeller derslerde yanlış cevaplar üretebilir. En az {{min}} bir model önerilir.",
     "test": "Bağlantıyı test et",
     "save": "Kaydet",
     "connected": "Bağlandı — {{count}} model bulundu",
@@ -631,7 +689,9 @@
       "reading": "Okuma",
       "comprehension": "Sorular",
       "discussion": "Tartışma"
-    }
+    },
+    "hideMessages": "Mesajları gizle",
+    "send": "Gönder"
   },
   "biome": {
     "meadow": "Çayır",

@@ -75,6 +75,8 @@ export function parseCourse(text: string, source: string): Course {
 }
 
 export const levelsOf = (c: Course) => CEFR.filter((l) => c.levels[l]);
+/** "A1" or "A1–C1": shown in the course picker so an A1-only course says so up front. */
+export const levelRange = (c: Course) => { const l = levelsOf(c); return l.length > 1 ? `${l[0]}–${l[l.length - 1]}` : l[0]; };
 
 // ---- Learn path (DECISIONS B8): only one level's units; chest after each unit, checkpoint last. ----
 

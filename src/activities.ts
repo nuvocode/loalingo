@@ -21,7 +21,7 @@ const choice = (guide: string, extra: Record<string, z.ZodType>, map: (g: any) =
   guide,
   schema: z.object({ prompt: s, ...extra, options, answer_index: idx }),
   toItem: (g) => {
-    if (g.answer_index >= g.options.length || new Set(g.options).size !== g.options.length) return null;
+    if (g.answer_index >= g.options.length || new Set(g.options).size !== g.options.length || givesAway(g.prompt, g.options, g.answer_index)) return null;
     const m = map(g);
     return { kind: "choice", prompt: g.prompt, context: m.context ?? "", big: !!m.big, listen: m.listen ?? "", ...shuffleAnswer(g.options, g.answer_index) };
   },
@@ -118,7 +118,7 @@ export function mistakeLine(it: Item): string | null {
   return null;
 }
 
-export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes: string[] = []) {
+export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes: string[] = [], about: string[] = []) {
   const st = c.step;
   return [
     `Unit: ${c.unitTitle}`, `Step: ${st.title}${st.description ? ` — ${st.description}` : ""}`,
@@ -128,6 +128,7 @@ export function lessonPrompt(c: LessonContext, acts: LessonActivity[], mistakes:
     ...acts.map((a) => `- ${a.key}: ${a.count} × ${a.type}. ${REGISTRY[a.type]!.guide}${Object.keys(a.hints).length ? ` Hints: ${JSON.stringify(a.hints)}` : ""}`),
     mistakes.length ? `\nThe learner recently got these wrong (exercise → correct answer):\n${mistakes.map((m) => `- ${m}`).join("\n")}\n` +
       "Where it fits this step's topic, reuse 1–2 of these words or patterns in new exercises. Do not copy them, and stay on the step's topic." : "",
+    about.length ? `\nAbout the learner: ${about.join(" ")}\nWhere it fits naturally, set a few example sentences in their world (their interests, plans, life). Stay on the step's topic and vocabulary.` : "",
   ].filter((l) => l !== "").join("\n");
 }
 
@@ -189,6 +190,13 @@ export function listenItems(words: PracticeWord[], prompt: string, n = 6): Item[
     const options = shuffle([w.word, ...shuffle(words.filter((o) => o.word !== w.word)).slice(0, 3).map((o) => o.word)]);
     return { kind: "choice", prompt, context: "", big: false, listen: w.word, options, answer: options.indexOf(w.word) };
   });
+}
+
+/** The question names the correct option and no other ('"evening" means which word?' → evening): nothing left to answer. */
+export function givesAway(prompt: string, options: string[], answer: number) {
+  const n = (x: string) => normalize(x).replace(/'/g, " ").replace(/\s+/g, " ").trim(); // quotes around the word too
+  const p = ` ${n(prompt)} `, has = (o: string) => !!n(o) && p.includes(` ${n(o)} `);
+  return has(options[answer]) && !options.some((o, i) => i !== answer && has(o));
 }
 
 // ---- helpers ----

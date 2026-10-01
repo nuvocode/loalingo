@@ -9,10 +9,11 @@ import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
+import { RECENT, baselineOf, learnerState, nextHint, summarize, type LearnerState, type Utterance } from "./speech";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
-import { loadPractice, tutorTurn } from "./lessons";
+import { learnerFacts, loadPractice, rememberSession, tutorTurn } from "./lessons";
 import { warmUp } from "./ai";
 import { FILLER_MS, NOTES_MAX, currentUnit, filler, isNoise, mergeInput, partialSay, sentences, silenceDelay, type TutorEvent, type TutorMsg, type TutorReply } from "./tutor";
 import { recordSession, today, xpMult } from "./progress";
@@ -32,6 +33,8 @@ type Call = {
   cut: (() => void) | null; // stops the reply being spoken, when the learner talks over it (SPR-17)
   speaking: boolean; micStarting: boolean; camStarting: boolean; // the tutor is talking; a device start is in flight
   pr: PracticeState | null; pending: TutorEvent | null; pxp: number; // practice panel state; a practice event waiting for the tutor; practice XP
+  speech: Utterance[]; silences: number; // speech signals and silence nudges, saved as one row at the end (SPR-25)
+  mood: { state: LearnerState; turns: number }; // the learner's state at the last turn, so its hint isn't repeated every turn (SPR-26)
 };
 
 export function TutorCall({ who }: { who: CharacterId }) {
@@ -43,8 +46,10 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const unit = levelDef ? currentUnit(levelDef, done) : undefined;
   usePrewarm(lang, ch.gender);
   useEffect(warmUp, []);
+  const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per call
+  const usual = useMemo(() => (profile ? db.speechBaseline(profile.id).catch(() => null) : Promise.resolve(null)), [profile?.id]);
 
-  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0 }).current;
+  const c = useRef<Call>({ hist: [], notes: "", last: null, queue: [], fixes: [], nudges: 0, fills: 0, running: false, over: false, opened: false, micOn: false, failed: null, cut: null, speaking: false, micStarting: false, camStarting: false, pr: null, pending: null, pxp: 0, speech: [], silences: 0, mood: { state: "neutral", turns: 0 } }).current;
   const mic = useRef<Listener | null>(null);
   const cam = useRef<MediaStream | null>(null);
   const ring = useRef<HTMLElement>(null);
@@ -52,7 +57,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const started = useRef(Date.now());
 
   const [msgs, setMsgs] = useState<TutorMsg[]>([]);
-  const chat = useRef<HTMLDivElement>(null), transcript = useRef<HTMLDivElement>(null);
+  const chat = useRef<HTMLDivElement>(null);
   const [last, setLast] = useState<TutorReply | null>(null);
   const [thinking, setThinking] = useState(false);
   const [talking, setTalking] = useState(false);
@@ -81,7 +86,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     clearSilence();
     const sec = c.micOn && !c.over && !c.failed ? silenceDelay(c.last, c.nudges) : null;
     if (sec) silence.current = setTimeout(() => {
-      c.nudges++;
+      c.nudges++; c.silences++;
       const stuck = !!c.pr && !!currentItem(c.pr) && !c.pr.last;
       fire(stuck ? { kind: "practice_stuck" } : { kind: "silence", seconds: sec });
     }, sec * 1000);
@@ -147,8 +152,12 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const waiting = e.kind === "user_said" || e.kind === "user_typed" || e.kind === "practice_answer"; // the learner expects an answer
     const slow = waiting ? setTimeout(() => sp.filler(filler(lang, c.fills++)), FILLER_MS) : undefined;
     try {
+      const facts = await about;
+      const said = c.speech.filter((u) => u.words > 0);
+      const mood = nextHint(c.mood, learnerState(said, (await usual) ?? baselineOf(said.slice(0, -RECENT))));
+      c.mood = mood.prev;
       mark("req");
-      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
+      const r = await tutorTurn({ course, level: enrollment.level, native: profile.native_lang, about: facts, coach: mood.hint }, who, unit, c.hist, c.notes, e, describePractice(c.pr, topics), onText);
       mark("llm");
       if (c.over) return true;
       c.notes = r.notes.slice(0, NOTES_MAX); c.last = r; c.failed = null;
@@ -227,7 +236,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (!after.last || after === st) return;
     setPractice(after); c.nudges = 0;
     if (after.last.correct) c.pxp += PRACTICE_XP;
-    else if (enrollment) db.addMistake(enrollment.id, it).catch(() => {}); // ponytail: a lost mistake row only weakens later review
+    // Reading questions make no sense without their text, so only warm-up exercises go to the mistakes review.
+    else if (enrollment && st.stage === "warmup") db.addMistake(enrollment.id, it).catch(() => {}); // ponytail: a lost mistake row only weakens later review
     sfx(after.last.correct ? "ok" : "bad");
     fire({ kind: "practice_answer", ...after.last });
   };
@@ -251,14 +261,14 @@ export function TutorCall({ who }: { who: CharacterId }) {
     c.micStarting = true;
     try {
       const m = await listen(lang, {
-        utterance: (x) => input("user_said", x),
+        utterance: (x, m) => { if (m) c.speech.push(m); input("user_said", x); },
         speech: () => {
           clearSilence(); // the learner started talking: no nudge mid-sentence
           if (c.speaking && s.bargeIn) { c.cut?.(); stopSpeaking(); } // ...over the tutor: the tutor stops (SPR-17)
         },
         level: (r) => ring.current?.style.setProperty("--level", String(Math.min(1, r * 10))),
         error: (x) => { toast(x.message); if (!c.running) armSilence(); },
-      });
+      }, s.speechOn ? profile?.native_lang : undefined); // voice analysis off: nothing measured, saved or adapted to
       if (c.over) return void m.stop();
       if (c.speaking) m.pause(s.bargeIn); // turned on mid-speech: the tutor's voice would be heard
       mic.current = m; c.micOn = true; setMicOn(true);
@@ -298,6 +308,9 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
+    if (profile && c.speech.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, "tutor", summarize(c.speech, c.silences)).catch(() => {});
+    if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const end = () => (c.hist.some((m) => m.from === "me") || c.pxp ? finish() : quit());
 
@@ -314,13 +327,15 @@ export function TutorCall({ who }: { who: CharacterId }) {
     const tick = setInterval(() => setNow(Date.now()), 1000);
     return () => { clearInterval(tick); c.over = true; clearSilence(); void mic.current?.stop(); mic.current = null; camStop(); stopSpeaking(); };
   }, []);
-  // New lines, or a list just opened: show the newest at the bottom.
-  useEffect(() => { for (const el of [chat.current, transcript.current]) el?.scrollTo(0, el.scrollHeight); }, [msgs, drawer, captions]);
+  // New messages, or the list just opened: show the newest at the bottom.
+  useEffect(() => { chat.current?.scrollTo(0, chat.current.scrollHeight); }, [msgs, drawer]);
 
   const faceState: FaceState = thinking ? "thinking" : talking ? "talking" : "idle";
   const micLabel = t(micOn ? "tutor.micOff" : "tutor.micOn"), camLabel = t(camOn ? "tutor.camOff" : "tutor.camOn");
   const spoken = msgs.filter((m) => m.via === "voice"), typed = msgs.filter((m) => m.via === "text"); // ponytail: the tutor only speaks for now; a "message" action would add tutor lines to `typed`
-  const lastTutor = spoken.filter((m) => m.from === "tutor").pop();
+  // Captions show only each side's latest line, on its own card: the face stays visible, and a learner who missed it has to ask.
+  const lastTutor = spoken.filter((m) => m.from === "tutor").pop(), lastMine = spoken.filter((m) => m.from === "me").pop();
+  const send = () => { if (text.trim()) { input("user_typed", text); setText(""); } };
   const prLabel = t(pr ? "tutor.practiceClose" : "tutor.practice");
   const capLabel = t(captions ? "tutor.transcriptOff" : "tutor.transcriptOn");
   let body: React.ReactNode, footer: React.ReactNode;
@@ -343,10 +358,8 @@ export function TutorCall({ who }: { who: CharacterId }) {
           <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} scene={who} />
           <b className="call-name">{ch.name}</b>
           {last?.correction.trim() && <p className="call-fix small"><Icon name="spark" /> {last.correction}</p>}
-          {captions && <div className="call-transcript" lang={lang} aria-live="polite" ref={transcript}>
-            {spoken.map((m, i) => m === lastTutor
-              ? <button key={i} className="call-line" onClick={() => setShowTr((v) => !v)}><b>{ch.name}:</b> {m.text}{showTr && last?.translation && <small>{last.translation}</small>}</button>
-              : <p key={i} className="call-line"><b>{m.from === "me" ? profile?.name : ch.name}:</b> {m.text}</p>)}
+          {captions && lastTutor && <div className="call-transcript" lang={lang} aria-live="polite">
+            <button className="call-line" onClick={() => setShowTr((v) => !v)}>{lastTutor.text}{showTr && last?.translation && <small>{last.translation}</small>}</button>
           </div>}
         </section>
         <section className="call-pane me" ref={ring} aria-label={profile?.name}>
@@ -354,26 +367,33 @@ export function TutorCall({ who }: { who: CharacterId }) {
             ? <video className="call-video" autoPlay muted playsInline ref={(el) => { if (el && el.srcObject !== cam.current) el.srcObject = cam.current; }} />
             : profile && <Avatar p={profile} size={96} />}
           {profile && <b className="call-name">{profile.name}</b>}
+          {captions && lastMine && <div className="call-transcript" lang={lang}><p className="call-line">{lastMine.text}</p></div>}
         </section>
         {drawer && <section className="call-drawer" aria-label={t("tutor.message")}>
+          <div className="od-row call-drawer-head">
+            <h3>{t("tutor.message")}</h3>
+            <button className="btn btn-ghost" onClick={() => setDrawer(false)} aria-label={t("tutor.hideMessages")} data-tip={t("tutor.hideMessages")}><Icon name="down" /></button>
+          </div>
           <div className="chat" ref={chat}>
             {typed.length ? typed.map((m, i) => <div key={i} className="bubble me" lang={lang}><span>{m.text}</span></div>)
               : <p className="small muted">{t("tutor.noMessages")}</p>}
           </div>
-          <input className="input" lang={lang} value={text} autoFocus aria-label={t("roleplay.message")} placeholder={t("tutor.placeholder")}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && text.trim()) { input("user_typed", text); setText(""); } }} />
+          <form className="od-row" style={{ "--od-gap": "8px" } as React.CSSProperties} onSubmit={(e) => { e.preventDefault(); send(); }}>
+            <input className="input od-fill" lang={lang} value={text} autoFocus aria-label={t("roleplay.message")} placeholder={t("tutor.placeholder")}
+              onChange={(e) => setText(e.target.value)} />
+            <button className="btn btn-primary" type="submit" disabled={!text.trim()} aria-label={t("tutor.send")} data-tip={t("tutor.send")}><Icon name="send" /></button>
+          </form>
         </section>}
       </div>
     );
     footer = (
       <div className="call-bar" style={enrollment ? biomeVars(enrollment.level) : undefined}>
-        <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-expanded={drawer} aria-label={t("tutor.message")} title={t("tutor.message")}><Icon name="chat" /></button>
-        <button className={`call-btn${captions ? " on" : ""}`} onClick={() => setCaptions((v) => !v)} aria-pressed={captions} aria-label={capLabel} title={capLabel}><Icon name="captions" /></button>
-        <button className={`call-btn${pr ? " on" : ""}`} onClick={() => (pr ? practiceClose() : practiceOpen(true))} aria-pressed={!!pr} aria-label={prLabel} title={prLabel}><Icon name="book" /></button>
-        <button className={`call-btn${micOn ? " on" : " off"}`} disabled={!!micBlock} onClick={toggleMic} aria-pressed={micOn} aria-label={micLabel} title={micBlock ? t(micBlock) : micLabel}><Icon name="mic" /></button>
-        <button className={`call-btn${camOn ? " on" : " off"}`} disabled={!camOk} onClick={toggleCam} aria-pressed={camOn} aria-label={camLabel} title={camOk ? camLabel : t("tutor.camDenied")}><Icon name="video" /></button>
-        <button className="call-btn end" onClick={end} aria-label={t("tutor.end")} title={t("tutor.end")}><Icon name="phone" /></button>
+        <button className={`call-btn${drawer ? " on" : ""}`} onClick={() => setDrawer((d) => !d)} aria-pressed={drawer} aria-expanded={drawer} aria-label={t("tutor.message")} data-tip={t("tutor.message")}><Icon name="chat" /></button>
+        <button className={`call-btn${captions ? " on" : ""}`} onClick={() => setCaptions((v) => !v)} aria-pressed={captions} aria-label={capLabel} data-tip={capLabel}><Icon name="captions" /></button>
+        <button className={`call-btn${pr ? " on" : ""}`} onClick={() => (pr ? practiceClose() : practiceOpen(true))} aria-pressed={!!pr} aria-label={prLabel} data-tip={prLabel}><Icon name="book" /></button>
+        <button className={`call-btn${micOn ? " on" : " off"}`} disabled={!!micBlock} onClick={toggleMic} aria-pressed={micOn} aria-label={micLabel} data-tip={micBlock ? t(micBlock) : micLabel}><Icon name="mic" /></button>
+        <button className={`call-btn${camOn ? " on" : " off"}`} disabled={!camOk} onClick={toggleCam} aria-pressed={camOn} aria-label={camLabel} data-tip={camOk ? camLabel : t("tutor.camDenied")}><Icon name="video" /></button>
+        <button className="call-btn end" onClick={end} aria-label={t("tutor.end")} data-tip={t("tutor.end")}><Icon name="phone" /></button>
       </div>
     );
   }

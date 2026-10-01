@@ -1,0 +1,534 @@
+# Turkish course (A1 only). Hierarchy: levels (CEFR) > units > steps > activities.
+# Activities name only a type (+ optional count and hints like scenario/goal); the AI writes the content
+# from the step's title, description, vocabulary, grammar and the level. Types: see src/course.ts.
+# Turkish has no articles and no grammatical gender; grammar steps follow suffixes and vowel harmony
+# instead of mirroring the English course.
+name: Turkish
+native_name: Türkçe
+iso: tr
+flag: 🇹🇷
+
+levels:
+  A1:
+    title: Beginner
+    description: >
+      Understand and use familiar everyday expressions and very basic phrases.
+
+    units:
+      - id: greetings
+        title: Greetings & Introductions
+        description: Meet people and introduce yourself.
+        icon: 👋
+        steps:
+          - id: basic-greetings
+            title: Basic Greetings
+            description: Common ways to greet people.
+            vocabulary: [merhaba, selam, günaydın, "iyi günler", "iyi akşamlar", "iyi geceler", "hoşça kal", görüşürüz]
+            grammar:
+              - pattern: "Günaydın!"
+            activities:
+              - { type: learn, count: 3 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: speak }
+          - id: introduce-yourself
+            title: Introduce Yourself
+            description: Tell someone your name and ask theirs.
+            vocabulary: [ad, benim, senin, tanışmak, memnun]
+            grammar:
+              - pattern: "Benim adım {name}."
+              - pattern: "Senin adın ne?"
+              - pattern: "Tanıştığımıza memnun oldum."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: word_bank, count: 2 }
+              - type: dialogue
+                scenario: meeting_someone
+                goal: Greet the person, introduce yourself and ask their name.
+          - id: how-are-you
+            title: How Are You?
+            description: Ask and answer how someone is.
+            vocabulary: [iyi, "çok iyi", "fena değil", yorgun, teşekkürler, "sen nasılsın"]
+            grammar:
+              - pattern: "Nasılsın?"
+              - pattern: "İyiyim, teşekkür ederim."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: friend_on_the_street
+          - id: polite-words
+            title: Please & Thank You
+            description: Be polite in everyday situations.
+            vocabulary: [lütfen, "teşekkür ederim", "sağ ol", "özür dilerim", affedersiniz, "rica ederim"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+
+      - id: numbers-colors
+        title: Numbers & Colors
+        description: Count, say your age and name colors.
+        icon: 🔢
+        steps:
+          - id: numbers-1-10
+            title: Numbers 1–10
+            vocabulary: [bir, iki, üç, dört, beş, altı, yedi, sekiz, dokuz, on]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: listen_select, count: 2 }
+              - { type: listen_type }
+          - id: numbers-11-100
+            title: Numbers 11–100
+            vocabulary: ["on bir", "on iki", "on üç", yirmi, otuz, kırk, elli, yüz]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: listen_type, count: 2 }
+              - { type: match }
+          - id: how-old
+            title: How Old Are You?
+            description: Say your age with -im/-ım/-um/-üm after yaşında.
+            vocabulary: [yaş, yıl, kaç, yaşında]
+            grammar:
+              - pattern: "{number} yaşındayım."
+              - pattern: "Kaç yaşındasın?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - { type: error_correct }
+          - id: colors
+            title: Basic Colors
+            vocabulary: [kırmızı, mavi, yeşil, sarı, siyah, beyaz, turuncu, kahverengi]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: match }
+              - { type: fill_blank }
+              - { type: listen_select }
+
+      - id: people-family
+        title: Family & People
+        description: Talk about your family and describe people.
+        icon: 👨‍👩‍👧
+        steps:
+          - id: family-members
+            title: Family Members
+            vocabulary: [anne, baba, abla, ağabey, "kız kardeş", "erkek kardeş", oğul, kız, aile]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: match }
+              - { type: word_select, count: 2 }
+              - { type: listen_select }
+          - id: possessive-suffixes
+            title: My, Your, His, Her (-im, -in, -i)
+            description: Possessive endings and vowel harmony (annem, kardeşin, babası).
+            vocabulary: [benim, senin, onun, bizim, sizin, onların, annem, babası]
+            grammar:
+              - pattern: "Bu benim ağabeyim."
+              - pattern: "Annemin adı {name}."
+              - pattern: "Ayşe'nin babası doktor."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+          - id: describing-people
+            title: Describing People (I am…)
+            description: Personal endings on nouns and adjectives (öğrenciyim, yorgunum).
+            vocabulary: ["uzun boylu", "kısa boylu", genç, yaşlı, mutlu, yorgun, öğrenci, saç, göz]
+            grammar:
+              - pattern: "Ben öğrenciyim."
+              - pattern: "Bugün çok yorgunum."
+              - pattern: "O uzun boylu ve gözleri kahverengi."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+          - id: pets
+            title: Pets & Animals
+            description: Say what you have with var / yok.
+            vocabulary: [köpek, kedi, kuş, balık, at, "evcil hayvan", var, yok]
+            grammar:
+              - pattern: "Bir köpeğim var."
+              - pattern: "Kedim yok."
+              - pattern: "Evcil hayvanın var mı?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+
+      - id: food-drink
+        title: Food & Drink
+        description: Order at a café and talk about what you like.
+        icon: 🍎
+        steps:
+          - id: food-basics
+            title: Food Basics
+            vocabulary: [ekmek, elma, yumurta, peynir, pilav, tavuk, çorba, salata]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: drinks
+            title: Drinks
+            vocabulary: [su, kahve, çay, süt, "meyve suyu", bardak, fincan]
+            grammar:
+              - pattern: "Bir çay, lütfen."
+              - pattern: "Bir bardak su, lütfen."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: likes-dislikes
+            title: I Like, I Don't Like
+            description: Likes and dislikes with sevmek and hoşlanmak (-den).
+            vocabulary: [sevmek, hoşlanmak, bayılmak, "nefret etmek", "en sevdiğim", lezzetli]
+            grammar:
+              - pattern: "Kahveyi seviyorum."
+              - pattern: "Sütü sevmiyorum."
+              - pattern: "Çikolatadan hoşlanıyorum."
+              - pattern: "Çayı seviyor musun?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate, count: 2 }
+          - id: at-the-cafe
+            title: At the Café
+            vocabulary: [menü, sipariş, hesap, fiyat, "ne kadar", istemek]
+            grammar:
+              - pattern: "Bir kahve istiyorum."
+              - pattern: "Ne kadar?"
+              - pattern: "Hesap, lütfen."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: ordering_at_a_cafe
+                goal: Order a drink and a snack, then ask for the bill.
+
+      - id: daily-routine
+        title: Daily Routine
+        description: Time, days and what you do every day.
+        icon: ⏰
+        steps:
+          - id: telling-time
+            title: Telling the Time
+            vocabulary: [saat, buçuk, çeyrek, geçiyor, dakika, zaman]
+            grammar:
+              - pattern: "Saat kaç?"
+              - pattern: "Saat yedi buçuk."
+              - pattern: "Saat dokuzu çeyrek geçiyor."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: multiple_choice, count: 2 }
+              - { type: listen_type, count: 2 }
+          - id: days-of-week
+            title: Days of the Week
+            vocabulary: [pazartesi, salı, çarşamba, perşembe, cuma, cumartesi, pazar, "hafta sonu", bugün, yarın]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_select }
+          - id: morning-routine
+            title: My Morning
+            vocabulary: [uyanmak, kalkmak, "duş almak", kahvaltı, "işe gitmek", "okula gitmek"]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: image_select }
+              - { type: translate }
+          - id: present-iyor
+            title: Every Day (-iyor Present)
+            description: The -iyor present, the main present tense, with personal endings and the negative -mi-.
+            vocabulary: ["her gün", "her zaman", genellikle, bazen, "hiç", çalışmak]
+            grammar:
+              - pattern: "Her gün çalışıyorum."
+              - pattern: "Annem pazartesi günleri çalışıyor."
+              - pattern: "Kahve içmiyorum."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: home
+        title: At Home
+        description: Rooms, furniture and where things are.
+        icon: 🏠
+        steps:
+          - id: rooms
+            title: Rooms
+            vocabulary: [ev, daire, mutfak, "yatak odası", banyo, salon, bahçe]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: furniture
+            title: Furniture
+            vocabulary: [masa, sandalye, yatak, kanepe, kapı, pencere, lamba]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: image_select }
+              - { type: listen_type }
+          - id: var-yok
+            title: There Is / There Isn't (var / yok)
+            description: Say what is and isn't in a place with var and yok.
+            vocabulary: [var, yok, "var mı", çok, hiç]
+            grammar:
+              - pattern: "Evde bir bahçe var."
+              - pattern: "Salonda iki sandalye var."
+              - pattern: "Mutfakta masa yok."
+              - pattern: "Bahçe var mı?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct }
+          - id: locative-de-da
+            title: Where Is It? (-de / -da)
+            description: The locative ending -de/-da/-te/-ta and place words (altında, üstünde).
+            vocabulary: [nerede, içinde, üstünde, altında, yanında, arkasında, önünde]
+            grammar:
+              - pattern: "Evdeyim."
+              - pattern: "Kedi masanın altında."
+              - pattern: "Anahtarlar nerede?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: translate }
+
+      - id: around-town
+        title: Around Town
+        description: Places, directions, transport and shopping.
+        icon: 🏙️
+        steps:
+          - id: places-in-town
+            title: Places in Town
+            vocabulary: [banka, süpermarket, istasyon, hastane, park, okul, müze, eczane]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: directions
+            title: Asking for Directions
+            vocabulary: [sol, sağ, düz, yakın, uzak, köşe, sokak]
+            grammar:
+              - pattern: "İstasyon nerede?"
+              - pattern: "Köşeden sola dönün."
+              - pattern: "Düz gidin."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_type }
+              - type: dialogue
+                scenario: lost_tourist
+                goal: Ask a local how to get to the museum.
+          - id: transport
+            title: Getting Around
+            description: Where you go with -e/-a and gitmek; how you go with -le/-la.
+            vocabulary: [otobüs, tren, taksi, bisiklet, araba, bilet, yürümek, gitmek]
+            grammar:
+              - pattern: "Okula gidiyorum."
+              - pattern: "İşe otobüsle gidiyorum."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: shopping
+            title: Shopping
+            vocabulary: [almak, dükkân, ucuz, pahalı, beden, para, ödemek]
+            grammar:
+              - pattern: "Bu ne kadar?"
+              - pattern: "Kartla ödeyebilir miyim?"
+              - pattern: "Bu çok pahalı."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_select }
+              - type: dialogue
+                scenario: clothes_shop
+                goal: Ask for a different size and pay.
+
+      - id: free-time
+        title: Free Time
+        description: Hobbies, sports and what you can do.
+        icon: ⚽
+        steps:
+          - id: hobbies
+            title: Hobbies
+            vocabulary: ["kitap okumak", müzik, film, "yemek yapmak", "dans etmek", "resim yapmak", "seyahat etmek"]
+            activities:
+              - { type: learn, count: 3 }
+              - { type: image_select, count: 2 }
+              - { type: match }
+              - { type: listen_select }
+          - id: sports
+            title: Sports
+            vocabulary: [futbol, tenis, yüzmek, koşmak, oynamak, takım, maç]
+            grammar:
+              - pattern: "Cumartesi günleri futbol oynuyorum."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: word_select, count: 2 }
+              - { type: fill_blank, count: 2 }
+              - { type: translate }
+          - id: ebil-ability
+            title: I Can, I Can't (-ebil)
+            description: Ability with -ebil/-abil and its negative -eme/-ama.
+            vocabulary: [yüzebilirim, yapabilirim, yüzemem, iyi, "biraz"]
+            grammar:
+              - pattern: "Yüzebilirim."
+              - pattern: "Araba kullanamam."
+              - pattern: "Yemek yapabilir misin?"
+            activities:
+              - { type: learn }
+              - { type: word_bank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: listen_type }
+          - id: weekend-plans
+            title: Weekend Plans
+            description: Make suggestions with -elim/-alım.
+            vocabulary: [boş, meşgul, birlikte, davet etmek, "hadi"]
+            grammar:
+              - pattern: "Sinemaya gidelim."
+              - pattern: "Pazar günü boş musun?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: sentence_complete, count: 2 }
+              - type: dialogue
+                scenario: making_plans
+                goal: Invite a friend to do something on the weekend and agree on a time.
+
+      - id: weather-clothes
+        title: Weather & Clothes
+        description: Seasons, the weather and what people are wearing.
+        icon: ☀️
+        steps:
+          - id: weather
+            title: The Weather
+            vocabulary: [hava, güneşli, yağmurlu, bulutlu, rüzgârlı, soğuk, sıcak, ılık, kar]
+            grammar:
+              - pattern: "Bugün hava güneşli."
+              - pattern: "Yağmur yağıyor."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 3 }
+              - { type: listen_select }
+          - id: seasons-months
+            title: Seasons & Months
+            vocabulary: [ilkbahar, yaz, sonbahar, kış, ocak, haziran, aralık, ay]
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: fill_blank, count: 2 }
+              - { type: listen_type }
+          - id: clothes
+            title: Clothes
+            vocabulary: [gömlek, pantolon, elbise, ayakkabı, ceket, şapka, giymek]
+            grammar:
+              - pattern: "Şu an ceket giyiyorum."
+            activities:
+              - { type: learn, count: 2 }
+              - { type: image_select, count: 2 }
+              - { type: word_select }
+              - { type: translate }
+          - id: question-mi
+            title: Yes/No Questions (mi?)
+            description: The question particle mi/mı/mu/mü and vowel harmony.
+            vocabulary: [mi, mı, mu, mü, evet, hayır, "şu an"]
+            grammar:
+              - pattern: "Hava soğuk mu?"
+              - pattern: "Ceket giyiyor musun?"
+              - pattern: "Bu senin şapkan mı?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: error_correct, count: 2 }
+              - { type: word_bank }
+
+      - id: yesterday
+        title: Yesterday
+        description: Talk about the past.
+        icon: 📅
+        steps:
+          - id: past-of-to-be
+            title: I Was… (-ydi / idi)
+            description: The past of "to be" with -di/-ydi on nouns and adjectives.
+            vocabulary: [dün, "dün akşam", "geçen hafta", önce, idi]
+            grammar:
+              - pattern: "Dün evdeydim."
+              - pattern: "Dün hava güzeldi."
+              - pattern: "Yorgun muydun?"
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 3 }
+              - { type: word_bank, count: 2 }
+              - { type: listen_select }
+          - id: past-di
+            title: Past Tense (-di)
+            description: The past tense -di/-dı/-du/-dü (-ti after hard consonants) and the negative.
+            vocabulary: [çalıştım, oynadım, izledim, "ziyaret ettim", pişirdim]
+            grammar:
+              - pattern: "Dün akşam film izledim."
+              - pattern: "Cuma günü çalışmadım."
+            activities:
+              - { type: learn }
+              - { type: fill_blank, count: 2 }
+              - { type: error_correct, count: 2 }
+              - { type: translate }
+          - id: past-questions
+            title: What Did You Do? (Past Questions)
+            description: Common verbs in the past and questions with mi after -di.
+            vocabulary: [gittim, yedim, gördüm, aldım, yaptım, içtim]
+            grammar:
+              - pattern: "Parka gittik."
+              - pattern: "Maçı izledin mi?"
+              - pattern: "Dün ne yedin?"
+            activities:
+              - { type: learn, count: 2 }
+              - { type: match }
+              - { type: sentence_complete, count: 2 }
+              - { type: listen_type }
+          - id: last-weekend
+            title: My Last Weekend
+            vocabulary: ["hafta sonu", eğlenceli, sıkıcı, önce, sonra, "ondan sonra"]
+            grammar:
+              - pattern: "Hafta sonu ne yaptın?"
+            activities:
+              - { type: word_bank, count: 2 }
+              - { type: translate, count: 2 }
+              - type: dialogue
+                scenario: monday_morning_chat
+                goal: Tell a colleague what you did last weekend and ask about theirs.
+
+    checkpoint:
+      title: A1 Checkpoint
+      required_score: 80
+      activities:
+        - { type: word_select, count: 3 }
+        - { type: fill_blank, count: 3 }
+        - { type: listen_select, count: 3 }
+        - { type: translate, count: 3 }
+        - { type: dialogue }

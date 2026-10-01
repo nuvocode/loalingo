@@ -1,11 +1,12 @@
 // Lesson generation (DECISIONS C2, C3): cache → one call for the whole step → per-activity fallback.
 import { z } from "zod";
 import { generate, generatePlain, generateStream } from "./ai";
-import { getCached, listMistakes, putCached } from "./db";
-import { REGISTRY, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
+import { applyMemoryOps, enrollmentProfile, getCached, listMemories, listMistakes, markMemoriesUsed, memoryOn, putCached } from "./db";
+import { REGISTRY, givesAway, langEn, lessonPrompt, mistakeLine, lessonSchema, plannedActivities, shuffleAnswer, systemPrompt, toItems, type Item, type LessonContext } from "./activities";
 import { CHARACTERS, CHAT_MAX_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
 import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./course";
 import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
+import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, pickMemories, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -15,6 +16,13 @@ export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(
 export const legendStep = (id: string) => id.startsWith("legend:") ? id.slice(7) : undefined;
 export const LEGEND_PASS = 80; // % needed to turn the step gold
 export const LEGEND_PRICE = 100; // gems per attempt, or one shop ticket
+
+/** `unit-test:<unit>`: a test over one unit; passing it marks the unit's lessons done, like the level test does for a level. */
+export const unitTestOf = (id: string) => id.startsWith("unit-test:") ? id.slice(10) : undefined;
+export const UNIT_TEST_PASS = 80;
+const UNIT_TEST: CourseLevel["units"][number]["steps"][number]["activities"] = [ // ponytail: one mix for every unit; per-unit YAML tests if a course needs them
+  { type: "multiple_choice", count: 3 }, { type: "fill_blank", count: 2 }, { type: "word_bank", count: 2 }, { type: "translate", count: 2 }, { type: "listen_select", count: 1 },
+];
 
 /** Finds a step and its surroundings in the course tree; exams get a synthetic step covering the whole level. */
 export function stepContext(course: Course, stepId: string, native: string): LessonContext | null {
@@ -45,9 +53,20 @@ export function stepContext(course: Course, stepId: string, native: string): Les
       },
     };
   }
+  const ut = unitTestOf(stepId);
   for (const level of levelsOf(course)) {
     const levelDef = course.levels[level]!;
     for (const u of levelDef.units) {
+      if (ut === u.id) return {
+        course, level, levelDef, unitTitle: u.title, native,
+        step: {
+          id: stepId, title: u.title,
+          description: `Unit test covering all of this unit: mix every lesson's words and grammar, do not focus on one.`,
+          vocabulary: [...new Set(u.steps.flatMap((s) => s.vocabulary))],
+          grammar: [...new Map(u.steps.flatMap((s) => s.grammar).map((g) => [g.pattern, g])).values()],
+          activities: UNIT_TEST,
+        },
+      };
       const step = u.steps.find((s) => s.id === stepId);
       if (step) return { course, level, levelDef, unitTitle: u.title, step, native };
     }
@@ -57,12 +76,12 @@ export function stepContext(course: Course, stepId: string, native: string): Les
 
 export const MISTAKES_IN_PROMPT = 8; // ponytail: most recent only, rank by frequency if prompts need sharper focus
 
-async function generateItems(c: LessonContext, mistakes: string[]): Promise<Item[]> {
+async function generateItems(c: LessonContext, mistakes: string[], about: string[]): Promise<Item[]> {
   const acts = plannedActivities(c.step.activities);
   if (!acts.length) throw new Error("This step has no activities that can be generated yet.");
   const system = systemPrompt(c);
   try {
-    const items = toItems(acts, await generate(lessonSchema(acts), system, lessonPrompt(c, acts, mistakes)) as Record<string, unknown[]>);
+    const items = toItems(acts, await generate(lessonSchema(acts), system, lessonPrompt(c, acts, mistakes, about)) as Record<string, unknown[]>);
     if (items.length) return items;
   } catch (e) { console.warn("Whole-lesson generation failed, falling back to per-activity calls", e); }
   // Fallback for small local models that struggle with the full schema.
@@ -70,7 +89,7 @@ async function generateItems(c: LessonContext, mistakes: string[]): Promise<Item
   let lastError: unknown;
   for (const a of acts) {
     try {
-      const out = await generate(z.object({ items: z.array(REGISTRY[a.type]!.schema).min(1).max(a.count) }), system, lessonPrompt(c, [{ ...a, key: "items" }], mistakes));
+      const out = await generate(z.object({ items: z.array(REGISTRY[a.type]!.schema).min(1).max(a.count) }), system, lessonPrompt(c, [{ ...a, key: "items" }], mistakes, about));
       items.push(...toItems([{ ...a, key: "items" }], out as Record<string, unknown[]>));
     } catch (e) { lastError = e; }
   }
@@ -85,9 +104,10 @@ export function loadLesson(enrollmentId: number, c: LessonContext, fresh = false
   if (!fresh && inflight.has(k)) return inflight.get(k)!;
   const p = (async () => {
     const cached = fresh ? null : await getCached<Item[]>(enrollmentId, c.step.id);
-    if (cached) return cached;
+    if (cached) return cached.filter((it) => it.kind !== "choice" || !givesAway(it.prompt, it.options, it.answer)); // cached before the check
     const mistakes = (await listMistakes<Item>(enrollmentId, MISTAKES_IN_PROMPT)).map((m) => mistakeLine(m.item)).filter((x): x is string => !!x);
-    const items = await generateItems(c, mistakes);
+    const pid = await enrollmentProfile(enrollmentId);
+    const items = await generateItems(c, mistakes, pid === null ? [] : await learnerFacts(pid));
     await putCached(enrollmentId, c.step.id, items);
     return items;
   })().finally(() => inflight.delete(k));
@@ -180,7 +200,7 @@ const turnSchema = z.object({ correction: z.string(), reply: z.string(), transla
 const looseTurn = turnSchema.extend({ correction: z.string().catch(""), goal_reached: z.boolean().catch(false) });
 
 /** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
-export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
+export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
   const ch = CHARACTERS[who], native = langEn(c.native);
   const free = topic.goal.startsWith(FREE_GOAL);
   const sent = history.filter((m) => m.from === "me").length;
@@ -190,6 +210,7 @@ export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, his
       // A free topic is the learner's own; the job in the persona must not pull it back into a work scene (a landlord asking about rent in a football chat).
       ? `Your personality: ${ch.persona} The learner picked the topic, so this is a casual chat between two people, not a scene from your job. Keep your personality and manner, but never bring up your work, customers, place or tasks unless the learner does. Topic: ${topic.goal.slice(FREE_GOAL.length)}.`
       : `${ch.persona} The learner's goal: ${topic.goal}.`,
+    c.about?.length ? `You have talked with this learner before and remember: ${c.about.join(" ")} Where it fits the chat, ask about one of these or link the topic to it, one thing at a time; never list what you know.` : "",
     `Stay in character. \`reply\`: ${c.course.name} only, 1–2 short sentences suited to ${c.level}, in your own manner. Always ${c.course.name}, even when the learner or the goal is written in another language. \`translation\`: the reply in ${native}.`,
     free
       ? "Keep the chat going: react to what the learner just said and ask one follow-up question about the topic or their experience with it."
@@ -199,7 +220,7 @@ export function chatTurn(c: Base, who: CharacterId, topic: { goal: string }, his
       ? "`goal_reached`: keep it false unless the learner clearly says goodbye; then say goodbye in `reply`."
       : `\`goal_reached\`: the learner has sent ${sent} message${sent === 1 ? "" : "s"}. Before ${CHAT_MIN_TURNS} it must be false: keep the scene going with the next step. From then on, true once the learner has achieved the goal; then wrap up the scene politely in \`reply\`.`,
     "Respond only with JSON matching the schema.",
-  ].join("\n");
+  ].filter(Boolean).join("\n");
   const last = history[history.length - 1];
   const prompt = last
     ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
@@ -235,15 +256,40 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
 // ---- Tutor call (spec T): the tutor's reply to one event ----
 
 /** With `onText` the reply streams (SPR-13); see generateStream. */
-export function tutorTurn(c: Base, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
+export function tutorTurn(c: Base & { about?: string[]; coach?: string }, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
   onText?: (raw: string) => boolean) {
   const ch = CHARACTERS[who];
   const system = tutorSystem({
     name: ch.name, persona: ch.persona, target: c.course.name, native: langEn(c.native), level: c.level,
-    unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit),
+    unit: unit.title, words: unitWords(unit), grammar: unitGrammar(unit), about: c.about ?? [],
   });
-  const prompt = tutorPrompt(ch.name, history, notes, event, screen);
+  const prompt = tutorPrompt(ch.name, history, notes, event, screen, c.coach);
   return onText ? generateStream(tutorSchema, system, prompt, onText, looseTutor) : generate(tutorSchema, system, prompt, undefined, looseTutor);
+}
+
+// ---- Profile memory (SPR-22): after a conversation, keep what is worth knowing about the learner ----
+
+/** Facts for one call, chat or lesson (SPR-23); counts as a use of each. Empty when memory is off; never throws. */
+export async function learnerFacts(profileId: number): Promise<string[]> {
+  try {
+    if (!(await memoryOn(profileId))) return [];
+    const picked = pickMemories(await listMemories(profileId));
+    await markMemoriesUsed(picked.map((m) => m.id));
+    return picked.map((m) => m.text);
+  } catch (e) { console.error("memory", e); return []; }
+}
+
+/** Background work after a finished call or chat; resolves to the number of new facts (for a toast).
+ *  Never throws: a lost memory must not break the lesson. */
+export async function rememberSession(profileId: number, native: string, source: MemorySource, otherName: string, lines: { from: "me" | "other"; text: string }[]) {
+  try {
+    if (!lines.some((l) => l.from === "me") || !(await memoryOn(profileId))) return 0;
+    const saved = await listMemories(profileId);
+    const raw = await generate(memorySchema, memorySystem(langEn(native)), memoryPrompt(saved, lines, otherName), undefined, looseMemory);
+    const ops = cleanOps(saved, raw);
+    await applyMemoryOps(profileId, source, ops);
+    return ops.add.length;
+  } catch (e) { console.error("memory", e); return 0; }
 }
 
 // ---- Practice together (spec P): one call per unit, cached ----

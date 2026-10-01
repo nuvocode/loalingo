@@ -10,7 +10,7 @@ const fresh = () => wrapSqlJs(new SQL.Database());
 const tables = async (db: ReturnType<typeof fresh>) =>
   (await db.select<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")).map((r) => r.name);
 
-const V1_TABLES = ["content_cache", "device_settings", "enrollments", "mistakes", "profiles", "step_progress", "words"];
+const TABLES = ["content_cache", "device_settings", "enrollments", "memories", "mistakes", "profiles", "speech_sessions", "step_progress", "words"];
 
 test("empty database migrates to the latest version", async () => {
   const db = fresh();
@@ -18,7 +18,7 @@ test("empty database migrates to the latest version", async () => {
   const latest = Math.max(...MIGRATIONS.map((m) => m.v));
   assert.deepEqual(r, { from: 0, to: latest });
   assert.equal(await schemaVersion(db), latest);
-  for (const t of V1_TABLES) assert.ok((await tables(db)).includes(t), `table ${t} exists`);
+  for (const t of TABLES) assert.ok((await tables(db)).includes(t), `table ${t} exists`);
 });
 
 test("existing pre-migration database (tables, user_version 0) keeps its data", async () => {
@@ -27,7 +27,7 @@ test("existing pre-migration database (tables, user_version 0) keeps its data", 
   await db.execute("INSERT INTO device_settings(key, value) VALUES ($1, $2)", ["k", "v"]);
   assert.equal(await schemaVersion(db), 0);
   await runMigrations(db, MIGRATIONS);
-  assert.equal(await schemaVersion(db), 1);
+  assert.equal(await schemaVersion(db), Math.max(...MIGRATIONS.map((m) => m.v)));
   assert.deepEqual(await db.select("SELECT key, value FROM device_settings"), [{ key: "k", value: "v" }]);
 });
 
@@ -52,7 +52,7 @@ test("pending migrations apply in order", async () => {
 test("a newer schema than the app knows throws FutureSchemaError and changes nothing", async () => {
   const db = fresh();
   await db.execute("PRAGMA user_version = 99");
-  await assert.rejects(runMigrations(db, MIGRATIONS), (e: unknown) => e instanceof FutureSchemaError && e.found === 99 && e.known === 1);
+  await assert.rejects(runMigrations(db, MIGRATIONS), (e: unknown) => e instanceof FutureSchemaError && e.found === 99 && e.known === Math.max(...MIGRATIONS.map((m) => m.v)));
   assert.equal(await schemaVersion(db), 99);
   assert.deepEqual(await tables(db), []);
 });

@@ -71,7 +71,10 @@
     "guideLoading": "Writing your guidebook…",
     "guideLoadingDesc": "The AI is adding translations, examples and grammar notes. This takes a few seconds, only the first time.",
     "legendTicket_one": "{{count}} ticket",
-    "legendTicket_other": "{{count}} tickets"
+    "legendTicket_other": "{{count}} tickets",
+    "skipUnit": "Pass this unit with a test (%{{score}})",
+    "toTop": "To the top",
+    "toHere": "Back to my lesson"
   },
   "practice": {
     "title": "Practice Hub",
@@ -143,6 +146,7 @@
   },
   "profile": {
     "since": "Learning since {{date}}",
+    "garden": "My garden",
     "streakDays_one": "{{count}} day",
     "streakDays_other": "{{count}} days",
     "streak": "Days of roots",
@@ -150,13 +154,60 @@
     "currentLeague": "Current league",
     "bestLeague": "Best league finish",
     "top3": "Top 3",
+    "forYou": "Just for you",
     "achievements": "Achievements",
     "achFire": "Deep roots",
     "achFireDesc": "Grow roots for 7 days in a row",
     "achFast": "Speedy",
     "achFastDesc": "Earn 50 XP in a day",
     "achBook": "Bookworm",
-    "achBookDesc": "Finish your first story"
+    "achBookDesc": "Finish your first story",
+    "details": "Details"
+  },
+  "memory": {
+    "title": "Sprigo knows you",
+    "empty": "Nothing yet. As you talk with a tutor or chat on your own topic, what Sprigo learns about you shows up here.",
+    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you.",
+    "hint": "Tap a line to correct it, or remove what shouldn't be kept.",
+    "kinds": {
+      "interest": "Interests",
+      "goal": "Goals and plans",
+      "background": "About you",
+      "learning": "Your learning"
+    },
+    "edit": "Edit",
+    "save": "Save",
+    "forget": "Forget: {{text}}",
+    "forgetOne": "Forget",
+    "forgetAll": "Forget everything",
+    "forgetAllSure": "Forget everything Sprigo knows about you?",
+    "cancel": "Cancel",
+    "saved_one": "Sprigo will remember {{count}} new thing about you (Profile)",
+    "saved_other": "Sprigo will remember {{count}} new things about you (Profile)",
+    "count_one": "Sprigo knows {{count}} thing about you",
+    "count_other": "Sprigo knows {{count}} things about you",
+    "none": "Nothing yet"
+  },
+  "coach": {
+    "title": "Your speaking",
+    "off": "Voice analysis is off. Turn it on in Settings > Advanced to see how your speaking changes.",
+    "empty": "After a few spoken lessons with a tutor, you'll see your progress here.",
+    "steady": "Your speaking has stayed steady over your last calls.",
+    "trend": {
+      "latency": "You answer faster: {{from}} s → {{to}} s before you start speaking.",
+      "words": "Your answers are getting longer: {{from}} → {{to}} words on average.",
+      "wpm": "You speak more fluently: {{from}} → {{to}} words a minute.",
+      "pauses": "Fewer long pauses: {{from}} → {{to}} per answer.",
+      "native": "You switch to your own language less: {{from}}% → {{to}}% of your words."
+    },
+    "tryThis": "Try this:",
+    "tip": {
+      "native": "When a word won't come, ask your tutor how to say it instead of switching languages.",
+      "short": "Have a 2-minute free chat with a tutor and give a reason in each answer.",
+      "pauses": "When you need time to think, use a phrase like \"let me think…\" in the language you're learning instead of going silent.",
+      "stretch": "You're ready for more: ask your tutor to discuss a topic and defend your opinion."
+    },
+    "start": "Start a call"
   },
   "stories": {
     "title": "Stories",
@@ -272,6 +323,10 @@
     "speakingDesc": "Exercises that use the microphone",
     "bargeIn": "Cut in on the tutor",
     "bargeInDesc": "Talk over the tutor in a live lesson to interrupt. Turn off if the tutor stops on their own because the mic hears the speakers.",
+    "memory": "Remember me",
+    "memoryDesc": "Sprigo keeps lasting things you tell your tutor (interests, plans, what you find hard) and uses them in lessons. Nothing leaves this device unless your AI provider is in the cloud.",
+    "speech": "Voice analysis",
+    "speechDesc": "Measures timing and pace while you talk to a tutor (how fast you answer, pauses, sentence length) to adjust the lesson and show your progress. No audio is recorded.",
     "phone": "Use on your phone",
     "phoneDesc": "Opens Sprigo to your own devices through Tailscale; your data stays on this computer.",
     "phoneMissing": "Tailscale isn't installed on this computer.",
@@ -345,7 +400,8 @@
     "quitTitle": "Quit the lesson?",
     "quitDesc": "You'll lose your progress in this lesson.",
     "quit": "Quit",
-    "keepGoing": "Keep learning"
+    "keepGoing": "Keep learning",
+    "close": "Close"
   },
   "lesson": {
     "dialog": "Lesson",
@@ -385,7 +441,8 @@
     "speakSub": "Tap the microphone and say the sentence.",
     "heard": "Heard: “{{text}}”",
     "heardNothing": "Didn't catch that — try again a little louder.",
-    "cantSpeak": "Can't speak now"
+    "cantSpeak": "Can't speak now",
+    "unitPassed": "Unit passed!"
   },
   "profiles": {
     "saved": "Profile saved",
@@ -432,6 +489,7 @@
     "apiKeyDesc": "Stored in your system keychain, never in the app database",
     "model": "Model",
     "modelDesc": "Test the connection to list the available models",
+    "smallModel": "Models under {{min}} can write lessons with wrong answers. A model of {{min}} or more is recommended.",
     "test": "Test connection",
     "save": "Save",
     "connected": "Connected — {{count}} models found",
@@ -636,7 +694,9 @@
       "reading": "Reading",
       "comprehension": "Questions",
       "discussion": "Discussion"
-    }
+    },
+    "hideMessages": "Hide messages",
+    "send": "Send"
   },
   "biome": {
     "meadow": "Meadow",

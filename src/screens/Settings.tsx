@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { languages } from "../i18n";
 import type { ThemePref } from "../theme";
+import { SMALL_MODEL_B, isSmallModel } from "../modelSize";
 import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
 import { getSetting, isCompanion, isTauri, setSetting } from "../db";
 import { setCompanion, tailscaleStatus, type TailscaleStatus } from "../companion";
@@ -15,7 +16,7 @@ import { Icon, type IconName } from "../icons";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
-function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onChange?: (on: boolean) => void }) {
+export function ToggleRow({ k, initial, onChange }: { k: string; initial: boolean; onChange?: (on: boolean) => void }) {
   const { t } = useTranslation();
   // ponytail: rows without onChange are visual only, as in the design; wired when each feature lands.
   const [on, setOnState] = useState(initial);
@@ -265,6 +266,7 @@ function AiConfigSheet({ provider, models: found }: { provider: ProviderId; mode
       <label className="od-field"><b>{t("ai.model")}</b><span className="muted small">{t("ai.modelDesc")}</span>
         <input className="input" list="ai-models" value={model} spellCheck={false} onChange={(e) => setModel(e.target.value)} />
         <datalist id="ai-models">{models.map((m) => <option key={m} value={m} />)}</datalist>
+        {!needsKey && isSmallModel(cfg.model) && <span className="small" role="note" style={{ color: "var(--orange)" }}>{t("ai.smallModel", { min: `${SMALL_MODEL_B}B` })}</span>}
       </label>
       {status && <p className="small" role="status" style={{ color: status.ok ? "var(--green)" : "var(--red)", overflowWrap: "anywhere" }}>{status.msg}</p>}
       <div className="od-stack sheet-actions" style={gap("8px")}>
@@ -367,6 +369,7 @@ export function Settings() {
             </div>
             <TtsRow />
             <SttRow />
+            <ToggleRow k="speech" initial={s.speechOn} onChange={(speechOn) => setS((s) => ({ ...s, speechOn }))} />
             {isTauri && <PhoneRow />}
           </div>
 

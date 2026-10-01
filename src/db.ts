@@ -10,7 +10,9 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
+import type { Baseline, SessionRow, SpeechSummary } from "./speech";
 import { remoteDb, serveCompanion } from "./companion";
+import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
 
 type Row = Record<string, any>;
@@ -22,7 +24,9 @@ async function browserDb(): Promise<Db> {
   const KEY = "sprigo.devdb";
   const saved = localStorage.getItem(KEY);
   const db = new SQL.Database(saved ? Uint8Array.from(atob(saved), (c) => c.charCodeAt(0)) : undefined);
-  return wrapSqlJs(db, () => localStorage.setItem(KEY, btoa(String.fromCharCode(...db.export()))));
+  // Chunked: spreading the whole export into fromCharCode overflows the stack once the database passes ~100 KB.
+  const b64 = (u: Uint8Array) => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+  return wrapSqlJs(db, () => localStorage.setItem(KEY, b64(db.export())));
 }
 
 let dbP: Promise<Db> | null = null;
@@ -194,6 +198,61 @@ export async function nudgeWord(enrollmentId: number, word: string, delta: numbe
 }
 export async function listWords(enrollmentId: number) {
   return (await db()).select<Word>("SELECT word, translation, strength FROM words WHERE enrollment_id = $1 ORDER BY updated_at DESC, word", [enrollmentId]);
+}
+
+// ---- Profile memory (SPR-22, src/memory.ts; per profile, shared by its courses) ----
+
+/** The profile's own switch (Stats.memoryOn, on for new and older profiles). */
+export const memoryOn = async (profileId: number) => (await getProfile(profileId))?.stats.memoryOn ?? false;
+export async function listMemories(profileId: number) {
+  return (await db()).select<Memory>("SELECT id, kind, text, source, hits, last_seen_at FROM memories WHERE profile_id = $1 ORDER BY id", [profileId]);
+}
+export async function updateMemory(id: number, text: string) {
+  await (await db()).execute("UPDATE memories SET text = $1, last_seen_at = CURRENT_TIMESTAMP WHERE id = $2", [text, id]);
+}
+export async function deleteMemory(id: number) {
+  await (await db()).execute("DELETE FROM memories WHERE id = $1", [id]);
+}
+export async function forgetMemories(profileId: number) {
+  await (await db()).execute("DELETE FROM memories WHERE profile_id = $1", [profileId]);
+}
+export async function markMemoriesUsed(ids: number[]) {
+  if (ids.length) await (await db()).execute(`UPDATE memories SET hits = hits + 1 WHERE id IN (${ids.map((_, i) => `$${i + 1}`).join(", ")})`, ids);
+}
+export async function enrollmentProfile(enrollmentId: number) {
+  const r = await (await db()).select<{ profile_id: number }>("SELECT profile_id FROM enrollments WHERE id = $1", [enrollmentId]);
+  return r[0]?.profile_id ?? null;
+}
+/** Applies cleaned ops (cleanOps), then drops the least used past MEMORY_MAX. */
+export async function applyMemoryOps(profileId: number, source: MemorySource, ops: MemoryOps) {
+  const d = await db();
+  for (const id of ops.forget) await d.execute("DELETE FROM memories WHERE id = $1 AND profile_id = $2", [id, profileId]);
+  for (const u of ops.update) await d.execute("UPDATE memories SET text = $1, last_seen_at = CURRENT_TIMESTAMP WHERE id = $2 AND profile_id = $3", [u.text, u.id, profileId]);
+  for (const a of ops.add) await d.execute("INSERT INTO memories(profile_id, kind, text, source) VALUES ($1, $2, $3, $4)", [profileId, a.kind, a.text, source]);
+  for (const id of evictIds(await listMemories(profileId))) await d.execute("DELETE FROM memories WHERE id = $1", [id]);
+}
+
+// ---- Speech signals (SPR-25, src/speech.ts) ----
+
+export async function saveSpeechSession(profileId: number, enrollmentId: number | null, mode: "tutor", x: SpeechSummary) {
+  await (await db()).execute(
+    `INSERT INTO speech_sessions(profile_id, enrollment_id, mode, utterances, silences, latency_ms, wpm, pause_ratio, long_pauses, level, fillers, words, native_words, speech_ms)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+    [profileId, enrollmentId, mode, x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs]);
+}
+
+/** The last 10 voice calls, oldest first, for the profile's coaching card (SPR-27). */
+export async function listSpeechSessions(profileId: number): Promise<SessionRow[]> {
+  return (await (await db()).select<SessionRow>(
+    "SELECT utterances, latency_ms, wpm, long_pauses, words, native_words FROM speech_sessions WHERE profile_id = $1 ORDER BY id DESC LIMIT 10", [profileId])).reverse();
+}
+/** The learner's usual per answer over their last 10 voice calls (SPR-26); null before they have said a few things. */
+export async function speechBaseline(profileId: number): Promise<Baseline | null> {
+  const [r] = await (await db()).select<Baseline & { n: number | null }>(
+    `SELECT SUM(utterances) AS n, AVG(latency_ms) AS latencyMs, SUM(wpm * utterances) * 1.0 / SUM(utterances) AS wpm,
+       SUM(pause_ratio * utterances) / SUM(utterances) AS pauseRatio, SUM(words) * 1.0 / SUM(utterances) AS words
+     FROM (SELECT * FROM speech_sessions WHERE profile_id = $1 AND utterances > 0 ORDER BY id DESC LIMIT 10)`, [profileId]);
+  return r && (r.n ?? 0) >= 3 ? { latencyMs: r.latencyMs, wpm: r.wpm, pauseRatio: r.pauseRatio, words: r.words } : null;
 }
 
 // ---- PIN (DECISIONS E4: a privacy lock between people sharing a device, not real security) ----

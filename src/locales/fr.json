@@ -74,7 +74,10 @@
     "guideLoadingDesc": "L'IA ajoute des traductions, des exemples et des notes de grammaire. Cela prend quelques secondes, uniquement la première fois.",
     "legendTicket_one": "{{count}} ticket",
     "legendTicket_other": "{{count}} tickets",
-    "legendTicket_many": "{{count}} tickets"
+    "legendTicket_many": "{{count}} tickets",
+    "skipUnit": "Valider l'unité par un test ({{score}} %)",
+    "toTop": "Tout en haut",
+    "toHere": "Revenir à ma leçon"
   },
   "practice": {
     "title": "Espace pratique",
@@ -152,6 +155,7 @@
   },
   "profile": {
     "since": "Apprend depuis le {{date}}",
+    "garden": "Mon jardin",
     "streakDays_one": "{{count}} jour",
     "streakDays_other": "{{count}} jours",
     "streakDays_many": "{{count}} jours",
@@ -160,13 +164,62 @@
     "currentLeague": "Ligue actuelle",
     "bestLeague": "Meilleure place en ligue",
     "top3": "Top 3",
+    "forYou": "Rien que pour toi",
     "achievements": "Succès",
     "achFire": "Racines profondes",
     "achFireDesc": "Fais pousser tes racines 7 jours d'affilée",
     "achFast": "Éclair",
     "achFastDesc": "Gagne 50 XP en une journée",
     "achBook": "Rat de bibliothèque",
-    "achBookDesc": "Termine ta première histoire"
+    "achBookDesc": "Termine ta première histoire",
+    "details": "Détails"
+  },
+  "memory": {
+    "title": "Sprigo te connaît",
+    "empty": "Rien pour l'instant. Quand tu parles avec un tuteur ou discutes de ton propre sujet, ce que Sprigo apprend sur toi apparaît ici.",
+    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi.",
+    "hint": "Touche une ligne pour la corriger, ou retire ce qui ne doit pas être gardé.",
+    "kinds": {
+      "interest": "Centres d'intérêt",
+      "goal": "Objectifs et projets",
+      "background": "À propos de toi",
+      "learning": "Ton apprentissage"
+    },
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "forget": "Oublier : {{text}}",
+    "forgetOne": "Oublier",
+    "forgetAll": "Tout oublier",
+    "forgetAllSure": "Sprigo doit-il oublier tout ce qu'il sait sur toi ?",
+    "cancel": "Annuler",
+    "saved_one": "Sprigo retiendra {{count}} nouvelle chose sur toi (Profil)",
+    "saved_other": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)",
+    "saved_many": "Sprigo retiendra {{count}} nouvelles choses sur toi (Profil)",
+    "count_one": "Sprigo sait {{count}} chose sur toi",
+    "count_many": "Sprigo sait {{count}} choses sur toi",
+    "count_other": "Sprigo sait {{count}} choses sur toi",
+    "none": "Rien pour l'instant"
+  },
+  "coach": {
+    "title": "Ton expression orale",
+    "off": "L'analyse vocale est désactivée. Active-la dans Paramètres > Avancé pour voir comment ton expression évolue.",
+    "empty": "Après quelques leçons orales avec un tuteur, tu verras tes progrès ici.",
+    "steady": "Ton expression est restée stable lors de tes derniers appels.",
+    "trend": {
+      "latency": "Tu réponds plus vite : {{from}} s → {{to}} s avant de commencer à parler.",
+      "words": "Tes réponses s'allongent : {{from}} → {{to}} mots en moyenne.",
+      "wpm": "Tu parles plus couramment : {{from}} → {{to}} mots par minute.",
+      "pauses": "Moins de longues pauses : {{from}} → {{to}} par réponse.",
+      "native": "Tu passes moins à ta langue : {{from}} % → {{to}} % de tes mots."
+    },
+    "tryThis": "Essaie ceci :",
+    "tip": {
+      "native": "Quand un mot ne vient pas, demande à ton tuteur comment le dire au lieu de changer de langue.",
+      "short": "Fais une conversation libre de 2 minutes avec un tuteur et donne une raison à chaque réponse.",
+      "pauses": "Quand tu as besoin de réfléchir, utilise dans la langue que tu apprends une expression comme « laisse-moi réfléchir… » au lieu de rester silencieux.",
+      "stretch": "Tu es prêt pour plus : demande à ton tuteur de débattre d'un sujet et défends ton avis."
+    },
+    "start": "Lancer un appel"
   },
   "stories": {
     "title": "Histoires",
@@ -286,6 +339,10 @@
     "speakingDesc": "Exercices qui utilisent le micro",
     "bargeIn": "Couper la parole au tuteur",
     "bargeInDesc": "En cours en direct, parle pendant que le tuteur parle pour l'interrompre. Désactive-le si le tuteur s'arrête tout seul parce que le micro capte les haut-parleurs.",
+    "memory": "Se souvenir de moi",
+    "memoryDesc": "Sprigo garde ce qui dure dans ce que tu racontes à ton tuteur (centres d'intérêt, projets, ce qui te pose problème) et s'en sert dans les leçons. Rien ne quitte cet appareil sauf si ton fournisseur d'IA est dans le cloud.",
+    "speech": "Analyse vocale",
+    "speechDesc": "Mesure le rythme et les temps de réponse quand tu parles avec un tuteur (rapidité de réponse, pauses, longueur des phrases) pour adapter la leçon et montrer tes progrès. Aucun son n'est enregistré.",
     "phone": "Utiliser sur ton téléphone",
     "phoneDesc": "Ouvre Sprigo à tes propres appareils via Tailscale ; tes données restent sur cet ordinateur.",
     "phoneMissing": "Tailscale n'est pas installé sur cet ordinateur.",
@@ -361,7 +418,8 @@
     "quitTitle": "Quitter la leçon ?",
     "quitDesc": "Tu perdras ta progression dans cette leçon.",
     "quit": "Quitter",
-    "keepGoing": "Continuer"
+    "keepGoing": "Continuer",
+    "close": "Fermer"
   },
   "lesson": {
     "dialog": "Leçon",
@@ -401,7 +459,8 @@
     "speakSub": "Touche le micro et dis la phrase.",
     "heard": "Entendu : « {{text}} »",
     "heardNothing": "Je n'ai pas compris — réessaie un peu plus fort.",
-    "cantSpeak": "Impossible de parler maintenant"
+    "cantSpeak": "Impossible de parler maintenant",
+    "unitPassed": "Unité validée !"
   },
   "profiles": {
     "saved": "Profil enregistré",
@@ -448,6 +507,7 @@
     "apiKeyDesc": "Stockée dans le trousseau de ton système, jamais dans la base de données de l'app",
     "model": "Modèle",
     "modelDesc": "Teste la connexion pour lister les modèles disponibles",
+    "smallModel": "Les modèles de moins de {{min}} peuvent écrire des leçons avec de mauvaises réponses. Un modèle d'au moins {{min}} est recommandé.",
     "test": "Tester la connexion",
     "save": "Enregistrer",
     "connected": "Connecté — {{count}} modèles trouvés",
@@ -652,7 +712,9 @@
       "reading": "Lecture",
       "comprehension": "Questions",
       "discussion": "Discussion"
-    }
+    },
+    "hideMessages": "Masquer les messages",
+    "send": "Envoyer"
   },
   "biome": {
     "meadow": "Prairie",

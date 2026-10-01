@@ -78,9 +78,13 @@ export async function listModels(c: AiConfig, key: string | null): Promise<strin
 }
 
 // Thinking models (e.g. glm on Ollama) otherwise reason for minutes; exercises need little. Measured: 185 s → 7 s.
-// Not "none" (Ollama's think:false): glm-5.3-flash:cloud then writes its reasoning into the reply itself (SPR-14, 213 tokens vs 44).
-// ponytail: local providers only; cloud models keep their default until measured per provider.
-const reasoning = (c: AiConfig) => c.provider === "ollama" || c.provider === "lmstudio" ? "low" as const : undefined;
+// Ollama models get "none": even "low" thinks 400–3500 tokens per tutor turn (pnpm bench, M4). First sentence with "none":
+// gemma4:e2b 5 s → 0.4 s, qwen3.5:4b 2 min → 0.9 s, kimi-k2.6:cloud 31 s → 1.4 s, deepseek-v4-pro:cloud 3.1 s → 0.5 s.
+// Except glm-5.3-flash:cloud: with "none" it writes its reasoning into the reply itself (SPR-14, 213 tokens vs 44; 2.2 s vs 0.5 s).
+// ponytail: one named exception; a per-model setting if more models behave like glm-5.3-flash. LM Studio not measured, keeps "low".
+const reasoning = (c: AiConfig) =>
+  c.provider === "ollama" ? (c.model.startsWith("glm-5.3-flash") ? "low" as const : "none" as const)
+  : c.provider === "lmstudio" ? "low" as const : undefined;
 
 let active: { cfg: AiConfig; key: string | null } | null = null;
 

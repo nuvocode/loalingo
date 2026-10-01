@@ -10,6 +10,7 @@
   .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
   .od-stat, .od-field, .od-cell { --od-gap: 2px; display: grid; gap: var(--od-gap); } /* own default: a row's gap must not leak into its title/description */
   :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+  datalist { display: none; } /* the rule above would draw it as an empty box */
   .od-tile { display: grid; grid-template-rows: auto 1fr; }
   :where(.od-tile) > :where(*) { display: block; }
   .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
@@ -170,6 +171,18 @@ html[data-theme="dark"] .biome-scene .sky{fill:transparent}
 }
 .unit-head .uh-kicker{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:.85}
 .unit-head h2{font-size:22px;font-weight:900}
+/* Units not reached yet: faded, so the way ahead reads as "later". */
+.unit.later .unit-head,.unit.later .path{opacity:.5;filter:saturate(.35)}
+.unit-skip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;border-radius:99px;background:rgb(0 0 0 / .18);color:inherit;font:inherit;font-size:13px;font-weight:800}
+.unit-skip:hover{background:rgb(0 0 0 / .28)}
+.unit-skip svg{width:16px;height:16px}
+.scroll-btns{position:fixed;right:max(16px,calc(50vw - 640px));bottom:24px;z-index:20;display:flex;flex-direction:column;gap:10px}
+.scroll-btn{width:48px;height:48px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--blue);border:2px solid var(--border);box-shadow:0 3px 0 var(--border)}
+.scroll-btn > :first-child{transform:rotate(180deg)}
+.scroll-btn.here{color:var(--gold-dark)}
+.scroll-btn.here > :first-child{transform:none}
+.scroll-btn[data-tip]:hover::after{left:auto;right:calc(100% + 8px);bottom:50%;transform:translateY(50%)}
+@media (max-width:767px){.scroll-btns{bottom:96px}}
 .unit-head .uh-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .unit-head .guidebook{
   display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);
@@ -388,6 +401,10 @@ html[data-theme="dark"] .biome-scene .sky{fill:transparent}
 .soon-tag{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--blue);background:var(--sky);border-radius:8px;padding:2px 8px}
 .seg{display:flex;gap:8px;flex-wrap:wrap}
 .select{font:inherit;font-weight:800;color:var(--text);background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:10px 12px;min-height:44px;box-shadow:0 2px 0 var(--border)}
+/* WebKit (the macOS app) draws its own native select otherwise; the caret is two gradients so it takes the text colour. */
+.select{-webkit-appearance:none;appearance:none;cursor:pointer;padding-right:36px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
 /* Profiles (not in the design; same visual language as .select / .avatar) */
 .input{font:inherit;font-weight:700;color:var(--text);background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:10px 12px;min-height:44px;width:100%}
 .input:focus-visible,.select:focus-visible{outline:none;border-color:var(--blue)}
@@ -421,6 +438,12 @@ button.bubble:hover{border-color:var(--blue)}
 
 /* Guidebook sheet (DECISIONS B8; not in the design) */
 .sheet:has(.guide){max-width:620px;text-align:left}
+.sheet:has(.sheet-wide){max-width:560px;text-align:left}
+.summary-card{text-align:left;align-content:start;cursor:pointer;font:inherit;color:inherit}
+.summary-card:hover{border-color:var(--blue)}
+@media (max-width:560px){.profile-cards{grid-template-columns:1fr}}
+/* Phones: the garden button goes under the name, so the name and date keep the full width. */
+@media (max-width:767px){.profile-head{display:grid;grid-template-columns:auto 1fr;row-gap:10px}.profile-head .avatar{grid-row:span 2}.profile-garden{justify-self:start}}
 .guide h3{text-align:center}
 .guide h4{font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin:18px 0 8px}
 .guide-words{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
@@ -497,8 +520,13 @@ html[data-theme="dark"] .face .scene{filter:brightness(.6) saturate(.8)}
 .call-line{display:block;margin:0;font:inherit;font-weight:600;font-size:15px;color:inherit;text-align:left}
 .call-line small{display:block;margin-top:2px;font-size:13px;opacity:.75}
 .call-fixes{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px}
-.call-drawer{position:absolute;right:16px;bottom:16px;z-index:2;width:min(340px,calc(100% - 32px));max-height:min(420px,70%);display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r);background:var(--bg);box-shadow:0 8px 30px rgb(0 0 0 / .25)}
+.call-drawer{position:fixed;right:16px;bottom:16px;z-index:2;width:min(340px,calc(100% - 32px));max-height:min(420px,70%);display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r);background:var(--bg);box-shadow:0 8px 30px rgb(0 0 0 / .25)}
 .call-drawer .chat{flex:1;min-height:0;overflow-y:auto}
+.call-drawer-head{justify-content:space-between}
+.call-drawer-head .btn,.call-drawer form .btn{padding:8px 10px}
+/* Hover labels for the call controls; the native title tooltip is slow and easy to miss. */
+[data-tip]{position:relative}
+[data-tip]:hover::after,[data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:5px 10px;border-radius:8px;background:var(--text);color:var(--bg);font-size:13px;font-weight:700;white-space:nowrap;pointer-events:none}
 .call-bar{display:flex;gap:12px;margin:0 auto}
 .call-btn{width:52px;height:52px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text)}
 .call-btn.on{background:var(--blue);color:var(--on-accent)}
@@ -568,7 +596,7 @@ html[data-theme="dark"] .garden-hero{background:var(--btd)}
 /* ===== live frame (SPR-11): the biome frames the call, never covers it ===== */
 .call-grid{gap:6px;padding:6px;border-radius:20px;background:var(--bh,var(--surface))}
 .call-grid .call-pane{border-radius:14px}
-.lesson-footer:has(.call-bar){position:relative;overflow:hidden}
+.lesson-footer:has(.call-bar){position:relative;overflow-x:clip}
 .call-bar{position:relative;isolation:isolate}
 .call-bar::before{content:"";position:absolute;z-index:-1;left:50%;width:100vw;top:-16px;bottom:-16px;transform:translateX(-50%);pointer-events:none;opacity:.14;
   background:var(--bh,transparent);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none'%3E%3Cpath d='M0 40Q100 10 200 34T400 26V60H0Z'/%3E%3C/svg%3E") center/100% 100%}

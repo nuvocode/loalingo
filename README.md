@@ -116,6 +116,7 @@ pnpm fetch-model   # downloads the whisper speech model into src-tauri/resources
 pnpm tauri dev     # desktop app
 pnpm dev           # browser preview (no speech, dev storage in localStorage)
 pnpm test
+pnpm bench         # tutor reply latency per Ollama model (pnpm bench <model…> for some)
 ```
 
 Courses are plain YAML files in [`courses/`](courses/en.yml). For the architecture and roadmap (in Turkish), see [docs/PLAN.md](docs/PLAN.md) and [docs/DECISIONS.md](docs/DECISIONS.md).

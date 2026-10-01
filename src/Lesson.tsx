@@ -8,7 +8,7 @@ import { SPEECH_PASS, hideAnswer, listenItems, madnessItems, matchesAnswer, norm
 import { MicButton } from "./Mic";
 import { sttReady } from "./stt";
 import { speak } from "./tts";
-import { LEGEND_PASS, appeal, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
+import { LEGEND_PASS, UNIT_TEST_PASS, unitTestOf, appeal, examLevel, explain, judge, legendStep, loadLesson, prefetchNext, stepContext } from "./lessons";
 import { recordSession, today, xpMult } from "./progress";
 import { acceptAppeal } from "./appeal";
 import { bankMatch, inField, keyAction, type KeyAction, type KeyState } from "./keys";
@@ -83,6 +83,7 @@ export function Lesson({ id }: { id: string }) {
   const practice = id.startsWith("practice-");
   const exam = examLevel(id);
   const legend = legendStep(id);
+  const unitTest = unitTestOf(id);
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [gen, setGen] = useState(0); // bump = regenerate (C3)
   const [i, setI] = useState(0);
@@ -142,11 +143,12 @@ export function Lesson({ id }: { id: string }) {
       const n = recordSession(s, { xp, gems, kind: practice ? "practice" : "lesson" }, today());
       return id === "practice-madness" ? { ...n, madnessBest: Math.max(n.madnessBest, score.correct * 5) } : n; // best = pairs matched
     });
-    const required = legend ? LEGEND_PASS : ctx?.levelDef.checkpoint?.required_score;
-    const passed = exam || legend ? acc >= required! : undefined;
+    const required = legend ? LEGEND_PASS : unitTest ? UNIT_TEST_PASS : ctx?.levelDef.checkpoint?.required_score;
+    const passed = exam || legend || unitTest ? acc >= required! : undefined;
     if (enrollment) {
       if (exam) (passed ? completeLevel(exam, xp) : gainXp(xp));
       else if (legend) { gainXp(xp); if (passed) markLegendary(legend); }
+      else if (unitTest) (passed ? completeStep(ctx!.levelDef.units.find((u) => u.id === unitTest)!.steps.map((st) => st.id), xp) : gainXp(xp));
       else if (ctx) {
         completeStep(id, xp);
         prefetchNext(enrollment.id, ctx.course, ctx.level, id, ctx.native);
@@ -329,7 +331,7 @@ export function Lesson({ id }: { id: string }) {
         <Icon name={result.passed === false ? "refresh" : "trophy"} />
       </div>
       <h2 style={{ fontSize: 26, fontWeight: 900 }}>
-        {result.passed === undefined ? t("lesson.done") : result.passed ? (legend ? t("lesson.legendPassed") : t("lesson.examPassed", { level: exam })) : t("lesson.examFailed")}
+        {result.passed === undefined ? t("lesson.done") : result.passed ? (legend ? t("lesson.legendPassed") : unitTest ? t("lesson.unitPassed") : t("lesson.examPassed", { level: exam })) : t("lesson.examFailed")}
       </h2>
       {result.passed === false && <p className="muted">{t("lesson.examNeed", { score: result.required })}</p>}
       <div className="result-stats">
