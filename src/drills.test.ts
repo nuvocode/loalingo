@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { NOVEL_TOPICS, REPETITION_RULE, ladderDrill, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
+import { NOVEL_TOPICS, avoidancePrompt, goalToName, looseAvoidance, verifyAvoidance, REPETITION_RULE, ladderDrill, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
 import { parseTalkId } from "./characters.ts";
 import type { SessionRow } from "./speech.ts";
 
@@ -95,4 +95,20 @@ test("ladder id round-trips; rung 4 is not a drill", () => {
   const d = ladderDrill(1, "my job: the hard part");
   assert.deepEqual(parseTalkId(drillId("tom", d))?.drill, d);
   assert.equal(parseDrill(["ladder", encodeURIComponent(JSON.stringify({ rung: 4, topic: "x" }))]), null);
+});
+
+test("verifyAvoidance: only attempted:false files the goal; a broken reply files nothing", () => {
+  assert.equal(verifyAvoidance("past simple", { attempted: false }), "past simple");
+  assert.equal(verifyAvoidance("past simple", { attempted: true }), null);
+  assert.equal(verifyAvoidance("past simple", looseAvoidance.parse({})), null);
+  const p = avoidancePrompt("Spanish", "past simple", ["fui al mercado"]);
+  assert.ok(p.includes('"past simple"') && p.includes('- "fui al mercado"') && !/repair/i.test(p));
+});
+
+test("goalToName: 3 sessions name a goal; the most recently avoided wins", () => {
+  const row = (avoided: string | null) => ({ utterances: 1, latency_ms: null, wpm: 100, long_pauses: 0, words: 10, native_words: 0, avoided }) as SessionRow;
+  assert.equal(goalToName([row("a"), row(null), row("a")]), null);
+  assert.equal(goalToName([row("a"), row("a"), row(null), row("a")]), "a");
+  assert.equal(goalToName([row("a"), row("b"), row("a"), row("b"), row("a"), row("b")]), "b");
+  assert.equal(goalToName([row("b"), row("b"), row("b"), row("a"), row("a"), row("a")]), "a");
 });

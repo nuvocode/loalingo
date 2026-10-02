@@ -9,6 +9,7 @@ import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, typ
 import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, pickMemories, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 import { cleanDebrief, debriefPrompt, debriefSchema, debriefSystem, looseDebrief, looseRoleTurn, rehearsalSystem, roleTurnSchema, type RehearsalBrief } from "./rehearsal";
+import { avoidancePrompt, avoidanceSchema, looseAvoidance } from "./drills";
 import { cleanNote, noteFor, noteFresh, notePrompt, noteSystem, NOTE_KEY, type GardenNote, type NoteInfo } from "./gardenNote";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -242,6 +243,10 @@ export function rehearseTurn(c: Base, brief: RehearsalBrief, history: ChatMsg[])
     : "Open the conversation the way it would really start.";
   return generate(roleTurnSchema, rehearsalSystem(c, brief), prompt, undefined, looseRoleTurn);
 }
+
+/** Structure drill (#43): asks whether the learner attempted `goal` in their spoken turns. */
+export const avoidancePass = (c: Base, goal: string, learnerTurns: string[]) =>
+  generate(avoidanceSchema, systemPrompt(c), avoidancePrompt(c.course.name, goal, learnerTurns), undefined, looseAvoidance);
 
 /** One call after the learner steps out of role; entries that point at no turn are dropped. */
 export async function debrief(c: Base, brief: RehearsalBrief, learnerTurns: string[]) {

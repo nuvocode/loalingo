@@ -8,12 +8,12 @@ import { onTtsFallback, prewarm, resetTtsNotice, speak, speakingWith, stopSpeaki
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type Talk } from "./characters";
-import { chatTurn, debrief, learnerFacts, loadStory, rehearseTurn, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
+import { avoidancePass, chatTurn, debrief, learnerFacts, loadStory, rehearseTurn, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
 import { REHEARSE_LONG, type Debrief } from "./rehearsal";
 import * as db from "./db";
 import { recordSession, today, xpMult } from "./progress";
 import { FREE_CONTEXT, summarize, type Conditions, type Utterance } from "./speech";
-import { DRILL_KEEP, FOUR_THREE_TWO_MINUTES, drillConditions, drillId, drillRules, mmss, roundStat, type RoundStat } from "./drills";
+import { DRILL_KEEP, FOUR_THREE_TWO_MINUTES, drillConditions, drillId, drillRules, mmss, roundStat, verifyAvoidance, type RoundStat } from "./drills";
 import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -336,12 +336,18 @@ export function Chat({ talk }: { talk: Talk }) {
   const talking = !drill || plan <= 0;
   const native = voice && s.speechOn ? profile?.native_lang : undefined; // voice analysis off: nothing measured or saved
   const spoken = useRef<Utterance[]>([]);
+  const heard = useRef<string[]>([]); // the learner's voice turns, for the avoidance pass
   const conditions = useRef<Conditions>(drill
     ? drillConditions(drill)
     : { ...FREE_CONTEXT, mode: rehearse ? "rehearse" : "chat" });
   /** One speech_sessions row per voice chat that measured something. */
   const saveSpeech = () => {
-    if (profile && spoken.current.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, summarize(spoken.current, 0), conditions.current).catch(() => {});
+    if (!profile || !spoken.current.length) return;
+    const x = summarize(spoken.current, 0), goal = drill?.goal;
+    const avoided = goal && course && enrollment && heard.current.length
+      ? avoidancePass({ course, level: enrollment.level, native: profile.native_lang }, goal, heard.current).then((r) => verifyAvoidance(goal, r), () => null)
+      : Promise.resolve(null);
+    void avoided.then((a) => db.saveSpeechSession(profile.id, enrollment?.id ?? null, x, conditions.current, a)).catch(() => {});
   };
   const mine = msgs.filter((m) => m.from === "me").length;
   const { quit, askQuit } = useQuit(mine > 0 && !result);
@@ -480,7 +486,7 @@ export function Chat({ talk }: { talk: Talk }) {
       {err && <Failed msg={err} retry={stepping ? stepOut : () => turn(msgs)} quit={quit} />}
       {rehearse && mine >= REHEARSE_LONG && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t("roleplay.rehearseLong")}</p>}
       {over && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t(goal ? "roleplay.goalReached" : "roleplay.limit")}</p>}
-      {voice && !over && <MicButton lang={lang} native={native} disabled={busy} onText={(said, m) => { if (m) spoken.current.push(m); send(said); }} />}
+      {voice && !over && <MicButton lang={lang} native={native} disabled={busy} onText={(said, m) => { if (m) spoken.current.push(m); if (said.trim()) heard.current.push(said.trim()); send(said); }} />}
       <div ref={endRef} />
     </>;
     footer = over || voice
