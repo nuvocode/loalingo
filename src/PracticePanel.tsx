@@ -1,4 +1,4 @@
-// Practice together panel (spec P): topics, warm-up and reading questions, the reading text, discussion questions.
+// Practice together panel: topics, warm-up and reading questions, the reading text, discussion questions.
 // It only shows the state and reports clicks; the flow and grading live in src/practice.ts, the tutor in TutorCall.
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

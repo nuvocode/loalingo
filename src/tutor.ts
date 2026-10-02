@@ -1,4 +1,4 @@
-// Tutor call brain (spec T): one event in, one structured reply out. Pure module, tested by src/tutor.test.ts;
+// Tutor call brain: one event in, one structured reply out. Pure module, tested by src/tutor.test.ts;
 // the model call is tutorTurn in src/lessons.ts. New capability = a new TUTOR_ACTIONS value + a handler in TutorCall.
 import { z } from "zod";
 import type { CourseLevel } from "./course";
@@ -13,7 +13,7 @@ export type TutorEvent =
   | { kind: "silence"; seconds: number }
   | { kind: "mic"; on: boolean }
   | { kind: "cam"; on: boolean }
-  // Practice together (spec P): what the screen shows is passed separately, see describePractice in src/practice.ts.
+  // Practice together: what the screen shows is passed separately, see describePractice in src/practice.ts.
   | { kind: "practice_opened" }
   | { kind: "practice_item" }
   | { kind: "practice_read" }

@@ -1,4 +1,4 @@
-// Schema migrations (spec A): ordered steps tracked by SQLite's `PRAGMA user_version`.
+// Schema migrations: ordered steps tracked by SQLite's `PRAGMA user_version`.
 // Pure: runs on any SqlDb (tauri-plugin-sql in the app, sql.js in the dev preview and tests).
 
 export type SqlDb = {

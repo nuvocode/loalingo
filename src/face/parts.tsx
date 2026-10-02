@@ -1,4 +1,4 @@
-// Cartoon bust parts (spec K) on a 200×200 canvas, stacked back to front by FaceArt.
+// Cartoon bust parts on a 200×200 canvas, stacked back to front by FaceArt.
 // Animated layers read CSS variables set by Face.tsx: .lid (--blink), .pupil (--look-x/y), .brow (--brow, --raise); Face.tsx redraws .mouth from mouthPaths() every frame.
 import type { FaceSpec } from "../characters";
 

@@ -29,7 +29,7 @@ export function LiveButton({ className = "" }: { className?: string }) {
   );
 }
 
-/** Picks the tutor for a video lesson (spec T); also opened from the live lesson button. */
+/** Picks the tutor for a video lesson; also opened from the live lesson button. */
 export function TutorSheet() {
   const { t } = useTranslation();
   const { closeSheet } = useApp();

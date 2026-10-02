@@ -151,7 +151,7 @@ export function Story({ unitId }: { unitId: string }) {
   };
   const check = () => { setChecked(true); sfx(sel === q!.answer ? "ok" : "bad"); if (sel === q!.answer) setCorrect((c) => c + 1); };
 
-  // Keyboard (spec L): digits pick an answer, Enter is the footer button, Space replays the line. Esc stays in useQuit.
+  // Keyboard: digits pick an answer, Enter is the footer button, Space replays the line. Esc stays in useQuit.
   const keyState: KeyState = {
     kind: q && !checked ? "choice" : "other",
     answered: false,

@@ -1,4 +1,4 @@
-// Text-to-speech (spec D): system voices, local Piper (every course language) or local Kokoro (English only).
+// Text-to-speech: system voices, local Piper (every course language) or local Kokoro (English only).
 // Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
 // and stream one sentence at a time, so the first sentence plays while the rest is made.
 import { getSetting, isCompanion } from "./db";

@@ -94,7 +94,7 @@ export function Lesson({ id }: { id: string }) {
   const [sel, setSel] = useState<number | null>(null);
   const [bankSel, setBankSel] = useState<number[]>([]);
   const [text, setText] = useState("");
-  const [typed, setTyped] = useState(""); // bank: letters typed to pick a word (spec L)
+  const [typed, setTyped] = useState(""); // bank: letters typed to pick a word
   const [micPress, setMicPress] = useState(0); // speak: Space bumps this to press the mic
   const [matched, setMatched] = useState<{ done: string[]; left: string | null; wrong: string[]; misses: number }>({ done: [], left: null, wrong: [], misses: 0 });
   const [heard, setHeard] = useState<string | null>(null); // speak: last transcript ("" = nothing heard)
@@ -260,7 +260,7 @@ export function Lesson({ id }: { id: string }) {
   const last = i + 1 >= list.length;
   const listenBtn = (txt: string) => <button className="prompt-word" onClick={() => speak(txt, lang)}><Icon name="headphones" /> {t("lesson.listen")}</button>;
 
-  // Keyboard (spec L): one listener maps keys to the same actions as the buttons.
+  // Keyboard: one listener maps keys to the same actions as the buttons.
   const hit = it?.kind === "bank" ? bankMatch(it.bank, bankSel, typed) : -1;
   const audio = !it ? "" : it.kind === "learn" ? it.phrase : (it.kind === "choice" || it.kind === "input") ? it.listen : "";
   const keyState: KeyState = {

@@ -253,7 +253,7 @@ export async function loadGuide(enrollmentId: number, c: Base, unit: Unit): Prom
   return g;
 }
 
-// ---- Tutor call (spec T): the tutor's reply to one event ----
+// ---- Tutor call: the tutor's reply to one event ----
 
 /** With `onText` the reply streams (SPR-13); see generateStream. */
 export function tutorTurn(c: Base & { about?: string[]; coach?: string }, who: CharacterId, unit: Unit, history: TutorMsg[], notes: string, event: TutorEvent, screen = "",
@@ -292,7 +292,7 @@ export async function rememberSession(profileId: number, native: string, source:
   } catch (e) { console.error("memory", e); return 0; }
 }
 
-// ---- Practice together (spec P): one call per unit, cached ----
+// ---- Practice together: one call per unit, cached ----
 
 export async function loadPractice(enrollmentId: number, c: Base, unit: Unit): Promise<PracticeSet> {
   const key = `practice:${unit.id}`;

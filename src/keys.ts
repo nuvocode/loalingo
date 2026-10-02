@@ -1,4 +1,4 @@
-// Keyboard control of lessons and stories (spec L). Pure: a key plus the screen's state in, an action out.
+// Keyboard control of lessons and stories. Pure: a key plus the screen's state in, an action out.
 
 export type KeyState = {
   kind: "choice" | "bank" | "match" | "speak" | "input" | "other";

@@ -1,4 +1,4 @@
-// Profile deletion (spec C). Pure so it can be tested on sql.js without importing db.ts (which touches `window`).
+// Profile deletion. Pure so it can be tested on sql.js without importing db.ts (which touches `window`).
 
 /** One BEGIN…COMMIT script: the pooled plugin-sql connection needs the whole transaction in a single execute call. */
 export function deleteProfileSql(id: number) {

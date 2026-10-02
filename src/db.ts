@@ -1,5 +1,5 @@
-// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql, `sprigo.db` in the data folder (spec B, src/datadir.ts).
-// Schema changes live in src/migrations.ts and run on open (spec A).
+// SQLite storage (DECISIONS A5, E4–E6). In Tauri: tauri-plugin-sql, `sprigo.db` in the data folder (src/datadir.ts).
+// Schema changes live in src/migrations.ts and run on open.
 // ponytail: in a plain browser (the Vite preview used during development) the same SQL runs on sql.js,
 // persisted to localStorage. Never used in the shipped app.
 import type { Cefr } from "./course";

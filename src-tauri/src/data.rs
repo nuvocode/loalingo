@@ -1,4 +1,4 @@
-//! Data folder, lock file and backups (spec B). The rules live in src/datarules.ts; these are the file operations
+//! Data folder, lock file and backups. The rules live in src/datarules.ts; these are the file operations
 //! the webview can't do. ponytail: paths come from the webview, which can already read and write any file through
 //! the sql plugin (`VACUUM INTO`, `ATTACH`), so they are not scoped here either.
 use std::path::{Path, PathBuf};

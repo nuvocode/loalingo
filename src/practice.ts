@@ -1,4 +1,4 @@
-// Practice together (spec P): the exercise panel inside the tutor call. Pure module, tested by src/practice.test.ts.
+// Practice together: the exercise panel inside the tutor call. Pure module, tested by src/practice.test.ts.
 // The app owns the flow and grades answers; the tutor only gets events and a text picture of the screen (describePractice).
 import { z } from "zod";
 import { CEFR, levelsOf, type Cefr, type Course, type CourseLevel } from "./course.ts";

@@ -1,4 +1,4 @@
-// Tutor video call (spec T): the tutor on the left, the learner's camera or profile on the right, a thin control bar below.
+// Tutor video call: the tutor on the left, the learner's camera or profile on the right, a thin control bar below.
 // Each event (speech, a typed message, silence, mic/cam toggles) gets one model reply; the rules live in src/tutor.ts.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";

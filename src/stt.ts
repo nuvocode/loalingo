@@ -87,7 +87,7 @@ export type Listener = { pause(bargeIn?: boolean): void; resume(): void; stop():
 // ponytail: 3× threshold, 300 ms start, guessed; raise if the tutor's own voice through the speakers still cuts her off
 const STRICT = { ...VAD, threshold: VAD.threshold * 3, startMs: 300 };
 
-/** Hands-free listening (tutor call, spec T): the voice detector cuts the mic stream into utterances and each one is transcribed.
+/** Hands-free listening (tutor call): the voice detector cuts the mic stream into utterances and each one is transcribed.
  *  With `native` each utterance also gets its speech signals (SPR-25), measured here so the phone companion gets them too. */
 export async function listen(lang: string, on: { utterance: (text: string, m?: Utterance) => void; speech?: () => void; level?: (rms: number) => void; error?: (e: Error) => void }, native?: string): Promise<Listener> {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });

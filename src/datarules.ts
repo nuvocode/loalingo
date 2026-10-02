@@ -1,4 +1,4 @@
-// Data folder rules (spec B), pure so they run under `node --test`. The Tauri side is src/datadir.ts.
+// Data folder rules, pure so they run under `node --test`. The Tauri side is src/datadir.ts.
 
 export type Lock = { device: string; at: number };
 

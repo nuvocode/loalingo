@@ -1,4 +1,4 @@
-// Ordered schema changes (spec A). Append only: never edit a shipped step, add a new one with the next `v`.
+// Ordered schema changes. Append only: never edit a shipped step, add a new one with the next `v`.
 import type { Migration } from "./migrate";
 
 export const MIGRATIONS: Migration[] = [

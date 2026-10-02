@@ -1,4 +1,4 @@
-// Settings > AI and voice: speech provider rows and their sheets (spec D).
+// Settings > AI and voice: speech provider rows and their sheets.
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";

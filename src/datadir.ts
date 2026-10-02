@@ -1,4 +1,4 @@
-// Data folder, lock and backups (spec B). Tauri only: the browser preview keeps its sql.js database.
+// Data folder, lock and backups. Tauri only: the browser preview keeps its sql.js database.
 // Rules in src/datarules.ts, file operations in src-tauri/src/data.rs.
 import { invoke } from "@tauri-apps/api/core";
 import type { SqlDb } from "./migrate";

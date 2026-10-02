@@ -1,4 +1,4 @@
-// A character's animated bust (spec K): blinks while idle, glances up while thinking, shapes its mouth to the voice.
+// A character's animated bust: blinks while idle, glances up while thinking, shapes its mouth to the voice.
 // Animation writes CSS variables on the root element and the mouth paths directly, so React never re-renders per frame.
 import { useEffect, useRef } from "react";
 import type { CharacterId, FaceSpec } from "../characters";

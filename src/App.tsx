@@ -76,7 +76,7 @@ function BootErrorScreen({ e }: { e: BootError }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const act = (f: () => Promise<void> | void) => async () => { setBusy(true); try { await f(); } catch (x) { console.error(x); setBusy(false); } };
-  // Data folder / lock (spec B): retrying is a reload, the boot sequence checks everything again.
+  // Data folder / lock: retrying is a reload, the boot sequence checks everything again.
   // Phone companion: one device at a time; continuing here reloads, which takes the data back (src/companion.ts).
   if (e.kind === "onPhone" || e.kind === "onDesktop") return (
     <div className="boot-error" role="alert">

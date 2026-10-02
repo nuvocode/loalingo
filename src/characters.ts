@@ -1,6 +1,6 @@
-// Roleplay cast (spec E). Pure data, no browser APIs: goals and personas are English prompt text, topic titles live in i18n as roleplay.topics.<char>.<topic>.
+// Roleplay cast. Pure data, no browser APIs: goals and personas are English prompt text, topic titles live in i18n as roleplay.topics.<char>.<topic>.
 export type Topic = { id: string; goal: string };
-/** Which parts and colors make up a character's cartoon bust (spec K). Parts are drawn in src/face/parts.tsx. */
+/** Which parts and colors make up a character's cartoon bust. Parts are drawn in src/face/parts.tsx. */
 export type FaceSpec = {
   head: "round" | "oval" | "square"; ears: "small" | "big"; eyes: "round" | "almond" | "sleepy";
   brows: "flat" | "arched" | "thick"; nose: "button" | "long" | "wide"; mouth: "small" | "wide" | "smile";

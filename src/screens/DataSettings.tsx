@@ -1,4 +1,4 @@
-// Settings > Data (spec B): where the database lives, export, import, reveal. Desktop only.
+// Settings > Data: where the database lives, export, import, reveal. Desktop only.
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
