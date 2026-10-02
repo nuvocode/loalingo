@@ -165,7 +165,7 @@
   "memory": {
     "title": "Sprigo seni tanıyor",
     "empty": "Henüz bir şey yok. Bir tutor'la ya da kendi konunda sohbet ettikçe Sprigo'nun seninle ilgili öğrendikleri burada görünür.",
-    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor.",
+    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor. Açmak için Ayarlar > Gelişmiş.",
     "hint": "Düzeltmek için bir satıra dokun, saklanmaması gerekeni sil.",
     "kinds": {
       "interest": "İlgi alanları",

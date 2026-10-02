@@ -177,7 +177,7 @@
   "memory": {
     "title": "Sprigo te connaît",
     "empty": "Rien pour l'instant. Quand tu parles avec un tuteur ou discutes de ton propre sujet, ce que Sprigo apprend sur toi apparaît ici.",
-    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi.",
+    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi. Active-la dans Paramètres > Avancé.",
     "hint": "Touche une ligne pour la corriger, ou retire ce qui ne doit pas être gardé.",
     "kinds": {
       "interest": "Centres d'intérêt",

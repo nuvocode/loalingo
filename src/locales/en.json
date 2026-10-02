@@ -167,7 +167,7 @@
   "memory": {
     "title": "Sprigo knows you",
     "empty": "Nothing yet. As you talk with a tutor or chat on your own topic, what Sprigo learns about you shows up here.",
-    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you.",
+    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you. Turn it on in Settings > Advanced.",
     "hint": "Tap a line to correct it, or remove what shouldn't be kept.",
     "kinds": {
       "interest": "Interests",

@@ -167,7 +167,7 @@
   "memory": {
     "title": "Sprigo kennt dich",
     "empty": "Noch nichts. Wenn du mit einem Tutor sprichst oder über dein eigenes Thema chattest, erscheint hier, was Sprigo über dich erfährt.",
-    "emptyOff": "Das Gedächtnis ist aus: Sprigo speichert und nutzt nichts über dich.",
+    "emptyOff": "Das Gedächtnis ist aus: Sprigo speichert und nutzt nichts über dich. Schalte es unter Einstellungen > Erweitert ein.",
     "hint": "Tippe auf eine Zeile, um sie zu korrigieren, oder entferne, was nicht bleiben soll.",
     "kinds": {
       "interest": "Interessen",
