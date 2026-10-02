@@ -93,6 +93,20 @@ fn stt_use(app: tauri::AppHandle, name: String) -> Result<(), String> {
     std::fs::write(dir.join("whisper.txt"), name).map_err(|e| e.to_string())
 }
 
+/// Deletes a downloaded model; if it was in use, the bundled base model takes over.
+#[tauri::command]
+fn stt_remove(app: tauri::AppHandle, name: String) -> Result<(), String> {
+    let file = stt_file(&name).ok_or("unknown model")?;
+    let dir = models_dir(&app)?;
+    if std::fs::read_to_string(dir.join("whisper.txt")).unwrap_or_default().trim() == name {
+        let _ = std::fs::remove_file(dir.join("whisper.txt"));
+    }
+    if let Ok(mut g) = STT.lock() {
+        if g.as_ref().is_some_and(|(p, _)| p.ends_with(file)) { g.take(); } // free its memory too
+    }
+    std::fs::remove_file(dir.join(file)).map_err(|e| e.to_string())
+}
+
 /// Downloads `name` from the whisper.cpp model repo, reporting 0..1 on `progress`.
 #[tauri::command]
 async fn stt_download(app: tauri::AppHandle, name: String, progress: tauri::ipc::Channel<f64>) -> Result<(), String> {
@@ -231,7 +245,7 @@ pub fn run() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, stt_models, stt_use, stt_download, transcribe, set_background,
+        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, stt_models, stt_use, stt_remove, stt_download, transcribe, set_background,
             companion::companion_set, companion::companion_status, companion::companion_reply,
             data::data_location, data::set_data_dir, data::dir_ok, data::file_exists, data::lock_read, data::lock_write,
             data::lock_remove, data::backups_list, data::backups_remove, data::copy_file, data::is_sqlite, data::install_db])

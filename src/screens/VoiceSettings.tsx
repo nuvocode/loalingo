@@ -1,12 +1,12 @@
 // Settings > AI and voice: speech provider rows and their sheets.
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { getSetting, isCompanion, isTauri, setSetting } from "../db";
 import { elevenVoice, getElevenKey, loadKokoro, loadPiper, localTts, sayWithEleven, sayWithLocal, setElevenKey, speak, speakingWith, TTS_KEY, ttsProvider, ttsSpeaks, type TtsProvider } from "../tts";
 import { ELEVEN_VOICES, LOCAL_TTS } from "../ttsCloud";
 import { Icon } from "../icons";
-import { deepgramTranscribe, downloadWhisper, getDeepgramKey, listen, pickWhisper, resetSttReady, setDeepgramKey, sttProvider, sttReady, whisperModels, type Listener, type SttProvider, type WhisperModel } from "../stt";
+import { deepgramTranscribe, downloadWhisper, getDeepgramKey, listen, pickWhisper, removeWhisper, resetSttReady, setDeepgramKey, sttProvider, sttReady, whisperModels, type Listener, type SttProvider, type WhisperModel } from "../stt";
 import { isNoise } from "../tutor";
 import { useLangName } from "./Profiles";
 import { wav16 } from "../wav";
@@ -311,6 +311,7 @@ function WhisperSheet({ onBack }: { onBack: () => void }) {
   const [have, setHave] = useState<WhisperModel[]>([]);
   const [busy, setBusy] = useState<{ m: WhisperModel; pct: number } | null>(null);
   const [err, setErr] = useState("");
+  const [ask, setAsk] = useState<WhisperModel | null>(null); // delete asked, waiting for the second tap
   useEffect(() => { whisperModels().then(([c, h]) => { setCur(c); setHave(h); }).catch((e) => setErr(String(e))); }, []);
   const pick = async (m: WhisperModel) => {
     if (busy || m === cur) return;
@@ -327,18 +328,38 @@ function WhisperSheet({ onBack }: { onBack: () => void }) {
     } catch (e) { setErr(String(e)); } // Tauri invoke rejects with strings
     finally { setBusy(null); }
   };
+  const remove = async (m: WhisperModel) => {
+    if (busy) return;
+    setErr(""); setAsk(null);
+    try {
+      await removeWhisper(m);
+      setHave((h) => h.filter((x) => x !== m));
+      if (cur === m) setCur("base");
+      toast(t("voice.whisperRemoved"));
+    } catch (e) { setErr(String(e)); }
+  };
   return (
     <div className="od-stack" style={sheet}>
       <h3 style={{ textAlign: "center" }}>{t("voice.whisperModel")}</h3>
       <p className="small">{t("voice.whisperModelDesc")}</p>
       <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("voice.whisperModel")}>
         {WHISPER.map((m, i) => (
-          <div key={m} className={`voice-option${cur === m ? " on" : ""}`}>
-            <button role="radio" aria-checked={cur === m} disabled={!!busy} onClick={() => pick(m)}>
-              <Signal bars={i + 1} color="var(--green)" />
-              <span className="od-field od-fill"><b>{t(`voice.whisper${cap(m)}`)}</b><span className="muted small">{t(`voice.whisper${cap(m)}Good`)}</span></span>
-            </button>
-          </div>
+          <Fragment key={m}>
+            <div className={`voice-option${cur === m ? " on" : ""}`}>
+              <button role="radio" aria-checked={cur === m} disabled={!!busy} onClick={() => pick(m)}>
+                <Signal bars={i + 1} color="var(--green)" />
+                <span className="od-field od-fill"><b>{t(`voice.whisper${cap(m)}`)}</b><span className="muted small">{t(`voice.whisper${cap(m)}Good`)}</span></span>
+              </button>
+              {have.includes(m) && <button className="icon-btn" aria-label={t("voice.whisperRemove", { name: t(`voice.whisper${cap(m)}`) })} disabled={!!busy} onClick={() => setAsk(ask === m ? null : m)}><Icon name="trash" /></button>}
+            </div>
+            {ask === m && (
+              <div className="od-row" style={gap("8px")} role="alert">
+                <span className="small od-fill">{t("voice.whisperRemoveAsk", { name: t(`voice.whisper${cap(m)}`) })}</span>
+                <button className="btn btn-ghost" onClick={() => setAsk(null)}>{t("sheet.cancel")}</button>
+                <button className="btn btn-danger" onClick={() => remove(m)}>{t("profiles.delete")}</button>
+              </div>
+            )}
+          </Fragment>
         ))}
       </div>
       {busy && (

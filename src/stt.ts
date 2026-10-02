@@ -35,6 +35,7 @@ export type WhisperModel = "base" | "small" | "turbo";
 /** [model in use, downloaded models] */
 export const whisperModels = () => invoke<[WhisperModel, WhisperModel[]]>("stt_models");
 export const pickWhisper = (name: WhisperModel) => invoke("stt_use", { name });
+export const removeWhisper = (name: WhisperModel) => invoke("stt_remove", { name });
 export function downloadWhisper(name: WhisperModel, onProgress: (p: number) => void) {
   const progress = new Channel<number>();
   progress.onmessage = onProgress;
