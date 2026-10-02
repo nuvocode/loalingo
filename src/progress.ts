@@ -36,7 +36,7 @@ export const xpMult = (s: Stats, now = Date.now()) => (s.doubleXpUntil > now ? 2
 
 export const today = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-const addDays = (day: string, n: number) => { const [y, m, d] = day.split("-").map(Number); return today(new Date(y, m - 1, d + n)); };
+export const addDays = (day: string, n: number) => { const [y, m, d] = day.split("-").map(Number); return today(new Date(y, m - 1, d + n)); };
 const daysBetween = (a: string, b: string) => { let n = 0; while (addDays(a, n) < b) n++; return n; }; // ponytail: loop, gaps are days not years
 
 /** Starts a new day: daily counters reset, hearts refill, a missed day breaks the streak unless freezes cover it. */

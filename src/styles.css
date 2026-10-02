@@ -587,6 +587,9 @@ html[data-theme="dark"] .garden-hero{background:var(--btd)}
 .garden-cards .card{padding:14px 16px}
 .garden-cards h3{font-size:17px;font-weight:900;margin-bottom:4px}
 .garden-cards .ic svg{width:32px;height:32px}
+.garden-cards .garden-note{grid-column:1/-1;--od-gap:12px;align-items:flex-start}
+.garden-note .ic{color:var(--green);flex:none}
+.garden-note p{line-height:1.5}
 .garden-fruit{display:flex;gap:6px;margin:6px 0}
 .garden-fruit span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:900;border:2px dashed var(--border);color:var(--text-faint)}
 .garden-fruit span.on{background:var(--fruit);border:none;color:#fff}

@@ -1,15 +1,39 @@
 // Full-screen garden (SPR-10): the streak tree large, on the learner's biome, with streak, fruit and greenhouse.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../icons";
 import { useApp } from "../store";
 import { levelsOf, checkpointId } from "../course";
 import { biomeScene, biomeVars } from "../biomes";
 import { STAGE_LESSONS, treeState, treeSvg } from "../tree";
+import { loadGardenNote } from "../lessons";
+import { moodOf, type NoteInfo } from "../gardenNote";
+import { today } from "../progress";
+
+const STAGE_EN = ["seed", "sprout", "sapling", "young tree", "full-grown tree"];
+
+/** Full-width row under the cards; hidden without an AI provider or when writing fails. */
+function GardenNote({ info }: { info: NoteInfo }) {
+  const { t, i18n } = useTranslation();
+  const { ai, enrollment, profile } = useApp();
+  const [text, setText] = useState<string | null | undefined>(undefined); // undefined: writing, null: none
+  useEffect(() => {
+    if (!ai || !enrollment || !profile) return setText(null);
+    loadGardenNote(enrollment.id, profile.id, i18n.resolvedLanguage ?? "en", info, today())
+      .then(setText, (e) => { console.error("garden note", e); setText(null); });
+  }, [ai, enrollment?.id]);
+  if (text === null) return null;
+  return (
+    <div className="card garden-note od-row" aria-live="polite">
+      <Icon name="spark" />
+      {text ? <p className="od-fill">{text}</p> : <p className="od-fill muted small">{t("garden.noteLoading")}</p>}
+    </div>
+  );
+}
 
 export function Garden() {
   const { t } = useTranslation();
-  const { s, done, course, enrollment, go } = useApp();
+  const { s, xp, done, course, enrollment, profile, go } = useApp();
   const close = () => (history.length > 1 ? history.back() : go("learn"));
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -22,6 +46,7 @@ export function Garden() {
   const tree = treeState(done, s.streak, s.lastActive);
   const nextAt = STAGE_LESSONS[tree.stage + 1];
   const level = enrollment?.level ?? "A1";
+  const fruit = course ? levelsOf(course).filter((l) => done.has(checkpointId(l))).length : 0;
   const streakMsg = tree.dry ? "garden.streakDry" : s.streak ? "garden.streakOk" : "garden.streakNew";
 
   return (
@@ -62,6 +87,10 @@ export function Garden() {
           </span>
           {!s.streakFreeze && <button className="btn btn-ghost" onClick={() => go("shop")}>{t("garden.toShop")}</button>}
         </div>
+        {course && <GardenNote info={{
+          name: profile?.name ?? "", course: course.name, level, mood: moodOf(s.streak, tree.dry),
+          roots: s.streak, bestRoots: s.bestStreak, xp, lessons: tree.lessons, stage: STAGE_EN[tree.stage], fruit, greenhouses: s.streakFreeze,
+        }} />}
       </div>
     </div>
   );
