@@ -371,6 +371,7 @@
     "sttWhisper": "Whisper (local)",
     "ttsKokoro": "Kokoro (local, natural)",
     "ttsElevenlabs": "ElevenLabs (cloud, most natural)",
+    "ttsLocal": "Local speech server",
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
@@ -591,13 +592,19 @@
       "system": "System voice",
       "piper": "Piper",
       "kokoro": "Kokoro",
-      "elevenlabs": "ElevenLabs"
+      "elevenlabs": "ElevenLabs",
+      "local": "Local speech server"
     },
     "elevenlabsGood": "Studio-quality cloud voices; needs an API key.",
     "elevenlabsDesc": "ElevenLabs reads the tutors' lines with very natural voices in every course language. Each line is sent to ElevenLabs and counts against your plan's characters.",
     "elevenKey": "ElevenLabs API key",
     "elevenVoiceF": "Female voice ID (optional)",
-    "elevenVoiceM": "Male voice ID (optional)"
+    "elevenVoiceM": "Male voice ID (optional)",
+    "localGood": "Your own TTS server on this Mac or network.",
+    "localDesc": "Connects to an OpenAI-compatible speech server you run yourself (for example Kokoro-FastAPI in Docker, port 8880). Lines stay on your machine; the voice name is the server's own.",
+    "localUrl": "Server address",
+    "localModel": "Model",
+    "localVoice": "Voice"
   },
   "data": {
     "section": "Data",

@@ -368,6 +368,7 @@
     "sttWhisper": "Whisper (yerel)",
     "ttsKokoro": "Kokoro (yerel, doğal)",
     "ttsElevenlabs": "ElevenLabs (bulut, en doğal)",
+    "ttsLocal": "Yerel ses sunucusu",
     "sttDeepgram": "Deepgram (bulut)",
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
@@ -586,13 +587,19 @@
       "system": "Sistem sesi",
       "piper": "Piper",
       "kokoro": "Kokoro",
-      "elevenlabs": "ElevenLabs"
+      "elevenlabs": "ElevenLabs",
+      "local": "Yerel ses sunucusu"
     },
     "elevenlabsGood": "Stüdyo kalitesinde bulut sesleri; API anahtarı gerekir.",
     "elevenlabsDesc": "ElevenLabs, tutor'ların cümlelerini her kurs dilinde çok doğal seslerle okur. Her cümle ElevenLabs'e gönderilir ve planındaki karakter hakkından düşer.",
     "elevenKey": "ElevenLabs API anahtarı",
     "elevenVoiceF": "Kadın sesi kimliği (isteğe bağlı)",
-    "elevenVoiceM": "Erkek sesi kimliği (isteğe bağlı)"
+    "elevenVoiceM": "Erkek sesi kimliği (isteğe bağlı)",
+    "localGood": "Bu Mac'te ya da ağında çalışan kendi TTS sunucun.",
+    "localDesc": "Kendi çalıştırdığın OpenAI uyumlu bir ses sunucusuna bağlanır (örneğin Docker'da Kokoro-FastAPI, 8880 portu). Cümleler bilgisayarından çıkmaz; ses adı sunucunun kendi adıdır.",
+    "localUrl": "Sunucu adresi",
+    "localModel": "Model",
+    "localVoice": "Ses"
   },
   "data": {
     "section": "Veri",

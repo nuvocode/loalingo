@@ -371,6 +371,7 @@
     "sttWhisper": "Whisper (lokal)",
     "ttsKokoro": "Kokoro (lokal, natürlich)",
     "ttsElevenlabs": "ElevenLabs (Cloud, am natürlichsten)",
+    "ttsLocal": "Lokaler Sprachserver",
     "sttDeepgram": "Deepgram (Cloud)",
     "hearts": "Tropfen",
     "heartsDesc": "Für jeden Fehler verlierst du einen Tropfen; sie füllen sich täglich wieder auf",
@@ -591,13 +592,19 @@
       "system": "Systemstimme",
       "piper": "Piper",
       "kokoro": "Kokoro",
-      "elevenlabs": "ElevenLabs"
+      "elevenlabs": "ElevenLabs",
+      "local": "Lokaler Sprachserver"
     },
     "elevenlabsGood": "Cloud-Stimmen in Studioqualität; braucht einen API-Schlüssel.",
     "elevenlabsDesc": "ElevenLabs liest die Sätze der Tutoren mit sehr natürlichen Stimmen in jeder Kurssprache. Jeder Satz geht an ElevenLabs und zählt zu den Zeichen deines Tarifs.",
     "elevenKey": "ElevenLabs-API-Schlüssel",
     "elevenVoiceF": "ID der Frauenstimme (optional)",
-    "elevenVoiceM": "ID der Männerstimme (optional)"
+    "elevenVoiceM": "ID der Männerstimme (optional)",
+    "localGood": "Dein eigener TTS-Server auf diesem Mac oder im Netzwerk.",
+    "localDesc": "Verbindet sich mit einem OpenAI-kompatiblen Sprachserver, den du selbst betreibst (zum Beispiel Kokoro-FastAPI in Docker, Port 8880). Die Sätze bleiben auf deinem Rechner; der Stimmenname ist der des Servers.",
+    "localUrl": "Serveradresse",
+    "localModel": "Modell",
+    "localVoice": "Stimme"
   },
   "data": {
     "section": "Daten",

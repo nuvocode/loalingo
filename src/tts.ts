@@ -1,15 +1,16 @@
-// Text-to-speech: system voices, local Piper (every course language), local Kokoro (English only) or ElevenLabs (cloud, desktop only).
-// Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro" | "elevenlabs". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
-// and stream one sentence at a time, so the first sentence plays while the rest is made. ElevenLabs returns the whole line as MP3.
+// Text-to-speech: system voices, local Piper (every course language), local Kokoro (English only), ElevenLabs (cloud) or a local speech server; the last two desktop only.
+// Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro" | "elevenlabs" | "local". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
+// and stream one sentence at a time, so the first sentence plays while the rest is made. ElevenLabs and a local OpenAI-compatible
+// speech server ("local", e.g. Kokoro-FastAPI) return the whole line as MP3.
 import { invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { getSetting, isCompanion, isTauri } from "./db";
-import { ELEVEN_VOICES, elevenRequest, type ByteRequest } from "./ttsCloud";
+import { ELEVEN_VOICES, LOCAL_TTS, elevenRequest, localRequest, type ByteRequest, type LocalTts } from "./ttsCloud";
 import { pickSystemVoice } from "./voices";
 import { mouthBright, mouthLevel, remember, zcr } from "./audio";
 
 export type Voice = { gender: "f" | "m"; kokoro?: string };
-export type TtsProvider = "system" | "piper" | "kokoro" | "elevenlabs";
+export type TtsProvider = "system" | "piper" | "kokoro" | "elevenlabs" | "local";
 type Engine = "piper" | "kokoro"; // the worker engines
 type Chunk = { audio: Float32Array; rate: number };
 type Msg = { type: string; id?: number; p?: number; message?: string; voice?: string } & Partial<Chunk>;
@@ -18,7 +19,7 @@ type Msg = { type: string; id?: number; p?: number; message?: string; voice?: st
 export const TTS_KEY = isCompanion ? "tts.phone" : "tts";
 export const ttsProvider = async (): Promise<TtsProvider> => {
   const v = await getSetting(TTS_KEY);
-  return ((v === "kokoro" || v === "elevenlabs") && !isCompanion) || v === "piper" ? v : "system";
+  return ((v === "kokoro" || v === "elevenlabs" || v === "local") && !isCompanion) || v === "piper" ? v : "system";
 };
 
 // ponytail: the dev browser preview has no keychain, so it keeps the key in localStorage. Never used in the app.
@@ -30,6 +31,8 @@ export async function setElevenKey(value: string | null) {
 }
 /** The learner's ElevenLabs voice ids (device settings "tts.eleven.voice.f/m"), else the defaults. */
 export const elevenVoice = async (gender: "f" | "m" = "f") => (await getSetting(`tts.eleven.voice.${gender}`)) || ELEVEN_VOICES[gender];
+/** The local speech server (device setting "tts.local"). */
+export const localTts = async (): Promise<LocalTts> => ({ ...LOCAL_TTS, ...JSON.parse((await getSetting("tts.local")) ?? "{}") });
 const http = (isTauri ? tauriFetch : window.fetch.bind(window)) as typeof fetch;
 
 // ponytail: one voice per language and gender; Turkish has no female Piper voice, dfki is the closest
@@ -46,6 +49,7 @@ const piperVoice = (lang: string, gender: "f" | "m" = "f") => PIPER[lang.slice(0
 async function engineFor(lang: string, voice?: Voice, p?: TtsProvider): Promise<[Exclude<TtsProvider, "system">, string] | null> {
   p ??= await ttsProvider();
   if (p === "elevenlabs") return ["elevenlabs", await elevenVoice(voice?.gender)];
+  if (p === "local") return ["local", JSON.stringify(await localTts())];
   if (p === "kokoro" && lang.startsWith("en")) return ["kokoro", voice?.kokoro ?? (voice?.gender === "m" ? "am_michael" : "af_heart")];
   const v = p === "piper" && piperVoice(lang, voice?.gender);
   return v ? ["piper", v] : null;
@@ -106,7 +110,7 @@ export const loadPiper = (lang: string, onProgress?: (p: number) => void, gender
 /** Starts loading the local voice this language will use, so the first line is not waiting on the model. */
 export async function prewarm(lang: string, voice?: Voice) {
   const got = await engineFor(lang, voice);
-  if (got && got[0] !== "elevenlabs") await load(got[0], got[0] === "kokoro" ? "" : got[1]);
+  if (got && (got[0] === "piper" || got[0] === "kokoro")) await load(got[0], got[0] === "kokoro" ? "" : got[1]);
 }
 
 let seq = 0;
@@ -245,6 +249,12 @@ const elevenLine = (text: string, lang: string, voice: string, key?: string) => 
     return elevenRequest(k, voice, text, lang);
   });
 
+/** Settings' test for the local server: no fallback, so an unreachable server throws; resolves once audio starts. */
+export async function sayWithLocal(text: string, c: LocalTts) {
+  stopSpeaking();
+  await viaBytes(`test:local\n${text}`, async () => localRequest(c, text), seq, () => {});
+}
+
 /** Settings' test: speaks with this key and voice, no fallback, so a bad key throws; resolves once audio starts. */
 export async function sayWithEleven(text: string, lang: string, key: string, voice: string) {
   stopSpeaking();
@@ -277,6 +287,7 @@ export async function speak(text: string, lang: string, voice?: Voice, started?:
     try {
       lastEngine = local[0];
       if (local[0] === "elevenlabs") await viaBytes(`elevenlabs:${local[1]}\n${text}`, elevenLine(text, lang, local[1]), mine, done);
+      else if (local[0] === "local") await viaBytes(`local:${local[1]}\n${text}`, async () => localRequest(JSON.parse(local[1]), text), mine, done);
       else await viaWorker(local[0], text, local[1], mine, done);
       return over;
     } catch (e) {
