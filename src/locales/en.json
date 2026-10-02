@@ -527,6 +527,8 @@
     "anthropicInfo": "Claude models write your lessons and chats. Requests go to Anthropic and are billed by usage.",
     "geminiGood": "Google's fast cloud models; needs an API key.",
     "geminiInfo": "Gemini models write your lessons and chats. Requests go to Google; usage limits and prices depend on your key.",
+    "openrouterGood": "Hundreds of models from many labs behind one API key.",
+    "openrouterInfo": "Connects to OpenRouter, which routes each request to the model you pick (OpenAI, Anthropic, Google, open models…). Requests go to OpenRouter and the model's provider; billed by usage on your OpenRouter key. Sprigo turns the model's thinking off where it can, so lessons stay fast.",
     "configure": "{{name}} settings"
   },
   "stt": {

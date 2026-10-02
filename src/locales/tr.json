@@ -522,6 +522,8 @@
     "anthropicInfo": "Derslerini ve sohbetlerini Claude modelleri yazar. İstekler Anthropic'e gider, kullanıma göre ücretlendirilir.",
     "geminiGood": "Google'ın hızlı bulut modelleri; API anahtarı gerekir.",
     "geminiInfo": "Derslerini ve sohbetlerini Gemini modelleri yazar. İstekler Google'a gider; kullanım sınırı ve ücret anahtarına bağlıdır.",
+    "openrouterGood": "Birçok laboratuvarın yüzlerce modeli, tek API anahtarıyla.",
+    "openrouterInfo": "OpenRouter'a bağlanır; her isteği seçtiğin modele (OpenAI, Anthropic, Google, açık modeller…) yönlendirir. İstekler OpenRouter'a ve modelin sağlayıcısına gider, OpenRouter anahtarına kullanıma göre ücretlendirilir. Sprigo, mümkün olan modellerde düşünmeyi kapatır; dersler hızlı kalır.",
     "configure": "{{name}} ayarları"
   },
   "stt": {
