@@ -14,6 +14,7 @@ import { rehearseId, type Formality } from "../rehearsal";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
+import { achievements, nearest, roman, type Achievement } from "../achievements";
 
 const iconBox = (bg: string, fg: string, size = 48, radius: number | string = 12): React.CSSProperties => ({
   width: size, height: size, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: radius, background: bg, color: fg,
@@ -231,9 +232,49 @@ export function Shop() {
   );
 }
 
+/** Earned achievements are all one gold; the tier sits on the badge's corner. */
+function AchBadge({ a, size = 52 }: { a: Achievement; size?: number }) {
+  const { t } = useTranslation();
+  const title = `${t(`profile.ach.${a.family}.title`)} ${roman(a.tier)}`;
+  return (
+    <span className={`ach-badge ${a.earned ? "earned" : ""}`} style={{ width: size, height: size }} title={title} role="img" aria-label={title}>
+      <Icon name={a.icon} /><i>{roman(a.tier)}</i>
+    </span>
+  );
+}
+
+function AchRow({ a }: { a: Achievement }) {
+  const { t } = useTranslation();
+  const done = Math.min(a.cur, a.goal);
+  return (
+    <div className="card od-row" style={{ "--od-gap": "14px", textAlign: "left" } as React.CSSProperties}>
+      <AchBadge a={a} size={44} />
+      <span className="od-field od-fill"><b>{t(`profile.ach.${a.family}.title`)} {roman(a.tier)}</b><span className="muted small">{t(`profile.ach.${a.family}.desc`, { count: a.goal })}</span>
+        {!a.earned && <span className="progress-track" style={{ display: "block", height: 10, marginTop: 6 }}><i className="progress-fill" style={{ display: "block", width: `${(done / a.goal) * 100}%` }} /></span>}
+      </span>
+      {a.earned ? <span style={{ color: "var(--gold-dark)" }}><Icon name="check" /></span> : <span className="od-nowrap muted small" style={{ fontWeight: 800 }}>{done}/{a.goal}</span>}
+    </div>
+  );
+}
+
+function AchievementsSheet({ list }: { list: Achievement[] }) {
+  const { t } = useTranslation();
+  const { closeSheet } = useApp();
+  return (
+    <div className="od-stack" style={{ "--od-gap": "10px" } as React.CSSProperties}>
+      <h3>{t("profile.achAllTitle")}</h3>
+      <span className="muted small">{t("profile.achEarned", { count: list.filter((a) => a.earned).length, total: list.length })}</span>
+      {list.map((a) => <AchRow key={a.id} a={a} />)}
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.close")}</button>
+    </div>
+  );
+}
+
 export function Profile() {
   const { t, i18n } = useTranslation();
-  const { s, xp, profile, done, go } = useApp();
+  const { s, xp, profile, done, legendary, enrollment, go, openSheet } = useApp();
+  const [words, setWords] = useState(0);
+  useEffect(() => { if (enrollment) db.listWords(enrollment.id).then((w) => setWords(w.length)); }, [enrollment?.id]);
   const league = useLeague();
   const since = new Date(profile!.created_at.replace(" ", "T") + "Z").toLocaleDateString(i18n.language, { month: "long", year: "numeric" });
   const stat = (v: React.ReactNode, k: string, c: string, onClick?: () => void) => {
@@ -245,9 +286,12 @@ export function Profile() {
       </Tag>
     );
   };
-  const ach: [IconName, string, number, number, string][] = [
-    ["roots", "achFire", s.bestStreak, 7, "var(--green)"], ["bolt", "achFast", s.bestDayXp, 50, "var(--gold-dark)"], ["book", "achBook", [...done].filter((d) => d.startsWith("story:")).length, 1, "var(--blue)"],
-  ];
+  // Lessons are plain step ids; stories are `story:<unit>`. Course-bound counts are the current course's.
+  const ach = achievements({
+    bestStreak: s.bestStreak, bestDayXp: s.bestDayXp, xp, words, legendary: legendary.size,
+    lessons: [...done].filter((d) => !d.includes(":")).length, stories: [...done].filter((d) => d.startsWith("story:")).length,
+  });
+  const earned = ach.filter((a) => a.earned);
   return (
     <>
       <div className="od-row profile-head" style={{ "--od-gap": "16px", marginTop: 24 } as React.CSSProperties}>
@@ -267,20 +311,15 @@ export function Profile() {
         <CoachCard />
         <MemoryCard />
       </div>
-      <h2 className="section-title">{t("profile.achievements")}</h2>
+      <div className="od-row section-title" style={{ "--od-gap": "12px" } as React.CSSProperties}>
+        <h2 className="od-fill" style={{ font: "inherit" }}>{t("profile.achievements")}</h2>
+        <button className="small" style={{ fontWeight: 800, color: "var(--blue)" }} onClick={() => openSheet(<AchievementsSheet list={ach} />)}>{t("profile.achAll")}</button>
+      </div>
+      {earned.length > 0 && <div className="ach-badges" aria-label={t("profile.achEarned", { count: earned.length, total: ach.length })}>
+        {earned.map((a) => <AchBadge key={a.id} a={a} />)}
+      </div>}
       <div className="od-stack" style={{ "--od-gap": "12px" } as React.CSSProperties}>
-        {ach.map(([ic, key, cur, goal, col]) => {
-          const done = Math.min(cur, goal);
-          return (
-            <div className="card od-row" style={{ "--od-gap": "14px" } as React.CSSProperties} key={key}>
-              <span style={iconBox("var(--surface)", col, 44, "50%")}><Icon name={ic} /></span>
-              <span className="od-field od-fill"><b>{t(`profile.${key}`)}</b><span className="muted small">{t(`profile.${key}Desc`)}</span>
-                <span className="progress-track" style={{ display: "block", height: 10, marginTop: 6 }}><i className="progress-fill" style={{ display: "block", width: `${(done / goal) * 100}%` }} /></span>
-              </span>
-              <span className="od-nowrap muted small" style={{ fontWeight: 800 }}>{done}/{goal}</span>
-            </div>
-          );
-        })}
+        {nearest(ach).map((a) => <AchRow key={a.id} a={a} />)}
       </div>
     </>
   );

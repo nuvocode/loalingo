@@ -166,12 +166,53 @@
     "top3": "Top 3",
     "forYou": "Solo para ti",
     "achievements": "Logros",
-    "achFire": "Raíces profundas",
-    "achFireDesc": "Cultiva raíces 7 días seguidos",
-    "achFast": "Veloz",
-    "achFastDesc": "Consigue 50 XP en un día",
-    "achBook": "Ratón de biblioteca",
-    "achBookDesc": "Termina tu primera historia",
+    "achAll": "Todos",
+    "achAllTitle": "Todos los logros",
+    "achEarned": "{{count}} de {{total}} conseguidos",
+    "ach": {
+      "streak": {
+        "title": "Raíces profundas",
+        "desc_one": "Cultiva raíces {{count}} día seguido",
+        "desc_other": "Cultiva raíces {{count}} días seguidos",
+        "desc_many": "Cultiva raíces {{count}} días seguidos"
+      },
+      "dayXp": {
+        "title": "Veloz",
+        "desc_one": "Consigue {{count}} XP en un día",
+        "desc_other": "Consigue {{count}} XP en un día",
+        "desc_many": "Consigue {{count}} XP en un día"
+      },
+      "xp": {
+        "title": "Cazador de XP",
+        "desc_one": "Consigue {{count}} XP en total",
+        "desc_other": "Consigue {{count}} XP en total",
+        "desc_many": "Consigue {{count}} XP en total"
+      },
+      "lessons": {
+        "title": "Constante",
+        "desc_one": "Termina {{count}} lección",
+        "desc_other": "Termina {{count}} lecciones",
+        "desc_many": "Termina {{count}} lecciones"
+      },
+      "stories": {
+        "title": "Ratón de biblioteca",
+        "desc_one": "Termina {{count}} historia",
+        "desc_other": "Termina {{count}} historias",
+        "desc_many": "Termina {{count}} historias"
+      },
+      "legendary": {
+        "title": "Maestro",
+        "desc_one": "Supera {{count}} desafío de maestría",
+        "desc_other": "Supera {{count}} desafíos de maestría",
+        "desc_many": "Supera {{count}} desafíos de maestría"
+      },
+      "words": {
+        "title": "Tesoro de palabras",
+        "desc_one": "Reúne {{count}} palabra en Mis palabras",
+        "desc_other": "Reúne {{count}} palabras en Mis palabras",
+        "desc_many": "Reúne {{count}} palabras en Mis palabras"
+      }
+    },
     "details": "Detalles"
   },
   "memory": {

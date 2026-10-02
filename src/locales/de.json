@@ -156,12 +156,46 @@
     "top3": "Top 3",
     "forYou": "Nur für dich",
     "achievements": "Erfolge",
-    "achFire": "Tiefe Wurzeln",
-    "achFireDesc": "Lass deine Wurzeln 7 Tage in Folge wachsen",
-    "achFast": "Blitzschnell",
-    "achFastDesc": "Sammle 50 XP an einem Tag",
-    "achBook": "Bücherwurm",
-    "achBookDesc": "Beende deine erste Geschichte",
+    "achAll": "Alle",
+    "achAllTitle": "Alle Erfolge",
+    "achEarned": "{{count}} von {{total}} erreicht",
+    "ach": {
+      "streak": {
+        "title": "Tiefe Wurzeln",
+        "desc_one": "Lass deine Wurzeln {{count}} Tag in Folge wachsen",
+        "desc_other": "Lass deine Wurzeln {{count}} Tage in Folge wachsen"
+      },
+      "dayXp": {
+        "title": "Blitzschnell",
+        "desc_one": "Sammle {{count}} XP an einem Tag",
+        "desc_other": "Sammle {{count}} XP an einem Tag"
+      },
+      "xp": {
+        "title": "XP-Jäger",
+        "desc_one": "Sammle insgesamt {{count}} XP",
+        "desc_other": "Sammle insgesamt {{count}} XP"
+      },
+      "lessons": {
+        "title": "Fleißig",
+        "desc_one": "Schließe {{count}} Lektion ab",
+        "desc_other": "Schließe {{count}} Lektionen ab"
+      },
+      "stories": {
+        "title": "Bücherwurm",
+        "desc_one": "Beende {{count}} Geschichte",
+        "desc_other": "Beende {{count}} Geschichten"
+      },
+      "legendary": {
+        "title": "Meister",
+        "desc_one": "Bestehe {{count}} Meisterprüfung",
+        "desc_other": "Bestehe {{count}} Meisterprüfungen"
+      },
+      "words": {
+        "title": "Wortschatz",
+        "desc_one": "Sammle {{count}} Wort in Meine Wörter",
+        "desc_other": "Sammle {{count}} Wörter in Meine Wörter"
+      }
+    },
     "details": "Details"
   },
   "memory": {
