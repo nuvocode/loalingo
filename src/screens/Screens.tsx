@@ -12,7 +12,7 @@ import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { rehearseId, type Formality } from "../rehearsal";
 import { currentUnit } from "../tutor";
-import { DRILL_MINUTES, drillId, nextPlanningSec, planningHistory } from "../drills";
+import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, nextPlanningSec, planningHistory } from "../drills";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
@@ -451,21 +451,25 @@ function RehearseSheet() {
 /** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Only the planning drill so far; #41–#44 add theirs to `list`. */
 function DrillsSheet() {
   const { t } = useTranslation();
-  const { closeSheet, profile, course, enrollment, done } = useApp();
+  const { closeSheet, profile, course, enrollment, done, s, setS } = useApp();
   const start = useStartLesson();
   const level = course && enrollment ? course.levels[enrollment.level] : undefined;
-  const [pick, setPick] = useState<"planning" | null>(null);
+  const [pick, setPick] = useState<Drill["kind"] | null>(null);
   const [topic, setTopic] = useState(level ? currentUnit(level, done).title : "");
   const [cast, setCast] = useState<CharacterId>("leo");
   const [planSec, setPlanSec] = useState(60);
   useEffect(() => { if (profile) db.listSpeechSessions(profile.id, 100).then((rows) => setPlanSec(nextPlanningSec(planningHistory(rows)))).catch(() => {}); }, [profile?.id]);
   const list = [
     { id: "planning" as const, icon: "clock" as IconName, title: t("practice.planning"), desc: planSec ? t("practice.planningDesc", { sec: planSec, min: DRILL_MINUTES }) : t("practice.planningDescNone", { min: DRILL_MINUTES }) },
+    { id: "432" as const, icon: "refresh" as IconName, title: t("practice.fourThreeTwo"), desc: t("practice.fourThreeTwoDesc") },
   ];
-  const go = () => {
-    if (!topic.trim()) return;
+  const go = (analysis = false) => {
+    if (!topic.trim() || !pick) return;
+    if (analysis) setS((s) => ({ ...s, speechOn: true }));
     closeSheet();
-    start(drillId(cast, { kind: "planning", topic: topic.trim(), planningSec: planSec, minutes: DRILL_MINUTES }));
+    start(drillId(cast, pick === "432"
+      ? { kind: "432", topic: topic.trim(), planningSec: 0, minutes: FOUR_THREE_TWO_MINUTES[0], round: 1, prev: [] }
+      : { kind: "planning", topic: topic.trim(), planningSec: planSec, minutes: DRILL_MINUTES }));
   };
   if (!pick) return (
     <div className="od-stack" style={{ "--od-gap": "12px", textAlign: "left" } as React.CSSProperties}>
@@ -488,9 +492,13 @@ function DrillsSheet() {
           onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(); }} />
       </label>
       <CastPicker value={cast} onChange={setCast} />
+      {pick === "432" && !s.speechOn && <p className="muted small">{t("practice.needAnalysis")}</p>}
       <span className="rp-actions sheet-actions">
         <button className="btn btn-ghost" onClick={() => setPick(null)}>{t("voice.back")}</button>
-        <button className="btn btn-blue" disabled={!topic.trim()} onClick={go}>{t("practice.start")}</button>
+        {pick === "432" && !s.speechOn
+          ? <><button className="btn btn-ghost" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>
+            <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go(true)}>{t("practice.enableAndStart")}</button></>
+          : <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>}
       </span>
     </div>
   );
