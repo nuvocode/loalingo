@@ -80,6 +80,10 @@
     "toHere": "Revenir à ma leçon"
   },
   "practice": {
+    "planning": "Temps de préparation",
+    "planningTitle": "Pense à ce que tu vas dire",
+    "startSpeaking": "Commencer à parler",
+    "timeUp": "Temps écoulé !",
     "title": "Espace pratique",
     "subtitle": "Une révision personnelle centrée sur tes points faibles.",
     "mistakes": "Corrige tes erreurs",

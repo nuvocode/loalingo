@@ -77,6 +77,10 @@
     "toHere": "Back to my lesson"
   },
   "practice": {
+    "planning": "Planning time",
+    "planningTitle": "Think about what you'll say",
+    "startSpeaking": "Start speaking",
+    "timeUp": "Time's up!",
     "title": "Practice Hub",
     "subtitle": "Personal review focused on your weak spots.",
     "mistakes": "Fix your mistakes",

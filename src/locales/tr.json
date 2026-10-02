@@ -77,6 +77,10 @@
     "toHere": "Kaldığım yere"
   },
   "practice": {
+    "planning": "Planlama süresi",
+    "planningTitle": "Ne söyleyeceğini düşün",
+    "startSpeaking": "Konuşmaya başla",
+    "timeUp": "Süre doldu!",
     "title": "Pratik Merkezi",
     "subtitle": "Zayıf noktalarına odaklanan kişisel tekrar.",
     "mistakes": "Hatalarını düzelt",

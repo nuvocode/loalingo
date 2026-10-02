@@ -77,6 +77,10 @@
     "toHere": "Zu meiner Lektion"
   },
   "practice": {
+    "planning": "Planungszeit",
+    "planningTitle": "Überleg dir, was du sagst",
+    "startSpeaking": "Jetzt sprechen",
+    "timeUp": "Zeit ist um!",
     "title": "Übungsbereich",
     "subtitle": "Persönliche Wiederholung für deine Schwachstellen.",
     "mistakes": "Fehler korrigieren",

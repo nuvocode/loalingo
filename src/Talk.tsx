@@ -13,14 +13,15 @@ import { REHEARSE_LONG, type Debrief } from "./rehearsal";
 import * as db from "./db";
 import { recordSession, today, xpMult } from "./progress";
 import { FREE_CONTEXT, summarize, type Conditions, type Utterance } from "./speech";
+import { DRILL_KEEP, mmss } from "./drills";
 import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export type Result = { xp: number; gems: number };
 
-export function Shell({ label, progress, onClose, onRegen, body, footer }: {
-  label: string; progress: number; onClose: () => void; onRegen?: () => void; body: React.ReactNode; footer?: React.ReactNode;
+export function Shell({ label, progress, time, onClose, onRegen, body, footer }: {
+  label: string; progress: number; time?: string; onClose: () => void; onRegen?: () => void; body: React.ReactNode; footer?: React.ReactNode;
 }) {
   const { t } = useTranslation();
   const { sheet } = useApp();
@@ -35,6 +36,7 @@ export function Shell({ label, progress, onClose, onRegen, body, footer }: {
       <div className="lesson-top">
         <button className="icon-btn" onClick={onClose} aria-label={t("lesson.close")}><Icon name="x" /></button>
         <div className="lesson-progress"><i style={{ width: `${progress}%` }} /></div>
+        {time && <span className="muted small" style={{ fontWeight: 800, fontVariantNumeric: "tabular-nums" }} role="timer">{time}</span>}
         {onRegen && <button className="icon-btn" onClick={onRegen} aria-label={t("ai.regenerate")} title={t("ai.regenerate")}><Icon name="refresh" /></button>}
       </div>
       <div className="lesson-body"><div className="lesson-inner">{body}</div></div>
@@ -280,7 +282,7 @@ function DebriefCard({ d, r, turns }: { d: Debrief; r: Result; turns: string[] }
 // With `talk.rehearse` the character plays someone from the learner's life instead: no corrections, no goal, the learner ends it. ----
 
 export function Chat({ talk }: { talk: Talk }) {
-  const { who, topic, voice, rehearse } = talk;
+  const { who, topic, voice, rehearse, drill } = talk;
   const { t } = useTranslation();
   const { course, enrollment, profile, s, setS, gainXp, toast } = useApp();
   const ch = CHARACTERS[who];
@@ -305,9 +307,15 @@ export function Chat({ talk }: { talk: Talk }) {
   const [deb, setDeb] = useState<Debrief | null>(null);
   const [stepping, setStepping] = useState(false); // a failed debrief retries the debrief, not a turn
   const ending = useRef(false); // finish once: double click, Enter
+  const total = drill ? drill.minutes * 60 : 0;
+  const [left, setLeft] = useState(total); // drill: seconds of talk left
+  const [plan, setPlan] = useState(drill?.planningSec ?? 0); // drill: planning seconds left; talk starts at 0
+  const talking = !drill || plan <= 0;
   const native = voice && s.speechOn ? profile?.native_lang : undefined; // voice analysis off: nothing measured or saved
   const spoken = useRef<Utterance[]>([]);
-  const conditions = useRef<Conditions>({ ...FREE_CONTEXT, mode: rehearse ? "rehearse" : "chat" });
+  const conditions = useRef<Conditions>(drill
+    ? { ...FREE_CONTEXT, mode: "drill", drill: "planning", planningTimeSec: drill.planningSec, topicFamiliarity: "prepared" }
+    : { ...FREE_CONTEXT, mode: rehearse ? "rehearse" : "chat" });
   /** One speech_sessions row per voice chat that measured something. */
   const saveSpeech = () => {
     if (profile && spoken.current.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, summarize(spoken.current, 0), conditions.current).catch(() => {});
@@ -327,7 +335,8 @@ export function Chat({ talk }: { talk: Talk }) {
         say(r.reply, history.length);
         return;
       }
-      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history);
+      const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history,
+        drill ? { rules: [`This is a speaking drill: the learner is telling you about ${drill.topic}. React briefly, ask at most one short question, and let the learner do most of the talking.`], keep: DRILL_KEEP } : {});
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
       say(r.reply, fixed.length);
@@ -337,7 +346,14 @@ export function Chat({ talk }: { talk: Talk }) {
     finally { setBusy(false); }
   };
   const opened = useRef(false); // StrictMode runs effects twice; open the scene once
-  useEffect(() => { if (!opened.current) { opened.current = true; turn([]); } }, []);
+  useEffect(() => { if (talking && !opened.current) { opened.current = true; turn([]); } }, [talking]);
+  // Drill clocks: planning counts down first, then the talk time; the talk ends itself at 0.
+  useEffect(() => {
+    if (!drill || result) return;
+    const id = setInterval(() => (plan > 0 ? setPlan((p) => p - 1) : setLeft((l) => Math.max(0, l - 1))), 1000);
+    return () => clearInterval(id);
+  }, [!!drill, !!result, plan > 0]);
+  useEffect(() => { if (drill && talking && left === 0 && !result) finish(); }, [left]);
 
   const send = (said?: string) => {
     const v = (said ?? text).trim();
@@ -346,8 +362,8 @@ export function Chat({ talk }: { talk: Talk }) {
     turn([...msgs, { from: "me", text: v }]);
   };
   const remember = () => {
-    // ponytail: only free-topic chats and rehearsals; in a scene the learner plays a role, so "I'm a doctor" is not about them
-    if (profile && (rehearse || topic.goal.startsWith(FREE_GOAL))) void rememberSession(profile.id, profile.native_lang, "chat", name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+    // ponytail: only free-topic chats and rehearsals, never drills; in a scene the learner plays a role, so "I'm a doctor" is not about them
+    if (profile && !drill && (rehearse || topic.goal.startsWith(FREE_GOAL))) void rememberSession(profile.id, profile.native_lang, "chat", name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
       .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };
   const turns = msgs.filter((m) => m.from === "me").map((m) => m.text);
@@ -381,15 +397,24 @@ export function Chat({ talk }: { talk: Talk }) {
     remember();
     saveSpeech();
   };
-  const over = !rehearse && (goal || mine >= CHAT_TURNS);
+  const over = drill ? left === 0 : !rehearse && (goal || mine >= CHAT_TURNS);
   const end = rehearse ? stepOut : finish, endLabel = t(rehearse ? "roleplay.outOfRole" : "lesson.finish");
 
   const faceState: FaceState = busy ? "thinking" : voicing !== null ? "talking" : "idle";
-  const topicLabel = rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
+  const topicLabel = drill ? `${t("practice.planning")} · ${drill.topic}` : rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
-    body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <Done title={t(goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
+    body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <Done title={t(drill && left === 0 ? "practice.timeUp" : goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
+  } else if (!talking) {
+    body = (
+      <div className="result-wrap">
+        <span className="muted">{t("practice.planningTitle")}</span>
+        <h2 style={{ fontSize: 24, fontWeight: 900 }}>{drill!.topic}</h2>
+        <span role="timer" style={{ fontSize: 56, fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>{mmss(plan)}</span>
+      </div>
+    );
+    footer = <><span /><button className="btn btn-primary" onClick={() => setPlan(0)}>{t("practice.startSpeaking")}</button></>;
   } else {
     body = <>
       {voice ? (
@@ -435,5 +460,6 @@ export function Chat({ talk }: { talk: Talk }) {
         </span>
       </>;
   }
-  return <Shell label={name} progress={result ? 100 : Math.min(100, (mine / (rehearse ? REHEARSE_LONG : CHAT_TURNS)) * 100)} onClose={askQuit} body={body} footer={footer} />;
+  return <Shell label={name} time={drill && talking && !result ? mmss(left) : undefined}
+    progress={result ? 100 : drill ? (talking ? (left / total) * 100 : 100) : Math.min(100, (mine / (rehearse ? REHEARSE_LONG : CHAT_TURNS)) * 100)} onClose={askQuit} body={body} footer={footer} />;
 }
