@@ -779,6 +779,7 @@
     "streakNew": "Finish your first lesson and the seed sprouts.",
     "fruit": "Fruit",
     "fruitDesc": "Each level checkpoint you pass grows one fruit.",
-    "toShop": "Shop"
+    "toShop": "Shop",
+    "noteLoading": "Sprigo is writing you a note…"
   }
 }

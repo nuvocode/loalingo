@@ -9,6 +9,7 @@ import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, typ
 import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, pickMemories, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 import { cleanDebrief, debriefPrompt, debriefSchema, debriefSystem, looseDebrief, looseRoleTurn, rehearsalSystem, roleTurnSchema, type RehearsalBrief } from "./rehearsal";
+import { cleanNote, noteFor, noteFresh, notePrompt, noteSystem, NOTE_KEY, type GardenNote, type NoteInfo } from "./gardenNote";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
@@ -319,4 +320,15 @@ export async function loadPractice(enrollmentId: number, c: Base, unit: Unit): P
   if (!set.warmup.length && !set.comprehension.length && !set.discussion.length) throw new Error("The model returned no usable exercises.");
   await putCached(enrollmentId, key, set);
   return set;
+}
+
+// ---- Garden note: one short message, rewritten every NOTE_DAYS or when the roots' mood changes ----
+
+export async function loadGardenNote(enrollmentId: number, profileId: number, lang: string, info: NoteInfo, day: string): Promise<string> {
+  const cached = await getCached<GardenNote>(enrollmentId, NOTE_KEY);
+  if (noteFresh(cached, day, info.mood, lang)) return cached!.text;
+  const text = cleanNote(await generatePlain(noteSystem(langEn(lang)), notePrompt(info, await learnerFacts(profileId))));
+  if (!text) throw new Error("empty garden note");
+  await putCached(enrollmentId, NOTE_KEY, noteFor(text, day, info.mood, lang));
+  return text;
 }
