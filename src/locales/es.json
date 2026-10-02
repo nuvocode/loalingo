@@ -218,7 +218,7 @@
   "memory": {
     "title": "Sprigo te conoce",
     "empty": "Todavía nada. Cuando hables con un tutor o charles sobre tu propio tema, aquí aparecerá lo que Sprigo aprende de ti.",
-    "emptyOff": "La memoria está desactivada: Sprigo no guarda ni usa nada sobre ti. Actívala en Ajustes > Avanzado.",
+    "emptyOff": "La memoria está desactivada: Sprigo no guarda ni usa nada sobre ti. Actívala en Ajustes > Privacidad y datos.",
     "hint": "Toca una línea para corregirla o quita lo que no deba guardarse.",
     "kinds": {
       "interest": "Intereses",
@@ -426,21 +426,15 @@
     "reduceMotionDesc": "Mantén las animaciones al mínimo",
     "appearance": "Apariencia",
     "theme": "Tema",
-    "themeDesc": "Claro, oscuro o el del sistema",
     "themeSystem": "Sistema",
     "themeLight": "Claro",
     "themeDark": "Oscuro",
     "language": "Idioma de la interfaz",
-    "languageDesc": "Los menús y botones se muestran en este idioma",
     "course": "Curso",
     "courseDesc": "Nivel {{level}} · explicaciones en {{native}}",
     "change": "Cambiar",
-    "account": "Cuenta",
     "editProfile": "Editar perfil",
     "logout": "Cambiar de perfil",
-    "general": "General",
-    "aiVoice": "IA y voz",
-    "advanced": "Avanzado",
     "tts": "Texto a voz",
     "ttsSystem": "Voz del sistema",
     "ttsPiper": "Piper (local, rápida)",
@@ -450,7 +444,15 @@
     "sttDeepgram": "Deepgram (nube)",
     "hearts": "Gotas",
     "heartsDesc": "Pierdes una gota por cada error; se recargan cada día",
-    "reminderBlocked": "Las notificaciones están bloqueadas. Permítelas en Ajustes del Sistema."
+    "reminderBlocked": "Las notificaciones están bloqueadas. Permítelas en Ajustes del Sistema.",
+    "tabs": {
+      "profile": "Perfil",
+      "prefs": "Preferencias",
+      "ai": "IA y voz",
+      "privacy": "Privacidad y datos"
+    },
+    "profileDesc": "Nombre, color, PIN e idioma nativo",
+    "edit": "Editar"
   },
   "rail": {
     "label": "Progreso",

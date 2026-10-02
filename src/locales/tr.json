@@ -199,7 +199,7 @@
   "memory": {
     "title": "Sprigo seni tanıyor",
     "empty": "Henüz bir şey yok. Bir tutor'la ya da kendi konunda sohbet ettikçe Sprigo'nun seninle ilgili öğrendikleri burada görünür.",
-    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor. Açmak için Ayarlar > Gelişmiş.",
+    "emptyOff": "Hafıza kapalı: Sprigo seninle ilgili hiçbir şey saklamıyor ve kullanmıyor. Açmak için Ayarlar > Gizlilik ve veri.",
     "hint": "Düzeltmek için bir satıra dokun, saklanmaması gerekeni sil.",
     "kinds": {
       "interest": "İlgi alanları",
@@ -400,21 +400,15 @@
     "reduceMotionDesc": "Animasyonları en aza indir",
     "appearance": "Görünüm",
     "theme": "Tema",
-    "themeDesc": "Açık, koyu ya da sistemi takip et",
     "themeSystem": "Sistem",
     "themeLight": "Açık",
     "themeDark": "Koyu",
     "language": "Arayüz dili",
-    "languageDesc": "Menüler ve düğmeler bu dilde gösterilir",
     "course": "Kurs",
     "courseDesc": "Seviye {{level}} · açıklamalar {{native}}",
     "change": "Değiştir",
-    "account": "Hesap",
     "editProfile": "Profili düzenle",
     "logout": "Profil değiştir",
-    "general": "Genel",
-    "aiVoice": "Yapay zekâ ve ses",
-    "advanced": "Gelişmiş",
     "tts": "Seslendirme",
     "ttsSystem": "Sistem sesi",
     "ttsPiper": "Piper (yerel, hızlı)",
@@ -424,7 +418,15 @@
     "sttDeepgram": "Deepgram (bulut)",
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
-    "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver."
+    "reminderBlocked": "Bildirimler engelli. Sistem Ayarları'ndan izin ver.",
+    "tabs": {
+      "profile": "Profil",
+      "prefs": "Tercihlerim",
+      "ai": "Yapay zekâ ve ses",
+      "privacy": "Gizlilik ve veri"
+    },
+    "profileDesc": "Ad, renk, PIN ve ana dil",
+    "edit": "Düzenle"
   },
   "rail": {
     "label": "İlerleme",

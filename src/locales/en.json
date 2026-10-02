@@ -201,7 +201,7 @@
   "memory": {
     "title": "Sprigo knows you",
     "empty": "Nothing yet. As you talk with a tutor or chat on your own topic, what Sprigo learns about you shows up here.",
-    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you. Turn it on in Settings > Advanced.",
+    "emptyOff": "Memory is off: Sprigo doesn't save or use anything about you. Turn it on in Settings > Privacy & data.",
     "hint": "Tap a line to correct it, or remove what shouldn't be kept.",
     "kinds": {
       "interest": "Interests",
@@ -403,21 +403,15 @@
     "reduceMotionDesc": "Keep animations to a minimum",
     "appearance": "Appearance",
     "theme": "Theme",
-    "themeDesc": "Light, dark, or follow the system",
     "themeSystem": "System",
     "themeLight": "Light",
     "themeDark": "Dark",
     "language": "Interface language",
-    "languageDesc": "Menus and buttons are shown in this language",
     "course": "Course",
     "courseDesc": "Level {{level}} · explanations in {{native}}",
     "change": "Change",
-    "account": "Account",
     "editProfile": "Edit profile",
     "logout": "Switch profile",
-    "general": "General",
-    "aiVoice": "AI and voice",
-    "advanced": "Advanced",
     "tts": "Text to speech",
     "ttsSystem": "System voice",
     "ttsPiper": "Piper (local, fast)",
@@ -427,7 +421,15 @@
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
-    "reminderBlocked": "Notifications are blocked. Allow them in System Settings."
+    "reminderBlocked": "Notifications are blocked. Allow them in System Settings.",
+    "tabs": {
+      "profile": "Profile",
+      "prefs": "Preferences",
+      "ai": "AI & voice",
+      "privacy": "Privacy & data"
+    },
+    "profileDesc": "Name, color, PIN and native language",
+    "edit": "Edit"
   },
   "rail": {
     "label": "Progress",
