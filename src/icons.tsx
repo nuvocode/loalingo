@@ -1,4 +1,4 @@
-// Icon set ported verbatim from docs/design/index.html.
+// Icon set, ported from the original design prototype.
 // ponytail: static trusted SVG strings rendered via innerHTML; switch to per-file SVG components if the set grows.
 const I = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>',

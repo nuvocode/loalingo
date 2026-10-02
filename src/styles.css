@@ -463,7 +463,7 @@ button.bubble:hover{border-color:var(--blue)}
 /* League promotion / demotion cut lines */
 .league-row.cut-up{border-bottom:2px dashed var(--green);border-radius:var(--r) var(--r) 0 0}
 .league-row.cut-down{border-bottom:2px dashed var(--red);border-radius:var(--r) var(--r) 0 0}
-/* Speaking: design's round mic button (docs/design speak screen) */
+/* Speaking: round mic button */
 .mic-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:26px 0}
 .mic-btn{width:84px;height:84px;border-radius:50%;background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--blue-dark);display:flex;align-items:center;justify-content:center}
 .mic-btn svg{width:34px;height:34px}

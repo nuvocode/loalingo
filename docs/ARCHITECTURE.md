@@ -1,6 +1,6 @@
 # Sprigo — Architecture notes
 
-The overview, the live-lesson voice turn and the data model are in the [README](../README.md#architecture). This file holds the details behind them: the course contract, the activity types, the AI layer and packaging. Decisions and their reasons: [DECISIONS.md](DECISIONS.md). The visual source is the prototype in [`design/index.html`](design/index.html).
+The overview, the live-lesson voice turn and the data model are in the [README](../README.md#architecture). This file holds the details behind them: the course contract, the activity types, the AI layer and packaging. Decisions and their reasons: [DECISIONS.md](DECISIONS.md).
 
 ## 1. Flow
 

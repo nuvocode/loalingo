@@ -1,5 +1,5 @@
 // The streak tree (SPR-9): progress grows it, the streak colours it, checkpoints hang fruit on it.
-// Drawn as an SVG string like src/icons.tsx and src/biomes.ts; shapes come from docs/design/nature.html.
+// Drawn as an SVG string like src/icons.tsx and src/biomes.ts.
 
 export type TreeState = { stage: 0 | 1 | 2 | 3 | 4; dry: boolean; fruit: number; lessons: number };
 
