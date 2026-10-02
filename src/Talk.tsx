@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
 import { sfx } from "./Lesson";
-import { prewarm, speak, stopSpeaking } from "./tts";
+import { onTtsFallback, prewarm, resetTtsNotice, speak, speakingWith, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
 import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type Talk } from "./characters";
@@ -83,9 +83,20 @@ export function Done({ title, r }: { title: string; r: Result }) {
   );
 }
 
-/** Loads the local voice while the first line is being written, so its voice is not waiting on the model too. */
+/** Loads the local voice while the first line is being written, so its voice is not waiting on the model too.
+ *  Also the session's one notice when the chosen voice falls back to the system voice. */
 export function usePrewarm(lang: string, gender?: "f" | "m") {
+  const { t } = useTranslation();
+  const { openSheet, closeSheet, endLesson, go } = useApp();
   useEffect(() => { prewarm(lang, gender && { gender }).catch(() => {}); }, [lang, gender]);
+  useEffect(() => {
+    resetTtsNotice();
+    return onTtsFallback(() => openSheet(<>
+      <h3>{t("voice.fellBackTitle")}</h3><p>{t("voice.fellBack")}</p>
+      <button className="btn btn-primary btn-block" onClick={closeSheet}>{t("sheet.keepGoing")}</button>
+      <button className="btn btn-ghost btn-block" onClick={() => { closeSheet(); endLesson(); stopSpeaking(); go("settings"); }}>{t("voice.fellBackAction")}</button>
+    </>));
+  }, []);
 }
 
 /** Asks before leaving a story or chat that is under way. */
@@ -275,9 +286,10 @@ export function Chat({ talk }: { talk: Talk }) {
   const name = rehearse ? rehearse.who : ch.name;
   const lang = course?.iso ?? "en";
   const [voicing, setVoicing] = useState<number | null>(null); // AI message being spoken (or its voice being made)
+  const [engine, setEngine] = useState<string | null>(null); // which voice engine is speaking it, once audio starts
   const say = (text: string, i: number) => {
-    setVoicing(i);
-    speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }).finally(() => setVoicing((v) => v === i ? null : v));
+    setVoicing(i); setEngine(null);
+    speak(text, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }, () => setEngine(speakingWith())).finally(() => setVoicing((v) => v === i ? null : v));
   };
   usePrewarm(lang, ch.gender);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
@@ -385,7 +397,7 @@ export function Chat({ talk }: { talk: Talk }) {
         {msgs.map((m, i) => m.from === "ai" ? (
           <button key={i} className="bubble" lang={lang} aria-busy={voicing === i} onClick={() => { say(m.text, i); setOpen((s) => new Set(s).add(i)); }}>
             <span>{m.text}</span>{open.has(i) && <small>{m.translation}</small>}
-            {voicing === i && <small className="voicing gen-pulse" role="status"><Icon name="headphones" /> {t("ai.speaking")}</small>}
+            {voicing === i && <small className="voicing gen-pulse" role="status"><Icon name="headphones" /> {engine ? t("ai.speakingWith", { engine: t(`voice.engine.${engine}`) }) : t("ai.speaking")}</small>}
           </button>
         ) : (
           <div key={i} className="bubble me" lang={lang}>

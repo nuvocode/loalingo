@@ -418,6 +418,8 @@
     "stt": "Speech recognition",
     "sttWhisper": "Whisper (local)",
     "ttsKokoro": "Kokoro (local, natural)",
+    "ttsElevenlabs": "ElevenLabs (cloud, most natural)",
+    "ttsLocal": "Local speech server",
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
@@ -562,6 +564,7 @@
     "regenerate": "Generate new exercises",
     "thinking": "Thinking…",
     "speaking": "Speaking…",
+    "speakingWith": "Speaking… · {{engine}}",
     "notSet": "Not set up — lessons are locked",
     "scanning": "Looking for a local model on this Mac…",
     "foundLocal": "{{name}} found on this Mac — pick a model and save.",
@@ -583,6 +586,8 @@
     "anthropicInfo": "Claude models write your lessons and chats. Requests go to Anthropic and are billed by usage.",
     "geminiGood": "Google's fast cloud models; needs an API key.",
     "geminiInfo": "Gemini models write your lessons and chats. Requests go to Google; usage limits and prices depend on your key.",
+    "openrouterGood": "Hundreds of models from many labs behind one API key.",
+    "openrouterInfo": "Connects to OpenRouter, which routes each request to the model you pick (OpenAI, Anthropic, Google, open models…). Requests go to OpenRouter and the model's provider; billed by usage on your OpenRouter key. Sprigo turns the model's thinking off where it can, so lessons stay fast.",
     "configure": "{{name}} settings"
   },
   "stt": {
@@ -634,7 +639,28 @@
     "back": "Back",
     "noKey": "Add a Deepgram key first.",
     "whisperMissing": "The Whisper model is not in this build (it only works in the desktop app).",
-    "micBlocked": "Could not use the microphone: {{error}}"
+    "micBlocked": "Could not use the microphone: {{error}}",
+    "fellBackTitle": "Switched to the system voice",
+    "fellBack": "The voice you chose couldn't speak here, so Sprigo switched to the system voice. You can pick another voice in Settings.",
+    "fellBackAction": "Go to Settings",
+    "using": "Speaking with: {{name}}",
+    "engine": {
+      "system": "System voice",
+      "piper": "Piper",
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs",
+      "local": "Local speech server"
+    },
+    "elevenlabsGood": "Studio-quality cloud voices; needs an API key.",
+    "elevenlabsDesc": "ElevenLabs reads the tutors' lines with very natural voices in every course language. Each line is sent to ElevenLabs and counts against your plan's characters.",
+    "elevenKey": "ElevenLabs API key",
+    "elevenVoiceF": "Female voice ID (optional)",
+    "elevenVoiceM": "Male voice ID (optional)",
+    "localGood": "Your own TTS server on this Mac or network.",
+    "localDesc": "Connects to an OpenAI-compatible speech server you run yourself (for example Kokoro-FastAPI in Docker, port 8880). Lines stay on your machine; the voice name is the server's own.",
+    "localUrl": "Server address",
+    "localModel": "Model",
+    "localVoice": "Voice"
   },
   "data": {
     "section": "Data",

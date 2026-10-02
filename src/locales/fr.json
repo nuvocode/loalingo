@@ -441,6 +441,8 @@
     "stt": "Reconnaissance vocale",
     "sttWhisper": "Whisper (local)",
     "ttsKokoro": "Kokoro (local, naturelle)",
+    "ttsElevenlabs": "ElevenLabs (cloud, la plus naturelle)",
+    "ttsLocal": "Serveur vocal local",
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Gouttes",
     "heartsDesc": "Tu perds une goutte à chaque erreur ; elles se rechargent chaque jour",
@@ -587,6 +589,7 @@
     "regenerate": "Générer de nouveaux exercices",
     "thinking": "Réflexion…",
     "speaking": "Parle…",
+    "speakingWith": "Parle… · {{engine}}",
     "notSet": "Non configuré — les leçons sont verrouillées",
     "scanning": "Recherche d'un modèle local sur ce Mac…",
     "foundLocal": "{{name}} trouvé sur ce Mac — choisis un modèle et enregistre.",
@@ -608,6 +611,8 @@
     "anthropicInfo": "Les modèles Claude écrivent tes leçons et discussions. Les requêtes vont chez Anthropic et sont facturées à l'usage.",
     "geminiGood": "Modèles cloud rapides de Google ; clé API requise.",
     "geminiInfo": "Les modèles Gemini écrivent tes leçons et discussions. Les requêtes vont chez Google ; limites et prix dépendent de ta clé.",
+    "openrouterGood": "Des centaines de modèles de nombreux labos avec une seule clé API.",
+    "openrouterInfo": "Se connecte à OpenRouter, qui envoie chaque requête au modèle choisi (OpenAI, Anthropic, Google, modèles ouverts…). Les requêtes vont à OpenRouter et au fournisseur du modèle ; facturées à l'usage sur ta clé OpenRouter. Sprigo coupe la réflexion du modèle quand c'est possible, pour que les leçons restent rapides.",
     "configure": "Réglages {{name}}"
   },
   "stt": {
@@ -659,7 +664,28 @@
     "back": "Retour",
     "noKey": "Ajoute d'abord une clé Deepgram.",
     "whisperMissing": "Le modèle Whisper n'est pas dans cette version (application de bureau uniquement).",
-    "micBlocked": "Micro inaccessible : {{error}}"
+    "micBlocked": "Micro inaccessible : {{error}}",
+    "fellBackTitle": "Passage à la voix du système",
+    "fellBack": "La voix choisie n'a pas pu parler ici, Sprigo est donc passé à la voix du système. Tu peux choisir une autre voix dans les Paramètres.",
+    "fellBackAction": "Aller aux Paramètres",
+    "using": "Voix utilisée : {{name}}",
+    "engine": {
+      "system": "Voix du système",
+      "piper": "Piper",
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs",
+      "local": "Serveur vocal local"
+    },
+    "elevenlabsGood": "Des voix cloud de qualité studio ; il faut une clé API.",
+    "elevenlabsDesc": "ElevenLabs lit les phrases des tuteurs avec des voix très naturelles dans toutes les langues du cours. Chaque phrase est envoyée à ElevenLabs et compte dans les caractères de ton forfait.",
+    "elevenKey": "Clé API ElevenLabs",
+    "elevenVoiceF": "ID de la voix féminine (facultatif)",
+    "elevenVoiceM": "ID de la voix masculine (facultatif)",
+    "localGood": "Ton propre serveur TTS sur ce Mac ou ton réseau.",
+    "localDesc": "Se connecte à un serveur vocal compatible OpenAI que tu fais tourner toi-même (par exemple Kokoro-FastAPI dans Docker, port 8880). Les phrases restent sur ta machine ; le nom de la voix est celui du serveur.",
+    "localUrl": "Adresse du serveur",
+    "localModel": "Modèle",
+    "localVoice": "Voix"
   },
   "data": {
     "section": "Données",

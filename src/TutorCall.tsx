@@ -7,7 +7,7 @@ import { useApp } from "./store";
 import { biomeVars } from "./biomes";
 import { mark } from "./latency";
 import { sfx } from "./Lesson";
-import { speak, stopSpeaking } from "./tts";
+import { speak, speakingWith, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
 import { RECENT, baselineOf, learnerState, nextHint, summarize, type LearnerState, type Utterance } from "./speech";
 import { Face, type FaceState } from "./face/Face";
@@ -61,6 +61,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const [last, setLast] = useState<TutorReply | null>(null);
   const [thinking, setThinking] = useState(false);
   const [talking, setTalking] = useState(false);
+  const [engine, setEngine] = useState<string>(""); // the voice engine of the line being spoken
   const [err, setErr] = useState("");
   const [showTr, setShowTr] = useState(false);
   const [micOn, setMicOn] = useState(false);
@@ -96,7 +97,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
   const voice = async (line: string, started?: (at: number) => void) => {
     if (!line.trim() || c.over) return;
     let fired = false;
-    const go = (at = performance.now()) => { if (!fired) { fired = true; started?.(at); } };
+    const go = (at = performance.now()) => { if (!fired) { fired = true; setEngine(speakingWith() ?? ""); started?.(at); } };
     c.speaking = true; mic.current?.pause(s.bargeIn); setTalking(true); // the mic would hear the tutor; with barge-in it only listens harder
     try { await speak(line, lang, { gender: ch.gender, kokoro: ch.kokoroVoice }, go); } catch { /* the caption still shows it */ }
     finally {
@@ -357,6 +358,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
         <section className="call-pane tutor" aria-label={ch.name}>
           <Face spec={ch.face} color={ch.color} label={ch.name} state={faceState} scene={who} />
           <b className="call-name">{ch.name}</b>
+          {talking && engine && <small className="muted small" role="status">{t("ai.speakingWith", { engine: t(`voice.engine.${engine}`) })}</small>}
           {last?.correction.trim() && <p className="call-fix small"><Icon name="spark" /> {last.correction}</p>}
           {captions && lastTutor && <div className="call-transcript" lang={lang} aria-live="polite">
             <button className="call-line" onClick={() => setShowTr((v) => !v)}>{lastTutor.text}{showTr && last?.translation && <small>{last.translation}</small>}</button>

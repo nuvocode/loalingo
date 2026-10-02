@@ -185,6 +185,7 @@ const AI_ROWS: { p: ProviderId; icon: IconName; color: string }[] = [
   { p: "openai", icon: "spark", color: "var(--blue)" },
   { p: "anthropic", icon: "spark", color: "var(--orange)" },
   { p: "gemini", icon: "spark", color: "var(--purple)" },
+  { p: "openrouter", icon: "spark", color: "var(--red)" },
 ];
 
 /** DECISIONS C1/C6: device-wide provider, key in the OS keychain. One row per provider; picking one opens its settings. */

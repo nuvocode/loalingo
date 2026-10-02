@@ -10,13 +10,14 @@ import { z } from "zod";
 import { isTauri, isCompanion, getSetting, setSetting } from "./db";
 import { retry } from "./retry";
 
-export type ProviderId = "ollama" | "lmstudio" | "openai" | "anthropic" | "gemini";
+export type ProviderId = "ollama" | "lmstudio" | "openai" | "anthropic" | "gemini" | "openrouter";
 export const PROVIDERS: Record<ProviderId, { label: string; baseURL: string; needsKey: boolean }> = {
   ollama: { label: "Ollama", baseURL: isCompanion ? `${location.origin}/ollama` : "http://localhost:11434", needsKey: false },
   lmstudio: { label: "LM Studio", baseURL: "http://localhost:1234/v1", needsKey: false },
   openai: { label: "OpenAI", baseURL: "https://api.openai.com/v1", needsKey: true },
   anthropic: { label: "Anthropic", baseURL: "https://api.anthropic.com/v1", needsKey: true },
   gemini: { label: "Gemini", baseURL: "https://generativelanguage.googleapis.com/v1beta", needsKey: true },
+  openrouter: { label: "OpenRouter", baseURL: "https://openrouter.ai/api/v1", needsKey: true },
 };
 export type AiConfig = { provider: ProviderId; baseURL: string; model: string };
 
@@ -46,6 +47,20 @@ export async function setKey(p: ProviderId, value: string | null) {
 
 // ---- Models ----
 
+// OpenRouter: thinking off (`reasoning.effort: "none"`). Models where it is mandatory answer 400, so they are asked
+// again with "minimal" and remembered for the session.
+const mustReason = new Set<string>();
+const openrouterFetch: typeof fetch = async (url, init) => {
+  if (typeof init?.body !== "string") return http(url, init);
+  const body = JSON.parse(init.body);
+  const send = (effort: string) => http(url, { ...init, body: JSON.stringify({ ...body, reasoning: { effort } }) });
+  if (mustReason.has(body.model)) return send("minimal");
+  const r = await send("none");
+  if (r.status !== 400 || !/reasoning/i.test(await r.clone().text())) return r;
+  mustReason.add(body.model);
+  return send("minimal");
+};
+
 function model(c: AiConfig, key: string | null): LanguageModel {
   const baseURL = baseOf(c);
   const apiKey = key ?? "";
@@ -56,6 +71,8 @@ function model(c: AiConfig, key: string | null): LanguageModel {
     case "openai": return createOpenAI({ apiKey, baseURL, fetch: http })(c.model);
     case "anthropic": return createAnthropic({ apiKey, baseURL, fetch: http, headers: { "anthropic-dangerous-direct-browser-access": "true" } })(c.model);
     case "gemini": return createGoogle({ apiKey, baseURL, fetch: http })(c.model);
+    // Compatible, not createOpenAI: that one may use the Responses API, which OpenRouter's chat models don't all speak.
+    case "openrouter": return createOpenAICompatible({ name: "openrouter", baseURL, apiKey, fetch: openrouterFetch, supportsStructuredOutputs: true }).chatModel(c.model);
   }
 }
 
@@ -70,7 +87,7 @@ export async function listModels(c: AiConfig, key: string | null): Promise<strin
   switch (c.provider) {
     case "ollama": return (await get(`${base}/api/tags`)).models.map((m: any) => m.name);
     case "lmstudio": return (await get(`${base}/models`)).data.map((m: any) => m.id);
-    case "openai": return (await get(`${base}/models`, { Authorization: `Bearer ${key}` })).data.map((m: any) => m.id).sort();
+    case "openai": case "openrouter": return (await get(`${base}/models`, { Authorization: `Bearer ${key}` })).data.map((m: any) => m.id).sort();
     case "anthropic": return (await get(`${base}/models`, { "x-api-key": key ?? "", "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" })).data.map((m: any) => m.id);
     case "gemini": return (await get(`${base}/models?key=${encodeURIComponent(key ?? "")}`)).models
       .filter((m: any) => m.supportedGenerationMethods?.includes("generateContent")).map((m: any) => m.name.replace(/^models\//, ""));
