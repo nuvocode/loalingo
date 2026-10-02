@@ -1,4 +1,4 @@
-// Fluency drills (epic #31, docs/superpowers/specs/2026-10-02-fluency-drills-design.md): a mode of the voice Chat.
+// Fluency drills (epic #31): a mode of the voice Chat.
 // Pure: the talk id, planning progression, drill rules/conditions, the avoidance pass prompt and time format. The sheet lives in screens/Screens.tsx, the screen in Talk.tsx.
 import { z } from "zod";
 import type { Conditions, SessionRow, SpeechSummary } from "./speech.ts";
