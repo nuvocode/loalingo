@@ -287,7 +287,7 @@ function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: S
               <span className="od-field od-fill"><b>{t(sttName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
             </button>
             {p === "deepgram" && hasKey && <button className="icon-btn" aria-label={t("voice.configure", { name: "Deepgram" })} onClick={configure}><Icon name="gear" /></button>}
-            {p === "whisper" && isTauri && <button className="icon-btn" aria-label={t("voice.configure", { name: "Whisper" })} onClick={() => openSheet(<WhisperSheet onBack={back} />)}><Icon name="gear" /></button>}
+            {p === "whisper" && <button className="icon-btn" aria-label={t("voice.configure", { name: "Whisper" })} onClick={() => openSheet(<WhisperSheet onBack={back} />)}><Icon name="gear" /></button>}
             <InfoTip label={t("voice.about", { name: p === "deepgram" ? "Deepgram" : "Whisper" })}>{t(p === "deepgram" ? "voice.deepgramDesc" : "voice.whisperDesc")}</InfoTip>
           </div>
         ))}
@@ -312,7 +312,10 @@ function WhisperSheet({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState<{ m: WhisperModel; pct: number } | null>(null);
   const [err, setErr] = useState("");
   const [ask, setAsk] = useState<WhisperModel | null>(null); // delete asked, waiting for the second tap
-  useEffect(() => { whisperModels().then(([c, h]) => { setCur(c); setHave(h); }).catch((e) => setErr(String(e))); }, []);
+  useEffect(() => {
+    if (!isTauri) return setErr(t("voice.whisperMissing")); // browser preview: no models to manage
+    whisperModels().then(([c, h]) => { setCur(c); setHave(h); }).catch((e) => setErr(String(e)));
+  }, []);
   const pick = async (m: WhisperModel) => {
     if (busy || m === cur) return;
     setErr("");
@@ -346,7 +349,7 @@ function WhisperSheet({ onBack }: { onBack: () => void }) {
         {WHISPER.map((m, i) => (
           <Fragment key={m}>
             <div className={`voice-option${cur === m ? " on" : ""}`}>
-              <button role="radio" aria-checked={cur === m} disabled={!!busy} onClick={() => pick(m)}>
+              <button role="radio" aria-checked={cur === m} disabled={!!busy || !isTauri} onClick={() => pick(m)}>
                 <Signal bars={i + 1} color="var(--green)" />
                 <span className="od-field od-fill"><b>{t(`voice.whisper${cap(m)}`)}</b><span className="muted small">{t(`voice.whisper${cap(m)}Good`)}</span></span>
               </button>
