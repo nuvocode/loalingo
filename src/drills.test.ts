@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { NOVEL_TOPICS, avoidancePrompt, goalToName, looseAvoidance, verifyAvoidance, REPETITION_RULE, ladderDrill, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
+import { NAME_STRUCTURE_PROMPT, NOVEL_TOPICS, structureDrill, avoidancePrompt, goalToName, looseAvoidance, verifyAvoidance, REPETITION_RULE, ladderDrill, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
 import { parseTalkId } from "./characters.ts";
 import type { SessionRow } from "./speech.ts";
 
@@ -111,4 +111,15 @@ test("goalToName: 3 sessions name a goal; the most recently avoided wins", () =>
   assert.equal(goalToName([row("a"), row("a"), row(null), row("a")]), "a");
   assert.equal(goalToName([row("a"), row("b"), row("a"), row("b"), row("a"), row("b")]), "b");
   assert.equal(goalToName([row("b"), row("b"), row("b"), row("a"), row("a"), row("a")]), "a");
+});
+
+test("structure drill: id round-trips, rules steer toward the goal, the named line only when named", () => {
+  const d = structureDrill("my weekend", "past simple", null), n = structureDrill("my weekend", "past simple", "going to");
+  assert.deepEqual(parseTalkId(drillId("tom", d))?.drill, d);
+  assert.deepEqual(parseTalkId(drillId("tom", n))?.drill, n);
+  assert.equal(parseDrill(["structure", encodeURIComponent(JSON.stringify({ topic: "x" }))]), null);
+  assert.deepEqual(drillConditions(d), { mode: "drill", drill: "structure", planningTimeSec: 0, topicFamiliarity: "prepared" });
+  assert.ok(drillRules(d).some((r) => r.includes('"past simple"')));
+  assert.ok(!drillRules(d).includes(NAME_STRUCTURE_PROMPT("past simple")));
+  assert.ok(drillRules(n).includes(NAME_STRUCTURE_PROMPT("going to")));
 });

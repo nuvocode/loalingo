@@ -1,12 +1,12 @@
 // Fluency drills (epic #31, docs/superpowers/specs/2026-10-02-fluency-drills-design.md): a mode of the voice Chat.
-// Pure: the talk id (planning and 4/3/2), planning progression, drill rules/conditions, the avoidance pass prompt and time format. The sheet lives in screens/Screens.tsx, the screen in Talk.tsx.
+// Pure: the talk id, planning progression, drill rules/conditions, the avoidance pass prompt and time format. The sheet lives in screens/Screens.tsx, the screen in Talk.tsx.
 import { z } from "zod";
 import type { Conditions, SessionRow, SpeechSummary } from "./speech.ts";
 
 /** Compared across 4/3/2 rounds; null = not measured (voice analysis off or nothing said). */
 export type RoundStat = Pick<SpeechSummary, "wpm" | "pauseRatio" | "fillers"> | null;
-/** `round` (1–3) and `prev` (the stats of the rounds before it) only on 4/3/2; `rung` (1–3) only on the ladder; `goal` (a structure) only on the structure drill. */
-export type Drill = { kind: "planning" | "432" | "ladder"; topic: string; planningSec: number; minutes: number; round?: number; prev?: RoundStat[]; rung?: number; goal?: string };
+/** `round` (1–3) and `prev` (the stats of the rounds before it) only on 4/3/2; `rung` (1–3) only on the ladder; `goal` (a structure) and `named` (a structure avoided in 3 sessions, see `goalToName`) only on the structure drill. */
+export type Drill = { kind: "planning" | "432" | "ladder" | "structure"; topic: string; planningSec: number; minutes: number; round?: number; prev?: RoundStat[]; rung?: number; goal?: string; named?: string };
 export const FOUR_THREE_TWO_MINUTES = [4, 3, 2];
 export const DRILL_MINUTES = 3;
 /** Ladder rung 3: a topic the learner did not pick. */
@@ -19,6 +19,12 @@ export const NOVEL_TOPICS = [
 export const ladderDrill = (rung: number, topic: string, rand = Math.random): Drill => ({
   kind: "ladder", topic: rung === 3 ? NOVEL_TOPICS[Math.floor(rand() * NOVEL_TOPICS.length)] : topic, planningSec: rung === 1 ? 60 : 0, minutes: DRILL_MINUTES, rung,
 });
+/** The structure drill: no planning, 3 minutes, steered toward `goal`. */
+export const structureDrill = (topic: string, goal: string, named: string | null): Drill =>
+  ({ kind: "structure", topic, planningSec: 0, minutes: DRILL_MINUTES, goal, ...(named ? { named } : {}) });
+/** Only when the learner avoided `s` in 3 sessions; otherwise nothing is said about avoiding. */
+export const NAME_STRUCTURE_PROMPT = (s: string) => `In recent sessions the learner kept steering around "${s}". Early on, name it plainly and invite them to try it in their next answer; if they do, don't make a fuss about it.`;
+
 /** Drill prompts only carry the last few messages; a 3-minute monologue grows the history fast. */
 export const DRILL_KEEP = 12;
 
@@ -29,10 +35,14 @@ export const REPETITION_RULE = "The learner already told you this once, with mor
 export const drillRules = (d: Drill) => [
   `This is a speaking drill: the learner is telling you about ${d.topic}. React briefly, ask at most one short question, and let the learner do most of the talking.`,
   ...(d.kind === "432" && (d.round ?? 1) > 1 ? [REPETITION_RULE] : []),
+  ...(d.goal ? [`Steer the talk toward natural openings where the learner can use "${d.goal}".`] : []),
+  ...(d.named ? [NAME_STRUCTURE_PROMPT(d.named)] : []),
 ];
 
 /** What the speech_sessions row records about the drill. From round 2 on, the 4/3/2 topic is one the learner has already told. */
-export const drillConditions = (d: Drill): Conditions => d.kind === "ladder"
+export const drillConditions = (d: Drill): Conditions => d.kind === "structure"
+  ? { mode: "drill", drill: "structure", planningTimeSec: 0, topicFamiliarity: "prepared" }
+  : d.kind === "ladder"
   ? { mode: "drill", drill: "ladder", planningTimeSec: d.planningSec, topicFamiliarity: d.rung === 3 ? "novel" : "prepared", rung: d.rung }
   : d.kind === "432"
   ? { mode: "drill", drill: "432", planningTimeSec: 0, topicFamiliarity: (d.round ?? 1) > 1 ? "prepared" : "novel", round: d.round }
@@ -58,7 +68,9 @@ export const planningHistory = (rows: SessionRow[]) =>
   rows.filter((r) => r.conditions?.mode === "drill" && r.conditions.drill === "planning").map((r) => r.conditions!.planningTimeSec).reverse();
 
 /** `drill:<who>:<kind>:<uri-encoded JSON>`; `who` is checked by parseTalkId. */
-export const drillId = (who: string, d: Drill) => `drill:${who}:${d.kind}:${encodeURIComponent(JSON.stringify(d.kind === "ladder"
+export const drillId = (who: string, d: Drill) => `drill:${who}:${d.kind}:${encodeURIComponent(JSON.stringify(d.kind === "structure"
+  ? { topic: d.topic, goal: d.goal, named: d.named }
+  : d.kind === "ladder"
   ? { rung: d.rung, topic: d.topic }
   : d.kind === "432"
   ? { topic: d.topic, round: d.round, prev: d.prev ?? [] }
@@ -67,11 +79,12 @@ export const drillId = (who: string, d: Drill) => `drill:${who}:${d.kind}:${enco
 /** `rest` = the id after `drill:<who>:`; null when it is not a usable drill. */
 export function parseDrill(rest: string[]): Drill | null {
   const [kind, enc] = rest;
-  if (rest.length !== 2 || (kind !== "planning" && kind !== "432" && kind !== "ladder")) return null;
+  if (rest.length !== 2 || (kind !== "planning" && kind !== "432" && kind !== "ladder" && kind !== "structure")) return null;
   let b: unknown;
   try { b = JSON.parse(decodeURIComponent(enc)); } catch { return null; }
-  const { topic, planningSec, minutes, round, prev, rung } = (b ?? {}) as Record<string, unknown>;
+  const { topic, planningSec, minutes, round, prev, rung, goal, named } = (b ?? {}) as Record<string, unknown>;
   if (typeof topic !== "string" || !topic.trim()) return null;
+  if (kind === "structure") return typeof goal === "string" && goal.trim() ? structureDrill(topic, goal, typeof named === "string" && named.trim() ? named : null) : null;
   if (kind === "ladder") return rung === 1 || rung === 2 || rung === 3 ? { kind, topic, planningSec: rung === 1 ? 60 : 0, minutes: DRILL_MINUTES, rung } : null;
   if (kind === "432") {
     if (round !== 1 && round !== 2 && round !== 3) return null;

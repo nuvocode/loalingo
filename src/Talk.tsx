@@ -436,7 +436,7 @@ export function Chat({ talk }: { talk: Talk }) {
   const end = rehearse ? stepOut : finish, endLabel = t(rehearse ? "roleplay.outOfRole" : "lesson.finish");
 
   const faceState: FaceState = busy ? "thinking" : voicing !== null ? "talking" : "idle";
-  const topicLabel = drill ? `${r432 ? t("practice.roundN", { n: r432.round, min: r432.minutes }) : drill.kind === "ladder" ? t("practice.rungN", { n: drill.rung }) : t("practice.planning")} · ${drill.topic}` : rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
+  const topicLabel = drill ? `${r432 ? t("practice.roundN", { n: r432.round, min: r432.minutes }) : drill.kind === "ladder" ? t("practice.rungN", { n: drill.rung }) : t(drill.kind === "structure" ? "practice.structure" : "practice.planning")} · ${drill.topic}` : rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
     body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <>
@@ -470,6 +470,7 @@ export function Chat({ talk }: { talk: Talk }) {
           <span className="od-field od-fill"><b>{rehearse ? t("roleplay.rehearseWith", { who: name }) : name}</b><span className="muted small">{topicLabel}</span></span>
         </div>
       )}
+      {drill?.named && <p className="muted small" style={{ textAlign: "center", marginBottom: 12 }}>{t("practice.namedStructure", { structure: drill.named })}</p>}
       <div className="chat">
         {msgs.map((m, i) => m.from === "ai" ? (
           <button key={i} className="bubble" lang={lang} aria-busy={voicing === i} onClick={() => { say(m.text, i); setOpen((s) => new Set(s).add(i)); }}>

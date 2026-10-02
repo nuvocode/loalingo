@@ -8,11 +8,11 @@ import { msLeft, rivalXp, zones, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, rollDay, today } from "../progress";
-import { LEGEND_PRICE } from "../lessons";
+import { LEGEND_PRICE, unitGrammar } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { rehearseId, type Formality } from "../rehearsal";
 import { currentUnit } from "../tutor";
-import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, ladderDrill, nextPlanningSec, planningHistory } from "../drills";
+import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, goalToName, ladderDrill, nextPlanningSec, planningHistory, structureDrill } from "../drills";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
@@ -448,28 +448,35 @@ function RehearseSheet() {
   );
 }
 
-/** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Planning, 4/3/2 and the ladder so far; #44 adds structure to `list`. */
+/** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Structure shows only when the current unit has a grammar pattern. */
 function DrillsSheet() {
   const { t } = useTranslation();
   const { closeSheet, profile, course, enrollment, done, s, setS } = useApp();
   const start = useStartLesson();
   const level = course && enrollment ? course.levels[enrollment.level] : undefined;
   const [pick, setPick] = useState<Drill["kind"] | null>(null);
-  const [topic, setTopic] = useState(level ? currentUnit(level, done).title : "");
+  const unit = level ? currentUnit(level, done) : undefined;
+  const pattern = unit ? unitGrammar(unit)[0] : undefined; // ponytail: the unit's first pattern; a picker if learners want another
+  const [topic, setTopic] = useState(unit?.title ?? "");
   const [cast, setCast] = useState<CharacterId>("leo");
   const [planSec, setPlanSec] = useState(60);
   const [rung, setRung] = useState(1);
-  useEffect(() => { if (profile) db.listSpeechSessions(profile.id, 100).then((rows) => setPlanSec(nextPlanningSec(planningHistory(rows)))).catch(() => {}); }, [profile?.id]);
+  const [named, setNamed] = useState<string | null>(null);
+  useEffect(() => {
+    if (profile) db.listSpeechSessions(profile.id, 100).then((rows) => { setPlanSec(nextPlanningSec(planningHistory(rows))); setNamed(goalToName(rows.slice(-30))); }).catch(() => {});
+  }, [profile?.id]);
   const list = [
     { id: "planning" as const, icon: "clock" as IconName, title: t("practice.planning"), desc: planSec ? t("practice.planningDesc", { sec: planSec, min: DRILL_MINUTES }) : t("practice.planningDescNone", { min: DRILL_MINUTES }) },
     { id: "432" as const, icon: "refresh" as IconName, title: t("practice.fourThreeTwo"), desc: t("practice.fourThreeTwoDesc") },
     { id: "ladder" as const, icon: "bolt" as IconName, title: t("practice.ladder"), desc: t("practice.ladderDesc") },
+    ...(pattern ? [{ id: "structure" as const, icon: "book" as IconName, title: t("practice.structure"), desc: t("practice.structureDesc", { pattern }) }] : []),
   ];
   const go = (analysis = false) => {
     if ((!topic.trim() && !(pick === "ladder" && rung === 3)) || !pick) return;
     if (analysis) setS((s) => ({ ...s, speechOn: true }));
     closeSheet();
-    start(drillId(cast, pick === "ladder" ? ladderDrill(rung, topic.trim())
+    start(drillId(cast, pick === "structure" ? structureDrill(topic.trim(), pattern!, named)
+      : pick === "ladder" ? ladderDrill(rung, topic.trim())
       : pick === "432" ? { kind: "432", topic: topic.trim(), planningSec: 0, minutes: FOUR_THREE_TWO_MINUTES[0], round: 1, prev: [] }
       : { kind: "planning", topic: topic.trim(), planningSec: planSec, minutes: DRILL_MINUTES }));
   };
@@ -503,10 +510,10 @@ function DrillsSheet() {
           onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(); }} />
       </label>}
       <CastPicker value={cast} onChange={setCast} />
-      {pick === "432" && !s.speechOn && <p className="muted small">{t("practice.needAnalysis")}</p>}
+      {(pick === "432" || pick === "structure") && !s.speechOn && <p className="muted small">{t(pick === "432" ? "practice.needAnalysis" : "practice.needAnalysisStructure")}</p>}
       <span className="rp-actions sheet-actions">
         <button className="btn btn-ghost" onClick={() => setPick(null)}>{t("voice.back")}</button>
-        {pick === "432" && !s.speechOn
+        {(pick === "432" || pick === "structure") && !s.speechOn
           ? <><button className="btn btn-ghost" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>
             <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go(true)}>{t("practice.enableAndStart")}</button></>
           : <button className="btn btn-blue" disabled={!topic.trim() && !(pick === "ladder" && rung === 3)} onClick={() => go()}>{t("practice.start")}</button>}
