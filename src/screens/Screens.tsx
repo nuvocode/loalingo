@@ -448,7 +448,7 @@ function RehearseSheet() {
   );
 }
 
-/** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Only the planning drill so far; #41–#44 add theirs to `list`. */
+/** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Planning and 4/3/2 so far; #42–#44 add theirs to `list`. */
 function DrillsSheet() {
   const { t } = useTranslation();
   const { closeSheet, profile, course, enrollment, done, s, setS } = useApp();
