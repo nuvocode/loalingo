@@ -1,0 +1,36 @@
+# Bumps the Homebrew cask (ozerozdas/homebrew-tap) when a release is published.
+# Needs the HOMEBREW_TAP_TOKEN secret: a fine-grained token with Contents read/write on homebrew-tap.
+name: tap
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  bump-cask:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Casks/sprigo.rb
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          tag="${{ github.event.release.tag_name }}"
+          [ -n "$tag" ] || tag=$(gh release view -R ${{ github.repository }} --json tagName -q .tagName)
+          version=${tag#v}
+          sha() { gh release view "$tag" -R ${{ github.repository }} --json assets \
+            -q ".assets[] | select(.name == \"Sprigo_${version}_$1.dmg\") | .digest" | sed 's/^sha256://'; }
+          arm=$(sha aarch64); intel=$(sha x64)
+          [ -n "$arm" ] && [ -n "$intel" ] || { echo "dmg digests missing for $tag"; exit 1; }
+
+          git clone --depth 1 "https://x-access-token:$GH_TOKEN@github.com/ozerozdas/homebrew-tap.git" tap
+          cd tap
+          sed -i -E \
+            -e "s/^  version \".*\"/  version \"$version\"/" \
+            -e "s/(sha256 arm: +)\"[0-9a-f]+\"/\1\"$arm\"/" \
+            -e "s/(intel: +)\"[0-9a-f]+\"/\1\"$intel\"/" \
+            Casks/sprigo.rb
+          git diff --quiet && { echo "Cask already at $version"; exit 0; }
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com \
+            commit -am "sprigo $version"
+          git push

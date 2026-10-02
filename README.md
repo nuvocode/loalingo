@@ -42,17 +42,25 @@
 
 ## Install
 
-Downloads for macOS (Apple silicon and Intel), Windows and Linux are on the [Releases](https://github.com/ozerozdas/sprigo/releases/latest) page.
+macOS, with [Homebrew](https://brew.sh):
 
-On macOS:
+```bash
+brew install --cask ozerozdas/tap/sprigo
+```
 
-1. Download the latest `.dmg` from [Releases](https://github.com/ozerozdas/sprigo/releases/latest).
-2. Open it and drag **Sprigo** into **Applications**.
-3. The app is not notarized yet, so macOS will block it the first time. Remove the quarantine flag once:
+macOS or Linux (x86_64), without Homebrew:
 
-   ```bash
-   xattr -dr com.apple.quarantine /Applications/Sprigo.app
-   ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/ozerozdas/sprigo/master/install.sh | sh
+```
+
+Both install the latest release and handle the macOS quarantine flag for you. Windows installers and the other packages (`.deb`, `.rpm`) are on the [Releases](https://github.com/ozerozdas/sprigo/releases/latest) page.
+
+If you install the `.dmg` by hand: the app is not notarized yet, so macOS blocks it the first time. Remove the quarantine flag once:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Sprigo.app
+```
 
 ## Set up an AI model
 

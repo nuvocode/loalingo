@@ -19,6 +19,7 @@ The repo is public, so GitHub Actions' macOS and Windows minutes are free and ev
    ```
    `release` runs the four builds and uploads the files and a merged `latest.json` to a **draft** release.
 6. **Publish:** publish the draft by hand. The in-app updater only sees published releases, so this is the last gate. If a build is red, the draft is not published; the fix ships as a new version.
+   Publishing also runs `tap`, which bumps the Homebrew cask in [ozerozdas/homebrew-tap](https://github.com/ozerozdas/homebrew-tap) (needs the `HOMEBREW_TAP_TOKEN` secret). `install.sh` always reads the latest release, so it needs nothing.
 
 ## Why no local or Docker builds
 
