@@ -282,7 +282,16 @@
     "limit": "That's enough for one chat — finish to collect your XP.",
     "goalDone": "Goal reached!",
     "done": "Chat complete!",
-    "callHint": "Speak your reply — the conversation is voice only."
+    "callHint": "Speak your reply — the conversation is voice only.",
+    "outOfRole": "Step out of role",
+    "rehearseWith": "Rehearsing with: {{who}}",
+    "rehearseLong": "That's a long rehearsal — step out of role whenever you're ready.",
+    "debriefTitle": "How it went",
+    "stuckTitle": "Where you got stuck",
+    "debriefSmooth": "No sticking points — that went smoothly.",
+    "turnN": "Message {{n}}",
+    "phrasesTitle": "Phrases that would have helped",
+    "phraseSaved": "Added to your words"
   },
   "friends": {
     "title": "Friends",

@@ -11,6 +11,8 @@ export type RehearsalBrief = { who: string; about?: string; formality: Formality
 
 const FORMALITY_WORD = { casual: "casually", neutral: "neutrally", formal: "formally" } as const;
 export const DEBRIEF_PHRASES_MAX = 5;
+/** No turn limit; past this many learner messages the chat only suggests stepping out. */
+export const REHEARSE_LONG = 20;
 
 // Base in lessons.ts fits this; kept structural so the module stays testable without a course.
 type Ctx = { course: { name: string }; level: string; native: string };

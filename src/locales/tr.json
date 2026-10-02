@@ -280,7 +280,16 @@
     "limit": "Bu sohbet için yeterli — XP'ni almak için bitir.",
     "goalDone": "Hedefe ulaştın!",
     "done": "Sohbet tamamlandı!",
-    "callHint": "Cevabını sesli söyle — bu görüşme sadece sesli."
+    "callHint": "Cevabını sesli söyle — bu görüşme sadece sesli.",
+    "outOfRole": "Rolden çık",
+    "rehearseWith": "Prova: {{who}}",
+    "rehearseLong": "Uzun bir prova oldu — hazır olduğunda rolden çık.",
+    "debriefTitle": "Nasıl geçti",
+    "stuckTitle": "Takıldığın yerler",
+    "debriefSmooth": "Takıldığın bir yer yok — akıcı geçti.",
+    "turnN": "{{n}}. mesaj",
+    "phrasesTitle": "İşine yarayacak ifadeler",
+    "phraseSaved": "Kelimelerine eklendi"
   },
   "friends": {
     "title": "Arkadaşlar",

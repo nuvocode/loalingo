@@ -294,7 +294,16 @@
     "limit": "C'est assez pour une discussion — termine pour récupérer ton XP.",
     "goalDone": "Objectif atteint !",
     "done": "Discussion terminée !",
-    "callHint": "Réponds à voix haute — la conversation est uniquement orale."
+    "callHint": "Réponds à voix haute — la conversation est uniquement orale.",
+    "outOfRole": "Sortir du rôle",
+    "rehearseWith": "Répétition avec : {{who}}",
+    "rehearseLong": "C'est une longue répétition — sors du rôle quand tu veux.",
+    "debriefTitle": "Comment ça s'est passé",
+    "stuckTitle": "Là où tu as bloqué",
+    "debriefSmooth": "Aucun blocage — c'était fluide.",
+    "turnN": "Message {{n}}",
+    "phrasesTitle": "Expressions qui t'auraient aidé",
+    "phraseSaved": "Ajoutée à tes mots"
   },
   "friends": {
     "title": "Amis",
