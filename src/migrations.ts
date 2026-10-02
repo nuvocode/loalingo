@@ -48,4 +48,10 @@ CREATE TABLE speech_sessions(
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE INDEX speech_sessions_profile ON speech_sessions(profile_id)`,
   },
+  {
+    v: 4, // fluency drills: the conditions a voice session was spoken under (JSON Conditions, src/speech.ts; NULL = not measured)
+    // and the target structure the learner avoided in it (structure drill)
+    sql: `ALTER TABLE speech_sessions ADD COLUMN conditions TEXT;
+ALTER TABLE speech_sessions ADD COLUMN avoided TEXT`,
+  },
 ];

@@ -29,7 +29,7 @@ export function CoachCard() {
   const { t, i18n } = useTranslation();
   const { profile, s, sheet, openSheet } = useApp();
   const [c, setC] = useState<Coaching | undefined>(undefined);
-  useEffect(() => { if (!sheet) db.listSpeechSessions(profile!.id).then((r) => setC(coach(r)), () => setC(null)); }, [profile!.id, !sheet]); // fresh after a sheet closes
+  useEffect(() => { if (!sheet) db.listSpeechSessions(profile!.id, 10, "tutor").then((r) => setC(coach(r)), () => setC(null)); }, [profile!.id, !sheet]); // fresh after a sheet closes
   if (c === undefined) return null;
   const x = c?.trends[0];
   const line = !s.speechOn ? t("settings.off") : !c ? t("coach.empty")

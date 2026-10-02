@@ -53,8 +53,9 @@ export const resetSttReady = () => { ready = undefined; };
 
 export const MAX_RECORD_S = 15;
 
-/** Starts recording; `stop()` returns the transcript (`stop(false)` just releases the mic). Auto-stops after MAX_RECORD_S (onAutoStop fires). */
-export async function startRecording(lang: string, onAutoStop?: () => void) {
+/** Starts recording; `stop()` returns the transcript (`stop(false)` just releases the mic). Auto-stops after MAX_RECORD_S (onAutoStop fires).
+ *  With `native` the transcript also gets its speech signals; there is no tutor turn to time, so `latencyMs` is null. */
+export async function startRecording(lang: string, onAutoStop?: () => void, native?: string) {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
   const ctx = new AudioContext();
   const src = ctx.createMediaStreamSource(stream);
@@ -67,15 +68,17 @@ export async function startRecording(lang: string, onAutoStop?: () => void) {
   const timer = setTimeout(() => onAutoStop?.(), MAX_RECORD_S * 1000);
   let stopped = false;
   return {
-    async stop(transcribe = true): Promise<string> {
-      if (stopped) return "";
+    async stop(transcribe = true): Promise<{ text: string; m?: Utterance }> {
+      if (stopped) return { text: "" };
       stopped = true;
       clearTimeout(timer);
       proc.disconnect(); src.disconnect();
       stream.getTracks().forEach((t) => t.stop());
       const rate = ctx.sampleRate;
       await ctx.close();
-      return transcribe ? transcribeSamples(concat(chunks), rate, lang) : "";
+      if (!transcribe) return { text: "" };
+      const all = concat(chunks), text = await transcribeSamples(all, rate, lang);
+      return { text, m: native && text ? speechMetrics(all, rate, text, { latencyMs: null }, native, lang) : undefined };
     },
   };
 }

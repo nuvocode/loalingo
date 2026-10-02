@@ -9,7 +9,7 @@ import { mark } from "./latency";
 import { sfx } from "./Lesson";
 import { speak, speakingWith, stopSpeaking } from "./tts";
 import { listen, sttReady, type Listener } from "./stt";
-import { RECENT, baselineOf, learnerState, nextHint, summarize, type LearnerState, type Utterance } from "./speech";
+import { FREE_CONTEXT, RECENT, baselineOf, learnerState, nextHint, summarize, type LearnerState, type Utterance } from "./speech";
 import { Face, type FaceState } from "./face/Face";
 import { Avatar } from "./screens/Profiles";
 import { CHARACTERS, type CharacterId } from "./characters";
@@ -309,7 +309,7 @@ export function TutorCall({ who }: { who: CharacterId }) {
     if (xp) { setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today())); gainXp(xp); }
     sfx("done");
     setResult({ xp, gems: 0, fixes: [...c.fixes] });
-    if (profile && c.speech.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, "tutor", summarize(c.speech, c.silences)).catch(() => {});
+    if (profile && c.speech.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, summarize(c.speech, c.silences), { ...FREE_CONTEXT, mode: "tutor", topicFamiliarity: "prepared" }).catch(() => {});
     if (profile) void rememberSession(profile.id, profile.native_lang, "tutor", ch.name, c.hist.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
       .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
   };

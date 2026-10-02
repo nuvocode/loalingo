@@ -10,7 +10,7 @@ import { MIGRATIONS } from "./migrations";
 import { wrapSqlJs } from "./sqljs";
 import { dailyBackup, openTauriDb, snapshot } from "./datadir";
 import { deleteProfileSql } from "./profileDelete";
-import type { Baseline, SessionRow, SpeechSummary } from "./speech";
+import type { Baseline, Conditions, SessionRow, SpeechSummary } from "./speech";
 import { remoteDb, serveCompanion } from "./companion";
 import { evictIds, type Memory, type MemoryOps, type MemorySource } from "./memory";
 export { NEW_STATS, type Stats };
@@ -234,24 +234,28 @@ export async function applyMemoryOps(profileId: number, source: MemorySource, op
 
 // ---- Speech signals (SPR-25, src/speech.ts) ----
 
-export async function saveSpeechSession(profileId: number, enrollmentId: number | null, mode: "tutor", x: SpeechSummary) {
+export async function saveSpeechSession(profileId: number, enrollmentId: number | null, x: SpeechSummary, conditions: Conditions | null, avoided: string | null = null) {
   await (await db()).execute(
-    `INSERT INTO speech_sessions(profile_id, enrollment_id, mode, utterances, silences, latency_ms, wpm, pause_ratio, long_pauses, level, fillers, words, native_words, speech_ms)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-    [profileId, enrollmentId, mode, x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs]);
+    `INSERT INTO speech_sessions(profile_id, enrollment_id, mode, utterances, silences, latency_ms, wpm, pause_ratio, long_pauses, level, fillers, words, native_words, speech_ms, conditions, avoided)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+    [profileId, enrollmentId, conditions?.mode ?? "chat", x.utterances, x.silences, x.latencyMs, x.wpm, x.pauseRatio, x.longPauses, x.level, x.fillers, x.words, x.nativeWords, x.speechMs,
+      conditions && JSON.stringify(conditions), avoided]);
 }
 
-/** The last 10 voice calls, oldest first, for the profile's coaching card (SPR-27). */
-export async function listSpeechSessions(profileId: number): Promise<SessionRow[]> {
-  return (await (await db()).select<SessionRow>(
-    "SELECT utterances, latency_ms, wpm, long_pauses, words, native_words FROM speech_sessions WHERE profile_id = $1 ORDER BY id DESC LIMIT 10", [profileId])).reverse();
+/** The last `limit` voice sessions, oldest first: the coaching card (SPR-27, tutor calls only) and the drills (every mode) read them. */
+export async function listSpeechSessions(profileId: number, limit = 10, mode?: Conditions["mode"]): Promise<SessionRow[]> {
+  const rows = await (await db()).select<SessionRow & { conditions: string | null }>(
+    `SELECT utterances, latency_ms, wpm, long_pauses, words, native_words, mode, conditions, avoided FROM speech_sessions WHERE profile_id = $1${mode ? " AND mode = $3" : ""} ORDER BY id DESC LIMIT $2`,
+    mode ? [profileId, limit, mode] : [profileId, limit]);
+  const parse = (s: string | null) => { try { return s ? JSON.parse(s) as Conditions : null; } catch { return null; } }; // a broken row counts as not measured
+  return rows.map((r) => ({ ...r, conditions: parse(r.conditions) })).reverse();
 }
-/** The learner's usual per answer over their last 10 voice calls (SPR-26); null before they have said a few things. */
+/** The learner's usual per answer over their last 10 tutor calls (SPR-26); chats and drills are a different kind of talk. Null before they have said a few things. */
 export async function speechBaseline(profileId: number): Promise<Baseline | null> {
   const [r] = await (await db()).select<Baseline & { n: number | null }>(
     `SELECT SUM(utterances) AS n, AVG(latency_ms) AS latencyMs, SUM(wpm * utterances) * 1.0 / SUM(utterances) AS wpm,
        SUM(pause_ratio * utterances) / SUM(utterances) AS pauseRatio, SUM(words) * 1.0 / SUM(utterances) AS words
-     FROM (SELECT * FROM speech_sessions WHERE profile_id = $1 AND utterances > 0 ORDER BY id DESC LIMIT 10)`, [profileId]);
+     FROM (SELECT * FROM speech_sessions WHERE profile_id = $1 AND mode = 'tutor' AND utterances > 0 ORDER BY id DESC LIMIT 10)`, [profileId]);
   return r && (r.n ?? 0) >= 3 ? { latencyMs: r.latencyMs, wpm: r.wpm, pauseRatio: r.pauseRatio, words: r.words } : null;
 }
 

@@ -126,7 +126,7 @@ export default function App() {
   const { ready, bootError, profile, route, sheet, openSheet, closeSheet, toastMsg, toastOn, lessonId, endLesson, s, setS, course, logout } = useApp();
   const langName = useLangName();
   const Screen = SCREENS[route];
-  const talk = lessonId && /^(chat|call|rehearse):/.test(lessonId) ? parseTalkId(lessonId) : undefined;
+  const talk = lessonId && /^(chat|call|rehearse|drill):/.test(lessonId) ? parseTalkId(lessonId) : undefined;
   const badTalk = talk === null;
   useEffect(() => { if (badTalk) endLesson(); }, [badTalk]);
 
@@ -195,7 +195,7 @@ export default function App() {
 
       {lessonId && (lessonId.startsWith("story:") ? <Story unitId={lessonId.slice(6)} />
         : lessonId.startsWith("tutor:") ? (lessonId.slice(6) in CHARACTERS && <TutorCall key={lessonId} who={lessonId.slice(6) as CharacterId} />)
-        : /^(chat|call|rehearse):/.test(lessonId) ? (talk && <Chat key={lessonId} talk={talk} />) : <Lesson id={lessonId} />)}
+        : /^(chat|call|rehearse|drill):/.test(lessonId) ? (talk && <Chat key={lessonId} talk={talk} />) : <Lesson id={lessonId} />)}
       </>}
 
       <div className={`sheet-scrim ${sheet ? "open" : ""}`} onClick={(e) => e.target === e.currentTarget && closeSheet()}>

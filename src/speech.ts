@@ -136,7 +136,20 @@ export function nextHint(prev: { state: LearnerState; turns: number }, state: Le
 
 // ---- Coaching card (SPR-27): trends over recent calls as plain sentences and one thing to try; templates, no model ----
 
-export type SessionRow = { utterances: number; latency_ms: number | null; wpm: number; long_pauses: number; words: number; native_words: number };
+/** What a voice session was spoken under, saved with its row (speech_sessions.conditions) so drills compare like with like. */
+export type Conditions = {
+  mode: "tutor" | "chat" | "rehearse" | "drill";
+  drill?: "planning" | "432" | "ladder" | "structure";
+  planningTimeSec: number;
+  topicFamiliarity: "prepared" | "novel";
+  round?: number; // 4/3/2
+  rung?: number; // pressure ladder
+};
+/** Ordinary talk: no planning time, a topic the learner did not prepare. */
+export const FREE_CONTEXT = { planningTimeSec: 0, topicFamiliarity: "novel" } as const;
+
+export type SessionRow = { utterances: number; latency_ms: number | null; wpm: number; long_pauses: number; words: number; native_words: number;
+  mode?: Conditions["mode"]; conditions?: Conditions | null; avoided?: string | null };
 export type Trend = { k: "latency" | "words" | "wpm" | "pauses" | "native"; from: number; to: number };
 export type Tip = "native" | "short" | "pauses" | "stretch";
 export const COACH_MIN = 3;

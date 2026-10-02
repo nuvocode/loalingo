@@ -85,3 +85,10 @@ test("backup runs once before migrating a database that has tables, never for an
   await runMigrations(old, ms, backup);
   assert.deepEqual(calls, [2], "no backup when nothing is pending");
 });
+
+test("v4: speech_sessions has nullable conditions and avoided", async () => {
+  const db = fresh();
+  await runMigrations(db, MIGRATIONS);
+  const cols = await db.select<{ name: string; notnull: number }>("PRAGMA table_info(speech_sessions)");
+  for (const c of ["conditions", "avoided"]) assert.equal(cols.find((x) => x.name === c)?.notnull, 0, c);
+});

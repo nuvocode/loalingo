@@ -9,6 +9,7 @@ import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, typ
 import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, pickMemories, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
 import { cleanDebrief, debriefPrompt, debriefSchema, debriefSystem, looseDebrief, looseRoleTurn, rehearsalSystem, roleTurnSchema, type RehearsalBrief } from "./rehearsal";
+import { avoidancePrompt, avoidanceSchema, looseAvoidance } from "./drills";
 import { cleanNote, noteFor, noteFresh, notePrompt, noteSystem, NOTE_KEY, type GardenNote, type NoteInfo } from "./gardenNote";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
@@ -201,8 +202,9 @@ const turnSchema = z.object({ correction: z.string(), reply: z.string(), transla
 // Some models (glm on Ollama) drop goal_reached or correction every time, so retrying can't help; a missing one means "no".
 const looseTurn = turnSchema.extend({ correction: z.string().catch(""), goal_reached: z.boolean().catch(false) });
 
-/** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
-export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
+/** The character's next turn; also corrects the learner's last message. Empty history = opening line.
+ *  `opts.rules` add lines to the system prompt (drills); `opts.keep` caps how many past messages the prompt carries. */
+export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic: { goal: string }, history: ChatMsg[], opts: { rules?: string[]; keep?: number } = {}) {
   const ch = CHARACTERS[who], native = langEn(c.native);
   const free = topic.goal.startsWith(FREE_GOAL);
   const sent = history.filter((m) => m.from === "me").length;
@@ -221,11 +223,12 @@ export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic
     free
       ? "`goal_reached`: keep it false unless the learner clearly says goodbye; then say goodbye in `reply`."
       : `\`goal_reached\`: the learner has sent ${sent} message${sent === 1 ? "" : "s"}. Before ${CHAT_MIN_TURNS} it must be false: keep the scene going with the next step. From then on, true once the learner has achieved the goal; then wrap up the scene politely in \`reply\`.`,
+    ...(opts.rules ?? []),
     "Respond only with JSON matching the schema.",
   ].filter(Boolean).join("\n");
   const last = history[history.length - 1];
   const prompt = last
-    ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
+    ? `Conversation so far:\n${history.slice(-(opts.keep ?? history.length)).map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
       `Check only this last learner message for \`correction\` (earlier ones were already corrected): "${last.text}"\nThen write ${ch.name}'s next turn.`
     : free ? "Open the chat: a short, friendly greeting and a first question about the topic."
     : "Open the scene: a short greeting that leads straight into the goal and invites the learner to start.";
@@ -240,6 +243,10 @@ export function rehearseTurn(c: Base, brief: RehearsalBrief, history: ChatMsg[])
     : "Open the conversation the way it would really start.";
   return generate(roleTurnSchema, rehearsalSystem(c, brief), prompt, undefined, looseRoleTurn);
 }
+
+/** Structure drill (#43): asks whether the learner attempted `goal` in their spoken turns. */
+export const avoidancePass = (c: Base, goal: string, learnerTurns: string[]) =>
+  generate(avoidanceSchema, systemPrompt(c), avoidancePrompt(c.course.name, goal, learnerTurns), undefined, looseAvoidance);
 
 /** One call after the learner steps out of role; entries that point at no turn are dropped. */
 export async function debrief(c: Base, brief: RehearsalBrief, learnerTurns: string[]) {

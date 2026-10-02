@@ -8,9 +8,11 @@ import { msLeft, rivalXp, zones, PROMOTE, DEMOTE, TIERS } from "../league";
 import * as db from "../db";
 import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, rollDay, today } from "../progress";
-import { LEGEND_PRICE } from "../lessons";
+import { LEGEND_PRICE, unitGrammar } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { rehearseId, type Formality } from "../rehearsal";
+import { currentUnit } from "../tutor";
+import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, goalToName, ladderDrill, nextPlanningSec, planningHistory, structureDrill } from "../drills";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
@@ -112,6 +114,7 @@ export function Practice() {
         {/* Speaking: bundled Whisper (DECISIONS D2). */}
         {card(() => speakBlock ? toast(t(speakBlock)) : words.length ? start("practice-speak") : toast(t("practice.needWords", { count: 1 })),
           "mic", "var(--sky)", "var(--blue)", t("practice.speak"), speakBlock ? t(speakBlock) : words.length ? t("practice.speakDesc") : t("practice.needWords", { count: 1 }))}
+        {card(() => speakBlock ? toast(t(speakBlock)) : openSheet(<DrillsSheet />), "clock", "var(--sky)", "var(--blue)", t("practice.drills"), speakBlock ? t(speakBlock) : t("practice.drillsDesc"))}
         {card(() => words.length >= LISTEN_MIN_WORDS ? start("practice-listen") : toast(t("practice.needWords", { count: LISTEN_MIN_WORDS })),
           "headphones", "var(--purple-tint)", "var(--purple-dark)", t("practice.listen"), words.length >= LISTEN_MIN_WORDS ? t("practice.listenDesc", { count: Math.min(6, words.length) }) : t("practice.needWords", { count: LISTEN_MIN_WORDS }))}
         {card(() => words.length >= MADNESS_MIN_WORDS ? start("practice-madness") : toast(t("practice.needWords", { count: MADNESS_MIN_WORDS })),
@@ -375,6 +378,27 @@ function TopicSheet({ who, voice }: { who: CharacterId; voice: boolean }) {
   );
 }
 
+/** The cast as a row of faces; one is picked. */
+function CastPicker({ value, onChange }: { value: CharacterId; onChange: (c: CharacterId) => void }) {
+  const { t } = useTranslation();
+  return (
+    <div className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+      <b id="cast-pick">{t("roleplay.briefCast")}</b>
+      <div className="seg" role="radiogroup" aria-labelledby="cast-pick">
+        {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
+          const { name, color, face } = CHARACTERS[k];
+          return (
+            <button key={k} role="radio" aria-checked={value === k} aria-label={name} title={name} className={`btn ${value === k ? "btn-blue" : "btn-ghost"}`}
+              style={{ padding: 4 }} onClick={() => onChange(k)}>
+              <Face spec={face} color={color} size={44} label={name} />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** Rehearsal brief: who the character plays and what about; the cast member only lends a face and a voice. */
 function RehearseSheet() {
   const { t } = useTranslation();
@@ -414,25 +438,86 @@ function RehearseSheet() {
           ))}
         </div>
       </div>
-      <div className="od-field" style={field}>
-        <b id="rh-cast">{t("roleplay.briefCast")}</b>
-        <div className="seg" role="radiogroup" aria-labelledby="rh-cast">
-          {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
-            const { name, color, face } = CHARACTERS[k];
-            return (
-              <button key={k} role="radio" aria-checked={cast === k} aria-label={name} title={name} className={`btn ${cast === k ? "btn-blue" : "btn-ghost"}`}
-                style={{ padding: 4 }} onClick={() => setCast(k)}>
-                <Face spec={face} color={color} size={44} label={name} />
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <CastPicker value={cast} onChange={setCast} />
       <span className="rp-actions sheet-actions">
         <button className="btn btn-ghost" disabled={!who.trim()} onClick={() => go(false)}>{t("roleplay.chat")}</button>
         <button className="btn btn-blue" disabled={!who.trim()} onClick={() => go(true)}><Icon name="video" /> {t("roleplay.call")}</button>
       </span>
       <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
+/** Fluency drills (epic #31): step 1 picks a drill, step 2 sets it up. Structure shows only when the current unit has a grammar pattern. */
+function DrillsSheet() {
+  const { t } = useTranslation();
+  const { closeSheet, profile, course, enrollment, done, s, setS } = useApp();
+  const start = useStartLesson();
+  const level = course && enrollment ? course.levels[enrollment.level] : undefined;
+  const [pick, setPick] = useState<Drill["kind"] | null>(null);
+  const unit = level ? currentUnit(level, done) : undefined;
+  const pattern = unit ? unitGrammar(unit)[0] : undefined; // ponytail: the unit's first pattern; a picker if learners want another
+  const [topic, setTopic] = useState(unit?.title ?? "");
+  const [cast, setCast] = useState<CharacterId>("leo");
+  const [planSec, setPlanSec] = useState(60);
+  const [rung, setRung] = useState(1);
+  const [named, setNamed] = useState<string | null>(null);
+  useEffect(() => {
+    if (profile) db.listSpeechSessions(profile.id, 100).then((rows) => { setPlanSec(nextPlanningSec(planningHistory(rows))); setNamed(goalToName(rows.slice(-30))); }).catch(() => {});
+  }, [profile?.id]);
+  const list = [
+    { id: "planning" as const, icon: "clock" as IconName, title: t("practice.planning"), desc: planSec ? t("practice.planningDesc", { sec: planSec, min: DRILL_MINUTES }) : t("practice.planningDescNone", { min: DRILL_MINUTES }) },
+    { id: "432" as const, icon: "refresh" as IconName, title: t("practice.fourThreeTwo"), desc: t("practice.fourThreeTwoDesc") },
+    { id: "ladder" as const, icon: "bolt" as IconName, title: t("practice.ladder"), desc: t("practice.ladderDesc") },
+    ...(pattern ? [{ id: "structure" as const, icon: "book" as IconName, title: t("practice.structure"), desc: t("practice.structureDesc", { pattern }) }] : []),
+  ];
+  const go = (analysis = false) => {
+    if ((!topic.trim() && !(pick === "ladder" && rung === 3)) || !pick) return;
+    if (analysis) setS((s) => ({ ...s, speechOn: true }));
+    closeSheet();
+    start(drillId(cast, pick === "structure" ? structureDrill(topic.trim(), pattern!, named)
+      : pick === "ladder" ? ladderDrill(rung, topic.trim())
+      : pick === "432" ? { kind: "432", topic: topic.trim(), planningSec: 0, minutes: FOUR_THREE_TWO_MINUTES[0], round: 1, prev: [] }
+      : { kind: "planning", topic: topic.trim(), planningSec: planSec, minutes: DRILL_MINUTES }));
+  };
+  if (!pick) return (
+    <div className="od-stack" style={{ "--od-gap": "12px", textAlign: "left" } as React.CSSProperties}>
+      <h3 style={{ textAlign: "center" }}>{t("practice.drills")}</h3>
+      {list.map((d) => (
+        <button key={d.id} className="card row-item" onClick={() => setPick(d.id)}>
+          <span style={iconBox("var(--sky)", "var(--blue)", 40, 10)}><Icon name={d.icon} /></span>
+          <span className="od-field od-fill"><b>{d.title}</b><span className="muted small">{d.desc}</span></span>
+        </button>
+      ))}
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+  return (
+    <div className="od-stack" style={{ "--od-gap": "14px", textAlign: "left" } as React.CSSProperties}>
+      <h3 style={{ textAlign: "center" }}>{list.find((d) => d.id === pick)!.title}</h3>
+      {pick === "ladder" && <div className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+        <b id="rung-pick">{t("practice.ladderRung")}</b>
+        <div className="seg" role="radiogroup" aria-labelledby="rung-pick">
+          {[1, 2, 3].map((r) => (
+            <button key={r} role="radio" aria-checked={rung === r} className={`btn ${rung === r ? "btn-blue" : "btn-ghost"}`} onClick={() => setRung(r)}>{r}</button>
+          ))}
+        </div>
+        <span className="muted small">{t(`practice.rung${rung}`)}</span>
+      </div>}
+      {!(pick === "ladder" && rung === 3) && <label className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+        <b>{t("practice.drillTopic")}</b>
+        <input className="input" value={topic} maxLength={120} placeholder={t("practice.drillTopicPlaceholder")}
+          onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(); }} />
+      </label>}
+      <CastPicker value={cast} onChange={setCast} />
+      {pick !== "ladder" && !s.speechOn && <p className="muted small">{t(pick === "432" ? "practice.needAnalysis" : pick === "structure" ? "practice.needAnalysisStructure" : "practice.needAnalysisPlanning")}</p>}
+      <span className="rp-actions sheet-actions">
+        <button className="btn btn-ghost" onClick={() => setPick(null)}>{t("voice.back")}</button>
+        {pick !== "ladder" && !s.speechOn
+          ? <><button className="btn btn-ghost" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>
+            <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go(true)}>{t("practice.enableAndStart")}</button></>
+          : <button className="btn btn-blue" disabled={!topic.trim() && !(pick === "ladder" && rung === 3)} onClick={() => go()}>{t("practice.start")}</button>}
+      </span>
     </div>
   );
 }
