@@ -201,8 +201,9 @@ const turnSchema = z.object({ correction: z.string(), reply: z.string(), transla
 // Some models (glm on Ollama) drop goal_reached or correction every time, so retrying can't help; a missing one means "no".
 const looseTurn = turnSchema.extend({ correction: z.string().catch(""), goal_reached: z.boolean().catch(false) });
 
-/** The character's next turn; also corrects the learner's last message. Empty history = opening line. */
-export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic: { goal: string }, history: ChatMsg[]) {
+/** The character's next turn; also corrects the learner's last message. Empty history = opening line.
+ *  `opts.rules` add lines to the system prompt (drills); `opts.keep` caps how many past messages the prompt carries. */
+export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic: { goal: string }, history: ChatMsg[], opts: { rules?: string[]; keep?: number } = {}) {
   const ch = CHARACTERS[who], native = langEn(c.native);
   const free = topic.goal.startsWith(FREE_GOAL);
   const sent = history.filter((m) => m.from === "me").length;
@@ -221,11 +222,12 @@ export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic
     free
       ? "`goal_reached`: keep it false unless the learner clearly says goodbye; then say goodbye in `reply`."
       : `\`goal_reached\`: the learner has sent ${sent} message${sent === 1 ? "" : "s"}. Before ${CHAT_MIN_TURNS} it must be false: keep the scene going with the next step. From then on, true once the learner has achieved the goal; then wrap up the scene politely in \`reply\`.`,
+    ...(opts.rules ?? []),
     "Respond only with JSON matching the schema.",
   ].filter(Boolean).join("\n");
   const last = history[history.length - 1];
   const prompt = last
-    ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
+    ? `Conversation so far:\n${history.slice(-(opts.keep ?? history.length)).map((m) => `${m.from === "ai" ? ch.name : "Learner"}: ${m.text}`).join("\n")}\n\n` +
       `Check only this last learner message for \`correction\` (earlier ones were already corrected): "${last.text}"\nThen write ${ch.name}'s next turn.`
     : free ? "Open the chat: a short, friendly greeting and a first question about the topic."
     : "Open the scene: a short greeting that leads straight into the goal and invites the learner to start.";

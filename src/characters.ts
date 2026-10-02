@@ -1,5 +1,6 @@
 // Roleplay cast. Pure data, no browser APIs: goals and personas are English prompt text, topic titles live in i18n as roleplay.topics.<char>.<topic>.
 import { parseBrief, type RehearsalBrief } from "./rehearsal.ts";
+import { parseDrill, type Drill } from "./drills.ts";
 export type Topic = { id: string; goal: string };
 /** Which parts and colors make up a character's cartoon bust. Parts are drawn in src/face/parts.tsx. */
 export type FaceSpec = {
@@ -93,11 +94,16 @@ export function talkId(voice: boolean, who: CharacterId, topic: string | { free:
   return `${voice ? "call" : "chat"}:${who}:${typeof topic === "string" ? topic : `${FREE}:${topic.free}`}`;
 }
 
-/** What App routes a chat/call/rehearse id to; `rehearse` only on a rehearsal (see rehearsal.ts). */
-export type Talk = { voice: boolean; who: CharacterId; topic: { id?: string; goal: string }; rehearse?: RehearsalBrief };
+/** What App routes a chat/call/rehearse/drill id to; `rehearse` only on a rehearsal (see rehearsal.ts), `drill` only on a fluency drill (see drills.ts). */
+export type Talk = { voice: boolean; who: CharacterId; topic: { id?: string; goal: string }; rehearse?: RehearsalBrief; drill?: Drill };
 
 export function parseTalkId(id: string): Talk | null {
   const [kind, who, ...rest] = id.split(":");
+  if (kind === "drill") {
+    const d = parseDrill(rest);
+    if (!Object.prototype.hasOwnProperty.call(CHARACTERS, who) || !d) return null;
+    return { voice: true, who: who as CharacterId, topic: { goal: FREE_GOAL + d.topic }, drill: d };
+  }
   if (kind === "rehearse") {
     const [mode, enc] = rest, brief = enc === undefined ? null : parseBrief(enc);
     if (!Object.prototype.hasOwnProperty.call(CHARACTERS, who) || (mode !== "chat" && mode !== "call") || rest.length !== 2 || !brief) return null;
