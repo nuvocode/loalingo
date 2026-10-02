@@ -167,7 +167,7 @@
   "memory": {
     "title": "Sprigo kennt dich",
     "empty": "Noch nichts. Wenn du mit einem Tutor sprichst oder über dein eigenes Thema chattest, erscheint hier, was Sprigo über dich erfährt.",
-    "emptyOff": "Das Gedächtnis ist aus: Sprigo speichert und nutzt nichts über dich. Schalte es unter Einstellungen > Erweitert ein.",
+    "emptyOff": "Das Gedächtnis ist aus: Sprigo speichert und nutzt nichts über dich. Schalte es unter Einstellungen > Datenschutz & Daten ein.",
     "hint": "Tippe auf eine Zeile, um sie zu korrigieren, oder entferne, was nicht bleiben soll.",
     "kinds": {
       "interest": "Interessen",
@@ -349,21 +349,15 @@
     "reduceMotionDesc": "Animationen auf ein Minimum beschränken",
     "appearance": "Darstellung",
     "theme": "Design",
-    "themeDesc": "Hell, dunkel oder wie das System",
     "themeSystem": "System",
     "themeLight": "Hell",
     "themeDark": "Dunkel",
     "language": "Oberflächensprache",
-    "languageDesc": "Menüs und Schaltflächen erscheinen in dieser Sprache",
     "course": "Kurs",
     "courseDesc": "Stufe {{level}} · Erklärungen auf {{native}}",
     "change": "Ändern",
-    "account": "Konto",
     "editProfile": "Profil bearbeiten",
     "logout": "Profil wechseln",
-    "general": "Allgemein",
-    "aiVoice": "KI und Stimme",
-    "advanced": "Erweitert",
     "tts": "Sprachausgabe",
     "ttsSystem": "Systemstimme",
     "ttsPiper": "Piper (lokal, schnell)",
@@ -373,7 +367,15 @@
     "sttDeepgram": "Deepgram (Cloud)",
     "hearts": "Tropfen",
     "heartsDesc": "Für jeden Fehler verlierst du einen Tropfen; sie füllen sich täglich wieder auf",
-    "reminderBlocked": "Mitteilungen sind blockiert. Erlaube sie in den Systemeinstellungen."
+    "reminderBlocked": "Mitteilungen sind blockiert. Erlaube sie in den Systemeinstellungen.",
+    "tabs": {
+      "profile": "Profil",
+      "prefs": "Präferenzen",
+      "ai": "KI & Stimme",
+      "privacy": "Datenschutz & Daten"
+    },
+    "profileDesc": "Name, Farbe, PIN und Muttersprache",
+    "edit": "Bearbeiten"
   },
   "rail": {
     "label": "Fortschritt",

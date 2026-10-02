@@ -23,7 +23,8 @@ export function ToggleRow({ k, initial, onChange }: { k: string; initial: boolea
   const setOn = (v: boolean) => { setOnState(v); onChange?.(v); };
   return (
     <div className="card od-row" style={gap("12px")}>
-      <span className="od-field od-fill"><b>{t(`settings.${k}`)}</b><span className="muted small">{t(`settings.${k}Desc`)}</span></span>
+      <b className="od-fill">{t(`settings.${k}`)}</b>
+      <InfoTip label={t("voice.about", { name: t(`settings.${k}`) })}>{t(`settings.${k}Desc`)}</InfoTip>
       <button className={`btn ${on ? "btn-primary" : "btn-ghost"}`} style={{ minWidth: 84 }} aria-pressed={on} onClick={() => setOn(!on)}>
         {t(on ? "settings.on" : "settings.off")}
       </button>
@@ -62,10 +63,10 @@ function PhoneRow() {
       tailscaleStatus().then(setTs); // a failure may mean Tailscale quit or signed out meanwhile
     } finally { setBusy(false); }
   };
-  const note = !ts.installed ? "settings.phoneMissing" : !ts.running ? "settings.phoneSignIn" : "settings.phoneDesc";
+  const note = !ts.installed ? "settings.phoneMissing" : "settings.phoneSignIn"; // ready: the ⓘ sheet explains it
   return (
     <div className="card od-row" style={gap("12px")}>
-      <span className="od-field od-fill"><b>{t("settings.phone")}</b><span className="muted small">{t(note)}</span></span>
+      <span className="od-field od-fill"><b>{t("settings.phone")}</b>{!ready && <span className="muted small">{t(note)}</span>}</span>
       <button className="icon-btn" aria-label={t("settings.phoneAbout")} onClick={() => openSheet(<PhoneInfoSheet />)}><Icon name="info" /></button>
       {on && ready && <button className="icon-btn" aria-label={t("settings.phoneShowQr")} disabled={busy} onClick={() => turn(true)}><Icon name="qr" /></button>}
       {/* An unready Tailscale still lets the learner switch an old "on" off. */}
@@ -294,11 +295,14 @@ function VersionRow() {
   };
   return (
     <div className="card od-row" style={gap("12px")}>
-      <span className="od-field od-fill"><b>{t("update.version", { version })}</b><span className="muted small">{t("update.desc")}</span></span>
+      <b className="od-fill">{t("update.version", { version })}</b>
+      <InfoTip label={t("voice.about", { name: t("update.section") })}>{t("update.desc")}</InfoTip>
       <button className="btn btn-ghost" disabled={busy} onClick={check}>{t("update.check")}</button>
     </div>
   );
 }
+
+type Tab = "profile" | "prefs" | "ai" | "privacy";
 
 export function Settings() {
   const { t, i18n } = useTranslation();
@@ -306,89 +310,88 @@ export function Settings() {
   const langName = useLangName();
   const themes: ThemePref[] = ["system", "light", "dark"];
   const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
-  const [advanced, setAdvanced] = useState(!ai); // AI not set up yet → open, so its warning stays visible
+  // Phone: AI, voice and data settings are the desktop's (shared database), so those tabs stay there.
+  const tabs: Tab[] = isCompanion ? ["profile", "prefs"] : ["profile", "prefs", "ai", "privacy"];
+  const [tab, setTab] = useState<Tab>(ai || isCompanion ? "profile" : "ai"); // AI not set up yet → its tab, so the warning shows
   return (
     <>
       <h1 className="section-title" style={{ marginTop: 24 }}>{t("settings.title")}</h1>
-
-      <h2 className="section-title">{t("settings.course")}</h2>
-      <div className="card od-row">
-        <span style={{ fontSize: 28 }}>{course && <CourseFlag c={course} />}</span>
-        <span className="od-field od-fill"><b>{course ? langName(course.iso) : "—"}</b>
-          <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
-        <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
+      <div className="tabs" role="tablist" aria-label={t("settings.title")}>
+        {tabs.map((k) => (
+          <button key={k} role="tab" id={`set-tab-${k}`} aria-selected={tab === k} aria-controls="set-panel" onClick={() => setTab(k)}>
+            {t(`settings.tabs.${k}`)}{k === "ai" && !ai && <span className="tab-dot" aria-hidden="true" />}
+          </button>
+        ))}
       </div>
 
-      <h2 className="section-title">{t("settings.general")}</h2>
-      <div className="od-stack" style={gap("12px")}>
-        <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
-        <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
-        <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
-        <ToggleRow k="bargeIn" initial={s.bargeIn} onChange={(bargeIn) => setS((s) => ({ ...s, bargeIn }))} />
-        {!isCompanion && <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
-          setS((s) => ({ ...s, reminderOn }));
-          if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
-        }} />}
-        <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
-        {isCompanion && <TtsRow />}
-      </div>
-
-      <h2 className="section-title">{t("settings.appearance")}</h2>
-      <div className="od-stack" style={gap("12px")}>
-        <div className="card od-row" style={{ ...gap("12px"), flexWrap: "wrap" }}>
-          <span className="od-field od-fill"><b>{t("settings.theme")}</b><span className="muted small">{t("settings.themeDesc")}</span></span>
-          <div className="seg" role="radiogroup" aria-label={t("settings.theme")}>
-            {themes.map((th) => (
-              <button key={th} role="radio" aria-checked={theme === th} className={`btn ${theme === th ? "btn-blue" : "btn-ghost"}`} onClick={() => setTheme(th)}>
-                {t(`settings.theme${cap(th)}`)}
-              </button>
-            ))}
+      <div id="set-panel" role="tabpanel" aria-labelledby={`set-tab-${tab}`} className="od-stack" style={gap("12px")}>
+        {tab === "profile" && <>
+          <div className="card od-row">
+            <span style={{ fontSize: 28 }}>{course && <CourseFlag c={course} />}</span>
+            <span className="od-field od-fill"><b>{course ? langName(course.iso) : "—"}</b>
+              <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
+            <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
           </div>
-        </div>
-        <div className="card od-row" style={gap("12px")}>
-          <label className="od-field od-fill" htmlFor="ui-lang"><b>{t("settings.language")}</b><span className="muted small">{t("settings.languageDesc")}</span></label>
-          <select id="ui-lang" className="select" value={i18n.resolvedLanguage} onChange={(e) => { i18n.changeLanguage(e.target.value); updateProfile({ ui_lang: e.target.value }); }}>
-            {languages.map((l) => <option key={l.code} value={l.code}>{l.name}</option>)}
-          </select>
-        </div>
-      </div>
+          <div className="card od-row" style={gap("12px")}>
+            <span className="od-field od-fill"><b>{profile!.name}</b><span className="muted small">{t("settings.profileDesc")}</span></span>
+            <button className="btn btn-ghost" onClick={() => openSheet(<><h3 style={{ marginBottom: 14 }}>{t("settings.editProfile")}</h3><ProfileForm initial={profile!} onDone={closeSheet} /></>)}>{t("settings.edit")}</button>
+          </div>
+          <button className="btn btn-ghost btn-block mobile-only" onClick={logout}>{t("settings.logout")}</button>
+        </>}
 
-      {/* Phone: AI, voice and data settings are the desktop's (shared database), so they stay there. */}
-      {!isCompanion && <button className="btn btn-ghost btn-block" style={{ marginTop: 24 }} aria-expanded={advanced} onClick={() => setAdvanced((a) => !a)}>
-        {t("settings.advanced")} <span aria-hidden="true">{advanced ? "▴" : "▾"}</span>
-      </button>}
-      {advanced && (
-        <>
-          <h2 className="section-title">{t("settings.aiVoice")}</h2>
-          <div className="od-stack" style={gap("12px")}>
-            <div className="card od-row" style={gap("12px")}>
-              <span className="od-field od-fill"><b>{t("ai.title")}</b>
-                {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
-                  : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
-              <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
+        {tab === "prefs" && <>
+          <ToggleRow k="hearts" initial={s.heartsOn} onChange={(heartsOn) => setS((s) => ({ ...s, heartsOn }))} />
+          <ToggleRow k="sound" initial={s.soundOn} onChange={(soundOn) => setS((s) => ({ ...s, soundOn }))} />
+          <ToggleRow k="speaking" initial={s.speakOn} onChange={(speakOn) => setS((s) => ({ ...s, speakOn }))} />
+          <ToggleRow k="bargeIn" initial={s.bargeIn} onChange={(bargeIn) => setS((s) => ({ ...s, bargeIn }))} />
+          {!isCompanion && <ToggleRow k="reminder" initial={s.reminderOn} onChange={async (reminderOn) => {
+            setS((s) => ({ ...s, reminderOn }));
+            if (reminderOn && !(await notifyAllowed())) toast(t("settings.reminderBlocked"));
+          }} />}
+          <ToggleRow k="reduceMotion" initial={s.reduceMotion} onChange={(reduceMotion) => setS((s) => ({ ...s, reduceMotion }))} />
+          {isCompanion && <TtsRow />}
+          <h2 className="section-title">{t("settings.appearance")}</h2>
+          <div className="card od-row" style={{ ...gap("12px"), flexWrap: "wrap" }}>
+            <b className="od-fill">{t("settings.theme")}</b>
+            <div className="seg" role="radiogroup" aria-label={t("settings.theme")}>
+              {themes.map((th) => (
+                <button key={th} role="radio" aria-checked={theme === th} className={`btn ${theme === th ? "btn-blue" : "btn-ghost"}`} onClick={() => setTheme(th)}>
+                  {t(`settings.theme${cap(th)}`)}
+                </button>
+              ))}
             </div>
-            <TtsRow />
-            <SttRow />
-            <ToggleRow k="speech" initial={s.speechOn} onChange={(speechOn) => setS((s) => ({ ...s, speechOn }))} />
-            <ToggleRow k="memory" initial={s.memoryOn} onChange={(memoryOn) => setS((s) => ({ ...s, memoryOn }))} />
-            {isTauri && <PhoneRow />}
           </div>
+          <div className="card od-row" style={gap("12px")}>
+            <label className="od-fill" htmlFor="ui-lang"><b>{t("settings.language")}</b></label>
+            <select id="ui-lang" className="select" value={i18n.resolvedLanguage} onChange={(e) => { i18n.changeLanguage(e.target.value); updateProfile({ ui_lang: e.target.value }); }}>
+              {languages.map((l) => <option key={l.code} value={l.code}>{l.name}</option>)}
+            </select>
+          </div>
+        </>}
 
+        {tab === "ai" && <>
+          <div className="card od-row" style={gap("12px")}>
+            <span className="od-field od-fill"><b>{t("ai.title")}</b>
+              {ai ? <span className="muted small" style={{ overflowWrap: "anywhere" }}>{PROVIDERS[ai.provider].label} · {ai.model}</span>
+                : <span className="small" style={{ color: "var(--orange)", fontWeight: 800 }}>{t("ai.notSet")}</span>}</span>
+            <button className={`btn ${ai ? "btn-ghost" : "btn-primary"}`} onClick={() => openSheet(<AiSheet />)}>{t(ai ? "settings.change" : "ai.setUp")}</button>
+          </div>
+          <TtsRow />
+          <SttRow />
+        </>}
+
+        {tab === "privacy" && <>
+          <ToggleRow k="memory" initial={s.memoryOn} onChange={(memoryOn) => setS((s) => ({ ...s, memoryOn }))} />
+          <ToggleRow k="speech" initial={s.speechOn} onChange={(speechOn) => setS((s) => ({ ...s, speechOn }))} />
           <DataSection />
-        </>
-      )}
+          {isTauri && <PhoneRow />}
+        </>}
+      </div>
 
-      {!isCompanion && <><h2 className="section-title">{t("update.section")}</h2>
-      <VersionRow /></>}
+      {!isCompanion && <div style={{ marginTop: 28 }}><VersionRow /></div>}
       <p className="muted small" style={{ textAlign: "center", marginTop: 8 }}>
         {t("update.madeBy")} <a href={AUTHOR_URL} onClick={(e) => { e.preventDefault(); void openLink(AUTHOR_URL); }}>mehmetozer.dev</a>
       </p>
-
-      <h2 className="section-title">{t("settings.account")}</h2>
-      <div className="od-stack" style={gap("12px")}>
-        <button className="btn btn-ghost btn-block" onClick={() => openSheet(<><h3 style={{ marginBottom: 14 }}>{t("settings.editProfile")}</h3><ProfileForm initial={profile!} onDone={closeSheet} /></>)}>{t("settings.editProfile")}</button>
-        <button className="btn btn-ghost btn-block mobile-only" onClick={logout}>{t("settings.logout")}</button>
-      </div>
     </>
   );
 }

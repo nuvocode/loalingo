@@ -177,7 +177,7 @@
   "memory": {
     "title": "Sprigo te connaît",
     "empty": "Rien pour l'instant. Quand tu parles avec un tuteur ou discutes de ton propre sujet, ce que Sprigo apprend sur toi apparaît ici.",
-    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi. Active-la dans Paramètres > Avancé.",
+    "emptyOff": "La mémoire est désactivée : Sprigo ne garde et n'utilise rien sur toi. Active-la dans Paramètres > Confidentialité et données.",
     "hint": "Touche une ligne pour la corriger, ou retire ce qui ne doit pas être gardé.",
     "kinds": {
       "interest": "Centres d'intérêt",
@@ -365,21 +365,15 @@
     "reduceMotionDesc": "Limiter les animations au minimum",
     "appearance": "Apparence",
     "theme": "Thème",
-    "themeDesc": "Clair, sombre ou selon le système",
     "themeSystem": "Système",
     "themeLight": "Clair",
     "themeDark": "Sombre",
     "language": "Langue de l'interface",
-    "languageDesc": "Les menus et les boutons s'affichent dans cette langue",
     "course": "Cours",
     "courseDesc": "Niveau {{level}} · explications en {{native}}",
     "change": "Modifier",
-    "account": "Compte",
     "editProfile": "Modifier le profil",
     "logout": "Changer de profil",
-    "general": "Général",
-    "aiVoice": "IA et voix",
-    "advanced": "Avancé",
     "tts": "Synthèse vocale",
     "ttsSystem": "Voix du système",
     "ttsPiper": "Piper (local, rapide)",
@@ -389,7 +383,15 @@
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Gouttes",
     "heartsDesc": "Tu perds une goutte à chaque erreur ; elles se rechargent chaque jour",
-    "reminderBlocked": "Les notifications sont bloquées. Autorise-les dans les Réglages Système."
+    "reminderBlocked": "Les notifications sont bloquées. Autorise-les dans les Réglages Système.",
+    "tabs": {
+      "profile": "Profil",
+      "prefs": "Préférences",
+      "ai": "IA et voix",
+      "privacy": "Confidentialité et données"
+    },
+    "profileDesc": "Nom, couleur, code PIN et langue maternelle",
+    "edit": "Modifier"
   },
   "rail": {
     "label": "Progression",
