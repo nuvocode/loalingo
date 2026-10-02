@@ -78,6 +78,12 @@
   },
   "practice": {
     "planning": "Planungszeit",
+    "drills": "Flüssigkeitsübungen",
+    "drillsDesc": "Zeitlich begrenztes Sprechen zu einem Thema",
+    "planningDesc": "{{sec}} s nachdenken, dann {{min}} Min. sprechen",
+    "planningDescNone": "{{min}} Min. sprechen, ohne Planung",
+    "drillTopic": "Thema",
+    "drillTopicPlaceholder": "z. B. mein letzter Urlaub",
     "planningTitle": "Überleg dir, was du sagst",
     "startSpeaking": "Jetzt sprechen",
     "timeUp": "Zeit ist um!",

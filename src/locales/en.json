@@ -78,6 +78,12 @@
   },
   "practice": {
     "planning": "Planning time",
+    "drills": "Fluency drills",
+    "drillsDesc": "Timed speaking on one topic",
+    "planningDesc": "Think {{sec}} s, then talk {{min}} min",
+    "planningDescNone": "Talk {{min}} min, no planning",
+    "drillTopic": "Topic",
+    "drillTopicPlaceholder": "e.g. my last holiday",
     "planningTitle": "Think about what you'll say",
     "startSpeaking": "Start speaking",
     "timeUp": "Time's up!",

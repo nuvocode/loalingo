@@ -78,6 +78,12 @@
   },
   "practice": {
     "planning": "Planlama süresi",
+    "drills": "Akıcılık alıştırmaları",
+    "drillsDesc": "Tek konuda süreli konuşma",
+    "planningDesc": "{{sec}} sn düşün, sonra {{min}} dk konuş",
+    "planningDescNone": "Planlamasız {{min}} dk konuş",
+    "drillTopic": "Konu",
+    "drillTopicPlaceholder": "ör. son tatilim",
     "planningTitle": "Ne söyleyeceğini düşün",
     "startSpeaking": "Konuşmaya başla",
     "timeUp": "Süre doldu!",

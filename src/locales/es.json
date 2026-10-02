@@ -81,6 +81,12 @@
   },
   "practice": {
     "planning": "Tiempo para planear",
+    "drills": "Ejercicios de fluidez",
+    "drillsDesc": "Hablar con tiempo sobre un tema",
+    "planningDesc": "Piensa {{sec}} s y luego habla {{min}} min",
+    "planningDescNone": "Habla {{min}} min sin planear",
+    "drillTopic": "Tema",
+    "drillTopicPlaceholder": "p. ej. mis últimas vacaciones",
     "planningTitle": "Piensa en lo que vas a decir",
     "startSpeaking": "Empezar a hablar",
     "timeUp": "¡Se acabó el tiempo!",
