@@ -348,11 +348,13 @@ export function Chat({ talk }: { talk: Talk }) {
   const opened = useRef(false); // StrictMode runs effects twice; open the scene once
   useEffect(() => { if (talking && !opened.current) { opened.current = true; turn([]); } }, [talking]);
   // Drill clocks: planning counts down first, then the talk time; the talk ends itself at 0.
+  // The talk clock waits for the first reply and stops while an error is on screen.
+  const paused = talking && (!!err || !msgs.length);
   useEffect(() => {
-    if (!drill || result) return;
+    if (!drill || result || paused) return;
     const id = setInterval(() => (plan > 0 ? setPlan((p) => p - 1) : setLeft((l) => Math.max(0, l - 1))), 1000);
     return () => clearInterval(id);
-  }, [!!drill, !!result, plan > 0]);
+  }, [!!drill, !!result, plan > 0, paused]);
   useEffect(() => { if (drill && talking && left === 0 && !result) finish(); }, [left]);
 
   const send = (said?: string) => {
