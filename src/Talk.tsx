@@ -7,8 +7,10 @@ import { sfx } from "./Lesson";
 import { prewarm, speak, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
-import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type CharacterId } from "./characters";
-import { chatTurn, learnerFacts, loadStory, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
+import { CHARACTERS, CHAT_MAX_TURNS as CHAT_TURNS, CHAT_MIN_TURNS, FREE_GOAL, type Talk } from "./characters";
+import { chatTurn, debrief, learnerFacts, loadStory, rehearseTurn, rememberSession, type ChatMsg, type Story as StoryData } from "./lessons";
+import { REHEARSE_LONG, type Debrief } from "./rehearsal";
+import * as db from "./db";
 import { recordSession, today, xpMult } from "./progress";
 import { inField, keyAction, type KeyState } from "./keys";
 
@@ -220,12 +222,57 @@ export function Story({ unitId }: { unitId: string }) {
     onRegen={story && !result ? () => setGen((g) => g + 1) : undefined} body={body} footer={footer} />;
 }
 
-// ---- Roleplay: free text chat with a character; the model corrects each message. `voice` = video-call mode: speak instead of type ----
+/** After a rehearsal: where the learner got stuck, and phrases they can tap into "My words". */
+function DebriefCard({ d, r, turns }: { d: Debrief; r: Result; turns: string[] }) {
+  const { t } = useTranslation();
+  const { course, enrollment, toast } = useApp();
+  const lang = course?.iso ?? "en";
+  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const save = (i: number) => {
+    if (!enrollment || saved.has(i)) return;
+    setSaved((x) => new Set(x).add(i));
+    db.addWords(enrollment.id, [[d.phrases[i].text, d.phrases[i].translation]])
+      .then(() => toast(t("roleplay.phraseSaved")), (e) => { setSaved((x) => { const n = new Set(x); n.delete(i); return n; }); toast((e as Error).message); });
+  };
+  return (
+    <div className="result-wrap">
+      <h2 style={{ fontSize: 26, fontWeight: 900 }}>{t("roleplay.debriefTitle")}</h2>
+      <div className="result-stats">
+        <span className="result-stat gold"><span className="rs-k">{t("lesson.totalXp")}</span><span className="rs-v">+{r.xp}</span></span>
+      </div>
+      <div className="od-stack" style={{ ...gap("10px"), textAlign: "start", width: "100%", maxWidth: 520 }}>
+        <h3 style={{ fontWeight: 900 }}>{t("roleplay.stuckTitle")}</h3>
+        {d.stuck.length ? d.stuck.map((x, i) => (
+          <div className="card" key={i}>
+            <b className="small" style={{ color: "var(--blue)" }}>{t("roleplay.turnN", { n: x.turn + 1 })}</b>
+            <p className="muted small" lang={lang}>“{turns[x.turn]}”</p>
+            <p>{x.moment}</p><p className="muted small">{x.why}</p>
+          </div>
+        )) : <p className="muted">{t("roleplay.debriefSmooth")}</p>}
+        {d.phrases.length > 0 && <>
+          <h3 style={{ fontWeight: 900, marginTop: 8 }}>{t("roleplay.phrasesTitle")}</h3>
+          <div className="od-row" style={{ ...gap("8px"), flexWrap: "wrap" }}>
+            {d.phrases.map((p, i) => (
+              <button key={i} className="word-chip" disabled={saved.has(i)} aria-pressed={saved.has(i)} onClick={() => save(i)} title={p.translation} style={{ textAlign: "start" }}>
+                <Icon name={saved.has(i) ? "check" : "book"} /><span lang={lang}>{p.text}</span><span className="muted small">{p.translation}</span>
+              </button>
+            ))}
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+}
 
-export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: { id?: string; goal: string }; voice?: boolean }) {
+// ---- Roleplay: free text chat with a character; the model corrects each message. `voice` = video-call mode: speak instead of type.
+// With `talk.rehearse` the character plays someone from the learner's life instead: no corrections, no goal, the learner ends it. ----
+
+export function Chat({ talk }: { talk: Talk }) {
+  const { who, topic, voice, rehearse } = talk;
   const { t } = useTranslation();
   const { course, enrollment, profile, s, setS, gainXp, toast } = useApp();
   const ch = CHARACTERS[who];
+  const name = rehearse ? rehearse.who : ch.name;
   const lang = course?.iso ?? "en";
   const [voicing, setVoicing] = useState<number | null>(null); // AI message being spoken (or its voice being made)
   const say = (text: string, i: number) => {
@@ -234,13 +281,17 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
   };
   usePrewarm(lang, ch.gender);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
-  const about = useMemo(() => (profile ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]); // loaded once per chat
+  // Loaded once per chat; a rehearsal does not use (or mark as used) the learner's facts.
+  const about = useMemo(() => (profile && !rehearse ? learnerFacts(profile.id) : Promise.resolve([])), [profile?.id]);
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState("");
   const [text, setText] = useState("");
   const [goal, setGoal] = useState(false);
   const [open, setOpen] = useState<Set<number>>(new Set()); // AI messages with translation revealed
   const [result, setResult] = useState<Result | null>(null);
+  const [deb, setDeb] = useState<Debrief | null>(null);
+  const [stepping, setStepping] = useState(false); // a failed debrief retries the debrief, not a turn
+  const ending = useRef(false); // finish once: double click, Enter
   const mine = msgs.filter((m) => m.from === "me").length;
   const { quit, askQuit } = useQuit(mine > 0 && !result);
   const endRef = useRef<HTMLDivElement>(null);
@@ -248,8 +299,14 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
 
   const turn = async (history: ChatMsg[]) => {
     if (!course || !enrollment || !profile) return;
-    setBusy(true); setErr("");
+    setBusy(true); setErr(""); setStepping(false);
     try {
+      if (rehearse) {
+        const r = await rehearseTurn({ course, level: enrollment.level, native: profile.native_lang }, rehearse, history);
+        setMsgs([...history, { from: "ai", text: r.reply, translation: r.translation }]);
+        say(r.reply, history.length);
+        return;
+      }
       const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history);
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
@@ -268,36 +325,60 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
     setText("");
     turn([...msgs, { from: "me", text: v }]);
   };
+  const remember = () => {
+    // ponytail: only free-topic chats and rehearsals; in a scene the learner plays a role, so "I'm a doctor" is not about them
+    if (profile && (rehearse || topic.goal.startsWith(FREE_GOAL))) void rememberSession(profile.id, profile.native_lang, "chat", name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
+      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
+  };
+  const turns = msgs.filter((m) => m.from === "me").map((m) => m.text);
+  /** Rehearsal end: one debrief call; XP only once it succeeded, so a retry cannot pay twice. */
+  const stepOut = async () => {
+    if (ending.current || !rehearse || !course || !enrollment || !profile) return;
+    ending.current = true;
+    setBusy(true); setErr(""); setStepping(true);
+    try {
+      const d = await debrief({ course, level: enrollment.level, native: profile.native_lang }, rehearse, turns);
+      const xp = (mine * 5 + 10) * xpMult(s);
+      setS((s) => recordSession(s, { xp, gems: 0, kind: "practice" }, today()));
+      gainXp(xp);
+      sfx("done");
+      setDeb(d);
+      setResult({ xp, gems: 0 });
+      remember();
+    } catch (e) { ending.current = false; setErr((e as Error).message); }
+    finally { setBusy(false); }
+  };
   const finish = () => {
+    if (ending.current) return;
+    ending.current = true;
     const clean = msgs.filter((m) => m.from === "me" && !m.correction).length;
     const xp = (mine * 5 + clean * 5 + (goal ? 20 : 0)) * xpMult(s), gems = goal ? 10 : 0;
     setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
     gainXp(xp);
     sfx("done");
     setResult({ xp, gems });
-    // ponytail: only free-topic chats; in a scene the learner plays a role, so "I'm a doctor" is not about them
-    if (profile && topic.goal.startsWith(FREE_GOAL)) void rememberSession(profile.id, profile.native_lang, "chat", ch.name, msgs.map((m) => ({ from: m.from === "me" ? "me" : "other", text: m.text })))
-      .then((n) => { if (n) toast(t("memory.saved", { count: n })); });
+    remember();
   };
-  const over = goal || mine >= CHAT_TURNS;
+  const over = !rehearse && (goal || mine >= CHAT_TURNS);
+  const end = rehearse ? stepOut : finish, endLabel = t(rehearse ? "roleplay.outOfRole" : "lesson.finish");
 
   const faceState: FaceState = busy ? "thinking" : voicing !== null ? "talking" : "idle";
-  const topicLabel = topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
+  const topicLabel = rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
-    body = <Done title={t(goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
+    body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <Done title={t(goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
     footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else {
     body = <>
       {voice ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginBottom: 16, textAlign: "center" }}>
-          <Face spec={ch.face} color={ch.color} size={220} label={ch.name} state={faceState} scene={who} />
-          <b>{ch.name}</b><span className="muted small">{topicLabel}</span>
+          <Face spec={ch.face} color={ch.color} size={220} label={name} state={faceState} scene={rehearse ? undefined : who} />
+          <b>{rehearse ? t("roleplay.rehearseWith", { who: name }) : name}</b><span className="muted small">{topicLabel}</span>
         </div>
       ) : (
         <div className="od-row" style={{ ...gap("12px"), marginBottom: 16 }}>
-          <Face spec={ch.face} color={ch.color} size={96} label={ch.name} state={faceState} />
-          <span className="od-field od-fill"><b>{ch.name}</b><span className="muted small">{topicLabel}</span></span>
+          <Face spec={ch.face} color={ch.color} size={96} label={name} state={faceState} />
+          <span className="od-field od-fill"><b>{rehearse ? t("roleplay.rehearseWith", { who: name }) : name}</b><span className="muted small">{topicLabel}</span></span>
         </div>
       )}
       <div className="chat">
@@ -313,23 +394,24 @@ export function Chat({ who, topic, voice = false }: { who: CharacterId; topic: {
         ))}
         {busy && <div className="bubble typing" role="status" aria-label={t("ai.thinking")}>…</div>}
       </div>
-      {err && <Failed msg={err} retry={() => turn(msgs)} quit={quit} />}
+      {err && <Failed msg={err} retry={stepping ? stepOut : () => turn(msgs)} quit={quit} />}
+      {rehearse && mine >= REHEARSE_LONG && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t("roleplay.rehearseLong")}</p>}
       {over && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t(goal ? "roleplay.goalReached" : "roleplay.limit")}</p>}
       {voice && !over && <MicButton lang={lang} disabled={busy} onText={(said) => send(said)} />}
       <div ref={endRef} />
     </>;
     footer = over || voice
       ? voice && !over
-        ? <><span className="muted small">{t("roleplay.callHint")}</span>{mine > 0 ? <button className="btn btn-ghost" disabled={busy} onClick={finish}>{t("lesson.finish")}</button> : <span />}</>
+        ? <><span className="muted small">{t("roleplay.callHint")}</span>{mine > 0 ? <button className="btn btn-ghost" disabled={busy} onClick={end}>{endLabel}</button> : <span />}</>
         : <><span className="muted small">{t("roleplay.tapHint")}</span><button className="btn btn-primary" disabled={busy} onClick={finish}>{t("lesson.finish")}</button></>
       : <>
         <input className="input" style={{ flex: 1, fontSize: 17 }} lang={lang} value={text} autoFocus aria-label={t("roleplay.message")} placeholder={t("roleplay.placeholder")}
           onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") send(); }} />
         <span className="od-row" style={gap("10px")}>
-          {mine > 0 && <button className="btn btn-ghost" disabled={busy} onClick={finish}>{t("lesson.finish")}</button>}
+          {mine > 0 && <button className="btn btn-ghost" disabled={busy} onClick={end}>{endLabel}</button>}
           <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={() => send()}>{t("roleplay.send")}</button>
         </span>
       </>;
   }
-  return <Shell label={ch.name} progress={result ? 100 : Math.min(100, (mine / CHAT_TURNS) * 100)} onClose={askQuit} body={body} footer={footer} />;
+  return <Shell label={name} progress={result ? 100 : Math.min(100, (mine / (rehearse ? REHEARSE_LONG : CHAT_TURNS)) * 100)} onClose={askQuit} body={body} footer={footer} />;
 }

@@ -10,6 +10,7 @@ import { LISTEN_MIN_WORDS, MADNESS_MIN_WORDS } from "../activities";
 import { DOUBLE_XP_MS, rollDay, today } from "../progress";
 import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
+import { rehearseId, type Formality } from "../rehearsal";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
@@ -335,6 +336,68 @@ function TopicSheet({ who, voice }: { who: CharacterId; voice: boolean }) {
   );
 }
 
+/** Rehearsal brief: who the character plays and what about; the cast member only lends a face and a voice. */
+function RehearseSheet() {
+  const { t } = useTranslation();
+  const { closeSheet, toast } = useApp();
+  const start = useStartLesson();
+  const speakBlock = useSpeakBlock();
+  const [who, setWho] = useState("");
+  const [about, setAbout] = useState("");
+  const [formality, setFormality] = useState<Formality>("neutral");
+  const [cast, setCast] = useState<CharacterId>("tom");
+  const go = (voice: boolean) => {
+    if (!who.trim()) return;
+    if (voice && speakBlock) return toast(t(speakBlock));
+    closeSheet();
+    start(rehearseId(voice, cast, { who: who.trim(), about: about.trim() || undefined, formality }));
+  };
+  const field = { "--od-gap": "6px" } as React.CSSProperties;
+  return (
+    <div className="od-stack" style={{ "--od-gap": "14px", textAlign: "left" } as React.CSSProperties}>
+      <h3 style={{ textAlign: "center" }}>{t("roleplay.rehearse")}</h3>
+      <label className="od-field" style={field}>
+        <b>{t("roleplay.briefWho")}</b>
+        <input className="input" value={who} maxLength={80} autoFocus placeholder={t("roleplay.briefWhoPlaceholder")}
+          onChange={(e) => setWho(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(false); }} />
+      </label>
+      <label className="od-field" style={field}>
+        <b>{t("roleplay.briefAbout")}</b>
+        <input className="input" value={about} maxLength={120} placeholder={t("roleplay.briefAboutPlaceholder")}
+          onChange={(e) => setAbout(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(false); }} />
+      </label>
+      <div className="od-field" style={field}>
+        <b id="rh-formality">{t("roleplay.briefFormality")}</b>
+        <div className="seg" role="radiogroup" aria-labelledby="rh-formality">
+          {(["casual", "neutral", "formal"] as const).map((f) => (
+            <button key={f} role="radio" aria-checked={formality === f} className={`btn ${formality === f ? "btn-blue" : "btn-ghost"}`} onClick={() => setFormality(f)}>
+              {t(`roleplay.formality${f[0].toUpperCase()}${f.slice(1)}`)}</button>
+          ))}
+        </div>
+      </div>
+      <div className="od-field" style={field}>
+        <b id="rh-cast">{t("roleplay.briefCast")}</b>
+        <div className="seg" role="radiogroup" aria-labelledby="rh-cast">
+          {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
+            const { name, color, face } = CHARACTERS[k];
+            return (
+              <button key={k} role="radio" aria-checked={cast === k} aria-label={name} title={name} className={`btn ${cast === k ? "btn-blue" : "btn-ghost"}`}
+                style={{ padding: 4 }} onClick={() => setCast(k)}>
+                <Face spec={face} color={color} size={44} label={name} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <span className="rp-actions sheet-actions">
+        <button className="btn btn-ghost" disabled={!who.trim()} onClick={() => go(false)}>{t("roleplay.chat")}</button>
+        <button className="btn btn-blue" disabled={!who.trim()} onClick={() => go(true)}><Icon name="video" /> {t("roleplay.call")}</button>
+      </span>
+      <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+    </div>
+  );
+}
+
 export function Roleplay() {
   const { t } = useTranslation();
   const { toast, openSheet } = useApp();
@@ -343,6 +406,11 @@ export function Roleplay() {
     <>
       <h1 className="section-title">{t("roleplay.title")}</h1>
       <p className="muted" style={{ marginBottom: 18 }}>{t("roleplay.subtitle")}</p>
+      <button className="card row-item" style={{ marginBottom: 18, width: "100%" }} onClick={() => openSheet(<RehearseSheet />)}>
+        <span style={iconBox("var(--sky)", "var(--blue)")}><Icon name="users" /></span>
+        <span className="od-field od-fill"><b>{t("roleplay.rehearse")}</b><span className="muted small">{t("roleplay.rehearseDesc")}</span></span>
+        <span className="btn btn-blue" style={{ pointerEvents: "none" }}>{t("roleplay.start")}</span>
+      </button>
       <div className="rp-grid">
         {(Object.keys(CHARACTERS) as CharacterId[]).map((k) => {
           const { name, color, face } = CHARACTERS[k];
