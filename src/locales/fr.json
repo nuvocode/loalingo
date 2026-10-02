@@ -166,12 +166,53 @@
     "top3": "Top 3",
     "forYou": "Rien que pour toi",
     "achievements": "Succès",
-    "achFire": "Racines profondes",
-    "achFireDesc": "Fais pousser tes racines 7 jours d'affilée",
-    "achFast": "Éclair",
-    "achFastDesc": "Gagne 50 XP en une journée",
-    "achBook": "Rat de bibliothèque",
-    "achBookDesc": "Termine ta première histoire",
+    "achAll": "Tout",
+    "achAllTitle": "Tous les succès",
+    "achEarned": "{{count}} sur {{total}} obtenus",
+    "ach": {
+      "streak": {
+        "title": "Racines profondes",
+        "desc_one": "Fais pousser tes racines {{count}} jour d'affilée",
+        "desc_other": "Fais pousser tes racines {{count}} jours d'affilée",
+        "desc_many": "Fais pousser tes racines {{count}} jours d'affilée"
+      },
+      "dayXp": {
+        "title": "Éclair",
+        "desc_one": "Gagne {{count}} XP en une journée",
+        "desc_other": "Gagne {{count}} XP en une journée",
+        "desc_many": "Gagne {{count}} XP en une journée"
+      },
+      "xp": {
+        "title": "Chasseur d'XP",
+        "desc_one": "Gagne {{count}} XP au total",
+        "desc_other": "Gagne {{count}} XP au total",
+        "desc_many": "Gagne {{count}} XP au total"
+      },
+      "lessons": {
+        "title": "Assidu",
+        "desc_one": "Termine {{count}} leçon",
+        "desc_other": "Termine {{count}} leçons",
+        "desc_many": "Termine {{count}} leçons"
+      },
+      "stories": {
+        "title": "Rat de bibliothèque",
+        "desc_one": "Termine {{count}} histoire",
+        "desc_other": "Termine {{count}} histoires",
+        "desc_many": "Termine {{count}} histoires"
+      },
+      "legendary": {
+        "title": "Maître",
+        "desc_one": "Réussis {{count}} défi de maîtrise",
+        "desc_other": "Réussis {{count}} défis de maîtrise",
+        "desc_many": "Réussis {{count}} défis de maîtrise"
+      },
+      "words": {
+        "title": "Trésor de mots",
+        "desc_one": "Rassemble {{count}} mot dans Mes mots",
+        "desc_other": "Rassemble {{count}} mots dans Mes mots",
+        "desc_many": "Rassemble {{count}} mots dans Mes mots"
+      }
+    },
     "details": "Détails"
   },
   "memory": {

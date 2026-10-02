@@ -154,12 +154,46 @@
     "top3": "İlk 3",
     "forYou": "Sana özel",
     "achievements": "Başarımlar",
-    "achFire": "Derin kökler",
-    "achFireDesc": "7 gün üst üste kök sal",
-    "achFast": "Hızlı",
-    "achFastDesc": "Bir günde 50 XP kazan",
-    "achBook": "Kitap kurdu",
-    "achBookDesc": "İlk hikâyeni bitir",
+    "achAll": "Tümü",
+    "achAllTitle": "Tüm başarımlar",
+    "achEarned": "{{total}} başarımdan {{count}} tanesi kazanıldı",
+    "ach": {
+      "streak": {
+        "title": "Derin kökler",
+        "desc_one": "{{count}} gün üst üste kök sal",
+        "desc_other": "{{count}} gün üst üste kök sal"
+      },
+      "dayXp": {
+        "title": "Hızlı",
+        "desc_one": "Bir günde {{count}} XP kazan",
+        "desc_other": "Bir günde {{count}} XP kazan"
+      },
+      "xp": {
+        "title": "XP avcısı",
+        "desc_one": "Toplam {{count}} XP kazan",
+        "desc_other": "Toplam {{count}} XP kazan"
+      },
+      "lessons": {
+        "title": "Çalışkan",
+        "desc_one": "{{count}} ders bitir",
+        "desc_other": "{{count}} ders bitir"
+      },
+      "stories": {
+        "title": "Kitap kurdu",
+        "desc_one": "{{count}} hikâye bitir",
+        "desc_other": "{{count}} hikâye bitir"
+      },
+      "legendary": {
+        "title": "Usta",
+        "desc_one": "{{count}} ustalık denemesini geç",
+        "desc_other": "{{count}} ustalık denemesini geç"
+      },
+      "words": {
+        "title": "Kelime hazinesi",
+        "desc_one": "Kelimelerinde {{count}} kelime topla",
+        "desc_other": "Kelimelerinde {{count}} kelime topla"
+      }
+    },
     "details": "Ayrıntılar"
   },
   "memory": {

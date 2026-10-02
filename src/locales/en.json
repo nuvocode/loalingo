@@ -156,12 +156,46 @@
     "top3": "Top 3",
     "forYou": "Just for you",
     "achievements": "Achievements",
-    "achFire": "Deep roots",
-    "achFireDesc": "Grow roots for 7 days in a row",
-    "achFast": "Speedy",
-    "achFastDesc": "Earn 50 XP in a day",
-    "achBook": "Bookworm",
-    "achBookDesc": "Finish your first story",
+    "achAll": "All",
+    "achAllTitle": "All achievements",
+    "achEarned": "{{count}} of {{total}} earned",
+    "ach": {
+      "streak": {
+        "title": "Deep roots",
+        "desc_one": "Grow roots for {{count}} day in a row",
+        "desc_other": "Grow roots for {{count}} days in a row"
+      },
+      "dayXp": {
+        "title": "Speedy",
+        "desc_one": "Earn {{count}} XP in a day",
+        "desc_other": "Earn {{count}} XP in a day"
+      },
+      "xp": {
+        "title": "XP hunter",
+        "desc_one": "Earn {{count}} XP in total",
+        "desc_other": "Earn {{count}} XP in total"
+      },
+      "lessons": {
+        "title": "Hard worker",
+        "desc_one": "Finish {{count}} lesson",
+        "desc_other": "Finish {{count}} lessons"
+      },
+      "stories": {
+        "title": "Bookworm",
+        "desc_one": "Finish {{count}} story",
+        "desc_other": "Finish {{count}} stories"
+      },
+      "legendary": {
+        "title": "Master",
+        "desc_one": "Pass {{count}} mastery challenge",
+        "desc_other": "Pass {{count}} mastery challenges"
+      },
+      "words": {
+        "title": "Word hoard",
+        "desc_one": "Collect {{count}} word in My words",
+        "desc_other": "Collect {{count}} words in My words"
+      }
+    },
     "details": "Details"
   },
   "memory": {

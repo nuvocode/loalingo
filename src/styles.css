@@ -229,6 +229,11 @@ html[data-theme="dark"] .biome-scene .sky{fill:transparent}
 }
 .row-item:hover{background:var(--surface)}
 .section-title{font-size:19px;font-weight:900;margin:28px 0 12px}
+.ach-badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.ach-badge{position:relative;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:var(--surface);color:var(--text-faint)}
+.ach-badge.earned{background:var(--gold);color:var(--on-accent);box-shadow:0 3px 0 var(--gold-dark)}
+.ach-badge i{position:absolute;right:-4px;bottom:-4px;min-width:20px;height:20px;padding:0 4px;border-radius:99px;background:var(--card);border:2px solid currentColor;color:var(--text-muted);font-style:normal;font-size:10px;font-weight:900;line-height:16px;text-align:center}
+.ach-badge.earned i{border-color:var(--gold-dark);color:var(--gold-dark)}
 .muted{color:var(--text-muted)}
 .small{font-size:13px}
 .progress-track{height:14px;background:var(--border);border-radius:99px;overflow:hidden}
