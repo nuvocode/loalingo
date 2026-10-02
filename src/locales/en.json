@@ -291,7 +291,18 @@
     "debriefSmooth": "No sticking points — that went smoothly.",
     "turnN": "Message {{n}}",
     "phrasesTitle": "Phrases that would have helped",
-    "phraseSaved": "Added to your words"
+    "phraseSaved": "Added to your words",
+    "rehearse": "Rehearse a real conversation",
+    "rehearseDesc": "Tell us who you need to talk to and about what. They play the part — no corrections — then you get a short debrief.",
+    "briefWho": "Who will you talk to?",
+    "briefWhoPlaceholder": "e.g. my landlord",
+    "briefAbout": "What about?",
+    "briefAboutPlaceholder": "e.g. the boiler that still isn't fixed",
+    "briefFormality": "How do you two talk?",
+    "formalityCasual": "Casual",
+    "formalityNeutral": "Neutral",
+    "formalityFormal": "Formal",
+    "briefCast": "Face and voice"
   },
   "friends": {
     "title": "Friends",

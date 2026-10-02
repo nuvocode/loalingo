@@ -289,7 +289,18 @@
     "debriefSmooth": "Takıldığın bir yer yok — akıcı geçti.",
     "turnN": "{{n}}. mesaj",
     "phrasesTitle": "İşine yarayacak ifadeler",
-    "phraseSaved": "Kelimelerine eklendi"
+    "phraseSaved": "Kelimelerine eklendi",
+    "rehearse": "Gerçek bir konuşmayı prova et",
+    "rehearseDesc": "Kiminle ve ne hakkında konuşacağını yaz. O kişiyi oynar, düzeltme yapmaz; sonunda kısa bir değerlendirme alırsın.",
+    "briefWho": "Kiminle konuşacaksın?",
+    "briefWhoPlaceholder": "ör. ev sahibim",
+    "briefAbout": "Ne hakkında?",
+    "briefAboutPlaceholder": "ör. hâlâ tamir edilmeyen kombi",
+    "briefFormality": "Nasıl konuşuyorsunuz?",
+    "formalityCasual": "Samimi",
+    "formalityNeutral": "Nötr",
+    "formalityFormal": "Resmi",
+    "briefCast": "Yüz ve ses"
   },
   "friends": {
     "title": "Arkadaşlar",

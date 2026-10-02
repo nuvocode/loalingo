@@ -291,7 +291,18 @@
     "debriefSmooth": "Keine Stolperstellen — das lief flüssig.",
     "turnN": "Nachricht {{n}}",
     "phrasesTitle": "Ausdrücke, die geholfen hätten",
-    "phraseSaved": "Zu deinen Wörtern hinzugefügt"
+    "phraseSaved": "Zu deinen Wörtern hinzugefügt",
+    "rehearse": "Ein echtes Gespräch proben",
+    "rehearseDesc": "Sag, mit wem du worüber sprechen musst. Die Person wird gespielt — ohne Korrekturen — danach bekommst du eine kurze Auswertung.",
+    "briefWho": "Mit wem wirst du sprechen?",
+    "briefWhoPlaceholder": "z. B. mein Vermieter",
+    "briefAbout": "Worüber?",
+    "briefAboutPlaceholder": "z. B. die Heizung, die immer noch kaputt ist",
+    "briefFormality": "Wie sprecht ihr miteinander?",
+    "formalityCasual": "Locker",
+    "formalityNeutral": "Neutral",
+    "formalityFormal": "Förmlich",
+    "briefCast": "Gesicht und Stimme"
   },
   "friends": {
     "title": "Freunde",

@@ -303,7 +303,18 @@
     "debriefSmooth": "Sin atascos — salió con fluidez.",
     "turnN": "Mensaje {{n}}",
     "phrasesTitle": "Frases que te habrían ayudado",
-    "phraseSaved": "Añadida a tus palabras"
+    "phraseSaved": "Añadida a tus palabras",
+    "rehearse": "Ensaya una conversación real",
+    "rehearseDesc": "Dinos con quién tienes que hablar y de qué. Esa persona se interpreta sin correcciones y al final recibes un breve repaso.",
+    "briefWho": "¿Con quién vas a hablar?",
+    "briefWhoPlaceholder": "p. ej. mi casero",
+    "briefAbout": "¿Sobre qué?",
+    "briefAboutPlaceholder": "p. ej. la caldera que sigue sin arreglar",
+    "briefFormality": "¿Cómo os habláis?",
+    "formalityCasual": "Informal",
+    "formalityNeutral": "Neutral",
+    "formalityFormal": "Formal",
+    "briefCast": "Cara y voz"
   },
   "friends": {
     "title": "Amigos",
