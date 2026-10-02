@@ -10,7 +10,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  # One draft before the matrix starts: four jobs looking for it at once made two drafts for v1.5.0.
+  release:
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      id: ${{ steps.draft.outputs.id }}
+    steps:
+      - id: draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "Sprigo ${TAG#v}" \
+            --notes "Downloads for macOS, Windows and Linux. The macOS app is not notarized yet: see the README for the one-time \`xattr\` command."
+          echo "id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq "map(select(.tag_name == \"$TAG\" and .draft)) | .[0].id")" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: release
+    if: ${{ !cancelled() && needs.release.result != 'failure' }} # manual runs skip `release` and still build
     permissions:
       contents: write
     strategy:
@@ -62,8 +82,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_type == 'tag' && 'v__VERSION__' || '' }}
-          releaseName: Sprigo __VERSION__
-          releaseBody: "Downloads for macOS, Windows and Linux. The macOS app is not notarized yet: see the README for the one-time `xattr` command."
-          releaseDraft: true
+          releaseId: ${{ needs.release.outputs.id }} # empty on manual runs: build only
+          # ponytail: each job merges latest.json as it finishes; two finishing in the same second could drop a platform. Check it before publishing.
           args: ${{ matrix.args }}
