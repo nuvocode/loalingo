@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "./icons";
 import { useApp } from "./store";
-import { sfx } from "./Lesson";
+import { sfx, useStartLesson } from "./Lesson";
 import { onTtsFallback, prewarm, resetTtsNotice, speak, speakingWith, stopSpeaking } from "./tts";
 import { MicButton } from "./Mic";
 import { Face, type FaceState } from "./face/Face";
@@ -13,7 +13,7 @@ import { REHEARSE_LONG, type Debrief } from "./rehearsal";
 import * as db from "./db";
 import { recordSession, today, xpMult } from "./progress";
 import { FREE_CONTEXT, summarize, type Conditions, type Utterance } from "./speech";
-import { DRILL_KEEP, mmss } from "./drills";
+import { DRILL_KEEP, FOUR_THREE_TWO_MINUTES, drillConditions, drillId, drillRules, mmss, roundStat, type RoundStat } from "./drills";
 import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -281,6 +281,29 @@ function DebriefCard({ d, r, turns }: { d: Debrief; r: Result; turns: string[] }
 // ---- Roleplay: free text chat with a character; the model corrects each message. `voice` = video-call mode: speak instead of type.
 // With `talk.rehearse` the character plays someone from the learner's life instead: no corrections, no goal, the learner ends it. ----
 
+/** 4/3/2 after round 3: the same topic told three times, side by side. "—" = not measured. */
+function Rounds({ stats }: { stats: RoundStat[] }) {
+  const { t } = useTranslation();
+  const rows: [string, (s: NonNullable<RoundStat>) => string][] = [
+    [t("practice.roundsWpm"), (s) => String(Math.round(s.wpm))],
+    [t("practice.roundsPause"), (s) => `${Math.round(s.pauseRatio * 100)}%`],
+    [t("practice.roundsFillers"), (s) => String(s.fillers)],
+  ];
+  return (
+    <div className="card" style={{ marginTop: 16 }}>
+      <b>{t("practice.roundsTitle")}</b>
+      <table style={{ width: "100%", marginTop: 8, textAlign: "center", fontVariantNumeric: "tabular-nums" }}>
+        <thead><tr><th />{FOUR_THREE_TWO_MINUTES.map((min, i) => <th key={i} className="small">{t("practice.roundN", { n: i + 1, min })}</th>)}</tr></thead>
+        <tbody>{rows.map(([k, f]) => (
+          <tr key={k}><th className="small" style={{ textAlign: "left" }}>{k}</th>{[0, 1, 2].map((i) => <td key={i}>{stats[i] ? f(stats[i]!) : "—"}</td>)}</tr>
+        ))}</tbody>
+      </table>
+      <p className="muted small" style={{ marginTop: 8 }}>{t("practice.roundsNote")}</p>
+      {[0, 1, 2].some((i) => !stats[i]) && <p className="muted small">{t("practice.roundsUnmeasured")}</p>}
+    </div>
+  );
+}
+
 export function Chat({ talk }: { talk: Talk }) {
   const { who, topic, voice, rehearse, drill } = talk;
   const { t } = useTranslation();
@@ -314,7 +337,7 @@ export function Chat({ talk }: { talk: Talk }) {
   const native = voice && s.speechOn ? profile?.native_lang : undefined; // voice analysis off: nothing measured or saved
   const spoken = useRef<Utterance[]>([]);
   const conditions = useRef<Conditions>(drill
-    ? { ...FREE_CONTEXT, mode: "drill", drill: "planning", planningTimeSec: drill.planningSec, topicFamiliarity: "prepared" }
+    ? drillConditions(drill)
     : { ...FREE_CONTEXT, mode: rehearse ? "rehearse" : "chat" });
   /** One speech_sessions row per voice chat that measured something. */
   const saveSpeech = () => {
@@ -336,7 +359,7 @@ export function Chat({ talk }: { talk: Talk }) {
         return;
       }
       const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history,
-        drill ? { rules: [`This is a speaking drill: the learner is telling you about ${drill.topic}. React briefly, ask at most one short question, and let the learner do most of the talking.`], keep: DRILL_KEEP } : {});
+        drill ? { rules: drillRules(drill), keep: DRILL_KEEP } : {});
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
       say(r.reply, fixed.length);
@@ -350,6 +373,9 @@ export function Chat({ talk }: { talk: Talk }) {
   // Drill clocks: planning counts down first, then the talk time; the talk ends itself at 0.
   // The talk clock waits for the first reply and stops while an error is on screen.
   const paused = talking && (!!err || !msgs.length);
+  const start = useStartLesson();
+  const [stat, setStat] = useState<RoundStat>(null); // 4/3/2: this round's numbers, set by finish()
+  const r432 = drill?.kind === "432" ? drill : null;
   useEffect(() => {
     if (!drill || result || paused) return;
     const id = setInterval(() => (plan > 0 ? setPlan((p) => p - 1) : setLeft((l) => Math.max(0, l - 1))), 1000);
@@ -398,16 +424,24 @@ export function Chat({ talk }: { talk: Talk }) {
     setResult({ xp, gems });
     remember();
     saveSpeech();
+    if (r432) setStat(roundStat(spoken.current.length ? summarize(spoken.current, 0) : null));
   };
   const over = drill ? left === 0 : !rehearse && (goal || mine >= CHAT_TURNS);
   const end = rehearse ? stepOut : finish, endLabel = t(rehearse ? "roleplay.outOfRole" : "lesson.finish");
 
   const faceState: FaceState = busy ? "thinking" : voicing !== null ? "talking" : "idle";
-  const topicLabel = drill ? `${t("practice.planning")} · ${drill.topic}` : rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
+  const topicLabel = drill ? `${r432 ? t("practice.roundN", { n: r432.round, min: r432.minutes }) : t("practice.planning")} · ${drill.topic}` : rehearse ? rehearse.about ?? "" : topic.id ? t(`roleplay.topics.${who}.${topic.id}`) : topic.goal.slice(FREE_GOAL.length);
   let body: React.ReactNode, footer: React.ReactNode;
   if (result) {
-    body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <Done title={t(drill && left === 0 ? "practice.timeUp" : goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />;
-    footer = <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
+    body = deb ? <DebriefCard d={deb} r={result} turns={turns} /> : <>
+      <Done title={t(drill && left === 0 ? "practice.timeUp" : goal ? "roleplay.goalDone" : "roleplay.done")} r={result} />
+      {r432?.round === 3 && <Rounds stats={[...(r432.prev ?? []), stat]} />}
+    </>;
+    const round = r432?.round ?? 3;
+    footer = round < 3
+      ? <><button className="btn btn-ghost" onClick={quit}>{t("lesson.end")}</button>
+        <button className="btn btn-primary" onClick={() => { stopSpeaking(); start(drillId(who, { ...r432!, round: round + 1, minutes: FOUR_THREE_TWO_MINUTES[round], prev: [...(r432!.prev ?? []), stat] })); }}>{t("practice.nextRound")}</button></>
+      : <><span /><button className="btn btn-primary" onClick={quit}>{t("lesson.end")}</button></>;
   } else if (!talking) {
     body = (
       <div className="result-wrap">
