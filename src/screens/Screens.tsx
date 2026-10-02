@@ -510,10 +510,10 @@ function DrillsSheet() {
           onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(); }} />
       </label>}
       <CastPicker value={cast} onChange={setCast} />
-      {(pick === "432" || pick === "structure") && !s.speechOn && <p className="muted small">{t(pick === "432" ? "practice.needAnalysis" : "practice.needAnalysisStructure")}</p>}
+      {pick !== "ladder" && !s.speechOn && <p className="muted small">{t(pick === "432" ? "practice.needAnalysis" : pick === "structure" ? "practice.needAnalysisStructure" : "practice.needAnalysisPlanning")}</p>}
       <span className="rp-actions sheet-actions">
         <button className="btn btn-ghost" onClick={() => setPick(null)}>{t("voice.back")}</button>
-        {(pick === "432" || pick === "structure") && !s.speechOn
+        {pick !== "ladder" && !s.speechOn
           ? <><button className="btn btn-ghost" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>
             <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go(true)}>{t("practice.enableAndStart")}</button></>
           : <button className="btn btn-blue" disabled={!topic.trim() && !(pick === "ladder" && rung === 3)} onClick={() => go()}>{t("practice.start")}</button>}

@@ -93,6 +93,7 @@
     "structure": "Struktur",
     "structureDesc": "Probier das Muster dieser Einheit: {{pattern}}",
     "needAnalysisStructure": "Ob du das Muster probiert hast, sieht nur die Sprachanalyse.",
+    "needAnalysisPlanning": "Damit die Planungszeit mit der Zeit kürzer wird, braucht es die Sprachanalyse.",
     "namedStructure": "Versuch diesmal, {{structure}} zu benutzen",
     "needAnalysis": "Für den Vergleich der Runden braucht es die Sprachanalyse.",
     "enableAndStart": "Einschalten und starten",

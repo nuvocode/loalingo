@@ -96,6 +96,7 @@
     "structure": "Estructura",
     "structureDesc": "Prueba el patrón de esta unidad: {{pattern}}",
     "needAnalysisStructure": "Para saber si probaste el patrón hace falta el análisis de voz.",
+    "needAnalysisPlanning": "Para que el tiempo de planificación se acorte con las sesiones hace falta el análisis de voz.",
     "namedStructure": "Esta vez, intenta usar {{structure}}",
     "needAnalysis": "Comparar las rondas requiere el análisis de voz.",
     "enableAndStart": "Activar y empezar",

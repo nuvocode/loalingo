@@ -360,12 +360,14 @@ export function Chat({ talk }: { talk: Talk }) {
     try {
       if (rehearse) {
         const r = await rehearseTurn({ course, level: enrollment.level, native: profile.native_lang }, rehearse, history);
+        if (ending.current) return; // the session ended while the reply was on its way (a drill's time ran out)
         setMsgs([...history, { from: "ai", text: r.reply, translation: r.translation }]);
         say(r.reply, history.length);
         return;
       }
       const r = await chatTurn({ course, level: enrollment.level, native: profile.native_lang, about: await about }, who, topic, history,
         drill ? { rules: drillRules(drill), keep: DRILL_KEEP } : {});
+      if (ending.current) return;
       const fixed = history.map((m, i) => i === history.length - 1 && m.from === "me" ? { ...m, correction: r.correction.trim() || undefined } : m);
       setMsgs([...fixed, { from: "ai", text: r.reply, translation: r.translation }]);
       say(r.reply, fixed.length);
@@ -391,7 +393,7 @@ export function Chat({ talk }: { talk: Talk }) {
 
   const send = (said?: string) => {
     const v = (said ?? text).trim();
-    if (!v || busy) return;
+    if (!v || busy || ending.current) return;
     setText("");
     turn([...msgs, { from: "me", text: v }]);
   };
@@ -424,8 +426,8 @@ export function Chat({ talk }: { talk: Talk }) {
     ending.current = true;
     const clean = msgs.filter((m) => m.from === "me" && !m.correction).length;
     const xp = (mine * 5 + clean * 5 + (goal ? 20 : 0)) * xpMult(s), gems = goal ? 10 : 0;
-    setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today()));
-    gainXp(xp);
+    if (xp) { setS((s) => recordSession(s, { xp, gems, kind: "practice" }, today())); gainXp(xp); } // a drill can time out with nothing said
+    if (drill) stopSpeaking();
     sfx("done");
     setResult({ xp, gems });
     remember();

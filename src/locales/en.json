@@ -93,6 +93,7 @@
     "structure": "Structure",
     "structureDesc": "Try this unit's pattern: {{pattern}}",
     "needAnalysisStructure": "Checking whether you tried the pattern needs voice analysis.",
+    "needAnalysisPlanning": "Shortening your planning time over sessions needs voice analysis.",
     "namedStructure": "This time, try using {{structure}}",
     "needAnalysis": "Comparing the rounds needs voice analysis.",
     "enableAndStart": "Turn on and start",

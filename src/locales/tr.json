@@ -93,6 +93,7 @@
     "structure": "Yapı",
     "structureDesc": "Bu ünitenin kalıbını dene: {{pattern}}",
     "needAnalysisStructure": "Kalıbı deneyip denemediğini görmek için ses analizi gerekir.",
+    "needAnalysisPlanning": "Planlama süresinin oturumlar içinde kısalması için ses analizi gerekir.",
     "namedStructure": "Bu sefer {{structure}} kullanmayı dene",
     "needAnalysis": "Turları karşılaştırmak için ses analizi gerekir.",
     "enableAndStart": "Aç ve başlat",
