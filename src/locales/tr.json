@@ -501,6 +501,7 @@
     "regenerate": "Yeni alıştırmalar üret",
     "thinking": "Düşünüyor…",
     "speaking": "Konuşuyor…",
+    "speakingWith": "Konuşuyor… · {{engine}}",
     "notSet": "Kurulmadı — dersler kilitli",
     "scanning": "Bu Mac'te yerel model aranıyor…",
     "foundLocal": "Bu Mac'te {{name}} bulundu — bir model seçip kaydet.",
@@ -575,7 +576,16 @@
     "back": "Geri",
     "noKey": "Önce bir Deepgram anahtarı ekle.",
     "whisperMissing": "Whisper modeli bu sürümde yok (yalnız masaüstü uygulamasında çalışır).",
-    "micBlocked": "Mikrofona erişilemedi: {{error}}"
+    "micBlocked": "Mikrofona erişilemedi: {{error}}",
+    "fellBackTitle": "Sistem sesine geçildi",
+    "fellBack": "Yerel ses kullanılamadı, sistem sesine geçildi. Ayarlar'dan başka bir ses seçebilirsin.",
+    "fellBackAction": "Ayarlar'a git",
+    "using": "Şu an konuşan: {{name}}",
+    "engine": {
+      "system": "Sistem sesi",
+      "piper": "Piper",
+      "kokoro": "Kokoro"
+    }
   },
   "data": {
     "section": "Veri",

@@ -29,8 +29,8 @@ const PIPER: Record<string, Record<"f" | "m", string>> = {
 const piperVoice = (lang: string, gender: "f" | "m" = "f") => PIPER[lang.slice(0, 2)]?.[gender];
 
 /** The local engine and its voice for this language, or null for the system voice. */
-async function engineFor(lang: string, voice?: Voice): Promise<[Engine, string] | null> {
-  const p = await ttsProvider();
+async function engineFor(lang: string, voice?: Voice, p?: TtsProvider): Promise<[Engine, string] | null> {
+  p ??= await ttsProvider();
   if (p === "kokoro" && lang.startsWith("en")) return ["kokoro", voice?.kokoro ?? (voice?.gender === "m" ? "am_michael" : "af_heart")];
   const v = p === "piper" && piperVoice(lang, voice?.gender);
   return v ? ["piper", v] : null;
@@ -171,7 +171,7 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
 
   const loading = load(e, e === "kokoro" ? "" : voice);
   // A Piper voice not downloaded yet keeps downloading, but this line falls back to the system voice.
-  if (e === "piper" && !(await Promise.race([loading.then(() => true), new Promise((ok) => setTimeout(ok, 5000, false))]))) throw new Error("Piper voice still loading");
+  if (e === "piper" && !(await Promise.race([loading.then(() => true), new Promise((ok) => setTimeout(ok, 5000, false))]))) throw new Error(STILL_LOADING);
   if (mine !== seq) return;
   const got: Chunk[] = [];
   await new Promise<void>((started, failed) => {
@@ -194,6 +194,17 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
   });
 }
 
+// ---- Which engine spoke, and one notice per session when the chosen one fell back to the system voice ----
+let lastEngine: TtsProvider | null = null; // null: nothing spoken yet
+export const speakingWith = () => lastEngine;
+const fallbackSubs = new Set<() => void>();
+let noticed = false;
+/** Calls `cb` the first time a line falls back to the system voice since `resetTtsNotice`; returns the unsubscribe. */
+export function onTtsFallback(cb: () => void) { fallbackSubs.add(cb); return () => { fallbackSubs.delete(cb); }; }
+export const resetTtsNotice = () => { noticed = false; };
+const fellBack = () => { if (!noticed) { noticed = true; fallbackSubs.forEach((f) => f()); } };
+const STILL_LOADING = "Piper voice still loading"; // a first download: the next lines use it, not worth a notice
+
 /** One voice at a time: a new call cuts the previous one. Resolves when this speech ends or is cut.
  *  Falls back to the system voice if the local engine fails before any audio. `started` gets the time its audio begins. */
 export async function speak(text: string, lang: string, voice?: Voice, started?: (at: number) => void): Promise<void> {
@@ -203,15 +214,19 @@ export async function speak(text: string, lang: string, voice?: Voice, started?:
   let done!: () => void;
   const over = new Promise<void>((ok) => { done = ok; });
   finish = done;
-  const local = await engineFor(lang, voice);
+  const want = await ttsProvider();
+  const local = await engineFor(lang, voice, want);
   if (local) {
     try {
+      lastEngine = local[0];
       await viaWorker(local[0], text, local[1], mine, done);
       return over;
     } catch (e) {
       console.error(e);
+      if ((e as Error).message !== STILL_LOADING) fellBack();
     }
-  }
+  } else if (want !== "system") fellBack(); // e.g. Kokoro or Piper has no voice for this language
+  lastEngine = "system";
   if (mine !== seq) return over;
   await system(text, lang, voice?.gender, mine, done);
   return over;

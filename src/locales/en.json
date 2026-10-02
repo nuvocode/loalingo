@@ -506,6 +506,7 @@
     "regenerate": "Generate new exercises",
     "thinking": "Thinking…",
     "speaking": "Speaking…",
+    "speakingWith": "Speaking… · {{engine}}",
     "notSet": "Not set up — lessons are locked",
     "scanning": "Looking for a local model on this Mac…",
     "foundLocal": "{{name}} found on this Mac — pick a model and save.",
@@ -580,7 +581,16 @@
     "back": "Back",
     "noKey": "Add a Deepgram key first.",
     "whisperMissing": "The Whisper model is not in this build (it only works in the desktop app).",
-    "micBlocked": "Could not use the microphone: {{error}}"
+    "micBlocked": "Could not use the microphone: {{error}}",
+    "fellBackTitle": "Switched to the system voice",
+    "fellBack": "The voice you chose couldn't speak here, so Sprigo switched to the system voice. You can pick another voice in Settings.",
+    "fellBackAction": "Go to Settings",
+    "using": "Speaking with: {{name}}",
+    "engine": {
+      "system": "System voice",
+      "piper": "Piper",
+      "kokoro": "Kokoro"
+    }
   },
   "data": {
     "section": "Data",

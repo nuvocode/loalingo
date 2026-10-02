@@ -506,6 +506,7 @@
     "regenerate": "Neue Übungen erstellen",
     "thinking": "Denkt nach…",
     "speaking": "Spricht…",
+    "speakingWith": "Spricht… · {{engine}}",
     "notSet": "Nicht eingerichtet – Lektionen sind gesperrt",
     "scanning": "Suche nach einem lokalen Modell auf diesem Mac…",
     "foundLocal": "{{name}} auf diesem Mac gefunden – wähle ein Modell und speichere.",
@@ -580,7 +581,16 @@
     "back": "Zurück",
     "noKey": "Füge zuerst einen Deepgram-Schlüssel hinzu.",
     "whisperMissing": "Das Whisper-Modell fehlt in diesem Build (nur in der Desktop-App).",
-    "micBlocked": "Mikrofon nicht verfügbar: {{error}}"
+    "micBlocked": "Mikrofon nicht verfügbar: {{error}}",
+    "fellBackTitle": "Zur Systemstimme gewechselt",
+    "fellBack": "Die gewählte Stimme konnte hier nicht sprechen, deshalb ist Sprigo zur Systemstimme gewechselt. In den Einstellungen kannst du eine andere Stimme wählen.",
+    "fellBackAction": "Zu den Einstellungen",
+    "using": "Spricht gerade mit: {{name}}",
+    "engine": {
+      "system": "Systemstimme",
+      "piper": "Piper",
+      "kokoro": "Kokoro"
+    }
   },
   "data": {
     "section": "Daten",

@@ -524,6 +524,7 @@
     "regenerate": "Générer de nouveaux exercices",
     "thinking": "Réflexion…",
     "speaking": "Parle…",
+    "speakingWith": "Parle… · {{engine}}",
     "notSet": "Non configuré — les leçons sont verrouillées",
     "scanning": "Recherche d'un modèle local sur ce Mac…",
     "foundLocal": "{{name}} trouvé sur ce Mac — choisis un modèle et enregistre.",
@@ -598,7 +599,16 @@
     "back": "Retour",
     "noKey": "Ajoute d'abord une clé Deepgram.",
     "whisperMissing": "Le modèle Whisper n'est pas dans cette version (application de bureau uniquement).",
-    "micBlocked": "Micro inaccessible : {{error}}"
+    "micBlocked": "Micro inaccessible : {{error}}",
+    "fellBackTitle": "Passage à la voix du système",
+    "fellBack": "La voix choisie n'a pas pu parler ici, Sprigo est donc passé à la voix du système. Tu peux choisir une autre voix dans les Paramètres.",
+    "fellBackAction": "Aller aux Paramètres",
+    "using": "Voix utilisée : {{name}}",
+    "engine": {
+      "system": "Voix du système",
+      "piper": "Piper",
+      "kokoro": "Kokoro"
+    }
   },
   "data": {
     "section": "Données",

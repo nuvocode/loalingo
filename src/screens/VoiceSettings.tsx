@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { isCompanion, setSetting } from "../db";
-import { loadKokoro, loadPiper, speak, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
+import { loadKokoro, loadPiper, speak, speakingWith, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
 import { Icon } from "../icons";
 import { deepgramTranscribe, getDeepgramKey, listen, resetSttReady, setDeepgramKey, sttProvider, sttReady, type Listener, type SttProvider } from "../stt";
 import { isNoise } from "../tutor";
@@ -47,9 +47,11 @@ export function TtsRow() {
   const { openSheet } = useApp();
   const [v, setV] = useState<TtsProvider>("system");
   useEffect(() => { ttsProvider().then(setV); }, []);
+  const now = speakingWith(); // the last line spoke with another engine than the saved one (it fell back)
   return (
     <div className="card od-row" style={gap("12px")}>
-      <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t(ttsName(v))}</span></span>
+      <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t(ttsName(v))}</span>
+        {now && now !== v && <span className="small" style={{ color: "var(--orange)" }}>{t("voice.using", { name: t(`voice.engine.${now}`) })}</span>}</span>
       <button className="btn btn-ghost" onClick={() => openSheet(<TtsSheet initial={v} onChange={setV} />)}>{t("settings.change")}</button>
     </div>
   );
