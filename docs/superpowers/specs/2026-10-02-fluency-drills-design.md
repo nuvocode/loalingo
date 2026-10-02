@@ -63,8 +63,9 @@ Step 2, the settings:
 
 ## Data
 
+- **`Conditions`** (new, in `src/speech.ts`): `{ mode: "tutor" | "chat" | "rehearse" | "drill"; drill?: "planning" | "432" | "ladder" | "structure"; planningTimeSec: number; topicFamiliarity: "prepared" | "novel"; round?: number; rung?: number }`. `FREE_CONTEXT = { planningTimeSec: 0, topicFamiliarity: "novel" }` covers ordinary talk.
 - **Migration v4:**
-  - Adds `speech_sessions.conditions TEXT`, a JSON `MonitorContext`; NULL means not measured.
+  - Adds `speech_sessions.conditions TEXT`, a JSON `Conditions`; NULL means not measured.
   - Adds `speech_sessions.avoided TEXT`.
   - Upgrading takes a `pre-v4-*` backup.
 - **`saveSpeechSession`** takes the mode `tutor | chat | rehearse | drill` plus `conditions` and `avoided`. `listSpeechSessions(profileId, limit)` returns them.
