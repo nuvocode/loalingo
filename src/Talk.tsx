@@ -12,6 +12,7 @@ import { chatTurn, debrief, learnerFacts, loadStory, rehearseTurn, rememberSessi
 import { REHEARSE_LONG, type Debrief } from "./rehearsal";
 import * as db from "./db";
 import { recordSession, today, xpMult } from "./progress";
+import { FREE_CONTEXT, summarize, type Conditions, type Utterance } from "./speech";
 import { inField, keyAction, type KeyState } from "./keys";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -304,6 +305,13 @@ export function Chat({ talk }: { talk: Talk }) {
   const [deb, setDeb] = useState<Debrief | null>(null);
   const [stepping, setStepping] = useState(false); // a failed debrief retries the debrief, not a turn
   const ending = useRef(false); // finish once: double click, Enter
+  const native = voice && s.speechOn ? profile?.native_lang : undefined; // voice analysis off: nothing measured or saved
+  const spoken = useRef<Utterance[]>([]);
+  const conditions = useRef<Conditions>({ ...FREE_CONTEXT, mode: rehearse ? "rehearse" : "chat" });
+  /** One speech_sessions row per voice chat that measured something. */
+  const saveSpeech = () => {
+    if (profile && spoken.current.length) void db.saveSpeechSession(profile.id, enrollment?.id ?? null, summarize(spoken.current, 0), conditions.current).catch(() => {});
+  };
   const mine = msgs.filter((m) => m.from === "me").length;
   const { quit, askQuit } = useQuit(mine > 0 && !result);
   const endRef = useRef<HTMLDivElement>(null);
@@ -357,6 +365,7 @@ export function Chat({ talk }: { talk: Talk }) {
       setDeb(d);
       setResult({ xp, gems: 0 });
       remember();
+      saveSpeech();
     } catch (e) { ending.current = false; setErr((e as Error).message); }
     finally { setBusy(false); }
   };
@@ -370,6 +379,7 @@ export function Chat({ talk }: { talk: Talk }) {
     sfx("done");
     setResult({ xp, gems });
     remember();
+    saveSpeech();
   };
   const over = !rehearse && (goal || mine >= CHAT_TURNS);
   const end = rehearse ? stepOut : finish, endLabel = t(rehearse ? "roleplay.outOfRole" : "lesson.finish");
@@ -409,7 +419,7 @@ export function Chat({ talk }: { talk: Talk }) {
       {err && <Failed msg={err} retry={stepping ? stepOut : () => turn(msgs)} quit={quit} />}
       {rehearse && mine >= REHEARSE_LONG && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t("roleplay.rehearseLong")}</p>}
       {over && !busy && <p className="muted small" style={{ textAlign: "center", marginTop: 16 }}>{t(goal ? "roleplay.goalReached" : "roleplay.limit")}</p>}
-      {voice && !over && <MicButton lang={lang} disabled={busy} onText={(said) => send(said)} />}
+      {voice && !over && <MicButton lang={lang} native={native} disabled={busy} onText={(said, m) => { if (m) spoken.current.push(m); send(said); }} />}
       <div ref={endRef} />
     </>;
     footer = over || voice
