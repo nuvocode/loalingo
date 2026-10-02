@@ -1,50 +1,38 @@
-# Telefondan Sprigo (companion mode)
+# Sprigo on your phone (companion mode)
 
-**Durum:** Plan onaylandı, spike bitti (2026-10-01) · **Epic:** SPR-4 · **Branch:** `feature/mobile-companion` → `test`
+The desktop app is the server; the phone's browser is the screen, microphone and speaker. Data, whisper and Ollama stay on the desktop.
 
-Masaüstü uygulama sunucu olur; telefon tarayıcısı ekran, mikrofon ve hoparlör olur. Veri, whisper ve Ollama masaüstünde kalır.
+## 1. Why it can stay simple
 
-## 1. Neden basit kalabiliyor
+1. **The UI already runs in a browser.** In dev mode the database runs on sql.js ([`src/db.ts`](../src/db.ts) `browserDb`), the AI on `window.fetch` ([`src/ai.ts`](../src/ai.ts)) and STT on Deepgram, all in the browser. No separate PWA layer is needed; only three things depend on Tauri: the database, `transcribe` and the Ollama address.
+2. **No audio stream.** Voice activity detection runs in the browser ([`src/stt.ts`](../src/stt.ts) `listen`); what goes to the desktop is one batch of samples when an utterance ends. No WebSocket, a single POST.
+3. **The Rust side is small.** SQL is bridged to the desktop webview (`companion-sql` event → `companion_reply`): same connection, same single writer, migrations in place. The bundled UI files are served with `app.asset_resolver()`, or from Vite under `tauri dev`.
 
-1. **Arayüz zaten tarayıcıda çalışıyor.** Dev modda veritabanı sql.js ile (`src/db.ts` `browserDb`), AI `window.fetch` ile (`src/ai.ts`), STT Deepgram ile tarayıcıda çalışır. Ayrı bir PWA katmanı gerekmez; Tauri'ye bağlı yalnızca üç nokta var: veritabanı, `transcribe`, Ollama adresi.
-2. **Ses akışı yok.** VAD tarayıcıda çalışır (`src/stt.ts` `listen`); masaüstüne giden şey cümle bitince tek seferlik ses örnekleridir. WebSocket gerekmez, tek POST yeter.
-3. **Rust tarafı küçük.** SQL masaüstü webview'ine köprülenir (`companion-sql` olayı → `companion_reply`); aynı bağlantı, aynı yazıcı, migration'lar yerinde. Gömülü arayüz dosyaları `app.asset_resolver()` ile, `tauri dev`'de Vite'tan servis edilir.
-
-## 2. Mimari
+## 2. Architecture
 
 ```
-Telefon tarayıcısı ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:1430 (Sprigo masaüstü)
-                                                  ├─ GET  /*          gömülü arayüz
-                                                  ├─ POST /sql        execute / select, webview üzerinden
-                                                  ├─ POST /transcribe whisper (f32 örnekler)
-                                                  └─ /ollama/*        → yapılandırılmış Ollama adresi
+Phone browser ──HTTPS──▶ tailscale serve ──▶ 127.0.0.1:1430 (Sprigo desktop)
+                                             ├─ GET  /*          bundled UI
+                                             ├─ POST /sql        execute / select, through the webview
+                                             ├─ POST /transcribe whisper (f32 samples)
+                                             └─ /ollama/*        → the configured Ollama address
 ```
 
-- **HTTPS ve erişim: Tailscale.** Mobil mikrofon secure context ister; LAN'da düz HTTP ile çalışmaz. `tailscale serve` geçerli sertifika verir ve erişimi kullanıcının tailnet'iyle sınırlar. Sunucu yalnızca `127.0.0.1`'e bağlanır. QR, token, rate limit, cihaz listesi ve self-signed sertifika yok.
-- **Rust:** `src-tauri/src/companion.rs`, küçük bir HTTP sunucusu. Ayarlar'dan açılır, varsayılan kapalı.
-- **Arayüz:** `isTauri` yanında `isCompanion`. Üç nokta değişir: `db.ts` uzak `SqlDb` adaptörü, `stt.ts` `transcribeSamples` → `/transcribe`, `ai.ts` Ollama `baseURL` → `location.origin + "/ollama"`. Masaüstüne özel ekranlar (güncelleme, veri klasörü, otomatik başlatma, bildirim) gizlenir.
-- **Tek cihaz kuralı:** Telefon bağlıyken masaüstü "Telefonda devam ediyor" ekranını gösterir; "Burada devam et" veriyi yeniden yükler. Birleştirme ve çakışma çözümü yok.
+- **HTTPS and access: Tailscale.** A phone microphone needs a secure context, so plain HTTP on the LAN does not work. `tailscale serve` provides a valid certificate and limits access to the learner's own tailnet. The server binds to `127.0.0.1` only. No QR pairing, tokens, rate limits, device list or self-signed certificates.
+- **Rust:** [`src-tauri/src/companion.rs`](../src-tauri/src/companion.rs), a small HTTP server. Turned on in Settings, off by default.
+- **UI:** `isCompanion` next to `isTauri`. Three things change: [`db.ts`](../src/db.ts) uses a remote `SqlDb` adapter, [`stt.ts`](../src/stt.ts) sends `transcribeSamples` to `/transcribe`, and [`ai.ts`](../src/ai.ts) points the Ollama `baseURL` at `location.origin + "/ollama"`. Desktop-only screens (updates, data folder, autostart, notifications) are hidden.
+- **One device at a time:** while the phone is connected, the desktop shows "Continuing on your phone"; "Continue here" reloads the data. No merging or conflict resolution.
 
-## 3. Görevler
+## 3. Phone limits (iPhone Safari)
 
-| # | İş | Kabul |
-|---|---|---|
-| 1 | Spike (kod yok): dev arayüzü `tailscale serve` ile telefonda aç; mic, TTS (sistem sesi ve Kokoro WASM), mobil düzen | Kısa rapor; sorun varsa plan revize |
-| 2 | Rust sunucu: arayüz, `/sql`, `/transcribe`, `/ollama` aktarımı, Ayarlar'da aç/kapat | Telefonda aynı profil ve ilerleme görünür |
-| 3 | Arayüz companion modu: uzak veritabanı, STT, Ollama; masaüstüne özel ekranlar gizli | Telefonda canlı ders uçtan uca çalışır |
-| 4 | Masaüstü "telefonda" ekranı + Ayarlar'da kurulum talimatı (`tailscale serve` komutu, adres) | İki cihaz aynı anda veriyi bozmaz |
+- Works: HTTPS through `tailscale serve`, microphone permission and VAD levels, the system voice, the `/ollama` proxy.
+- With the phone in silent mode, browser audio (system voice, Piper, Kokoro) is muted; the setup steps say so.
+- Kokoro runs out of memory on iOS (`RangeError: Out of memory`, the WASM memory limit), so it is not offered on the phone.
+- Piper works on the phone. The phone has its own voice setting (`tts.phone`): the system voice or Piper.
 
-## 4. Spike sonucu (SPR-18, iPhone Safari)
+## 4. Out of scope
 
-- Çalışıyor: `tailscale serve` ile HTTPS, mikrofon izni ve VAD seviyesi, sistem sesi, `/ollama` aktarımı.
-- Telefonda sessiz mod açıkken tarayıcı sesi (sistem sesi, Piper, Kokoro) susar; kurulum talimatına eklenecek.
-- Kokoro: `RangeError: Out of memory` (iOS WASM bellek sınırı). Telefonda kapsam dışı.
-- Piper: sessiz mod kapalıyken telefonda çalışıyor (ilk sessizlik sessiz moddandı). Telefonun kendi ses seçimi var (`tts.phone`): sistem sesi ya da Piper.
-- Spike'ta giderilenler: Vite `127.0.0.1`'e bağlanır; uzun pencereler ekrana sığar; `.ts.net`'ten açılınca Ollama varsayılanı `/ollama`; konuşma deneme penceresi tanıyıcı olmadan da mikrofonu açar.
-
-## 5. Kapsam dışı
-
-- Public URL (Cloudflare tunnel), QR eşleştirme, token.
-- Native mobil uygulama (Tauri iOS/Android).
-- Masaüstü kapalıyken telefonda çalışma.
-- Bulut AI sağlayıcıları: anahtarlar masaüstü keychain'inde kalır; v1'de telefon yalnızca masaüstündeki Ollama'yı kullanır.
+- A public URL (Cloudflare tunnel), QR pairing, tokens.
+- A native mobile app (Tauri iOS/Android).
+- Using the phone while the desktop is off.
+- Cloud AI providers on the phone: the keys stay in the desktop keychain, so the phone only uses the desktop's Ollama.

@@ -1,4 +1,4 @@
-// Course YAML contract (docs/PLAN.md §3.1) and the Learn-path view model built from it.
+// Course YAML contract (docs/ARCHITECTURE.md §2) and the Learn-path view model built from it.
 // Pure module (no Vite/Tauri imports) so `node --test` can run src/course.test.ts directly.
 import { parse } from "yaml";
 import { z } from "zod";

@@ -11,7 +11,7 @@ type Engine = Exclude<TtsProvider, "system">;
 type Chunk = { audio: Float32Array; rate: number };
 type Msg = { type: string; id?: number; p?: number; message?: string; voice?: string } & Partial<Chunk>;
 
-// The phone shares the desktop's database but has its own voice: Kokoro runs out of memory in iOS Safari (docs/MOBILE.md §4).
+// The phone shares the desktop's database but has its own voice: Kokoro runs out of memory in iOS Safari (docs/MOBILE.md §3).
 export const TTS_KEY = isCompanion ? "tts.phone" : "tts";
 export const ttsProvider = async (): Promise<TtsProvider> => {
   const v = await getSetting(TTS_KEY);

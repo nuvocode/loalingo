@@ -1,194 +1,172 @@
-# Sprigo — Kararlar
+# Sprigo — Decisions
 
-Her madde: seçenekler, öneri, karar. Tüm kararlar verildi (2026-09-29).
-Plan: [PLAN.md](PLAN.md)
+Each entry lists the options that were considered and the decision. All were made on 2026-09-29; later changes are marked **Later**.
+Architecture: [ARCHITECTURE.md](ARCHITECTURE.md)
 
-## A. Platform & teknoloji
+## A. Platform and technology
 
-**A1. Masaüstü kabuk**
-- Tauri 2 (küçük binary ~10MB, Rust backend, native eklentiler) · Electron (her şey JS, ~150MB, Chromium)
-- Öneri: Tauri 2
-- Karar: Tauri 2
+**A1. Desktop shell**
+- Tauri 2 (small binary ~10 MB, Rust backend, native plugins) · Electron (all JS, ~150 MB, Chromium)
+- Decision: Tauri 2
 
-**A2. Hedef işletim sistemleri (v1)**
-- Sadece macOS · macOS + Windows · macOS + Windows + Linux
-- Öneri: macOS önce; Tauri ile diğerleri sonra ucuz
-- Karar: macOS önce; Tauri ile diğerleri sonra ucuz
+**A2. Target operating systems**
+- macOS only · macOS + Windows · macOS + Windows + Linux
+- Decision: macOS first; Tauri makes the others cheap later.
+- **Later:** macOS (Apple silicon and Intel), Windows and Linux are all built in CI.
 
 **A3. UI framework**
-- React + TS · Svelte · Vanilla (prototipi olduğu gibi kullanmak)
-- Öneri: React + TS
-- Karar: React + TS
+- React + TS · Svelte · Vanilla (use the prototype as is)
+- Decision: React + TS
 
-**A4. Stil yaklaşımı**
-- Prototip CSS'ini global olarak aynen taşı · Tailwind'e çevir · CSS Modules
-- Öneri: Aynen taşı (piksel sadakati, en az iş)
-- Karar: Aynen taşı (piksel sadakati, en az iş)
+**A4. Styling**
+- Move the prototype's CSS over as one global stylesheet · convert to Tailwind · CSS Modules
+- Decision: Move it over as is (pixel fidelity, least work)
 
-**A5. Lokal veri**
-- SQLite · JSON dosyaları · IndexedDB
-- Öneri: SQLite
-- Karar: SQLite
+**A5. Local data**
+- SQLite · JSON files · IndexedDB
+- Decision: SQLite
 
-**A6. API anahtarlarının saklanması**
-- OS keychain · şifreli dosya · düz config dosyası
-- Öneri: OS keychain
-- Karar: OS keychain
+**A6. Storing API keys**
+- OS keychain · encrypted file · plain config file
+- Decision: OS keychain
 
-## B. Dil & içerik
+## B. Language and content
 
-**B1. Ana dil (kaynak dil)**
-- Sabit Türkçe · kullanıcı seçer
-- Öneri: v1 Türkçe sabit, alanı parametrik tut
-- Karar: Kullanıcı seçer; varsayılan arayüz dilinden gelir, Ayarlar'da ayrıca değiştirilebilir.
+**B1. Native (source) language**
+- Fixed Turkish · chosen by the learner
+- Decision: chosen by the learner. It defaults to the interface language and can be changed separately in Settings.
 
-**B2. Arayüz dili (UI i18n)**
-- Karar: Çok dilli başlar. Varsayılan İngilizce; `tr` de v1'de gelir (tasarım metinleri zaten Türkçe, bedava).
-- Uygulama: `react-i18next`; her dil tek dosya `src/locales/<iso>.json`. Yeni dil = dosyayı kopyala, çevir, ekle — kod değişikliği yok (dil listesi klasörden otomatik okunur).
-- Kural: bileşenlerde sabit metin yok; hepsi anahtar üzerinden (`t('nav.learn')`). Eksik anahtar İngilizceye düşer.
-- Not: Arayüz dili ≠ ana dil (B1). Ayarlar'da ikisi ayrı seçilir; ana dil varsayılan olarak arayüz dilinden gelir.
+**B2. Interface language (UI i18n)**
+- Decision: multilingual from the start. English by default, Turkish in v1.
+- Implementation: `react-i18next`, one file per language in `src/locales/<iso>.json`. A new language is a new file; the language list is read from the folder.
+- Rule: no hard-coded text in components, everything goes through keys (`t('nav.learn')`). A missing key falls back to English.
+- Note: interface language ≠ native language (B1). They are picked separately in Settings.
+- **Later:** English, Turkish, German, French and Spanish.
 
-**B3. Kurs dosyalarının konumu**
-- Uygulamaya gömülü · kullanıcı klasörü · ikisi birden
-- Öneri: İkisi (gömülü + `Application Support/Sprigo/courses`)
-- Karar: İkisi (gömülü + `Application Support/Sprigo/courses`)
+**B3. Where course files live**
+- Bundled with the app · a user folder · both
+- Decision: both (bundled + `<app data>/courses`; a user file with the same `iso` wins)
 
-**B4. v1'de hazır gelecek kurs(lar)**
-- Sadece İngilizce A1 · İngilizce A1–A2 · birden fazla dil
-- Öneri: İngilizce A1 tam
-- Karar: İngilizce A1 tam
+**B4. Courses shipped in v1**
+- English A1 only · English A1–A2 · several languages
+- Decision: English A1, complete
+- **Later:** English A1–C2, plus Spanish, French, German and Turkish at A1.
 
-**B5. YAML'da etkinlik içeriği**
-- Sadece `type` (her şeyi AI üretir) · içerik opsiyonel (varsa statik, yoksa AI) · her zaman statik
-- Öneri: Opsiyonel — statik içerik aynı zamanda AI'sız fallback
-- Karar: Her şeyi AI üretir; YAML yalnızca type + bağlam verir. (Sonuç: AI kurulmadan ders oynanamaz → bkz. C6.)
+**B5. Activity content in YAML**
+- Only `type` (the AI writes everything) · optional content (static if present, AI otherwise) · always static
+- Decision: the AI writes everything; YAML only gives the type and context. Consequence: no lessons without an AI provider (see C6).
 
-**B6. Ders başı soru sayısı**
-- YAML'da activity başına `count` · global ayar · ikisi (YAML varsayılanı ezer)
-- Öneri: `count` alanı, yoksa varsayılan
-- Karar: `count` alanı, yoksa varsayılan
+**B6. Questions per lesson**
+- A `count` per activity in YAML · a global setting · both
+- Decision: a `count` field, with a default when it is missing
 
-**B7. "Bölüm" kavramı**
-- Bölüm = CEFR seviyesi (A1, A2…) · YAML'a ayrı `sections` katmanı
-- Öneri: Bölüm = CEFR seviyesi
-- Karar: Bölüm = CEFR seviyesi
+**B7. What a "section" is**
+- Section = CEFR level (A1, A2…) · a separate `sections` layer in YAML
+- Decision: section = CEFR level
 
-**B8. Seviye (CEFR) geçişi ve path eşlemesi**
-- **Öğren ekranı yalnızca aktif seviyenin ünitelerini gösterir.** Diğer seviyelerin dersleri listede yer almaz; uzun tek liste yok.
-- Eşleme: Bölüm = CEFR seviyesi (`BÖLÜM 1` → `A1 · Ünite 1` başlığı), Ünite = renkli başlık kartı, Adım = path düğümü, **Ünite sandığı = her ünitenin sonuna otomatik eklenir** (YAML'a yazılmaz), `checkpoint` = seviyenin son düğümü (kupa).
-- Path'in sonunda seviye kartı (tasarımda yok → aynı görsel dille yeni bileşen):
-  - A1 bitmediyse: "A2'ye geçmek için X ders kaldı" + ilerleme çubuğu. A2'nin dersleri gösterilmez, sadece bu kart.
-  - "A1'i atla — seviye testi yap" butonu → `checkpoint` etkinlikleri AI ile üretilir; `required_score` geçilirse A1 tamamlanır.
-  - Seviye tamamlanınca Öğren ekranı A2'nin path'ine geçer.
-- Seviye seçici: ünite başlığının üstünde küçük "A1 · Beginner ▾" çipi → tasarımdaki bottom sheet ile seviye listesi. Tamamlanan seviyeler açılıp tekrar edilebilir (Legendary buradan); gelecek seviyeler kilitli, sadece "seviye testi" seçeneği.
-- Rehber butonu: ünitenin adımlarındaki `vocabulary` + `grammar` listesi; açıklamaları AI üretir (cache'li).
-- Karar: Yukarıdaki gibi; seviye testi v1'de (Faz 3, checkpoint ile aynı akış).
+**B8. Moving between CEFR levels and mapping to the path**
+- **The Learn screen shows only the active level's units.** Other levels are not listed; no single long list.
+- Mapping: section = CEFR level (`A1 · Unit 1` heading), unit = coloured header card, step = path node, **a unit chest is added at the end of every unit automatically** (not in the YAML), `checkpoint` = the level's last node (trophy).
+- A level card at the end of the path:
+  - While A1 is unfinished: "X lessons until A2" with a progress bar. A2's lessons are not shown, only this card.
+  - "Skip A1, take the level test": the `checkpoint` activities are generated by the AI; passing `required_score` completes A1.
+  - When a level is complete, the Learn screen switches to the next level's path.
+- Level picker: a small "A1 · Beginner ▾" chip above the unit heading opens a sheet with the levels. Finished levels can be reopened and replayed (Legendary lives here); later levels are locked except for their level test.
+- Guidebook button: the `vocabulary` + `grammar` of the unit's steps; the AI writes the explanations (cached).
+- Decision: as above, with the level test in v1 (same flow as the checkpoint).
+- **Later:** a unit test lets the learner pass the current unit too.
 
 ## C. AI
 
-**C1. v1 sağlayıcıları**
-- Ollama, LM Studio, OpenAI, Anthropic, Gemini — hepsi mi, önce lokal ikisi mi?
-- Öneri: Hepsi (Vercel AI SDK ile maliyet düşük)
-- Karar: Hepsi (Vercel AI SDK ile maliyet düşük)
+**C1. Providers in v1**
+- Ollama, LM Studio, OpenAI, Anthropic, Gemini: all, or the two local ones first?
+- Decision: all (cheap with the Vercel AI SDK)
 
-**C2. Üretim stratejisi**
-- Dersin tamamı tek çağrı · her etkinlik ayrı çağrı · tek çağrı, başarısızsa ayrı
-- Öneri: Tek çağrı + fallback
-- Karar: Tek çağrı + fallback
+**C2. Generation strategy**
+- The whole lesson in one call · one call per activity · one call, falling back to one per activity
+- Decision: one call with the fallback
 
-**C3. Üretilen içeriğin cache'lenmesi**
-- Cache'le (tekrar açınca aynı) · her seferinde yeni üret · cache + "yeniden üret" butonu
-- Öneri: Cache + yeniden üret + sonraki dersi önceden üret
-- Karar: Cache + yeniden üret + sonraki dersi önceden üret
+**C3. Caching generated content**
+- Cache (same lesson when reopened) · generate fresh every time · cache + "regenerate" button
+- Decision: cache + regenerate + generate the next lesson ahead of time
 
-**C4. Cevap kontrolü (serbest yazı: çeviri, dinle-yaz)**
-- Normalize string karşılaştırma + alternatif cevaplar · AI değerlendirme · ikisi (önce string, uymazsa AI)
-- Öneri: İkisi
-- Karar: String + AI (önce normalize/alternatifler, uymazsa AI)
+**C4. Checking free-text answers (translation, listen and type)**
+- Normalized string comparison + alternative answers · AI judgement · both
+- Decision: both (normalized match and alternatives first, the AI when they don't match)
 
-**C5. Geri bildirim açıklaması**
-- Yanlışta sadece doğru cevap · AI kısa açıklama ("neden yanlış")
-- Öneri: Doğru cevap + opsiyonel "Açıkla" butonu
-- Karar: Doğru cevap + opsiyonel "Açıkla" butonu
+**C5. Feedback on a wrong answer**
+- Only the correct answer · a short AI explanation of why it was wrong
+- Decision: the correct answer plus an optional "Explain" button
 
-**C6. AI ayarlanmamışken davranış**
-- Onboarding'de zorunlu kurulum · statik içerikle çalış, AI'yı sonra iste
-- Öneri: Statik içerikle çalış, banner ile kurulum öner
-- Karar: İlk açılışta zorunlu AI kurulum akışı (B5 gereği AI olmadan ders yok). Kurulum tamamlanana kadar path görünür ama dersler kilitli + kurulum banner'ı.
+**C6. No AI provider configured**
+- Required setup during onboarding · work with static content and ask for AI later
+- Decision: a required AI setup flow on first launch (B5 means no lessons without AI). Until setup is done, the path is visible but lessons are locked, with a setup banner.
 
-## D. Ses
+## D. Voice
 
-**D1. Metin → ses (dinleme)**
-- Sistem TTS (Web Speech, ücretsiz) · sağlayıcı TTS (OpenAI/Gemini) · ikisi seçmeli
-- Öneri: v1 sistem TTS
-- Karar: v1 sistem TTS
+**D1. Text to speech (listening)**
+- System TTS (Web Speech, free) · provider TTS (OpenAI/Gemini) · both, selectable
+- Decision: system TTS in v1
+- **Later:** local Piper (every course language) and Kokoro (English only) as well, running in Web Workers.
 
-**D2. Ses → metin (konuşma)**
-- v1'de "Yakında" · lokal Whisper (whisper.cpp) · sağlayıcı STT
-- Öneri: v1'de Yakında
-- Karar: v1'de Yakında → **güncellendi (Faz 5): lokal whisper.cpp, model uygulamaya gömülü** (ayrı servis kurulmaz; `whisper-rs` + Metal, `ggml-base-q5_1`).
+**D2. Speech to text (speaking)**
+- "Coming soon" in v1 · local Whisper (whisper.cpp) · provider STT
+- Decision: "coming soon" in v1
+- **Later:** local whisper.cpp with the model bundled in the app (no separate service; `whisper-rs` + Metal, `ggml-base-q5_1`). Deepgram is an optional cloud alternative.
 
-## E. Kapsam & ekranlar
+## E. Scope and screens
 
-**E1. Tasarımdaki ekranların v1 durumu**
-- Öğren, Pratik, Profil, Ayarlar: çalışır
-- Hikâyeler, Rol Yapma: faz 2 (AI sohbet)
-- Lig, Arkadaşlar, Mağaza, Bildirimler: ?
-- Öneri: Son dörtlü "Yakında"; local-first'te anlamları ayrıca konuşulsun
-- Karar: Lig, Arkadaşlar, Mağaza, Bildirimler "Yakında"
+**E1. The design's screens in v1**
+- Learn, Practice, Profile, Settings: working
+- Stories, Roleplay: phase 2 (AI chat)
+- League, Friends, Shop, Notifications: ?
+- Decision: League, Friends, Shop and Notifications marked "coming soon"
+- **Later:** all of them work: a local league with simulated rivals, friends = the other profiles on this device, a shop for coins, and notifications built from real state.
 
-**E2. Oyunlaştırma (kalp, XP, seri, gem)**
-- Hepsi · kalp hariç (yerel uygulamada ceza anlamsız olabilir) · sadece XP + seri
-- Öneri: XP + seri + günlük hedef; kalp opsiyonel ayar
-- Karar: XP + seri + günlük hedef; kalp opsiyonel ayar
+**E2. Gamification (hearts, XP, streak, gems)**
+- All · everything but hearts (a penalty may make little sense in a local app) · XP + streak only
+- Decision: XP + streak + daily goal; hearts as an optional setting
 
-**E3. Kilit mantığı**
-- Sıralı (önceki bitmeden açılmaz) · serbest · sıralı + "atla" testi
-- Öneri: Sıralı; checkpoint ile seviye atlama sonra
-- Karar: Sıralı; seviye atlama testi v1'de (bkz. B8)
+**E3. Locking**
+- Sequential (the next step opens when the previous one is done) · free · sequential + a skip test
+- Decision: sequential; the level-skip test in v1 (see B8)
 
-**E4. Kullanıcı profili → lokal çoklu profil**
-- Karar: Cihazda birden fazla profil. "Çıkış yap" profili silmez; profil seçme ekranına döner, başka profil seçilir ya da yeni profil oluşturulur.
-- Koruma: opsiyonel 4 haneli PIN (tuzlu hash, SQLite). Not: local-first'te bu bir mahremiyet kilididir, gerçek güvenlik değil.
-- Profil seçme ekranı + "Profil oluştur" akışı tasarımda yok → tasarım diliyle yeni ekran (lig satırlarındaki avatar stili).
-- İlk açılış: profil oluştur (ad, ana dil, ilk kurs) → AI kurulumu (C6) → Öğren.
+**E4. User profile → several local profiles**
+- Decision: several profiles per device. "Sign out" does not delete a profile; it returns to the profile picker, where another profile can be picked or a new one created.
+- Protection: an optional 4-digit PIN (salted hash, SQLite). In a local-first app this is a privacy lock, not real security.
+- The profile picker and "create profile" flow are not in the design; they are new screens in the design's style (the avatar style of the league rows).
+- First launch: create a profile (name, native language, first course) → AI setup (C6) → Learn.
 
-**E5. Profil içinde çoklu dil (kurs)**
-- Karar: Profil birden fazla kursa kayıt olabilir; aktif kurs değiştirilebilir. Her (profil × kurs) ilerlemesi ayrı tutulur.
-- Geçiş yeri: sağ raydaki istatistik şeridine aktif kurs bayrak çipi (tıklayınca sheet: kayıtlı kurslar + "Yeni dil ekle") ve Ayarlar > Kurs > Değiştir (aynı sheet). Mobil düzende (ray yok) Ayarlar'dan.
-- Bayrak çipi tasarımda yok → aynı stat-chip stiliyle.
+**E5. Several languages (courses) per profile**
+- Decision: a profile can enrol in several courses and switch the active one. Progress is kept per (profile × course).
+- Where to switch: a flag chip for the active course in the right rail's stats strip (opens a sheet with enrolled courses and "Add a language"), and Settings > Course > Change (the same sheet). In the narrow layout (no rail), from Settings.
 
-**E6. Neyin kime ait olduğu**
-- Cihaz geneli: AI sağlayıcıları, API anahtarları (keychain), model seçimi; kurs YAML dosyaları; son kullanılan profil.
-- Profil: ad, avatar rengi, PIN, arayüz dili, tema, ana dil, aktif kurs, seri, elmas, kalp, günlük görevler, bildirim/ses ayarları.
-- Profil × kurs (kayıt/enrollment): aktif CEFR seviyesi, adım ilerlemesi, XP, hatalar (mistakes), öğrenilen kelimeler, üretilmiş içerik cache'i (hatalara göre kişiselleştiği için paylaşılmaz).
-- Karar: Yukarıdaki gibi. Toplam XP = kayıtların toplamı; seri profil genelidir (hangi dilde olursa olsun günlük pratik sayılır).
+**E6. What belongs to whom**
+- Device: AI providers, API keys (keychain), model choice; course YAML files; the last used profile.
+- Profile: name, avatar colour, PIN, interface language, theme, native language, active course, streak, gems, hearts, daily quests, notification and sound settings.
+- Profile × course (enrollment): active CEFR level, step progress, XP, mistakes, learned words, the generated content cache (not shared, since it is personalised by mistakes).
+- Decision: as above. Total XP = the sum over enrollments; the streak is per profile (practice in any language counts for the day).
 
-## F. Tasarım
+## F. Design
 
-**F1. Dark mode tetikleme**
-- Sistemi takip et + manuel (Sistem/Açık/Koyu) · sadece manuel
-- Öneri: Sistem + manuel
-- Karar: Sistem + manuel
+**F1. Dark mode**
+- Follow the system + manual (System/Light/Dark) · manual only
+- Decision: system + manual
 
-**F2. Responsive hedef**
-- Sadece masaüstü genişlikleri · dar pencerede mobil düzen (bottom-nav) de korunur
-- Öneri: Koru — tasarımda zaten var, pencere küçültülünce devreye girer
-- Karar: Koru — tasarımda zaten var, pencere küçültülünce devreye girer
+**F2. Responsive target**
+- Desktop widths only · keep the mobile layout (bottom nav) for narrow windows
+- Decision: keep it; it is already in the design and kicks in when the window is narrowed
 
 **F3. Font**
-- Nunito Google Fonts'tan · uygulamaya gömülü (offline)
-- Öneri: Gömülü (local-first)
-- Karar: Gömülü (local-first)
+- Nunito from Google Fonts · bundled with the app (offline)
+- Decision: bundled (local-first)
 
-## G. Süreç
+## G. Process
 
-**G1. Repo**
-- Bu klasörde `git init` · ayrı repo
-- Öneri: Bu klasörde git init
-- Karar: Bu klasörde git init
+**G1. Repository**
+- `git init` in this folder · a separate repo
+- Decision: `git init` in this folder
 
-**G2. Test seviyesi**
-- Sadece kritik mantık (YAML loader, cevap kontrolü, şema doğrulama) · geniş test
-- Öneri: Kritik mantık
-- Karar: Kritik mantık
+**G2. Testing**
+- Critical logic only (YAML loader, answer checking, schema validation) · broad tests
+- Decision: critical logic
