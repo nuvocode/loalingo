@@ -1,13 +1,16 @@
-// Text-to-speech: system voices, local Piper (every course language) or local Kokoro (English only).
-// Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
-// and stream one sentence at a time, so the first sentence plays while the rest is made.
-import { getSetting, isCompanion } from "./db";
+// Text-to-speech: system voices, local Piper (every course language), local Kokoro (English only) or ElevenLabs (cloud, desktop only).
+// Device setting "tts" ("tts.phone" on the phone): "system" | "piper" | "kokoro" | "elevenlabs". Piper and Kokoro run in workers (src/piper.worker.ts, src/kokoro.worker.ts)
+// and stream one sentence at a time, so the first sentence plays while the rest is made. ElevenLabs returns the whole line as MP3.
+import { invoke } from "@tauri-apps/api/core";
+import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
+import { getSetting, isCompanion, isTauri } from "./db";
+import { ELEVEN_VOICES, elevenRequest, type ByteRequest } from "./ttsCloud";
 import { pickSystemVoice } from "./voices";
 import { mouthBright, mouthLevel, remember, zcr } from "./audio";
 
 export type Voice = { gender: "f" | "m"; kokoro?: string };
-export type TtsProvider = "system" | "piper" | "kokoro";
-type Engine = Exclude<TtsProvider, "system">;
+export type TtsProvider = "system" | "piper" | "kokoro" | "elevenlabs";
+type Engine = "piper" | "kokoro"; // the worker engines
 type Chunk = { audio: Float32Array; rate: number };
 type Msg = { type: string; id?: number; p?: number; message?: string; voice?: string } & Partial<Chunk>;
 
@@ -15,8 +18,19 @@ type Msg = { type: string; id?: number; p?: number; message?: string; voice?: st
 export const TTS_KEY = isCompanion ? "tts.phone" : "tts";
 export const ttsProvider = async (): Promise<TtsProvider> => {
   const v = await getSetting(TTS_KEY);
-  return (v === "kokoro" && !isCompanion) || v === "piper" ? v : "system";
+  return ((v === "kokoro" || v === "elevenlabs") && !isCompanion) || v === "piper" ? v : "system";
 };
+
+// ponytail: the dev browser preview has no keychain, so it keeps the key in localStorage. Never used in the app.
+const DEV_KEY = "sprigo.devkey.elevenlabs";
+export const getElevenKey = () => (isTauri ? invoke<string | null>("secret_get", { key: "tts-key.elevenlabs" }) : Promise.resolve(localStorage.getItem(DEV_KEY)));
+export async function setElevenKey(value: string | null) {
+  if (isTauri) return invoke("secret_set", { key: "tts-key.elevenlabs", value });
+  value ? localStorage.setItem(DEV_KEY, value) : localStorage.removeItem(DEV_KEY);
+}
+/** The learner's ElevenLabs voice ids (device settings "tts.eleven.voice.f/m"), else the defaults. */
+export const elevenVoice = async (gender: "f" | "m" = "f") => (await getSetting(`tts.eleven.voice.${gender}`)) || ELEVEN_VOICES[gender];
+const http = (isTauri ? tauriFetch : window.fetch.bind(window)) as typeof fetch;
 
 // ponytail: one voice per language and gender; Turkish has no female Piper voice, dfki is the closest
 const PIPER: Record<string, Record<"f" | "m", string>> = {
@@ -28,9 +42,10 @@ const PIPER: Record<string, Record<"f" | "m", string>> = {
 };
 const piperVoice = (lang: string, gender: "f" | "m" = "f") => PIPER[lang.slice(0, 2)]?.[gender];
 
-/** The local engine and its voice for this language, or null for the system voice. */
-async function engineFor(lang: string, voice?: Voice, p?: TtsProvider): Promise<[Engine, string] | null> {
+/** The engine and its voice for this language, or null for the system voice. */
+async function engineFor(lang: string, voice?: Voice, p?: TtsProvider): Promise<[Exclude<TtsProvider, "system">, string] | null> {
   p ??= await ttsProvider();
+  if (p === "elevenlabs") return ["elevenlabs", await elevenVoice(voice?.gender)];
   if (p === "kokoro" && lang.startsWith("en")) return ["kokoro", voice?.kokoro ?? (voice?.gender === "m" ? "am_michael" : "af_heart")];
   const v = p === "piper" && piperVoice(lang, voice?.gender);
   return v ? ["piper", v] : null;
@@ -91,7 +106,7 @@ export const loadPiper = (lang: string, onProgress?: (p: number) => void, gender
 /** Starts loading the local voice this language will use, so the first line is not waiting on the model. */
 export async function prewarm(lang: string, voice?: Voice) {
   const got = await engineFor(lang, voice);
-  if (got) await load(got[0], got[0] === "kokoro" ? "" : got[1]);
+  if (got && got[0] !== "elevenlabs") await load(got[0], got[0] === "kokoro" ? "" : got[1]);
 }
 
 let seq = 0;
@@ -143,12 +158,8 @@ async function system(text: string, lang: string, gender: "f" | "m" | undefined,
   speechSynthesis.speak(u);
 }
 
-/** Plays local-engine audio for `text`; resolves once the first sentence plays, throws before that to fall back. */
-async function viaWorker(e: Engine, text: string, voice: string, mine: number, done: () => void) {
-  const key = `${e}:${voice}\n${text}`;
-  const ctx = (actx ??= new AudioContext());
-  await ctx.resume();
-  if (mine !== seq) return; // cut while waiting; `next` belongs to the newer speak now
+/** Queues chunks back to back through the analyser; `end()` once no more will come, then `done` runs when the last one has played. */
+function player(ctx: AudioContext, mine: number, done: () => void) {
   next = 0;
   let left = 0, streaming = true, first = true;
   const play = (c: Chunk) => {
@@ -166,8 +177,24 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
     sources.push(src);
     src.start(at);
   };
+  const end = () => { streaming = false; if (left === 0) done(); };
+  return { play, end };
+}
+
+const audioCtx = async (mine: number) => {
+  const ctx = (actx ??= new AudioContext());
+  await ctx.resume();
+  return mine === seq ? ctx : null; // null: cut while waiting; `next` belongs to the newer speak now
+};
+
+/** Plays local-engine audio for `text`; resolves once the first sentence plays, throws before that to fall back. */
+async function viaWorker(e: Engine, text: string, voice: string, mine: number, done: () => void) {
+  const key = `${e}:${voice}\n${text}`;
+  const ctx = await audioCtx(mine);
+  if (!ctx) return;
+  const { play, end } = player(ctx, mine, done);
   const hit = cache.get(key);
-  if (hit) { remember(cache, key, hit); streaming = false; hit.forEach(play); return; }
+  if (hit) { remember(cache, key, hit); hit.forEach(play); end(); return; }
 
   const loading = load(e, e === "kokoro" ? "" : voice);
   // A Piper voice not downloaded yet keeps downloading, but this line falls back to the system voice.
@@ -184,14 +211,44 @@ async function viaWorker(e: Engine, text: string, voice: string, mine: number, d
         else if (m.type === "end" || m.type === "error") {
           clearTimeout(timer);
           pending = undefined;
-          streaming = false;
           if (m.type === "end") remember(cache, key, got); // ponytail: 20 lines kept, oldest dropped
-          if (got.length) { if (left === 0) done(); started(); } else failed(new Error(m.message ?? `${e} made no audio`));
+          if (got.length) { end(); started(); } else failed(new Error(m.message ?? `${e} made no audio`));
         }
       },
     };
     worker(e).postMessage({ type: "speak", id: mine, text, voice });
   });
+}
+
+/** Plays one line an HTTP engine returns as an audio file (MP3); throws before any audio to fall back. */
+async function viaBytes(cacheKey: string, req: () => Promise<ByteRequest>, mine: number, done: () => void) {
+  const ctx = await audioCtx(mine);
+  if (!ctx) return;
+  const { play, end } = player(ctx, mine, done);
+  let hit = cacheKey.startsWith("test:") ? undefined : cache.get(cacheKey); // a test must reach the server
+  if (!hit) {
+    const { url, headers, body } = await req();
+    const r = await http(url, { method: "POST", headers, body, signal: AbortSignal.timeout(30_000) });
+    if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
+    const buf = await ctx.decodeAudioData(await r.arrayBuffer());
+    hit = [{ audio: buf.getChannelData(0), rate: buf.sampleRate }];
+  }
+  remember(cache, cacheKey, hit);
+  if (mine !== seq) return;
+  hit.forEach(play);
+  end();
+}
+
+const elevenLine = (text: string, lang: string, voice: string, key?: string) => () =>
+  (key ? Promise.resolve(key) : getElevenKey()).then((k) => {
+    if (!k) throw new Error("No ElevenLabs key");
+    return elevenRequest(k, voice, text, lang);
+  });
+
+/** Settings' test: speaks with this key and voice, no fallback, so a bad key throws; resolves once audio starts. */
+export async function sayWithEleven(text: string, lang: string, key: string, voice: string) {
+  stopSpeaking();
+  await viaBytes(`test:${voice}\n${text}`, elevenLine(text, lang, voice, key), seq, () => {});
 }
 
 // ---- Which engine spoke, and one notice per session when the chosen one fell back to the system voice ----
@@ -219,7 +276,8 @@ export async function speak(text: string, lang: string, voice?: Voice, started?:
   if (local) {
     try {
       lastEngine = local[0];
-      await viaWorker(local[0], text, local[1], mine, done);
+      if (local[0] === "elevenlabs") await viaBytes(`elevenlabs:${local[1]}\n${text}`, elevenLine(text, lang, local[1]), mine, done);
+      else await viaWorker(local[0], text, local[1], mine, done);
       return over;
     } catch (e) {
       console.error(e);

@@ -367,6 +367,7 @@
     "stt": "Konuşma tanıma",
     "sttWhisper": "Whisper (yerel)",
     "ttsKokoro": "Kokoro (yerel, doğal)",
+    "ttsElevenlabs": "ElevenLabs (bulut, en doğal)",
     "sttDeepgram": "Deepgram (bulut)",
     "hearts": "Damlalar",
     "heartsDesc": "Her hatada bir damla gider; her gün yenilenir",
@@ -584,8 +585,14 @@
     "engine": {
       "system": "Sistem sesi",
       "piper": "Piper",
-      "kokoro": "Kokoro"
-    }
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs"
+    },
+    "elevenlabsGood": "Stüdyo kalitesinde bulut sesleri; API anahtarı gerekir.",
+    "elevenlabsDesc": "ElevenLabs, tutor'ların cümlelerini her kurs dilinde çok doğal seslerle okur. Her cümle ElevenLabs'e gönderilir ve planındaki karakter hakkından düşer.",
+    "elevenKey": "ElevenLabs API anahtarı",
+    "elevenVoiceF": "Kadın sesi kimliği (isteğe bağlı)",
+    "elevenVoiceM": "Erkek sesi kimliği (isteğe bağlı)"
   },
   "data": {
     "section": "Veri",

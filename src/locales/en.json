@@ -370,6 +370,7 @@
     "stt": "Speech recognition",
     "sttWhisper": "Whisper (local)",
     "ttsKokoro": "Kokoro (local, natural)",
+    "ttsElevenlabs": "ElevenLabs (cloud, most natural)",
     "sttDeepgram": "Deepgram (cloud)",
     "hearts": "Drops",
     "heartsDesc": "Lose a drop for each mistake; they refill every day",
@@ -589,8 +590,14 @@
     "engine": {
       "system": "System voice",
       "piper": "Piper",
-      "kokoro": "Kokoro"
-    }
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs"
+    },
+    "elevenlabsGood": "Studio-quality cloud voices; needs an API key.",
+    "elevenlabsDesc": "ElevenLabs reads the tutors' lines with very natural voices in every course language. Each line is sent to ElevenLabs and counts against your plan's characters.",
+    "elevenKey": "ElevenLabs API key",
+    "elevenVoiceF": "Female voice ID (optional)",
+    "elevenVoiceM": "Male voice ID (optional)"
   },
   "data": {
     "section": "Data",

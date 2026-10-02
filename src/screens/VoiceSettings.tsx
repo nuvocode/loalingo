@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
 import { isCompanion, setSetting } from "../db";
-import { loadKokoro, loadPiper, speak, speakingWith, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
+import { elevenVoice, getElevenKey, loadKokoro, loadPiper, sayWithEleven, setElevenKey, speak, speakingWith, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
+import { ELEVEN_VOICES } from "../ttsCloud";
 import { Icon } from "../icons";
 import { deepgramTranscribe, getDeepgramKey, listen, resetSttReady, setDeepgramKey, sttProvider, sttReady, type Listener, type SttProvider } from "../stt";
 import { isNoise } from "../tutor";
@@ -16,6 +17,7 @@ const TTS = [
   { p: "system", bars: 1, color: "var(--orange)" },
   { p: "piper", bars: 2, color: "var(--gold)" },
   { p: "kokoro", bars: 3, color: "var(--green)" },
+  { p: "elevenlabs", bars: 3, color: "var(--blue)" },
 ] as const;
 const ttsName = (p: TtsProvider) => `settings.tts${p[0].toUpperCase()}${p.slice(1)}`;
 const HELLO: Record<string, string> = {
@@ -59,16 +61,22 @@ export function TtsRow() {
 
 function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: TtsProvider) => void }) {
   const { t } = useTranslation();
-  const { course, closeSheet } = useApp();
+  const { course, closeSheet, openSheet } = useApp();
   const lang = course?.iso ?? "en";
   const [v, setV] = useState(initial);
   const [pct, setPct] = useState<number | null>(null); // a local voice downloading
   const [err, setErr] = useState("");
+  const [hasKey, setHasKey] = useState(false);
+  useEffect(() => { getElevenKey().then((k) => setHasKey(!!k)).catch(() => {}); }, []);
+  // ElevenLabs needs its key first: without one, picking it opens the key sheet; with one, the gear edits it.
+  const configure = () => openSheet(<ElevenSheet onSaved={() => { onChange("elevenlabs"); openSheet(<TtsSheet initial="elevenlabs" onChange={onChange} />); }}
+    onCancel={() => openSheet(<TtsSheet initial={v} onChange={onChange} />)} />);
   // Picking saves; a local voice only once its model has loaded, otherwise the choice stays where it was.
   const pick = async (next: TtsProvider) => {
     if (pct !== null || next === v) return;
     setErr("");
-    if (next !== "system") {
+    if (next === "elevenlabs" && !hasKey) return configure();
+    if (next === "piper" || next === "kokoro") {
       setPct(0);
       try { await (next === "kokoro" ? loadKokoro(setPct) : loadPiper(lang, setPct)); }
       catch (e) { setErr(t("voice.loadFailed", { name: t(ttsName(next)), error: (e as Error).message })); setPct(null); return; }
@@ -81,13 +89,15 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
     <div className="od-stack" style={sheet}>
       <h3 style={{ textAlign: "center" }}>{t("settings.tts")}</h3>
       <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.tts")}>
-        {TTS.filter(({ p }) => !(isCompanion && p === "kokoro")).map(({ p, bars, color }) => (
+        {TTS.filter(({ p }) => !(isCompanion && (p === "kokoro" || p === "elevenlabs"))).map(({ p, bars, color }) => (
           <div key={p} className={`voice-option${v === p ? " on" : ""}`}>
             <button role="radio" aria-checked={v === p} disabled={pct !== null} onClick={() => pick(p)}>
               <Signal bars={bars} color={color} />
               <span className="od-field od-fill"><b>{t(ttsName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
             </button>
+            {p === "elevenlabs" && hasKey && <button className="icon-btn" aria-label={t("voice.configure")} onClick={configure}><Icon name="gear" /></button>}
             {p === "kokoro" && <InfoTip label={t("voice.about", { name: "Kokoro" })}>{t("voice.kokoroDesc")} {t("voice.englishOnly")}</InfoTip>}
+            {p === "elevenlabs" && <InfoTip label={t("voice.about", { name: "ElevenLabs" })}>{t("voice.elevenlabsDesc")}</InfoTip>}
           </div>
         ))}
       </div>
@@ -101,6 +111,66 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
       <div className="od-stack sheet-actions" style={gap("8px")}>
         <button className="btn btn-blue btn-block" disabled={pct !== null} onClick={() => speak(HELLO[lang] ?? HELLO.en, lang, { gender: "f" })}>{t("voice.listen")}</button>
         <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
+      </div>
+    </div>
+  );
+}
+
+/** The ElevenLabs key and voices: test them, then save and switch the voice to ElevenLabs. */
+function ElevenSheet({ onSaved, onCancel }: { onSaved: () => void; onCancel: () => void }) {
+  const { t } = useTranslation();
+  const { toast, course } = useApp();
+  const lang = course?.iso ?? "en";
+  const [key, setKey] = useState("");
+  const [vf, setVf] = useState("");
+  const [vm, setVm] = useState("");
+  const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    getElevenKey().then((k) => setKey(k ?? "")).catch(() => {});
+    elevenVoice("f").then((x) => setVf(x === ELEVEN_VOICES.f ? "" : x));
+    elevenVoice("m").then((x) => setVm(x === ELEVEN_VOICES.m ? "" : x));
+  }, []);
+  const test = async () => {
+    setBusy(true); setStatus(null);
+    try {
+      await sayWithEleven(HELLO[lang] ?? HELLO.en, lang, key.trim(), vf.trim() || ELEVEN_VOICES.f);
+      setStatus({ ok: true, msg: t("voice.connected") });
+    } catch (e) { setStatus({ ok: false, msg: `${t("ai.connectFailed")}: ${(e as Error).message}` }); }
+    finally { setBusy(false); }
+  };
+  const save = async () => {
+    setBusy(true);
+    try {
+      await setElevenKey(key.trim());
+      await setSetting("tts.eleven.voice.f", vf.trim() || null);
+      await setSetting("tts.eleven.voice.m", vm.trim() || null);
+      await setSetting(TTS_KEY, "elevenlabs");
+      toast(t("voice.saved"));
+      onSaved();
+    } catch (e) { setStatus({ ok: false, msg: (e as Error).message }); setBusy(false); }
+  };
+  const voiceField = (label: string, value: string, set: (v: string) => void, placeholder: string) => (
+    <label className="od-field"><b>{label}</b>
+      <input className="input" spellCheck={false} value={value} placeholder={placeholder} onChange={(e) => set(e.target.value)} />
+    </label>
+  );
+  return (
+    <div className="od-stack" style={sheet}>
+      <h3 style={{ textAlign: "center" }}>{t("settings.ttsElevenlabs")}</h3>
+      <p className="small">{t("voice.elevenlabsDesc")}</p>
+      <label className="od-field"><b>{t("voice.elevenKey")}</b><span className="muted small">{t("ai.apiKeyDesc")}</span>
+        <input className="input" type="password" autoComplete="off" spellCheck={false} value={key} onChange={(e) => setKey(e.target.value)} />
+      </label>
+      {voiceField(t("voice.elevenVoiceF"), vf, setVf, ELEVEN_VOICES.f)}
+      {voiceField(t("voice.elevenVoiceM"), vm, setVm, ELEVEN_VOICES.m)}
+      {status && <p className="small" role="status" style={{ color: status.ok ? "var(--green)" : "var(--red)", overflowWrap: "anywhere" }}>{status.msg}</p>}
+      <div className="od-stack sheet-actions" style={gap("8px")}>
+        <div className="od-row" style={gap("8px")}>
+          <button className="btn btn-ghost" disabled={busy || !key.trim()} onClick={test}>{t("ai.test")}</button>
+          <button className="btn btn-primary od-fill" disabled={busy || !key.trim()} onClick={save}>{t("ai.save")}</button>
+        </div>
+        <button className="btn btn-ghost btn-block" onClick={onCancel}>{t("sheet.cancel")}</button>
       </div>
     </div>
   );

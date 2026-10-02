@@ -370,6 +370,7 @@
     "stt": "Spracherkennung",
     "sttWhisper": "Whisper (lokal)",
     "ttsKokoro": "Kokoro (lokal, natürlich)",
+    "ttsElevenlabs": "ElevenLabs (Cloud, am natürlichsten)",
     "sttDeepgram": "Deepgram (Cloud)",
     "hearts": "Tropfen",
     "heartsDesc": "Für jeden Fehler verlierst du einen Tropfen; sie füllen sich täglich wieder auf",
@@ -589,8 +590,14 @@
     "engine": {
       "system": "Systemstimme",
       "piper": "Piper",
-      "kokoro": "Kokoro"
-    }
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs"
+    },
+    "elevenlabsGood": "Cloud-Stimmen in Studioqualität; braucht einen API-Schlüssel.",
+    "elevenlabsDesc": "ElevenLabs liest die Sätze der Tutoren mit sehr natürlichen Stimmen in jeder Kurssprache. Jeder Satz geht an ElevenLabs und zählt zu den Zeichen deines Tarifs.",
+    "elevenKey": "ElevenLabs-API-Schlüssel",
+    "elevenVoiceF": "ID der Frauenstimme (optional)",
+    "elevenVoiceM": "ID der Männerstimme (optional)"
   },
   "data": {
     "section": "Daten",

@@ -386,6 +386,7 @@
     "stt": "Reconocimiento de voz",
     "sttWhisper": "Whisper (local)",
     "ttsKokoro": "Kokoro (local, natural)",
+    "ttsElevenlabs": "ElevenLabs (nube, la más natural)",
     "sttDeepgram": "Deepgram (nube)",
     "hearts": "Gotas",
     "heartsDesc": "Pierdes una gota por cada error; se recargan cada día",
@@ -607,8 +608,14 @@
     "engine": {
       "system": "Voz del sistema",
       "piper": "Piper",
-      "kokoro": "Kokoro"
-    }
+      "kokoro": "Kokoro",
+      "elevenlabs": "ElevenLabs"
+    },
+    "elevenlabsGood": "Voces en la nube con calidad de estudio; necesita una clave de API.",
+    "elevenlabsDesc": "ElevenLabs lee las frases de los tutores con voces muy naturales en todos los idiomas del curso. Cada frase se envía a ElevenLabs y cuenta para los caracteres de tu plan.",
+    "elevenKey": "Clave de API de ElevenLabs",
+    "elevenVoiceF": "ID de voz femenina (opcional)",
+    "elevenVoiceM": "ID de voz masculina (opcional)"
   },
   "data": {
     "section": "Datos",
