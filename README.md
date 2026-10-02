@@ -109,7 +109,7 @@ flowchart LR
 
 Pure logic (activities, course parsing, migrations, the league, timing and more) is written without imports from Vite or Tauri, so `node --test` runs it directly. CI builds macOS (Apple silicon and Intel), Windows and Linux on every tagged release and publishes signed updates for the in-app updater.
 
-Design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md) (in Turkish).
+Design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Development
 
@@ -124,7 +124,7 @@ pnpm test
 pnpm bench         # tutor reply latency per Ollama model (pnpm bench <model…> for some)
 ```
 
-Courses are plain YAML files in [`courses/`](courses/en.yml). For the architecture and roadmap (in Turkish), see [docs/PLAN.md](docs/PLAN.md) and [docs/DECISIONS.md](docs/DECISIONS.md).
+Courses are plain YAML files in [`courses/`](courses/en.yml). For the course format, activity types and AI layer, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); for the phone companion, [docs/MOBILE.md](docs/MOBILE.md).
 
 ### Releasing
 

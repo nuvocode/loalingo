@@ -17,4 +17,4 @@ Good first contributions: A2 for Spanish, French, German or Turkish, or A1 for a
 
 - Branch from `master`, open the pull request against `test`.
 - Keep changes small and focused, and run `pnpm test` before pushing.
-- Design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md) (in Turkish; ask in the issue if something is unclear).
+- Design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md).

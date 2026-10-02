@@ -1,39 +1,30 @@
-# Sprigo — Geliştirme ve canlıya çıkış
+# Sprigo — Development and release
 
-Karar: 2026-10-01. Repo public kalıyor; GitHub Actions'ın macOS/Windows dakikaları public repoda ücretsiz,
-o yüzden bütün build'ler CI'da. Lokal/Docker build yok (aşağıda neden).
+The repo is public, so GitHub Actions' macOS and Windows minutes are free and every build runs in CI. There are no local or Docker builds (see below).
 
-## Akış
+## Flow
 
-1. **Branch:** Her geliştirme `master`'dan açılan bir branch'te yapılır (`feature/…`, `fix/…`, `chore/…`).
-2. **Test'e birleştirme:** Branch push edilir, `test`'e PR açılır ve PR ile birleştirilir. Küçük
-   değişiklikler PR'sız, doğrudan `test`'e `--no-ff` merge edilebilir. `test` push edilir.
-   - `test`'e her push'ta ve her PR'da `check` çalışır: typecheck, testler, 3 işletim sisteminde
-     `cargo check` (whisper.cpp dahil). Release build'lerini kıran hatalar çoğunlukla burada yakalanır.
-3. **Canlı öncesi duman testi:** `test` master'a geçmeden önce release build'i yayın yapmadan çalıştırılır:
+1. **Branch:** every change is made on a branch from `master` (`feature/…`, `fix/…`, `chore/…`).
+2. **Merge into test:** push the branch, open a PR against `test` and merge it. Small changes can be merged into `test` directly with `--no-ff`, without a PR. Push `test`.
+   - `check` runs on every push to `test` and every PR: typecheck, tests, and `cargo check` on three operating systems (whisper.cpp included). Most errors that would break a release build are caught here.
+3. **Smoke test before release:** before `test` goes to `master`, run the release build without publishing:
    ```bash
    gh workflow run release.yml --ref test
    ```
-   4 build de yeşilse devam (~15 dk, paralel). Paketleme/imzalama hataları burada çıkar, tag'den önce.
-4. **Master = canlı:** `test` → `master` yalnızca açık onayla. Önce sürüm yükseltilir (`package.json`,
-   `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, sonra `src-tauri`'de `cargo update -p sprigo --offline`).
-   Master push'unda `check` tekrar çalışır.
-5. **Release:** `check` master'da yeşilse tag atılır:
+   Continue when all four builds are green (~15 min, in parallel). Packaging and signing errors show up here, before the tag.
+4. **Master = live:** `test` → `master` only with explicit approval. Bump the version first (`package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, then `cargo update -p sprigo --offline` in `src-tauri`). `check` runs again on the push to `master`.
+5. **Release:** when `check` is green on `master`, push a tag:
    ```bash
    git tag v1.3.0 && git push origin v1.3.0
    ```
-   `release` 4 build'i yapar, dosyaları ve birleşik `latest.json`'ı **taslak** release'e ekler.
-6. **Yayın:** Taslak elle "Publish" edilir. Uygulama içi güncelleme yalnızca yayınlanmış release'i görür;
-   bu, son kontrol kapısıdır. Bir build kırmızıysa taslak yayınlanmaz, düzeltme yeni sürümle gelir.
+   `release` runs the four builds and uploads the files and a merged `latest.json` to a **draft** release.
+6. **Publish:** publish the draft by hand. The in-app updater only sees published releases, so this is the last gate. If a build is red, the draft is not published; the fix ships as a new version.
 
-## Neden lokal/Docker build yok
+## Why no local or Docker builds
 
-- **macOS:** Docker'da macOS build yapılamaz (macOS konteyneri yok). Bu Mac'te yapılabilir ama CI zaten
-  ücretsiz ve 6–8 dk.
-- **Windows:** Windows konteyneri Windows host ister; macOS'tan çapraz derleme (cargo-xwin) Tauri'de
-  deneysel, whisper.cpp'nin MSVC/CMake build'i ile kırılgan. En uzun build (~14 dk) ama ücretsiz.
-- **Linux:** Docker'da yapılabilir, ama tek başına kazandırdığı bir şey yok.
-- Build'leri iki yerden üretmek `latest.json`'ı birleştirmeyi elle yapmayı gerektirir; tek kaynak daha güvenli.
+- **macOS:** Docker cannot build for macOS (there are no macOS containers). A local Mac could, but CI is free and takes 6–8 min.
+- **Windows:** Windows containers need a Windows host; cross-compiling from macOS (cargo-xwin) is experimental in Tauri and fragile with whisper.cpp's MSVC/CMake build. The longest build (~14 min), but free.
+- **Linux:** possible in Docker, but it gains nothing on its own.
+- Producing builds in two places would mean merging `latest.json` by hand; one source is safer.
 
-Repo private olursa (macOS dakikası 10x, Windows 2x ücretli) macOS build'lerini bu Mac'e almak yeniden
-değerlendirilir.
+If the repo goes private (macOS minutes cost 10×, Windows 2×), moving the macOS builds to a local Mac is worth reconsidering.
