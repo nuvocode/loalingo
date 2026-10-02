@@ -430,7 +430,7 @@
       "ai": "AI & voice",
       "privacy": "Privacy & data"
     },
-    "profileDesc": "Name, color, PIN and native language",
+    "profileDesc": "Name, color and PIN",
     "edit": "Edit"
   },
   "rail": {
@@ -629,8 +629,16 @@
     "kokoroGood": "The most realistic; may lag a moment.",
     "about": "About {{name}}",
     "whisperGood": "Private and offline; a bit slower.",
+    "whisperModel": "Whisper model",
+    "whisperModelDesc": "Bigger models understand better but are slower and take disk space. Downloaded once, then they work offline.",
+    "whisperBase": "Standard",
+    "whisperBaseGood": "Comes with the app · fast",
+    "whisperSmall": "Advanced",
+    "whisperSmallGood": "190 MB · more accurate, a bit slower",
+    "whisperTurbo": "Best (large-v3 turbo)",
+    "whisperTurboGood": "574 MB · most accurate; needs a strong computer",
     "deepgramGood": "Fastest and most accurate; needs internet and a key.",
-    "configure": "Deepgram settings",
+    "configure": "{{name}} settings",
     "try": "Try it",
     "tryTitle": "Try {{name}}",
     "tryHint": "Say something; each sentence appears below when you pause.",
@@ -644,6 +652,7 @@
     "fellBack": "The voice you chose couldn't speak here, so Sprigo switched to the system voice. You can pick another voice in Settings.",
     "fellBackAction": "Go to Settings",
     "using": "Speaking with: {{name}}",
+    "notForLang": "Not available for {{lang}}",
     "engine": {
       "system": "System voice",
       "piper": "Piper",

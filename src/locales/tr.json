@@ -427,7 +427,7 @@
       "ai": "Yapay zekâ ve ses",
       "privacy": "Gizlilik ve veri"
     },
-    "profileDesc": "Ad, renk, PIN ve ana dil",
+    "profileDesc": "Ad, renk ve PIN",
     "edit": "Düzenle"
   },
   "rail": {
@@ -624,8 +624,16 @@
     "kokoroGood": "En gerçekçi ses; biraz gecikebilir.",
     "about": "{{name}} hakkında",
     "whisperGood": "Gizli ve çevrimdışı; biraz daha yavaş.",
+    "whisperModel": "Whisper modeli",
+    "whisperModelDesc": "Büyük modeller daha doğru anlar ama daha yavaştır ve diskte yer kaplar. Bir kez indirilir, sonra çevrimdışı çalışır.",
+    "whisperBase": "Standart",
+    "whisperBaseGood": "Uygulamayla gelir · hızlı",
+    "whisperSmall": "Gelişmiş",
+    "whisperSmallGood": "190 MB · daha doğru, biraz yavaş",
+    "whisperTurbo": "En iyi (large-v3 turbo)",
+    "whisperTurboGood": "574 MB · en doğru; güçlü bir bilgisayar ister",
     "deepgramGood": "En hızlı ve en doğru; internet ve anahtar gerekir.",
-    "configure": "Deepgram ayarları",
+    "configure": "{{name}} ayarları",
     "try": "Dene",
     "tryTitle": "{{name}} deneme",
     "tryHint": "Bir şey söyle; durakladığında her cümle aşağıda görünür.",
@@ -639,6 +647,7 @@
     "fellBack": "Yerel ses kullanılamadı, sistem sesine geçildi. Ayarlar'dan başka bir ses seçebilirsin.",
     "fellBackAction": "Ayarlar'a git",
     "using": "Şu an konuşan: {{name}}",
+    "notForLang": "{{lang}} için yok",
     "engine": {
       "system": "Sistem sesi",
       "piper": "Piper",

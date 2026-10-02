@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../store";
-import { getSetting, isCompanion, setSetting } from "../db";
-import { elevenVoice, getElevenKey, loadKokoro, loadPiper, localTts, sayWithEleven, sayWithLocal, setElevenKey, speak, speakingWith, TTS_KEY, ttsProvider, type TtsProvider } from "../tts";
+import { getSetting, isCompanion, isTauri, setSetting } from "../db";
+import { elevenVoice, getElevenKey, loadKokoro, loadPiper, localTts, sayWithEleven, sayWithLocal, setElevenKey, speak, speakingWith, TTS_KEY, ttsProvider, ttsSpeaks, type TtsProvider } from "../tts";
 import { ELEVEN_VOICES, LOCAL_TTS } from "../ttsCloud";
 import { Icon } from "../icons";
-import { deepgramTranscribe, getDeepgramKey, listen, resetSttReady, setDeepgramKey, sttProvider, sttReady, type Listener, type SttProvider } from "../stt";
+import { deepgramTranscribe, downloadWhisper, getDeepgramKey, listen, pickWhisper, resetSttReady, setDeepgramKey, sttProvider, sttReady, whisperModels, type Listener, type SttProvider, type WhisperModel } from "../stt";
 import { isNoise } from "../tutor";
+import { useLangName } from "./Profiles";
 import { wav16 } from "../wav";
 
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
@@ -47,14 +48,17 @@ export function InfoTip({ label, children }: { label: string; children: React.Re
 
 export function TtsRow() {
   const { t } = useTranslation();
-  const { openSheet } = useApp();
+  const { openSheet, course } = useApp();
+  const langName = useLangName();
+  const lang = course?.iso ?? "en";
   const [v, setV] = useState<TtsProvider>("system");
   useEffect(() => { ttsProvider().then(setV); }, []);
   const now = speakingWith(); // the last line spoke with another engine than the saved one (it fell back)
   return (
     <div className="card od-row" style={gap("12px")}>
       <span className="od-field od-fill"><b>{t("settings.tts")}</b><span className="muted small">{t(ttsName(v))}</span>
-        {now && now !== v && <span className="small" style={{ color: "var(--orange)" }}>{t("voice.using", { name: t(`voice.engine.${now}`) })}</span>}</span>
+        {now && now !== v && <span className="small" style={{ color: "var(--orange)" }}>{t("voice.using", { name: t(`voice.engine.${now}`) })}</span>}
+        {!ttsSpeaks(v, lang) && <span className="small" style={{ color: "var(--orange)" }}>{t("voice.notForLang", { lang: langName(lang) })}</span>}</span>
       <button className="btn btn-ghost" onClick={() => openSheet(<TtsSheet initial={v} onChange={setV} />)}>{t("settings.change")}</button>
     </div>
   );
@@ -63,6 +67,7 @@ export function TtsRow() {
 function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: TtsProvider) => void }) {
   const { t } = useTranslation();
   const { course, closeSheet, openSheet } = useApp();
+  const langName = useLangName();
   const lang = course?.iso ?? "en";
   const [v, setV] = useState(initial);
   const [pct, setPct] = useState<number | null>(null); // a local voice downloading
@@ -99,13 +104,14 @@ function TtsSheet({ initial, onChange }: { initial: TtsProvider; onChange: (v: T
       <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("settings.tts")}>
         {TTS.filter(({ p }) => !(isCompanion && p !== "system" && p !== "piper")).map(({ p, bars, color }) => (
           <div key={p} className={`voice-option${v === p ? " on" : ""}`}>
-            <button role="radio" aria-checked={v === p} disabled={pct !== null} onClick={() => pick(p)}>
+            <button role="radio" aria-checked={v === p} disabled={pct !== null || !ttsSpeaks(p, lang)} onClick={() => pick(p)}>
               <Signal bars={bars} color={color} />
-              <span className="od-field od-fill"><b>{t(ttsName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
+              <span className="od-field od-fill"><b>{t(ttsName(p))}</b>
+                <span className="muted small">{ttsSpeaks(p, lang) ? t(`voice.${p}Good`) : t("voice.notForLang", { lang: langName(lang) })}</span></span>
             </button>
-            {p === "elevenlabs" && <button className="icon-btn" aria-label={t("voice.configure")} onClick={configure}><Icon name="gear" /></button>}
+            {p === "elevenlabs" && <button className="icon-btn" aria-label={t("voice.configure", { name: "ElevenLabs" })} onClick={configure}><Icon name="gear" /></button>}
             {p === "kokoro" && <InfoTip label={t("voice.about", { name: "Kokoro" })}>{t("voice.kokoroDesc")} {t("voice.englishOnly")}</InfoTip>}
-            {p === "local" && <button className="icon-btn" aria-label={t("voice.configure")} onClick={configureLocal}><Icon name="gear" /></button>}
+            {p === "local" && <button className="icon-btn" aria-label={t("voice.configure", { name: t("settings.ttsLocal") })} onClick={configureLocal}><Icon name="gear" /></button>}
             {p === "elevenlabs" && <InfoTip label={t("voice.about", { name: "ElevenLabs" })}>{t("voice.elevenlabsDesc")}</InfoTip>}
             {p === "local" && <InfoTip label={t("voice.about", { name: t("settings.ttsLocal") })}>{t("voice.localDesc")}</InfoTip>}
           </div>
@@ -280,7 +286,8 @@ function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: S
               <span className="voice-icon" style={{ color }}><Icon name={icon} /></span>
               <span className="od-field od-fill"><b>{t(sttName(p))}</b><span className="muted small">{t(`voice.${p}Good`)}</span></span>
             </button>
-            {p === "deepgram" && hasKey && <button className="icon-btn" aria-label={t("voice.configure")} onClick={configure}><Icon name="gear" /></button>}
+            {p === "deepgram" && hasKey && <button className="icon-btn" aria-label={t("voice.configure", { name: "Deepgram" })} onClick={configure}><Icon name="gear" /></button>}
+            {p === "whisper" && isTauri && <button className="icon-btn" aria-label={t("voice.configure", { name: "Whisper" })} onClick={() => openSheet(<WhisperSheet onBack={back} />)}><Icon name="gear" /></button>}
             <InfoTip label={t("voice.about", { name: p === "deepgram" ? "Deepgram" : "Whisper" })}>{t(p === "deepgram" ? "voice.deepgramDesc" : "voice.whisperDesc")}</InfoTip>
           </div>
         ))}
@@ -289,6 +296,59 @@ function SttSheet({ initial, onChange }: { initial: SttProvider; onChange: (v: S
         <button className="btn btn-blue btn-block" onClick={() => openSheet(<SttTrySheet provider={v} onBack={back} />)}><Icon name="mic" /> {t("voice.try")}</button>
         <button className="btn btn-ghost btn-block" onClick={closeSheet}>{t("sheet.cancel")}</button>
       </div>
+    </div>
+  );
+}
+
+const WHISPER: WhisperModel[] = ["base", "small", "turbo"];
+const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
+
+/** Whisper model: the bundled one or a bigger download. Picking one downloads it if needed, then uses it. */
+function WhisperSheet({ onBack }: { onBack: () => void }) {
+  const { t } = useTranslation();
+  const { toast } = useApp();
+  const [cur, setCur] = useState<WhisperModel>("base");
+  const [have, setHave] = useState<WhisperModel[]>([]);
+  const [busy, setBusy] = useState<{ m: WhisperModel; pct: number } | null>(null);
+  const [err, setErr] = useState("");
+  useEffect(() => { whisperModels().then(([c, h]) => { setCur(c); setHave(h); }).catch((e) => setErr(String(e))); }, []);
+  const pick = async (m: WhisperModel) => {
+    if (busy || m === cur) return;
+    setErr("");
+    try {
+      if (m !== "base" && !have.includes(m)) {
+        setBusy({ m, pct: 0 });
+        await downloadWhisper(m, (pct) => setBusy({ m, pct }));
+        setHave((h) => [...h, m]);
+      }
+      await pickWhisper(m);
+      setCur(m);
+      toast(t("voice.saved"));
+    } catch (e) { setErr(String(e)); } // Tauri invoke rejects with strings
+    finally { setBusy(null); }
+  };
+  return (
+    <div className="od-stack" style={sheet}>
+      <h3 style={{ textAlign: "center" }}>{t("voice.whisperModel")}</h3>
+      <p className="small">{t("voice.whisperModelDesc")}</p>
+      <div className="od-stack" style={gap("8px")} role="radiogroup" aria-label={t("voice.whisperModel")}>
+        {WHISPER.map((m, i) => (
+          <div key={m} className={`voice-option${cur === m ? " on" : ""}`}>
+            <button role="radio" aria-checked={cur === m} disabled={!!busy} onClick={() => pick(m)}>
+              <Signal bars={i + 1} color="var(--green)" />
+              <span className="od-field od-fill"><b>{t(`voice.whisper${cap(m)}`)}</b><span className="muted small">{t(`voice.whisper${cap(m)}Good`)}</span></span>
+            </button>
+          </div>
+        ))}
+      </div>
+      {busy && (
+        <div className="od-stack" style={gap("6px")} role="status">
+          <div className="progress-track"><div className="progress-fill green" style={{ width: `${Math.round(busy.pct * 100)}%` }} /></div>
+          <span className="muted small">{t("voice.downloading", { pct: Math.round(busy.pct * 100) })}</span>
+        </div>
+      )}
+      {err && <p className="small" role="status" style={{ color: "var(--red)", overflowWrap: "anywhere" }}>{err}</p>}
+      <button className="btn btn-ghost btn-block" disabled={!!busy} onClick={onBack}>{t("voice.back")}</button>
     </div>
   );
 }

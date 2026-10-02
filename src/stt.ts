@@ -1,6 +1,6 @@
 // Speech-to-text (DECISIONS D2): microphone in the webview, bundled whisper.cpp in Rust (src-tauri/src/lib.rs).
 import { mark } from "./latency";
-import { invoke } from "@tauri-apps/api/core";
+import { Channel, invoke } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { isTauri, isCompanion, getSetting } from "./db";
 import { VAD, VAD_IDLE, concat, resample, rms, vadStep, type VadEvent } from "./audio";
@@ -28,6 +28,17 @@ export async function deepgramTranscribe(wav: Uint8Array, lang: string, key?: st
   });
   if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
   return (await r.json()).results?.channels?.[0]?.alternatives?.[0]?.transcript ?? "";
+}
+
+/** Whisper model sizes (src-tauri/src/lib.rs `stt_file`): "base" ships with the app, the others are downloaded on demand. */
+export type WhisperModel = "base" | "small" | "turbo";
+/** [model in use, downloaded models] */
+export const whisperModels = () => invoke<[WhisperModel, WhisperModel[]]>("stt_models");
+export const pickWhisper = (name: WhisperModel) => invoke("stt_use", { name });
+export function downloadWhisper(name: WhisperModel, onProgress: (p: number) => void) {
+  const progress = new Channel<number>();
+  progress.onmessage = onProgress;
+  return invoke("stt_download", { name, progress });
 }
 
 let ready: Promise<boolean> | undefined;

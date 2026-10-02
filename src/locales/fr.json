@@ -453,7 +453,7 @@
       "ai": "IA et voix",
       "privacy": "Confidentialité et données"
     },
-    "profileDesc": "Nom, couleur, code PIN et langue maternelle",
+    "profileDesc": "Nom, couleur et PIN",
     "edit": "Modifier"
   },
   "rail": {
@@ -654,8 +654,16 @@
     "kokoroGood": "Le plus réaliste ; peut avoir un petit délai.",
     "about": "À propos de {{name}}",
     "whisperGood": "Privé et hors ligne ; un peu plus lent.",
+    "whisperModel": "Modèle Whisper",
+    "whisperModelDesc": "Les grands modèles comprennent mieux mais sont plus lents et prennent de la place. Téléchargés une fois, ils marchent hors ligne.",
+    "whisperBase": "Standard",
+    "whisperBaseGood": "Inclus dans l'app · rapide",
+    "whisperSmall": "Avancé",
+    "whisperSmallGood": "190 Mo · plus précis, un peu plus lent",
+    "whisperTurbo": "Le meilleur (large-v3 turbo)",
+    "whisperTurboGood": "574 Mo · le plus précis ; demande un ordinateur puissant",
     "deepgramGood": "Le plus rapide et le plus précis ; nécessite Internet et une clé.",
-    "configure": "Réglages Deepgram",
+    "configure": "Réglages {{name}}",
     "try": "Essayer",
     "tryTitle": "Essayer {{name}}",
     "tryHint": "Dis quelque chose ; chaque phrase s'affiche ci-dessous quand tu fais une pause.",
@@ -669,6 +677,7 @@
     "fellBack": "La voix choisie n'a pas pu parler ici, Sprigo est donc passé à la voix du système. Tu peux choisir une autre voix dans les Paramètres.",
     "fellBackAction": "Aller aux Paramètres",
     "using": "Voix utilisée : {{name}}",
+    "notForLang": "Indisponible pour {{lang}}",
     "engine": {
       "system": "Voix du système",
       "piper": "Piper",

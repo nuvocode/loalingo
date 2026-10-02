@@ -50,11 +50,76 @@ fn secret_set(key: String, value: Option<String>) -> Result<(), String> {
 /// Speech-to-text (DECISIONS D2): whisper.cpp runs in-process (Metal on Apple silicon); the model ships inside
 /// the app bundle, so nothing has to be installed or started. Loaded on first use, then kept in memory.
 const STT_MODEL: &str = "resources/ggml-base-q5_1.bin";
-static STT: std::sync::Mutex<Option<whisper_rs::WhisperContext>> = std::sync::Mutex::new(None);
+static STT: std::sync::Mutex<Option<(std::path::PathBuf, whisper_rs::WhisperContext)>> = std::sync::Mutex::new(None);
+
+/// Bigger Whisper models the learner can download (Settings > Speech recognition > gear): `<app data>/models/<file>`.
+/// `models/whisper.txt` names the chosen one; without it (or its file) the bundled base model is used.
+fn stt_file(name: &str) -> Option<&'static str> {
+    match name {
+        "small" => Some("ggml-small-q5_1.bin"),
+        "turbo" => Some("ggml-large-v3-turbo-q5_0.bin"),
+        _ => None,
+    }
+}
+fn models_dir(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
+    Ok(app.path().app_data_dir().map_err(|e| e.to_string())?.join("models"))
+}
 
 fn stt_model(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
+    if let Ok(dir) = models_dir(app) {
+        let chosen = std::fs::read_to_string(dir.join("whisper.txt")).unwrap_or_default();
+        if let Some(p) = stt_file(chosen.trim()).map(|f| dir.join(f)).filter(|p| p.exists()) {
+            return Some(p);
+        }
+    }
     let p = app.path().resolve(STT_MODEL, tauri::path::BaseDirectory::Resource).ok()?;
     p.exists().then_some(p)
+}
+
+/// (model in use, downloaded models).
+#[tauri::command]
+fn stt_models(app: tauri::AppHandle) -> Result<(String, Vec<String>), String> {
+    let dir = models_dir(&app)?;
+    let chosen = std::fs::read_to_string(dir.join("whisper.txt")).unwrap_or_default().trim().to_string();
+    let have: Vec<String> = ["small", "turbo"].iter().filter(|n| dir.join(stt_file(n).unwrap()).exists()).map(|n| n.to_string()).collect();
+    Ok((if have.contains(&chosen) { chosen } else { "base".into() }, have))
+}
+
+/// Uses `name` from the next recording on; "base" is the bundled model.
+#[tauri::command]
+fn stt_use(app: tauri::AppHandle, name: String) -> Result<(), String> {
+    let dir = models_dir(&app)?;
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    std::fs::write(dir.join("whisper.txt"), name).map_err(|e| e.to_string())
+}
+
+/// Downloads `name` from the whisper.cpp model repo, reporting 0..1 on `progress`.
+#[tauri::command]
+async fn stt_download(app: tauri::AppHandle, name: String, progress: tauri::ipc::Channel<f64>) -> Result<(), String> {
+    let file = stt_file(&name).ok_or("unknown model")?;
+    let dir = models_dir(&app)?;
+    tauri::async_runtime::spawn_blocking(move || -> Result<(), String> {
+        use std::io::{Read, Write};
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let url = format!("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/{file}");
+        let client = tauri_plugin_http::reqwest::blocking::Client::builder().timeout(None).build().map_err(|e| e.to_string())?;
+        let mut res = client.get(url).send().and_then(|r| r.error_for_status()).map_err(|e| e.to_string())?;
+        let total = res.content_length().unwrap_or(0) as f64;
+        let part = dir.join(format!("{file}.part"));
+        let mut out = std::fs::File::create(&part).map_err(|e| e.to_string())?;
+        let (mut buf, mut got, mut sent) = (vec![0u8; 1 << 16], 0f64, 0f64);
+        loop {
+            let n = res.read(&mut buf).map_err(|e| e.to_string())?;
+            if n == 0 { break; }
+            out.write_all(&buf[..n]).map_err(|e| e.to_string())?;
+            got += n as f64;
+            if total > 0.0 && got / total - sent >= 0.01 { sent = got / total; let _ = progress.send(sent); }
+        }
+        drop(out);
+        std::fs::rename(&part, dir.join(file)).map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 
 #[tauri::command]
@@ -74,11 +139,12 @@ async fn transcribe(app: tauri::AppHandle, samples: Vec<f32>, lang: String) -> R
 fn whisper_text(model: &std::path::Path, samples: &[f32], lang: &str) -> Result<String, String> {
     // ponytail: one global lock, recordings are short and one learner speaks at a time
     let mut guard = STT.lock().map_err(|e| e.to_string())?;
-    if guard.is_none() {
+    if guard.as_ref().map_or(true, |(p, _)| p != model) { // first use, or another model was picked
+        guard.take(); // free the old one before loading the next
         let path = model.to_str().ok_or("bad model path")?;
-        *guard = Some(whisper_rs::WhisperContext::new_with_params(path, Default::default()).map_err(|e| e.to_string())?);
+        *guard = Some((model.to_path_buf(), whisper_rs::WhisperContext::new_with_params(path, Default::default()).map_err(|e| e.to_string())?));
     }
-    let mut state = guard.as_ref().unwrap().create_state().map_err(|e| e.to_string())?;
+    let mut state = guard.as_ref().unwrap().1.create_state().map_err(|e| e.to_string())?;
     let mut params = whisper_rs::FullParams::new(whisper_rs::SamplingStrategy::Greedy { best_of: 1 });
     params.set_language(Some(lang));
     params.set_print_progress(false);
@@ -165,7 +231,7 @@ pub fn run() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, transcribe, set_background,
+        .invoke_handler(tauri::generate_handler![list_user_courses, secret_get, secret_set, stt_ready, stt_models, stt_use, stt_download, transcribe, set_background,
             companion::companion_set, companion::companion_status, companion::companion_reply,
             data::data_location, data::set_data_dir, data::dir_ok, data::file_exists, data::lock_read, data::lock_write,
             data::lock_remove, data::backups_list, data::backups_remove, data::copy_file, data::is_sqlite, data::install_db])

@@ -10,7 +10,7 @@ import { levelRange, type Course } from "../course";
 
 const COLORS = ["#12b886", "#4c6ef5", "#b07cf0", "#f4862a", "#e91e63", "#00b8a9", "#f5b014", "#5c6bc0"];
 // ponytail: fixed list of native languages the AI can translate into; extend when someone asks.
-const NATIVE = ["en", "tr", "de", "fr", "es", "it", "pt", "ru", "ar", "ja", "ko", "zh"];
+export const NATIVE = ["en", "tr", "de", "fr", "es", "it", "pt", "ru", "ar", "ja", "ko", "zh"];
 const gap = (g: string) => ({ "--od-gap": g }) as React.CSSProperties;
 
 export function useLangName() {
@@ -46,7 +46,7 @@ export function ProfileForm({ initial, onDone }: { initial?: Profile; onDone?: (
     setBusy(true);
     try {
       if (initial) {
-        await updateProfile({ name: name.trim(), color, native_lang: native, ...(pin ? { pin } : {}) });
+        await updateProfile({ name: name.trim(), color, ...(pin ? { pin } : {}) });
         toast(t("profiles.saved"));
       } else {
         await createProfile({ name: name.trim(), color, native_lang: native, ui_lang: i18n.language, theme, pin: pin || null }, courseIso);
@@ -77,11 +77,13 @@ export function ProfileForm({ initial, onDone }: { initial?: Profile; onDone?: (
           </select>
         </label>
       )}
-      <label className="od-field"><b>{t("profiles.native")}</b><span className="muted small">{t("profiles.nativeDesc")}</span>
-        <select className="select" value={native} onChange={(e) => setNative(e.target.value)}>
-          {NATIVE.map((l) => <option key={l} value={l}>{langName(l)}</option>)}
-        </select>
-      </label>
+      {!initial && (
+        <label className="od-field"><b>{t("profiles.native")}</b><span className="muted small">{t("profiles.nativeDesc")}</span>
+          <select className="select" value={native} onChange={(e) => setNative(e.target.value)}>
+            {NATIVE.map((l) => <option key={l} value={l}>{langName(l)}</option>)}
+          </select>
+        </label>
+      )}
       {!initial && (
         <label className="od-field"><b>{t("profiles.course")}</b>
           <select className="select" value={courseIso} onChange={(e) => setCourseIso(e.target.value)}>

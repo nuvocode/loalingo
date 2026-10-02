@@ -44,6 +44,8 @@ const PIPER: Record<string, Record<"f" | "m", string>> = {
   tr: { f: "tr_TR-dfki-medium", m: "tr_TR-fahrettin-medium" },
 };
 const piperVoice = (lang: string, gender: "f" | "m" = "f") => PIPER[lang.slice(0, 2)]?.[gender];
+/** Can `p` speak `lang`? Kokoro is English only, Piper has the voices above; the rest are assumed to (they fall back if not). */
+export const ttsSpeaks = (p: TtsProvider, lang: string) => (p === "kokoro" ? lang.startsWith("en") : p === "piper" ? !!piperVoice(lang) : true);
 
 /** The engine and its voice for this language, or null for the system voice. */
 async function engineFor(lang: string, voice?: Voice, p?: TtsProvider): Promise<[Exclude<TtsProvider, "system">, string] | null> {

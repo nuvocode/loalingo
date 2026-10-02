@@ -7,7 +7,7 @@ import { SMALL_MODEL_B, isSmallModel } from "../modelSize";
 import { PROVIDERS, RECOMMENDED_OLLAMA, detectLocal, getKey, listModels, pullOllama, setKey, type AiConfig, type ProviderId } from "../ai";
 import { getSetting, isCompanion, isTauri, setSetting } from "../db";
 import { setCompanion, tailscaleStatus, type TailscaleStatus } from "../companion";
-import { CourseFlag, CourseSheet, ProfileForm, useLangName } from "./Profiles";
+import { CourseFlag, CourseSheet, NATIVE, ProfileForm, useLangName } from "./Profiles";
 import { notifyAllowed } from "../notify";
 import { findUpdate, UpdateSheet } from "../Update";
 import { DataSection } from "./DataSettings";
@@ -332,6 +332,12 @@ export function Settings() {
             <span className="od-field od-fill"><b>{course ? langName(course.iso) : "—"}</b>
               <span className="muted small">{t("settings.courseDesc", { level: enrollment?.level, native: langName(profile!.native_lang) })}</span></span>
             <button className="btn btn-ghost" onClick={() => openSheet(<CourseSheet />)}>{t("settings.change")}</button>
+          </div>
+          <div className="card od-row" style={gap("12px")}>
+            <label className="od-field od-fill" htmlFor="native-lang"><b>{t("profiles.native")}</b><span className="muted small">{t("profiles.nativeDesc")}</span></label>
+            <select id="native-lang" className="select" value={profile!.native_lang} onChange={(e) => updateProfile({ native_lang: e.target.value })}>
+              {NATIVE.map((l) => <option key={l} value={l}>{langName(l)}</option>)}
+            </select>
           </div>
           <div className="card od-row" style={gap("12px")}>
             <span className="od-field od-fill"><b>{profile!.name}</b><span className="muted small">{t("settings.profileDesc")}</span></span>
