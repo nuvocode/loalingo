@@ -8,6 +8,7 @@ import { CEFR, levelsOf, type Course, type CourseLevel, type Cefr } from "./cour
 import { looseTutor, tutorPrompt, tutorSchema, tutorSystem, type TutorEvent, type TutorMsg } from "./tutor";
 import { cleanOps, looseMemory, memoryPrompt, memorySchema, memorySystem, pickMemories, type MemorySource } from "./memory";
 import { practicePrompt, practiceSchema, toPracticeSet, type PracticeSet } from "./practice";
+import { cleanDebrief, debriefPrompt, debriefSchema, debriefSystem, looseDebrief, looseRoleTurn, rehearsalSystem, roleTurnSchema, type RehearsalBrief } from "./rehearsal";
 
 /** `A1:checkpoint` (path node) and `A1:test` (skip-level test) share one flow (DECISIONS B8). */
 export const examLevel = (id: string) => /^([ABC][12]):(checkpoint|test)$/.exec(id)?.[1] as Cefr | undefined;
@@ -228,6 +229,21 @@ export function chatTurn(c: Base & { about?: string[] }, who: CharacterId, topic
     : free ? "Open the chat: a short, friendly greeting and a first question about the topic."
     : "Open the scene: a short greeting that leads straight into the goal and invites the learner to start.";
   return generate(turnSchema, system, prompt, undefined, looseTurn);
+}
+
+/** Rehearsal: the next in-role turn as `brief.who`. No correction, no goal, and no learner facts: the brief is the whole context. */
+export function rehearseTurn(c: Base, brief: RehearsalBrief, history: ChatMsg[]) {
+  const who = brief.who.trim();
+  const prompt = history.length
+    ? `Conversation so far:\n${history.map((m) => `${m.from === "ai" ? who : "Learner"}: ${m.text}`).join("\n")}\n\nWrite ${who}'s next turn.`
+    : "Open the conversation the way it would really start.";
+  return generate(roleTurnSchema, rehearsalSystem(c, brief), prompt, undefined, looseRoleTurn);
+}
+
+/** One call after the learner steps out of role; entries that point at no turn are dropped. */
+export async function debrief(c: Base, brief: RehearsalBrief, learnerTurns: string[]) {
+  const d = await generate(debriefSchema, debriefSystem(c), debriefPrompt(c, brief, learnerTurns), undefined, looseDebrief);
+  return cleanDebrief(d, learnerTurns.length);
 }
 
 // ---- Guidebook (DECISIONS B8): the unit's vocabulary and grammar, explained once and cached ----

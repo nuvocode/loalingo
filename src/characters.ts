@@ -1,4 +1,5 @@
 // Roleplay cast. Pure data, no browser APIs: goals and personas are English prompt text, topic titles live in i18n as roleplay.topics.<char>.<topic>.
+import { parseBrief, type RehearsalBrief } from "./rehearsal.ts";
 export type Topic = { id: string; goal: string };
 /** Which parts and colors make up a character's cartoon bust. Parts are drawn in src/face/parts.tsx. */
 export type FaceSpec = {
@@ -92,8 +93,16 @@ export function talkId(voice: boolean, who: CharacterId, topic: string | { free:
   return `${voice ? "call" : "chat"}:${who}:${typeof topic === "string" ? topic : `${FREE}:${topic.free}`}`;
 }
 
-export function parseTalkId(id: string): { voice: boolean; who: CharacterId; topic: { id?: string; goal: string } } | null {
+/** What App routes a chat/call/rehearse id to; `rehearse` only on a rehearsal (see rehearsal.ts). */
+export type Talk = { voice: boolean; who: CharacterId; topic: { id?: string; goal: string }; rehearse?: RehearsalBrief };
+
+export function parseTalkId(id: string): Talk | null {
   const [kind, who, ...rest] = id.split(":");
+  if (kind === "rehearse") {
+    const [mode, enc] = rest, brief = enc === undefined ? null : parseBrief(enc);
+    if (!Object.prototype.hasOwnProperty.call(CHARACTERS, who) || (mode !== "chat" && mode !== "call") || rest.length !== 2 || !brief) return null;
+    return { voice: mode === "call", who: who as CharacterId, topic: { goal: brief.about ?? "" }, rehearse: brief };
+  }
   if ((kind !== "chat" && kind !== "call") || !Object.prototype.hasOwnProperty.call(CHARACTERS, who) || !rest.length) return null;
   const voice = kind === "call", c = who as CharacterId;
   if (rest[0] === FREE) {
