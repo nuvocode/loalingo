@@ -12,7 +12,7 @@ import { LEGEND_PRICE } from "../lessons";
 import { CHARACTERS, talkId, type CharacterId } from "../characters";
 import { rehearseId, type Formality } from "../rehearsal";
 import { currentUnit } from "../tutor";
-import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, nextPlanningSec, planningHistory } from "../drills";
+import { DRILL_MINUTES, FOUR_THREE_TWO_MINUTES, type Drill, drillId, ladderDrill, nextPlanningSec, planningHistory } from "../drills";
 import { Face } from "../face/Face";
 import { MemoryCard } from "./Memory";
 import { CoachCard } from "./Coach";
@@ -458,17 +458,19 @@ function DrillsSheet() {
   const [topic, setTopic] = useState(level ? currentUnit(level, done).title : "");
   const [cast, setCast] = useState<CharacterId>("leo");
   const [planSec, setPlanSec] = useState(60);
+  const [rung, setRung] = useState(1);
   useEffect(() => { if (profile) db.listSpeechSessions(profile.id, 100).then((rows) => setPlanSec(nextPlanningSec(planningHistory(rows)))).catch(() => {}); }, [profile?.id]);
   const list = [
     { id: "planning" as const, icon: "clock" as IconName, title: t("practice.planning"), desc: planSec ? t("practice.planningDesc", { sec: planSec, min: DRILL_MINUTES }) : t("practice.planningDescNone", { min: DRILL_MINUTES }) },
     { id: "432" as const, icon: "refresh" as IconName, title: t("practice.fourThreeTwo"), desc: t("practice.fourThreeTwoDesc") },
+    { id: "ladder" as const, icon: "bolt" as IconName, title: t("practice.ladder"), desc: t("practice.ladderDesc") },
   ];
   const go = (analysis = false) => {
-    if (!topic.trim() || !pick) return;
+    if ((!topic.trim() && !(pick === "ladder" && rung === 3)) || !pick) return;
     if (analysis) setS((s) => ({ ...s, speechOn: true }));
     closeSheet();
-    start(drillId(cast, pick === "432"
-      ? { kind: "432", topic: topic.trim(), planningSec: 0, minutes: FOUR_THREE_TWO_MINUTES[0], round: 1, prev: [] }
+    start(drillId(cast, pick === "ladder" ? ladderDrill(rung, topic.trim())
+      : pick === "432" ? { kind: "432", topic: topic.trim(), planningSec: 0, minutes: FOUR_THREE_TWO_MINUTES[0], round: 1, prev: [] }
       : { kind: "planning", topic: topic.trim(), planningSec: planSec, minutes: DRILL_MINUTES }));
   };
   if (!pick) return (
@@ -486,11 +488,20 @@ function DrillsSheet() {
   return (
     <div className="od-stack" style={{ "--od-gap": "14px", textAlign: "left" } as React.CSSProperties}>
       <h3 style={{ textAlign: "center" }}>{list.find((d) => d.id === pick)!.title}</h3>
-      <label className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+      {pick === "ladder" && <div className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
+        <b id="rung-pick">{t("practice.ladderRung")}</b>
+        <div className="seg" role="radiogroup" aria-labelledby="rung-pick">
+          {[1, 2, 3].map((r) => (
+            <button key={r} role="radio" aria-checked={rung === r} className={`btn ${rung === r ? "btn-blue" : "btn-ghost"}`} onClick={() => setRung(r)}>{r}</button>
+          ))}
+        </div>
+        <span className="muted small">{t(`practice.rung${rung}`)}</span>
+      </div>}
+      {!(pick === "ladder" && rung === 3) && <label className="od-field" style={{ "--od-gap": "6px" } as React.CSSProperties}>
         <b>{t("practice.drillTopic")}</b>
         <input className="input" value={topic} maxLength={120} placeholder={t("practice.drillTopicPlaceholder")}
           onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") go(); }} />
-      </label>
+      </label>}
       <CastPicker value={cast} onChange={setCast} />
       {pick === "432" && !s.speechOn && <p className="muted small">{t("practice.needAnalysis")}</p>}
       <span className="rp-actions sheet-actions">
@@ -498,7 +509,7 @@ function DrillsSheet() {
         {pick === "432" && !s.speechOn
           ? <><button className="btn btn-ghost" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>
             <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go(true)}>{t("practice.enableAndStart")}</button></>
-          : <button className="btn btn-blue" disabled={!topic.trim()} onClick={() => go()}>{t("practice.start")}</button>}
+          : <button className="btn btn-blue" disabled={!topic.trim() && !(pick === "ladder" && rung === 3)} onClick={() => go()}>{t("practice.start")}</button>}
       </span>
     </div>
   );
