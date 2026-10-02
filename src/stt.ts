@@ -53,7 +53,8 @@ export const resetSttReady = () => { ready = undefined; };
 
 export const MAX_RECORD_S = 15;
 
-/** Starts recording; `stop()` returns the transcript (`stop(false)` just releases the mic). Auto-stops after MAX_RECORD_S (onAutoStop fires). */
+/** Starts recording; `stop()` returns the transcript (`stop(false)` just releases the mic). Auto-stops after MAX_RECORD_S (onAutoStop fires).
+ *  With `native` the transcript also gets its speech signals; there is no tutor turn to time, so `latencyMs` is null. */
 export async function startRecording(lang: string, onAutoStop?: () => void, native?: string) {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
   const ctx = new AudioContext();
