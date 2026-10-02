@@ -93,6 +93,7 @@
     "timeUp": "Time's up!",
     "nextRound": "Next round",
     "roundN": "Round {{n}} · {{min}} min",
+    "rungN": "Ladder · rung {{n}}",
     "roundsTitle": "Your three rounds",
     "roundsWpm": "Words/min",
     "roundsPause": "Pauses",

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { REPETITION_RULE, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
+import { NOVEL_TOPICS, REPETITION_RULE, ladderDrill, drillConditions, drillId, drillRules, mmss, nextPlanningSec, parseDrill, planningHistory, roundStat, type Drill } from "./drills.ts";
 import { parseTalkId } from "./characters.ts";
 import type { SessionRow } from "./speech.ts";
 
@@ -78,4 +78,21 @@ test("roundStat keeps only the compared numbers", () => {
   assert.equal(roundStat(null), null);
   assert.deepEqual(roundStat({ utterances: 3, silences: 0, latencyMs: null, wpm: 101, pauseRatio: 0.1, longPauses: 1, level: 0.1, fillers: 2, words: 40, nativeWords: 0, speechMs: 20000 }),
     { wpm: 101, pauseRatio: 0.1, fillers: 2 });
+});
+
+test("ladderDrill + drillConditions: 3 rungs, each a little harder", () => {
+  const [a, b, c] = [1, 2, 3].map((r) => ladderDrill(r, "my job", () => 0));
+  assert.deepEqual(a, { kind: "ladder", topic: "my job", planningSec: 60, minutes: 3, rung: 1 });
+  assert.deepEqual(b, { kind: "ladder", topic: "my job", planningSec: 0, minutes: 3, rung: 2 });
+  assert.deepEqual(c, { kind: "ladder", topic: NOVEL_TOPICS[0], planningSec: 0, minutes: 3, rung: 3 });
+  assert.equal(ladderDrill(3, "my job", () => 0.999).topic, NOVEL_TOPICS[NOVEL_TOPICS.length - 1]);
+  assert.deepEqual(drillConditions(a), { mode: "drill", drill: "ladder", planningTimeSec: 60, topicFamiliarity: "prepared", rung: 1 });
+  assert.deepEqual(drillConditions(b), { mode: "drill", drill: "ladder", planningTimeSec: 0, topicFamiliarity: "prepared", rung: 2 });
+  assert.deepEqual(drillConditions(c), { mode: "drill", drill: "ladder", planningTimeSec: 0, topicFamiliarity: "novel", rung: 3 });
+});
+
+test("ladder id round-trips; rung 4 is not a drill", () => {
+  const d = ladderDrill(1, "my job: the hard part");
+  assert.deepEqual(parseTalkId(drillId("tom", d))?.drill, d);
+  assert.equal(parseDrill(["ladder", encodeURIComponent(JSON.stringify({ rung: 4, topic: "x" }))]), null);
 });

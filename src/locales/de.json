@@ -93,6 +93,7 @@
     "timeUp": "Zeit ist um!",
     "nextRound": "Nächste Runde",
     "roundN": "Runde {{n}} · {{min}} Min.",
+    "rungN": "Leiter · Stufe {{n}}",
     "roundsTitle": "Deine drei Runden",
     "roundsWpm": "Wörter/Min.",
     "roundsPause": "Pausen",

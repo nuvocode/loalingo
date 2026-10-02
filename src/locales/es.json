@@ -96,6 +96,7 @@
     "timeUp": "¡Se acabó el tiempo!",
     "nextRound": "Siguiente ronda",
     "roundN": "Ronda {{n}} · {{min}} min",
+    "rungN": "Escalera · peldaño {{n}}",
     "roundsTitle": "Tus tres rondas",
     "roundsWpm": "Palabras/min",
     "roundsPause": "Pausas",

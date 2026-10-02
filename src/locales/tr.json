@@ -93,6 +93,7 @@
     "timeUp": "Süre doldu!",
     "nextRound": "Sonraki tur",
     "roundN": "{{n}}. tur · {{min}} dk",
+    "rungN": "Merdiven · {{n}}. basamak",
     "roundsTitle": "Üç turun",
     "roundsWpm": "Kelime/dk",
     "roundsPause": "Duraklama",

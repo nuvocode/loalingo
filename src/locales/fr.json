@@ -96,6 +96,7 @@
     "timeUp": "Temps écoulé !",
     "nextRound": "Manche suivante",
     "roundN": "Manche {{n}} · {{min}} min",
+    "rungN": "Échelle · échelon {{n}}",
     "roundsTitle": "Tes trois manches",
     "roundsWpm": "Mots/min",
     "roundsPause": "Pauses",
