@@ -444,6 +444,14 @@ button.bubble:hover{border-color:var(--blue)}
 /* Guidebook sheet (DECISIONS B8; not in the design) */
 .sheet:has(.guide){max-width:620px;text-align:left}
 .sheet:has(.sheet-wide){max-width:560px;text-align:left}
+.mem-list{list-style:disc;padding-left:22px;margin:4px 0 0}
+.mem-list li::marker{color:var(--text-faint)}
+.mem-item{display:flex;align-items:flex-start;gap:4px}
+.mem-text{flex:1;min-width:0;text-align:left;font:inherit;padding:3px 0;overflow-wrap:anywhere}
+.mem-text:hover{text-decoration:underline;text-decoration-color:var(--text-faint)}
+.mem-x{flex:none;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-faint)}
+.mem-x:hover,.mem-x:focus-visible{background:var(--surface);color:var(--red)}
+.mem-forget{align-self:flex-start;font-weight:800;color:var(--red)}
 .summary-card{text-align:left;align-content:start;cursor:pointer;font:inherit;color:inherit}
 .summary-card:hover{border-color:var(--blue)}
 @media (max-width:560px){.profile-cards{grid-template-columns:1fr}}
