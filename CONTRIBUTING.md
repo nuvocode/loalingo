@@ -12,7 +12,7 @@ By taking part you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Courses (no code needed)
 
-Each course is one YAML file in [`courses/`](courses/). It lists levels (CEFR) > units > steps, with each step's vocabulary, grammar patterns and activity types. The AI writes the actual exercises from that, so a course is mostly a well-ordered syllabus.
+Each course is one YAML file in [`courses/`](courses/). It lists levels (CEFR) > units > steps, with each step's vocabulary, grammar patterns and activity types. The AI writes the actual exercises from that, so a course is mostly a well-ordered syllabus. The [Writing a Course](https://github.com/ozerozdas/sprigo/wiki/Writing-a-Course) wiki page walks through the format with an example.
 
 - Copy the shape of an existing file. [`courses/es.yml`](courses/es.yml) is a compact A1 example, [`courses/en.yml`](courses/en.yml) goes up to C2.
 - Titles and descriptions are in English; vocabulary and example patterns are in the target language.
@@ -25,13 +25,14 @@ Good first contributions: A2 for Spanish, French, German or Turkish, or A1 for a
 
 ### Setup
 
-Requires Node.js with pnpm, Rust, and the [Tauri prerequisites](https://tauri.app/start/prerequisites/). For the AI, install [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) and pull a model (see [Set up an AI model](README.md#set-up-an-ai-model)).
+Requires Node.js with pnpm, Rust, and the [Tauri prerequisites](https://tauri.app/start/prerequisites/). For the AI, install [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) and pull a model (see [AI Model Setup](https://github.com/ozerozdas/sprigo/wiki/AI-Model-Setup) in the wiki).
 
 ```bash
 pnpm install
 pnpm fetch-model   # downloads the whisper speech model into src-tauri/resources
 pnpm tauri dev     # desktop app
 pnpm dev           # browser preview (no speech, dev storage in localStorage)
+pnpm bench         # tutor reply latency per Ollama model (pnpm bench <model…> for some)
 ```
 
 How the app fits together is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); design decisions and their reasons are in [docs/DECISIONS.md](docs/DECISIONS.md).
