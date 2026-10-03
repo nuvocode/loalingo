@@ -1,0 +1,19 @@
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem or wish?
+      description: What are you trying to do, and what gets in the way? A real situation from your learning helps most.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How could Sprigo help? Rough is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Anything you've tried or seen elsewhere?
