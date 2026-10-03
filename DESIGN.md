@@ -1,6 +1,6 @@
 ---
 name: Sprigo
-description: Warm, playful, chunky UI for a local-first language learning app. A garden theme: things grow as you learn.
+description: "Warm, playful, chunky UI for a local-first language learning app. A garden theme: things grow as you learn."
 colors:
   light:
     bg: "#fbf8f1"
