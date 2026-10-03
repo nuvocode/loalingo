@@ -47,5 +47,10 @@
     "sql.js": "^1.14.2",
     "typescript": "~6.0.3",
     "vite": "^8.0.16"
+  },
+  "pnpm": {
+    "overrides": {
+      "sharp": ">=0.35.4"
+    }
   }
 }
