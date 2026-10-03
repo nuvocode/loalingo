@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://github.com/ozerozdas/sprigo/releases/latest"><img src="https://img.shields.io/github/v/release/ozerozdas/sprigo" alt="Latest release"></a>
+  <a href="https://github.com/ozerozdas/sprigo/releases"><img src="https://img.shields.io/github/downloads/ozerozdas/sprigo/total" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/ozerozdas/sprigo" alt="MIT license"></a>
   <a href="https://github.com/ozerozdas/sprigo/discussions"><img src="https://img.shields.io/github/discussions/ozerozdas/sprigo" alt="Discussions"></a>
   <a href="https://github.com/ozerozdas/sprigo/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22"><img src="https://img.shields.io/github/issues/ozerozdas/sprigo/good%20first%20issue?color=7057ff" alt="Good first issues"></a>
