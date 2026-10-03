@@ -1,0 +1,33 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Many answers are already in the [wiki](https://github.com/ozerozdas/sprigo/wiki), especially [Troubleshooting](https://github.com/ozerozdas/sprigo/wiki/Troubleshooting). If something is clearly broken, a [bug report](https://github.com/ozerozdas/sprigo/issues/new?template=bug.yml) is the better place.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What are you trying to do, and what happens?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Sprigo version
+      description: Shown under Settings → Updates.
+      placeholder: "1.5.0"
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS (Apple silicon), macOS (Intel), Windows, Linux, Phone companion]
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI provider
+      options: [Ollama, LM Studio, OpenAI, Anthropic, Gemini, OpenRouter, Not set up yet, Not related to AI]
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: "qwen3:8b"
