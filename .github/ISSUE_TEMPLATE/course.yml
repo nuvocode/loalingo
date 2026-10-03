@@ -1,0 +1,33 @@
+name: Course request or fix
+description: A new language, a new level, or a mistake in an existing course.
+labels: ["area:courses"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Courses are YAML files in [`courses/`](https://github.com/ozerozdas/sprigo/tree/master/courses) and need no code. If you'd like to write it yourself, say so below; [CONTRIBUTING.md](https://github.com/ozerozdas/sprigo/blob/master/CONTRIBUTING.md#courses-no-code-needed) explains the format.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of change?
+      options: [New language, New level for an existing language, Fix in an existing course]
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language and level
+      placeholder: "Italian A1"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: For a fix, the file, unit and step plus what's wrong. For a new course, anything we should know.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to write this course or fix myself.

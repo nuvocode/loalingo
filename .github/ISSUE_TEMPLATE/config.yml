@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or setup help
+    url: https://github.com/ozerozdas/sprigo/discussions/categories/q-a-help
+    about: Installing, choosing a model, voice setup. Ask in Q&A.
+  - name: Feature idea
+    url: https://github.com/ozerozdas/sprigo/discussions/categories/ideas-feature-requests
+    about: Share and discuss ideas before they become issues.
