@@ -1,0 +1,62 @@
+name: Bug report
+description: Something in Sprigo doesn't work as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Questions and setup help go to [Q&A](https://github.com/ozerozdas/sprigo/discussions/categories/q-a-help).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a lesson in the Spanish A1 course
+        2. Tap the mic
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Sprigo version
+      description: Shown under Settings → Updates.
+      placeholder: "1.5.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS (Apple silicon), macOS (Intel), Windows, Linux, Phone companion]
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI provider
+      options: [Ollama, LM Studio, OpenAI, Anthropic, Gemini, OpenRouter, Not related to AI]
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: "gemma3:4b"
+  - type: input
+    id: voice
+    attributes:
+      label: Speech engines (if it's about voice)
+      placeholder: "Whisper + Piper"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Anything from the console or a screenshot helps.
