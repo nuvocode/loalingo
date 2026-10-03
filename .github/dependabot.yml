@@ -1,0 +1,37 @@
+# Monthly version updates, one grouped PR per ecosystem, into test.
+# Security updates are separate and always target master.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: test
+    schedule:
+      interval: monthly
+    groups:
+      npm:
+        patterns: ["*"]
+    ignore:
+      # Tauri major upgrades are done by hand.
+      - dependency-name: "@tauri-apps/*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    target-branch: test
+    schedule:
+      interval: monthly
+    groups:
+      cargo:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "tauri*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: test
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
