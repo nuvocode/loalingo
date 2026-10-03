@@ -14,6 +14,10 @@ updates:
       # Tauri major upgrades are done by hand.
       - dependency-name: "@tauri-apps/*"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # Pinned for piper-tts-web; bump only with a Piper voice check.
+      - dependency-name: "onnxruntime-web"
 
   - package-ecosystem: cargo
     directory: /src-tauri
